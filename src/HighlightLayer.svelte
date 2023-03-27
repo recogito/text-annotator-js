@@ -13,9 +13,25 @@
   });
 
   store.observe(event => {
+    const context = canvas.getContext('2d');
+    context.fillStyle = 'rgba(0, 128, 255, 0.3)';
+
+    const offset = container.getBoundingClientRect();
+
+
     const { created, updated, deleted } = event.changes;
 
     console.log('store change', created, updated, deleted);
+
+    created.forEach(annotation => {
+      const { selector } = annotation.target;
+
+      // Just a hack for now
+      Array.from(selector.getClientRects()).forEach(rect => {
+        const { x, y, width, height } = rect;
+        context.fillRect(x - offset.x, y - offset.y, width, height);
+      });
+    });
     
     /*
     created.forEach(annotation => stage.addAnnotation(annotation));
@@ -36,6 +52,10 @@
 <style>
   :global(.r6o-annotatable, .r6o-annotatable *) {
     position: relative;
+  }
+
+  :global(.r6o-annotatable ::selection) {
+    background-color: transparent;
   }
 
   .r6o-annotation-canvas {
