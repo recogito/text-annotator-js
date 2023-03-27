@@ -16,5 +16,8 @@
     "svelte-preprocess": "^5.0.1",
     "typescript": "^4.9.5",
     "vite": "^4.1.4"
+  },
+  "dependencies": {
+    "@annotorious/core": "file:../../annotorious/annotorious-3/packages/annotorious-core"
   }
 }
