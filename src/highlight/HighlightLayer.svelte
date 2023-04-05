@@ -13,7 +13,7 @@
 
   let height = container.offsetHeight;
 
-  const highlights: TextAnnotation[] = [];
+  let highlights: TextAnnotation[] = [];
 
   const reviveRange = (annotation: TextAnnotation): TextAnnotation => {
     const { quote, start, end } = annotation.target.selector;
@@ -91,6 +91,7 @@
 
   store.observe(event => {
     const context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
     context.fillStyle = 'rgba(0, 128, 255, 0.2)';
 
     const offset = container.getBoundingClientRect();
@@ -100,27 +101,26 @@
     console.log('store change', created, updated, deleted);
 
     created.forEach(annotation => {
+      console.log('Created!')
       const revived = reviveRange(annotation);
-
-      const { selector } = revived.target;
-
       highlights.push(revived);
+    });
 
-      // Just a hack for now
-      Array.from(selector.range.getClientRects()).forEach(rect => {
+    updated.forEach(({ oldValue, newValue }) => {
+      highlights = highlights.map(annotation => 
+        annotation.id === newValue.id ? 
+          reviveRange(newValue) : annotation);
+    });
+
+    console.log('redrawing annotations', highlights);
+
+    // Just a hack for now
+    highlights.forEach(annotation => {
+      Array.from(annotation.target.selector.range.getClientRects()).forEach(rect => {
         const { x, y, width, height } = rect;
         context.fillRect(x - offset.x, y - offset.y - 2.5, width, height + 5);
       });
     });
-
-
-    /*
-    created.forEach(annotation => stage.addAnnotation(annotation));
-    updated.forEach(({ oldValue, newValue }) => stage.updateAnnotation(oldValue, newValue));
-    deleted.forEach(annotation => stage.removeAnnotation(annotation));
-    
-    stage.redraw();
-    */
   });
 </script>
 
