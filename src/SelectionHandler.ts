@@ -2,21 +2,32 @@ import type { User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotationStore } from './state';
 
-export const SelectionHandler = (store: TextAnnotationStore) => {
+export const SelectionHandler = (container: HTMLElement, store: TextAnnotationStore) => {
 
   let currentUser: User;
 
   const setUser = (user: User) => currentUser = user;
 
-  document.addEventListener('selectionchange', () => {
-    // TODO for future use (touch!)
+  container.addEventListener('selectstart', () => {
+    // Show native browser selection
+    delete container.dataset.native;
+  });
+
+  document.addEventListener('selectionchange', () => {   
+    const selection = document.getSelection();
+
+    if (!selection.isCollapsed) 
+      console.log('changed!')
   });
 
   document.addEventListener('pointerup', () => {
     const selection = document.getSelection();
 
     if (selection.isCollapsed)
-      return
+      return;
+
+    // Hide native browser selection
+    container.dataset.native = 'hidden';
 
     const ranges = Array.from(Array(selection.rangeCount).keys())
       .map(idx => selection.getRangeAt(idx));

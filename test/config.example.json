@@ -1,0 +1,9 @@
+{
+  "base": "[your-project-id].supabase.co",
+  "apiKey": "your-anonymous-key",
+  "channel": "room1",
+  "user": {
+    "id": "aboutgeo",
+    "name": "Rainer"
+  }
+}

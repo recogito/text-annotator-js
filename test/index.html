@@ -15,7 +15,7 @@
       }
 
       #content {
-        width: 800px;
+        max-width: 800px;
         background-color: #fff;
         padding: 40px;
         border-style: solid;
@@ -69,9 +69,19 @@
 
     <script type="module">
       import { TextAnnotator } from '../src/index.ts';
+      import { SupabasePlugin } from '@annotorious/supabase';
 
-      window.onload = function() {
+      window.onload = async function() {
         var anno = TextAnnotator(document.getElementById('content'));
+
+        anno.on('createAnnotation', annotation => {
+          console.log('created', annotation);
+        });
+
+        var config = await fetch('config.json').then((response) => response.json());
+
+        var supabase = SupabasePlugin(anno, config);
+        supabase.connect();
       }
     </script>
   </body>
