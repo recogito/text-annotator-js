@@ -1,6 +1,21 @@
 import type { User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotationStore } from './state';
+import type { TextSelector } from './model';
+
+export const rangeToSelector = (range: Range, container: HTMLElement): TextSelector => {
+  const rangeBefore = document.createRange();
+
+  // A helper range from the start of the contentNode to the start of the selection
+  rangeBefore.setStart(container, 0);
+  rangeBefore.setEnd(range.startContainer, range.startOffset);
+
+  const quote = range.toString();
+  const start = rangeBefore.toString().length;
+  const end = start + quote.length;
+
+  return {  quote, start, end, range };
+}
 
 export const SelectionHandler = (container: HTMLElement, store: TextAnnotationStore) => {
 
@@ -16,8 +31,8 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
   document.addEventListener('selectionchange', () => {   
     const selection = document.getSelection();
 
-    if (!selection.isCollapsed) 
-      console.log('changed!')
+    // if (!selection.isCollapsed) 
+    //   console.log('changed!')
   });
 
   document.addEventListener('pointerup', () => {
@@ -40,7 +55,7 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
         bodies: [],
         target: {
           annotation: id,
-          selector: range,
+          selector: rangeToSelector(range, container),
           creator: currentUser,
           created: new Date()
         }

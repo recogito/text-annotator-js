@@ -8,6 +8,18 @@ export interface TextAnnotation extends Annotation {
 
 export interface TextAnnotationTarget extends AnnotationTarget {
 
-  selector: Range;
+  selector: TextSelector;
+
+}
+
+export interface TextSelector {
+
+  quote: string;
+  
+  start: number;
+
+  end: number;
+
+  range: Range;
 
 }

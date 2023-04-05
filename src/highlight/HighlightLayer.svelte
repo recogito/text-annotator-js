@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { TextAnnotation } from '@/model';
+  import type { TextAnnotation } from '@/model';
   import { onMount } from 'svelte';
   import type { TextAnnotationStore } from '../state';
 
@@ -14,6 +14,52 @@
   let height = container.offsetHeight;
 
   const highlights: TextAnnotation[] = [];
+
+  const reviveRange = (annotation: TextAnnotation): TextAnnotation => {
+    const { quote, start, end } = annotation.target.selector;
+
+    const iterator = document.createNodeIterator(container, NodeFilter.SHOW_TEXT);
+
+    let runningOffset = 0;
+
+    let range = document.createRange();
+
+    let n = iterator.nextNode();
+
+    // Set start
+    while (n !== null) {
+      const len = n.textContent.length;
+
+      if (runningOffset + len > start) {
+        range.setStart(n, start - runningOffset);
+        break;
+      }
+
+      runningOffset += len;
+
+      n = iterator.nextNode();
+    }
+
+    while (n !== null) {
+      const len = n.textContent.length;
+
+      if (runningOffset + len > end) {
+        range.setEnd(n, end - runningOffset);
+        break;
+      }
+
+      runningOffset += len;
+      n = iterator.nextNode();
+    }
+
+    return {
+      ...annotation,
+      target: {
+        ...annotation.target,
+        selector: { quote, start, end, range }
+      }
+    }
+  }
 
   onMount(() => {
     container.classList.add('r6o-annotatable');
@@ -32,7 +78,7 @@
           context.fillStyle = 'rgba(0, 128, 255, 0.3)';
           
           // Just a hack for now
-          Array.from(selector.getClientRects()).forEach(rect => {
+          Array.from(selector.range.getClientRects()).forEach(rect => {
             const { x, y, width, height } = rect;
             context.fillRect(x - offset.x, y - offset.y, width, height);
           });
@@ -54,12 +100,14 @@
     console.log('store change', created, updated, deleted);
 
     created.forEach(annotation => {
-      const { selector } = annotation.target;
+      const revived = reviveRange(annotation);
 
-      highlights.push(annotation);
-    
+      const { selector } = revived.target;
+
+      highlights.push(revived);
+
       // Just a hack for now
-      Array.from(selector.getClientRects()).forEach(rect => {
+      Array.from(selector.range.getClientRects()).forEach(rect => {
         const { x, y, width, height } = rect;
         context.fillRect(x - offset.x, y - offset.y - 2.5, width, height + 5);
       });
