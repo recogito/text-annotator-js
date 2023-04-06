@@ -1,7 +1,7 @@
 import { Origin, type AnnotationTarget, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotationStore } from './state';
-import type { TextAnnotation, TextSelector } from './model';
+import type { TextSelector } from './model';
 
 export const rangeToSelector = (range: Range, container: HTMLElement): TextSelector => {
   const rangeBefore = document.createRange();

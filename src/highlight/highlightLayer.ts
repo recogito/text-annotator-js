@@ -21,6 +21,21 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
 
   container.insertBefore(canvas, container.firstChild);
 
+  container.addEventListener('pointermove', (event: PointerEvent) => {
+    const {x, y} = container.getBoundingClientRect();
+    const hovered = store.getAt(event.clientX - x, event.clientY - y);
+    if (hovered) {
+      canvas.classList.add('hover');
+
+      if (store.hover.current !== hovered.id)
+        store.hover.set(hovered.id);
+    } else {
+      canvas.classList.remove('hover');
+      if (store.hover.current)
+        store.hover.set(null);
+    }
+  });
+
   const context = canvas.getContext('2d');
 
   let renderedIds = new Set<string>();

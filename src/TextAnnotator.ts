@@ -15,6 +15,10 @@ export const TextAnnotator = (container: HTMLElement, options: TextAnnotatorOpti
 
   const lifecycle = createLifecyleObserver(store.selection, store);
 
+  store.hover.subscribe(id => {
+    console.log('hover change', id ? store.getAnnotation(id) : null);
+  });
+
   let currentUser = options.readOnly ? null : createAnonymousGuest();
 
   const highlightLayer = createHighlightLayer(container, store);

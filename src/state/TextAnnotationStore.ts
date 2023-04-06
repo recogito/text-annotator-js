@@ -1,4 +1,4 @@
-import { Origin, createSelectionState, createStore} from '@annotorious/core';
+import { Origin, createHoverState, createSelectionState, createStore} from '@annotorious/core';
 import { createSpatialTree } from './spatialTree';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
 
@@ -64,6 +64,8 @@ export const createTextStore = (container: HTMLElement) => {
 
   const selection = createSelectionState<TextAnnotation>(store);
 
+  const hover = createHoverState(store);
+
   // Wrap store interface to intercept annotations and revive DOM ranges, if needed
   const addAnnotation = (annotation: TextAnnotation, origin = Origin.LOCAL) => {
     const revived = annotation.target.selector.range instanceof Range ?
@@ -124,6 +126,7 @@ export const createTextStore = (container: HTMLElement) => {
     bulkUpdateTarget,
     getAt,
     getIntersecting,
+    hover,
     recalculatePositions,
     selection,
     updateTarget
