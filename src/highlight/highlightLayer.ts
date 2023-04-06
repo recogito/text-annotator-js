@@ -1,5 +1,7 @@
 import type { TextAnnotationStore } from '../state';
 
+import './highlightLayer.css';
+
 /**
  * Returns true if set a is equal to b, or if a is a subset of b. 
  * @param a set A
@@ -10,7 +12,6 @@ const equalOrSubset = (a: Set<string>, b: Set<string>) =>
   a.size <= b.size && [...a].every(value => b.has(value));
 
 export const createHighlightLayer = (container: HTMLElement, store: TextAnnotationStore) => {
-
   container.classList.add('r6o-annotatable');
 
   const canvas = document.createElement('canvas');
@@ -37,7 +38,7 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
     return { minX, minY, maxX, maxY };
   }
 
-  const onScroll = () => redraw(false);
+  const onScroll = () => redraw(true);
 
   document.addEventListener('scroll', onScroll, true);
 
@@ -63,8 +64,6 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
       // Don't re-render if there are no new annotations
       return;
 
-    console.log('drawing ' + annotationsInView.length + ' annotations');
-
     requestAnimationFrame(() => {
       context.clearRect(0, 0, canvas.width, canvas.height);
       context.fillStyle = 'rgba(0, 128, 255, 0.2)';
@@ -75,11 +74,17 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
           context.fillRect(x - offset.x, y - offset.y - 2.5, width, height + 5);
         });
       });
-
-      renderedIds = ids;
     });
+
+    renderedIds = ids;
   }
 
-  store.observe(() => redraw());
+  store.observe(({ changes }) => {
+    const updatedIds = (changes.updated || []).map(update => update.newValue.id);
+
+    // Check if any rendered annotations are affected by updates
+    const affectsRendered = updatedIds.some(id => renderedIds.has(id));
+    redraw(!affectsRendered);
+  });
 
 }

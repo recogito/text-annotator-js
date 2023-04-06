@@ -16,22 +16,24 @@ interface IndexedHighlightRect {
 
 }
 
-export const createSpatialTree = (store: Store<TextAnnotation>) => {
+export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLElement) => {
 
   const tree = new RBush<IndexedHighlightRect>();
 
   // Helper: converts a single text annotation target to a list of hightlight rects
   const toItems = (target: TextAnnotationTarget): IndexedHighlightRect[] => {
+    const offset = container.getBoundingClientRect();
+
     const rects = Array.from(target.selector.range.getClientRects());
 
     return rects.map(rect => {
       const { x, y, width, height } = rect;
 
       return {
-        minX: x,
-        minY: y,
-        maxX: x + width,
-        maxY: y + height,
+        minX: x - offset.x,
+        minY: y - offset.y,
+        maxX: x - offset.x + width,
+        maxY: y - offset.y + height,
         annotationId: target.annotation
       }
     });

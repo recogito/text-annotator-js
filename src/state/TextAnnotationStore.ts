@@ -60,7 +60,7 @@ export const createTextStore = (container: HTMLElement) => {
 
   const store = createStore<TextAnnotation>();
 
-  const tree = createSpatialTree(store);
+  const tree = createSpatialTree(store, container);
 
   const selection = createSelectionState<TextAnnotation>(store);
 
