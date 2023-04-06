@@ -1,8 +1,8 @@
 import { createAnonymousGuest, type AnnotationLayer, type User, createLifecyleObserver } from '@annotorious/core';
 import type { TextAnnotation } from './model/TextAnnotation';
-import HighlightLayer from './highlight/HighlightLayer.svelte';
 import { SelectionHandler } from './SelectionHandler';
 import { createTextStore } from './state';
+import { createHighlightLayer } from './highlight/highlightLayer';
 import type { TextAnnotatorOptions } from './TextAnnotatorOptions';
 
 import './TextAnnotator.css';
@@ -11,17 +11,13 @@ export type TextAnnotationLayer = AnnotationLayer<TextAnnotation> & ReturnType<t
 
 export const TextAnnotator = (container: HTMLElement, options: TextAnnotatorOptions = {}) => {
 
-  const store = createTextStore();
+  const store = createTextStore(container);
 
   const lifecycle = createLifecyleObserver(store.selection, store);
 
   let currentUser = options.readOnly ? null : createAnonymousGuest();
 
-  const highlightLayer = new HighlightLayer({
-    target: container,
-    anchor: container.firstChild as Element,
-    props: { container, store,  }
-  });
+  const highlightLayer = createHighlightLayer(container, store);
 
   const selectionHandler = SelectionHandler(container, store);
   selectionHandler.setUser(currentUser);

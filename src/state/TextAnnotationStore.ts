@@ -1,107 +1,62 @@
-import RBush from 'rbush';
-import { createSelectionState, createStore, type Store } from '@annotorious/core';
+import { Origin, createSelectionState, createStore} from '@annotorious/core';
+import { createSpatialTree } from './spatialTree';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
 
-interface IndexedHighlightRect {
+/**
+ * Recalculates the DOM range from the given text annotation target.
+ * 
+ * @param annotation the text annotation
+ * @param container the HTML container of the annotated content
+ * @returns the DOM range
+ */
+const reviveTarget = (target: TextAnnotationTarget, container: HTMLElement): TextAnnotationTarget => {
+  const { quote, start, end } = target.selector;
 
-  minX: number;
+  const iterator = document.createNodeIterator(container, NodeFilter.SHOW_TEXT);
 
-  minY: number;
+  let runningOffset = 0;
 
-  maxX: number;
+  let range = document.createRange();
 
-  maxY: number;
+  let n = iterator.nextNode();
 
-  annotationId: string;
+  // set range start
+  while (n !== null) {
+    const len = n.textContent.length;
 
-}
-
-const createSpatialTree = (store: Store<TextAnnotation>) => {
-
-  const tree = new RBush<IndexedHighlightRect>();
-
-  // Helper: converts a single text annotation target to a list of hightlight rects
-  const toItems = (target: TextAnnotationTarget): IndexedHighlightRect[] => {
-    const rects = Array.from(target.selector.range.getClientRects());
-
-    return rects.map(rect => {
-      const { x, y, width, height } = rect;
-
-      return {
-        minX: x,
-        minY: y,
-        maxX: x + width,
-        maxY: y + height,
-        annotationId: target.annotation
-      }
-    });
-  }
-
-  const all = () => tree.all().map(item => item.annotationId);
-
-  const clear = () => tree.clear();
-
-  const insert = (target: TextAnnotationTarget) => {
-    const rects = toItems(target);
-    rects.forEach(rect => tree.insert(rect));
-  }
-
-  const remove = (target: TextAnnotationTarget) => {
-    const rects = toItems(target);
-    rects.forEach(rect => tree.remove(rect, (a, b) => a.annotationId === b.annotationId));
-  }
-
-  const update = (previous: TextAnnotationTarget, updated: TextAnnotationTarget) => {
-    remove(previous);
-    insert(updated);
-  }
-
-  const set = (targets: TextAnnotationTarget[], replace: boolean = true) => {
-    if (replace) tree.clear();
-
-    const rects = targets.reduce((all, target) => [...all, ...toItems(target)], []);
-    tree.load(rects);
-  }
-
-  const getAt = (x: number, y: number): string | undefined => {
-    const hits = tree.search({
-      minX: x,
-      minY: y,
-      maxX: x,
-      maxY: y
-    });
-
-    const area = (rect: IndexedHighlightRect) => 
-      (rect.maxX - rect.minX) * (rect.maxY - rect.maxY);
-
-    // Get smallest rect
-    if (hits.length > 0) {
-      hits.sort((a, b) => area(a) - area(b));
-      return hits[0].annotationId;
+    if (runningOffset + len > start) {
+      range.setStart(n, start - runningOffset);
+      break;
     }
+
+    runningOffset += len;
+
+    n = iterator.nextNode();
   }
 
-  const size = () => tree.all().length;
+  // set range end
+  while (n !== null) {
+    const len = n.textContent.length;
 
-  const recalculate = () => set(store.all().map(a => a.target), true);
+    if (runningOffset + len > end) {
+      range.setEnd(n, end - runningOffset);
+      break;
+    }
+
+    runningOffset += len;
+
+    n = iterator.nextNode();
+  }
 
   return {
-    all,
-    clear,
-    getAt,
-    insert,
-    recalculate,
-    remove,
-    set,
-    size,
-    update
+    ...target,
+    selector: { quote, start, end, range }
   }
-
 }
 
 export type TextAnnotationStore = ReturnType<typeof createTextStore>;
 
-export const createTextStore = () => {
+export const createTextStore = (container: HTMLElement) => {
 
   const store = createStore<TextAnnotation>();
 
@@ -109,10 +64,44 @@ export const createTextStore = () => {
 
   const selection = createSelectionState<TextAnnotation>(store);
 
+  // Wrap store interface to intercept annotations and revive DOM ranges, if needed
+  const addAnnotation = (annotation: TextAnnotation, origin = Origin.LOCAL) => {
+    const revived = annotation.target.selector.range instanceof Range ?
+      annotation : { ...annotation, target: reviveTarget(annotation.target, container) };
+
+    store.addAnnotation(revived, origin);
+  }
+
+  const bulkAddAnnotation = (annotations: TextAnnotation[], replace = true, origin = Origin.LOCAL) => {
+    const revived = annotations.map(a => a.target.selector.range instanceof Range ?
+      a : { ...a, target: reviveTarget(a.target, container )});
+
+    store.bulkAddAnnotation(revived, replace, origin);
+  }
+
+  const updateTarget = (target: TextAnnotationTarget, origin = Origin.LOCAL) => {
+    const revived = target.selector.range instanceof Range ?
+      target : reviveTarget(target, container);
+
+    store.updateTarget(revived, origin);
+  }
+
+  const bulkUpdateTarget = (targets: TextAnnotationTarget[], origin = Origin.LOCAL) => {
+    const revived = targets.map(t => t.selector.range instanceof Range ? t : reviveTarget(t, container));
+    store.bulkUpdateTarget(revived, origin);
+  }
+
   const getAt = (x: number, y: number): TextAnnotation | undefined => {
     const annotationId = tree.getAt(x, y);
     return annotationId ? store.getAnnotation(annotationId) : undefined;
   }
+
+  const getIntersecting = (minX: number, minY: number, maxX: number, maxY: number) => {
+    const ids = tree.getIntersecting(minX, minY, maxX, maxY);
+    return ids.map(id => store.getAnnotation(id));
+  }
+
+  const recalculatePositions = () => tree.recalculate();
 
   store.observe(({ changes }) => {
     const { created, deleted, updated } = changes;
@@ -130,8 +119,14 @@ export const createTextStore = () => {
 
   return {
     ...store,
+    addAnnotation,
+    bulkAddAnnotation,
+    bulkUpdateTarget,
     getAt,
-    selection
+    getIntersecting,
+    recalculatePositions,
+    selection,
+    updateTarget
   }
 
 }

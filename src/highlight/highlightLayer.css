@@ -1,0 +1,11 @@
+.r6o-annotatable, .r6o-annotatable * {
+  position: relative;
+}
+
+.r6o-highlight-layer {
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
