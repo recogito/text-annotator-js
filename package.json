@@ -12,6 +12,7 @@
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.0.3",
     "@tsconfig/svelte": "^3.0.0",
+    "@types/rbush": "^3.0.0",
     "@types/uuid": "^9.0.1",
     "svelte": "^3.56.0",
     "svelte-preprocess": "^5.0.1",
@@ -21,6 +22,7 @@
   "dependencies": {
     "@annotorious/core": "file:../../annotorious/annotorious-v3/packages/annotorious-core",
     "@annotorious/supabase": "file:../../annotorious/annotorious-v3/packages/annotorious-supabase",
+    "rbush": "^3.0.1",
     "uuid": "^9.0.0"
   }
 }
