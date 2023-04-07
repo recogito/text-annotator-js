@@ -82,6 +82,8 @@
 
         var supabase = SupabasePlugin(anno, config);
         supabase.connect();
+
+        anno.setPresenceProvider(supabase);
       }
     </script>
   </body>

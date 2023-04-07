@@ -5,7 +5,7 @@
   "type": "module",
   "main": "src/index.ts",
   "scripts": {
-    "start": "vite"
+    "start": "vite --host"
   },
   "author": "Rainer Simon",
   "license": "BSD-3-Clause",

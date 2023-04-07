@@ -1,4 +1,5 @@
 import type { TextAnnotationStore } from '../state';
+import type { Painter } from './Painter';
 
 import './highlightLayer.css';
 
@@ -12,6 +13,9 @@ const equalOrSubset = (a: Set<string>, b: Set<string>) =>
   a.size <= b.size && [...a].every(value => b.has(value));
 
 export const createHighlightLayer = (container: HTMLElement, store: TextAnnotationStore) => {
+
+  let currentPainter: Painter = () => ({});
+
   container.classList.add('r6o-annotatable');
 
   const canvas = document.createElement('canvas');
@@ -81,11 +85,13 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
 
     requestAnimationFrame(() => {
       context.clearRect(0, 0, canvas.width, canvas.height);
-      context.fillStyle = 'rgba(0, 128, 255, 0.2)';
 
       annotationsInView.forEach(annotation => {
+        context.fillStyle = currentPainter(annotation).fill || 'rgba(0, 128, 255, 0.2)';
+
         Array.from(annotation.target.selector.range.getClientRects()).forEach(rect => {
           const { x, y, width, height } = rect;
+
           context.fillRect(x - offset.x, y - offset.y - 2.5, width, height + 5);
         });
       });
@@ -101,5 +107,11 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
     const affectsRendered = updatedIds.some(id => renderedIds.has(id));
     redraw(!affectsRendered);
   });
+
+  const setPainter = (painter: Painter) => currentPainter = painter; 
+
+  return {
+    setPainter
+  }
 
 }

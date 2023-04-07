@@ -6,6 +6,7 @@ import { createHighlightLayer } from './highlight/highlightLayer';
 import type { TextAnnotatorOptions } from './TextAnnotatorOptions';
 
 import './TextAnnotator.css';
+import { createPainter } from './presence/PresencePainter';
 
 export type TextAnnotationLayer = AnnotationLayer<TextAnnotation> & ReturnType<typeof TextAnnotator>;
 
@@ -33,10 +34,15 @@ export const TextAnnotator = (container: HTMLElement, options: TextAnnotatorOpti
 
   const getUser = () => currentUser;
 
+  // Hack
+  const setPresenceProvider = (provider: any) =>
+    highlightLayer.setPainter(createPainter(provider));
+
   return {
     getUser,
     on: lifecycle.on,
     off: lifecycle.off,
+    setPresenceProvider,
     setUser,
     store
   }
