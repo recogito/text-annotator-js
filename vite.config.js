@@ -17,11 +17,11 @@ export default defineConfig({
       entry: './src/index.ts',
       name: 'RecogitoJS',
       formats: ['es', 'umd'],
-      fileName: 'recogito-js'
+      fileName: 'text-annotator'
     },
     rollupOptions: {
       output: {
-        assetFileNames: 'recogito-js.[ext]'
+        assetFileNames: 'text-annotator.[ext]'
       }
     }
   }

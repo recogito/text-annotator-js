@@ -3,7 +3,18 @@
   "version": "3.0.0-pre-alpha-02",
   "description": "Experimental rewrite of RecogitoJS",
   "type": "module",
-  "main": "src/index.ts",
+  "main": "./dist/text-annotator.js",
+  "types": "./dist/text-annotator.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/text-annotator.js",
+      "require": "./dist/text-annotator.umd.cjs"
+    },
+    "./dist/text-annotator.css": {
+      "import": "./dist/text-annotator.css",
+      "require": "./dist/text-annotator.css"
+    }
+  },
   "scripts": {
     "start": "vite --host",
     "build": "vite build",
