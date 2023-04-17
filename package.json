@@ -14,12 +14,8 @@
   "author": "Rainer Simon",
   "license": "BSD-3-Clause",
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^2.0.3",
-    "@tsconfig/svelte": "^3.0.0",
     "@types/rbush": "^3.0.0",
     "@types/uuid": "^9.0.1",
-    "svelte": "^3.56.0",
-    "svelte-preprocess": "^5.0.1",
     "typescript": "^4.9.5",
     "vite": "^4.2.1",
     "vite-plugin-dts": "^2.3.0"

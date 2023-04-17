@@ -1,4 +1,4 @@
-import { Origin, createHoverState, createSelectionState, createStore} from '@annotorious/core';
+import { type Store, Origin, createHoverState, createSelectionState, createStore} from '@annotorious/core';
 import { createSpatialTree } from './spatialTree';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
 
@@ -54,11 +54,23 @@ const reviveTarget = (target: TextAnnotationTarget, container: HTMLElement): Tex
   }
 }
 
-export type TextAnnotationStore = ReturnType<typeof createTextStore>;
+export type TextAnnotationStore = Store<TextAnnotation> & {
 
-export const createTextStore = (container: HTMLElement) => {
+  getAt(x: number, y: number): TextAnnotation | undefined;
+  
+  getIntersecting(minX: number, minY: number, maxX: number, maxY: number): TextAnnotation[];
 
-  const store = createStore<TextAnnotation>();
+  hover: ReturnType<typeof createHoverState>;
+  
+  recalculatePositions(): void;
+  
+  selection: ReturnType<typeof createSelectionState>;
+
+}
+
+export const createTextStore = (container: HTMLElement): TextAnnotationStore => {
+
+  const store: Store<TextAnnotation> = createStore<TextAnnotation>();
 
   const tree = createSpatialTree(store, container);
 
