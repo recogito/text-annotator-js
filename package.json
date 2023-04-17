@@ -1,11 +1,14 @@
 {
   "name": "@recogito/recogito-js-3",
-  "version": "3.0.0-alpha",
+  "version": "3.0.0-pre-alpha-01",
   "description": "Experimental rewrite of RecogitoJS",
   "type": "module",
   "main": "src/index.ts",
   "scripts": {
-    "start": "vite --host"
+    "start": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "echo 'Skipping tests in @recogito/recogito-js package'"
   },
   "author": "Rainer Simon",
   "license": "BSD-3-Clause",
@@ -17,7 +20,8 @@
     "svelte": "^3.56.0",
     "svelte-preprocess": "^5.0.1",
     "typescript": "^4.9.5",
-    "vite": "^4.2.1"
+    "vite": "^4.2.1",
+    "vite-plugin-dts": "^2.3.0"
   },
   "dependencies": {
     "@annotorious/core": "file:../../annotorious/annotorious-v3/packages/annotorious-core",
