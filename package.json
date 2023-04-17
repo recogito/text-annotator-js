@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@annotorious/core": "file:../../annotorious/annotorious-v3/packages/annotorious-core",
-    "@annotorious/supabase": "file:../../annotorious/annotorious-v3/packages/annotorious-supabase",
+    "@annotorious/supabase": "^3.0.0-pre-alpha-05",
     "rbush": "^3.0.1",
     "uuid": "^9.0.0"
   }

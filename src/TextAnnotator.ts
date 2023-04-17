@@ -1,4 +1,4 @@
-import { createAnonymousGuest, type AnnotationLayer, type User, createLifecyleObserver } from '@annotorious/core';
+import { createAnonymousGuest, type AnnotationLayer, type User, createLifecyleObserver, type PresenceProvider } from '@annotorious/core';
 import type { TextAnnotation } from './model/TextAnnotation';
 import { SelectionHandler } from './SelectionHandler';
 import { createTextStore } from './state';
@@ -20,7 +20,7 @@ export const TextAnnotator = (container: HTMLElement, options: TextAnnotatorOpti
     console.log('hover change', id ? store.getAnnotation(id) : null);
   });
 
-  let currentUser = options.readOnly ? null : createAnonymousGuest();
+  let currentUser: User = options.readOnly ? null : createAnonymousGuest();
 
   const highlightLayer = createHighlightLayer(container, store);
 
@@ -35,7 +35,7 @@ export const TextAnnotator = (container: HTMLElement, options: TextAnnotatorOpti
   const getUser = () => currentUser;
 
   // Hack
-  const setPresenceProvider = (provider: any) =>
+  const setPresenceProvider = (provider: PresenceProvider) =>
     highlightLayer.setPainter(createPainter(provider));
 
   return {
