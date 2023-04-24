@@ -8,9 +8,13 @@ export const createPainter = (provider: PresenceProvider): Painter => {
   const styles = new Map<string, string>();
 
   provider.on('selectionChange', (user: PresentUser, selection: string[]) => {
-    selection.forEach(annotationId => {
-      styles.set(annotationId, user.color);
-    });
+    if (selection) {
+      selection.forEach(annotationId => {
+        styles.set(annotationId, user.color);
+      });
+    } else {
+      // TODO
+    }
   });  
 
   const paint = (annotation: TextAnnotation): PaintStyle => {

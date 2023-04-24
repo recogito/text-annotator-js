@@ -61,9 +61,6 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
   });
 
   document.addEventListener('pointerup', () => {
-    // Hide native browser selection
-    container.dataset.native = 'hiddn';
-
     const selection = document.getSelection();
     if (selection.isCollapsed)
       return;
@@ -71,6 +68,9 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
     // Clear the selection (will trigger lifecycle event)
     if (currentTarget)
       store.selection.clear();
+
+    // Hide native browser selection
+    container.dataset.native = 'hidden';
 
     currentTarget = null;
   });
