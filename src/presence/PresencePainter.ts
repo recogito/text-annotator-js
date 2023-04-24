@@ -4,19 +4,13 @@ import type { PaintStyle, Painter } from '../highlight/Painter';
 
 export const createPainter = (provider: PresenceProvider): Painter => {
 
-  console.log('provider', provider);
-
   // Current colors and selections
   const styles = new Map<string, string>();
 
-  provider.on('selectionChange', (user: PresentUser) => {
-    console.log('selection change', user);
-
-    /*
-    if (selection) {
-      styles.set(selection, presenceState.color);
-    }
-    */
+  provider.on('selectionChange', (user: PresentUser, selection: string[]) => {
+    selection.forEach(annotationId => {
+      styles.set(annotationId, user.color);
+    });
   });  
 
   const paint = (annotation: TextAnnotation): PaintStyle => {

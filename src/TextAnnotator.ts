@@ -17,7 +17,7 @@ export const TextAnnotator = (container: HTMLElement, options: TextAnnotatorOpti
   const lifecycle = createLifecyleObserver(store.selection, store);
 
   store.hover.subscribe(id => {
-    console.log('hover change', id ? store.getAnnotation(id) : null);
+    // console.log('hover change', id ? store.getAnnotation(id) : null);
   });
 
   let currentUser: User = options.readOnly ? null : createAnonymousGuest();
@@ -34,7 +34,6 @@ export const TextAnnotator = (container: HTMLElement, options: TextAnnotatorOpti
 
   const getUser = () => currentUser;
 
-  // Hack
   const setPresenceProvider = (provider: PresenceProvider) =>
     highlightLayer.setPainter(createPainter(provider));
 
