@@ -75,7 +75,11 @@
         var anno = TextAnnotator(document.getElementById('content'));
 
         anno.on('createAnnotation', annotation => {
-          // console.log('created', annotation);
+          console.log('created', annotation);
+        });
+
+        anno.on('updateAnnotation', annotation => {
+          console.log('updated', annotation);
         });
 
         var config = await fetch('config.json').then((response) => response.json());

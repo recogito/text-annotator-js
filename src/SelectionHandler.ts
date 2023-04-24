@@ -52,6 +52,8 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
           bodies: [],
           target: updatedTarget
         });
+
+        store.selection.setSelected(updatedTarget.annotation);
       }
 
       currentTarget = updatedTarget;
@@ -59,37 +61,18 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
   });
 
   document.addEventListener('pointerup', () => {
-    const selection = document.getSelection();
+    // Hide native browser selection
+    container.dataset.native = 'hiddn';
 
+    const selection = document.getSelection();
     if (selection.isCollapsed)
       return;
 
-    // Hide native browser selection
-    container.dataset.native = 'hidden';
+    // Clear the selection (will trigger lifecycle event)
+    if (currentTarget)
+      store.selection.clear();
 
     currentTarget = null;
-
-    /*
-    const ranges = Array.from(Array(selection.rangeCount).keys())
-      .map(idx => selection.getRangeAt(idx));
-
-    const annotations = ranges.map(range => {
-      const id = uuidv4();
-
-      return {
-        id,
-        bodies: [],
-        target: {
-          annotation: id,
-          selector: rangeToSelector(range, container),
-          creator: currentUser,
-          created: new Date()
-        }
-      }
-    });
-
-    store.bulkAddAnnotation(annotations, false);
-    */
   });
 
   return {
