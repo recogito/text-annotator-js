@@ -3,6 +3,22 @@ import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotationStore } from './state';
 import type { TextSelector } from './model';
 
+/*
+const clearSelection = () => {
+  if (window.getSelection) {
+    if (window.getSelection().empty) {  // Chrome
+      window.getSelection().empty();
+    } else if (window.getSelection().removeAllRanges) {  // Firefox
+      window.getSelection().removeAllRanges();
+    }
+  // @ts-ignore
+  } else if (document.selection) {  // IE?
+    // @ts-ignore
+    document.selection.empty();
+  }
+}
+*/
+
 export const rangeToSelector = (range: Range, container: HTMLElement): TextSelector => {
   const rangeBefore = document.createRange();
 
@@ -66,13 +82,14 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
       return;
 
     // Clear the selection (will trigger lifecycle event)
-    if (currentTarget)
+    if (currentTarget) {
+      store.updateTarget(currentTarget, Origin.LOCAL);
       store.selection.clear();
+      currentTarget = null;
+    }
 
     // Hide native browser selection
     container.dataset.native = 'hidden';
-
-    currentTarget = null;
   });
 
   return {
