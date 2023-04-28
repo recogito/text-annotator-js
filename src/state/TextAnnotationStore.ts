@@ -100,9 +100,9 @@ export const createTextStore = (container: HTMLElement): TextAnnotationStore => 
     store.updateTarget(revived, origin);
   }
 
-  const bulkUpdateTarget = (targets: TextAnnotationTarget[], origin = Origin.LOCAL) => {
+  const bulkUpdateTargets = (targets: TextAnnotationTarget[], origin = Origin.LOCAL) => {
     const revived = targets.map(t => t.selector.range instanceof Range ? t : reviveTarget(t, container));
-    store.bulkUpdateTarget(revived, origin);
+    store.bulkUpdateTargets(revived, origin);
   }
 
   const getAt = (x: number, y: number): TextAnnotation | undefined => {
@@ -135,7 +135,7 @@ export const createTextStore = (container: HTMLElement): TextAnnotationStore => 
     ...store,
     addAnnotation,
     bulkAddAnnotation,
-    bulkUpdateTarget,
+    bulkUpdateTargets,
     getAt,
     getIntersecting,
     hover,
