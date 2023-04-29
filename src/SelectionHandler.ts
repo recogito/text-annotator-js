@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotationStore } from './state';
 import type { TextSelector } from './model';
 
-/*
 const clearSelection = () => {
   if (window.getSelection) {
     if (window.getSelection().empty) {  // Chrome
@@ -17,7 +16,6 @@ const clearSelection = () => {
     document.selection.empty();
   }
 }
-*/
 
 export const rangeToSelector = (range: Range, container: HTMLElement): TextSelector => {
   const rangeBefore = document.createRange();
@@ -84,6 +82,7 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
     // Clear the selection (will trigger lifecycle event)
     if (currentTarget) {
       store.updateTarget(currentTarget, Origin.LOCAL);
+      clearSelection();
       store.selection.clear();
       currentTarget = null;
     }
