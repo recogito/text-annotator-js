@@ -1,4 +1,4 @@
-import { createAnonymousGuest, type AnnotationLayer, type User, createLifecyleObserver, type PresenceProvider } from '@annotorious/core';
+import { createAnonymousGuest, type Annotator, type User, createLifecyleObserver, type PresenceProvider } from '@annotorious/core';
 import type { TextAnnotation } from './model/TextAnnotation';
 import { SelectionHandler } from './SelectionHandler';
 import { createTextStore, type TextAnnotationStore } from './state';
@@ -8,7 +8,7 @@ import type { TextAnnotatorOptions } from './TextAnnotatorOptions';
 import './TextAnnotator.css';
 import { createPainter } from './presence/PresencePainter';
 
-export type TextAnnotationLayer = AnnotationLayer<TextAnnotation> & ReturnType<typeof TextAnnotator> ;
+export type TextAnnotationLayer = Annotator<TextAnnotation> & ReturnType<typeof TextAnnotator> ;
 
 export const TextAnnotator = (container: HTMLElement, options: TextAnnotatorOptions = {}) => {
 
