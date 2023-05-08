@@ -1,8 +1,9 @@
 import type { PresenceProvider, PresentUser } from '@annotorious/core';
 import type { TextAnnotation } from '../model';
-import type { Painter } from '../highlight/Painter';
+import type { HighlightPainter } from '../highlight';
+import type { PresencePainterOptions } from './PresencePainterOptions';
 
-export const createPainter = (provider: PresenceProvider): Painter => {
+export const createPainter = (provider: PresenceProvider, opts: PresencePainterOptions = {}): HighlightPainter => {
 
   const trackedAnnotations = new Map<string, PresentUser>();
 
@@ -22,6 +23,10 @@ export const createPainter = (provider: PresenceProvider): Painter => {
   });  
 
   const paint = (annotation: TextAnnotation, rects: DOMRect[], context: CanvasRenderingContext2D, offset: DOMRect) => {
+    // Keep font, set size
+    if (opts.font)
+      context.font = opts.font;
+
     const user = trackedAnnotations.get(annotation.id);
     if (user) {
       const { x, y, height } = rects[0];

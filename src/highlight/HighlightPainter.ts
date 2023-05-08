@@ -1,6 +1,6 @@
 import type { TextAnnotation } from '../model';
 
-export type Painter = (
+export type HighlightPainter = (
   
   annotation: TextAnnotation, 
   
@@ -10,9 +10,10 @@ export type Painter = (
 
   offset: DOMRect
   
-) => PaintStyle | void;
+) => HighlightStyle | void;
 
-export interface PaintStyle {
+
+export interface HighlightStyle {
 
   fill?: string;
 

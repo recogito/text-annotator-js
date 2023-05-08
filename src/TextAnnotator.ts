@@ -35,7 +35,7 @@ export const TextAnnotator = (container: HTMLElement, options: TextAnnotatorOpti
   const getUser = () => currentUser;
 
   const setPresenceProvider = (provider: PresenceProvider) =>
-    highlightLayer.setPainter(createPainter(provider));
+    highlightLayer.setPainter(createPainter(provider, options.presence));
 
   return {
     getUser,

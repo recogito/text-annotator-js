@@ -1,5 +1,5 @@
 import type { TextAnnotationStore } from '../state';
-import type { Painter } from './Painter';
+import type { HighlightPainter } from './HighlightPainter';
 
 import './highlightLayer.css';
 
@@ -14,7 +14,7 @@ const equalOrSubset = (a: Set<string>, b: Set<string>) =>
 
 export const createHighlightLayer = (container: HTMLElement, store: TextAnnotationStore) => {
 
-  let currentPainter: Painter = () => ({});
+  let currentPainter: HighlightPainter = () => ({});
 
   container.classList.add('r6o-annotatable');
 
@@ -119,10 +119,8 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
     redraw(!affectsRendered);
   });
 
-  const setPainter = (painter: Painter) => currentPainter = painter; 
-
   return {
-    setPainter
+    setPainter: (painter: HighlightPainter) => currentPainter = painter
   }
 
 }
