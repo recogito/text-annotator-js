@@ -3,14 +3,14 @@ import type { TextAnnotation } from './model/TextAnnotation';
 import { SelectionHandler } from './SelectionHandler';
 import { createTextStore, type TextAnnotationStore } from './state';
 import { createHighlightLayer } from './highlight/highlightLayer';
+import { createPainter } from './presence/PresencePainter';
 import type { TextAnnotatorOptions } from './TextAnnotatorOptions';
 
 import './TextAnnotator.css';
-import { createPainter } from './presence/PresencePainter';
 
-export type TextAnnotationLayer = Annotator<TextAnnotation> & ReturnType<typeof TextAnnotator> ;
+export type TextAnnotator = Annotator<TextAnnotation> & ReturnType<typeof RecogitoJS>;
 
-export const TextAnnotator = (container: HTMLElement, options: TextAnnotatorOptions = {}) => {
+export const RecogitoJS = (container: HTMLElement, options: TextAnnotatorOptions = {}): Annotator<TextAnnotation> & ReturnType<typeof RecogitoJS> => {
 
   const store: TextAnnotationStore = createTextStore(container);
 
@@ -39,10 +39,11 @@ export const TextAnnotator = (container: HTMLElement, options: TextAnnotatorOpti
 
   return {
     getUser,
+    setUser,
+    setPresenceProvider,
     on: lifecycle.on,
     off: lifecycle.off,
-    setPresenceProvider,
-    setUser,
+    selection: store.selection,
     store
   }
 
