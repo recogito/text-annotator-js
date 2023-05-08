@@ -79,7 +79,6 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
     if (selection.isCollapsed)
       return;
 
-    /*
     if (currentTarget) {
       store.updateTarget(currentTarget, Origin.LOCAL);
       
@@ -88,7 +87,6 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
       store.selection.clear();
       currentTarget = null;
     }
-    */
 
     // Hide native browser selection
     container.dataset.native = 'hidden';
