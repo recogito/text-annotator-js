@@ -72,19 +72,21 @@
       import { SupabasePlugin } from '@annotorious/supabase';
 
       window.onload = async function() {
-        var anno = TextAnnotator(document.getElementById('content'));
+        var r = TextAnnotator(document.getElementById('content'), { 
+          presence: { font: 'bold 14px Arial' }
+        });
 
-        anno.on('createAnnotation', annotation => {
+        r.on('createAnnotation', annotation => {
           // console.log('[index] created', annotation);
         });
 
-        anno.on('updateAnnotation', annotation => {
+        r.on('updateAnnotation', annotation => {
           // console.log('[index] updated', annotation);
         });
 
         var config = await fetch('config.json').then((response) => response.json());
 
-        var supabase = SupabasePlugin(anno, config);
+        var supabase = SupabasePlugin(r, config);
         supabase.connect();
       }
     </script>

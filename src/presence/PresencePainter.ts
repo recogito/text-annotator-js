@@ -39,11 +39,14 @@ export const createPainter = (provider: PresenceProvider, opts: PresencePainterO
       const label =
         user.user.name || user.user.email?.substring(0, user.user.email.indexOf('@')) || user.user.id;
 
-      const { width } = context.measureText(label);
-      context.fillRect(x - offset.x - 2, y - offset.y - 16.5, width + 8, 14.5);
+      const metrics = context.measureText(label);
+      const textWidth = metrics.width;
+      const textHeight = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent;
+
+      context.fillRect(x - offset.x - 2, y - offset.y - textHeight - 4, textWidth + 8, textHeight + 2);
       
       context.fillStyle = '#fff';
-      context.fillText(label, x - offset.x + 1.5, y - offset.y - 5.5);
+      context.fillText(label, x - offset.x + 1, y - offset.y - 6.5);
       
       return { fill: user.color + '33' };
     } else {
