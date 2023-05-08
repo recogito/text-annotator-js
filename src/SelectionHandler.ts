@@ -79,13 +79,16 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
     if (selection.isCollapsed)
       return;
 
-    // Clear the selection (will trigger lifecycle event)
+    /*
     if (currentTarget) {
       store.updateTarget(currentTarget, Origin.LOCAL);
+      
+      // Clear the selection (will trigger lifecycle event)
       clearSelection();
       store.selection.clear();
       currentTarget = null;
     }
+    */
 
     // Hide native browser selection
     container.dataset.native = 'hidden';
