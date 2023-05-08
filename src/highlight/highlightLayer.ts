@@ -23,7 +23,7 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
   canvas.height = container.offsetHeight;
   canvas.className = 'r6o-highlight-layer';
 
-  container.insertBefore(canvas, container.firstChild);
+  container.appendChild(canvas);
 
   container.addEventListener('pointermove', (event: PointerEvent) => {
     const {x, y} = container.getBoundingClientRect();
@@ -86,14 +86,25 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
     requestAnimationFrame(() => {
       context.clearRect(0, 0, canvas.width, canvas.height);
 
+      if (!currentPainter)
+        context.fillStyle = 'rgba(0, 128, 255, 0.2)';
+
       annotationsInView.forEach(annotation => {
-        context.fillStyle = currentPainter(annotation).fill || 'rgba(0, 128, 255, 0.2)';
+        const rects = Array.from(annotation.target.selector.range.getClientRects());
+        
+        if (currentPainter) {
+          const style = currentPainter(annotation, rects, context, offset);
 
-        Array.from(annotation.target.selector.range.getClientRects()).forEach(rect => {
-          const { x, y, width, height } = rect;
+          if (style) {
+            context.fillStyle = style.fill;
 
-          context.fillRect(x - offset.x, y - offset.y - 2.5, width, height + 5);
-        });
+            rects.forEach(({ x, y, width, height }) =>
+              context.fillRect(x - offset.x, y - offset.y - 2.5, width, height + 5));
+          }
+        } else {
+          rects.forEach(({ x, y, width, height }) =>
+            context.fillRect(x - offset.x, y - offset.y - 2.5, width, height + 5));
+        }
       });
     });
 
