@@ -1,6 +1,6 @@
 {
   "name": "@recogito/recogito-js-3",
-  "version": "3.0.0-pre-alpha-09",
+  "version": "3.0.0-pre-alpha-09-patch-01",
   "description": "Experimental rewrite of RecogitoJS",
   "type": "module",
   "main": "./dist/text-annotator.js",
@@ -24,8 +24,8 @@
     "vite-plugin-dts": "^2.3.0"
   },
   "dependencies": {
-    "@annotorious/core": "file:../../annotorious/annotorious-v3/packages/annotorious-core",
-    "@annotorious/supabase": "file:../../annotorious/annotorious-v3/packages/annotorious-supabase",
+    "@annotorious/core": "^3.0.0-pre-alpha-09",
+    "@annotorious/supabase": "^3.0.0-pre-alpha-09",
     "rbush": "^3.0.1",
     "uuid": "^9.0.0"
   }
