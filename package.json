@@ -1,6 +1,6 @@
 {
   "name": "@recogito/recogito-js-3",
-  "version": "3.0.0-pre-alpha-08",
+  "version": "3.0.0-pre-alpha-09",
   "description": "Experimental rewrite of RecogitoJS",
   "type": "module",
   "main": "./dist/text-annotator.js",
