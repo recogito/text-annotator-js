@@ -4,7 +4,7 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "declaration": true,
-    "declarationDir": "types",
+    "declarationDir": "dist",
     "declarationMap": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
@@ -14,13 +14,17 @@
     "module": "ESNext",
     "moduleResolution": "node",
     "noEmit": true,
-    "outDir": "dist",
+    "outDir": "./dist",
+    "paths": {
+      "@recogito/react": ["src/index.ts"]
+    },
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "sourceMap": true,
     "target": "ESNext",
     "useDefineForClassFields": true
   },
-  "include": ["src"],
+  "include": ["./src/**/*", "./test/**/*"],
+  "exclude": ["node_modules", "dist"],
   "references": [{ "path": "./tsconfig.node.json" }],
 }

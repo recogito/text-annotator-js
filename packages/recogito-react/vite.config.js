@@ -9,8 +9,8 @@ export default defineConfig(({ command, mode }) => ({
   plugins: [
     react(),
     tsConfigPaths(),
-    dts({
-      include: ['./src/']
+    dts({ 
+      entryRoot: '.'
     })
   ],
   server: {
