@@ -15,9 +15,6 @@
     "moduleResolution": "node",
     "noEmit": true,
     "outDir": "dist",
-    "paths": {
-      "@recogito/recogito-js": ["../recogito/src/index.ts"]
-    },
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "sourceMap": true,
