@@ -13,7 +13,7 @@
     "test": "npm run test --workspaces"
   },
   "workspaces": [
-    "./packages/recogito",
-    "./packages/recogito-react"
+    "./packages/recogito-js",
+    "./packages/recogito-js-react"
   ]
 }

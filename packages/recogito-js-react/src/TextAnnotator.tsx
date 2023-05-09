@@ -1,10 +1,12 @@
-import { useContext, useEffect } from 'react';
+import { ReactNode, useContext, useEffect } from 'react';
 import { AnnotoriousContext } from '@annotorious/react';
 import { TextAnnotatorOptions, RecogitoJS } from '@recogito/recogito-js';
 
 export type TextAnnotatorProps = TextAnnotatorOptions & {
 
   element: string,
+
+  children?: ReactNode;
 
 }
 
@@ -20,6 +22,6 @@ export const TextAnnotator = (props: TextAnnotatorProps) => {
     setAnno(r);
   }, []);
 
-  return null;
+  return props.children ? <>{props.children}</> : null;
 
 }

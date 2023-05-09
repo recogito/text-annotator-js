@@ -24,7 +24,13 @@ export default defineConfig(({ command, mode }) => ({
       fileName: (format) => `recogito-react.${format}.js`
     },
     rollupOptions: {
-      external: [...Object.keys(packageJson.peerDependencies)]
+      external: [...Object.keys(packageJson.peerDependencies)],
+      output: {
+        globals: {
+          react: 'React',
+          openseadragon: 'OpenSeadragon'
+        }
+      }
     }
   }
 }));
