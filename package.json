@@ -1,32 +1,19 @@
 {
-  "name": "@recogito/recogito-js-3",
-  "version": "3.0.0-pre-alpha-09-patch-01",
-  "description": "Experimental rewrite of RecogitoJS",
-  "type": "module",
-  "main": "./dist/text-annotator.js",
-  "types": "./dist/text-annotator.d.ts",
-  "scripts": {
-    "start": "vite --host",
-    "build": "vite build",
-    "preview": "vite preview",
-    "test": "echo 'Skipping tests in @recogito/recogito-js package'"
-  },
-  "files": [
-    "dist"
-  ],
+  "name": "@recogito/monorepo",
+  "version": "3.0.0-pre-alpha-10",
+  "description": "Recogito Text Annotator monorep",
   "author": "Rainer Simon",
-  "license": "BSD-3-Clause",
-  "devDependencies": {
-    "@types/rbush": "^3.0.0",
-    "@types/uuid": "^9.0.1",
-    "typescript": "^4.9.5",
-    "vite": "^4.2.1",
-    "vite-plugin-dts": "^2.3.0"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/recogito/recogito-text-annotator.git"
   },
-  "dependencies": {
-    "@annotorious/core": "^3.0.0-pre-alpha-09",
-    "@annotorious/supabase": "^3.0.0-pre-alpha-09",
-    "rbush": "^3.0.1",
-    "uuid": "^9.0.0"
-  }
+  "license": "BSD-3-Clause",
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces"
+  },
+  "workspaces": [
+    "./packages/recogito",
+    "./packages/recogito-react"
+  ]
 }

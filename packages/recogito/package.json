@@ -1,0 +1,32 @@
+{
+  "name": "@recogito/recogito-js",
+  "version": "3.0.0-pre-alpha-10",
+  "description": "Experimental rewrite of RecogitoJS",
+  "type": "module",
+  "main": "./dist/text-annotator.js",
+  "types": "./dist/text-annotator.d.ts",
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "echo 'Skipping tests in @recogito/recogito-js package'"
+  },
+  "files": [
+    "dist"
+  ],
+  "author": "Rainer Simon",
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "@annotorious/supabase": "file:../../../../annotorious/annotorious-v3/packages/annotorious-supabase",
+    "@types/rbush": "^3.0.0",
+    "@types/uuid": "^9.0.1",
+    "typescript": "^4.9.5",
+    "vite": "^4.2.1",
+    "vite-plugin-dts": "^2.3.0"
+  },
+  "dependencies": {
+    "@annotorious/core": "file:../../../../annotorious/annotorious-v3/packages/annotorious-core",
+    "rbush": "^3.0.1",
+    "uuid": "^9.0.0"
+  }
+}

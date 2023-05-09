@@ -14,7 +14,7 @@ const equalOrSubset = (a: Set<string>, b: Set<string>) =>
 
 export const createHighlightLayer = (container: HTMLElement, store: TextAnnotationStore) => {
 
-  let currentPainter: HighlightPainter = () => ({});
+  let currentPainter: HighlightPainter = null;
 
   container.classList.add('r6o-annotatable');
 

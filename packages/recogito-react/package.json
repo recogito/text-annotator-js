@@ -1,0 +1,44 @@
+{
+  "name": "@recogito/react",
+  "version": "3.0.0-pre-alpha-10",
+  "description": "Experimental rewrite of RecogitoJS",
+  "author": "Rainer Simon",
+  "license": "BSD-3-Clause",
+  "type": "module",
+  "scripts": {
+    "start": "vite",
+    "build": "tsc && vite build",
+    "test": "echo 'Skipping tests in @recogito/react package'"
+  },
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/recogito-react.es.js",
+      "require": "./dist/recogito-react.umd.js"
+    },
+    "./dist/style.css": "./dist/style.css"
+  },
+  "main": "./dist/recogito-react.umd.js",
+  "module": "./dist/recogito-react.es.js",
+  "types": "./dist/packages/recogito-react/src/index.d.ts",
+  "devDependencies": {
+    "@types/react-dom": "^18.0.11",
+    "@vitejs/plugin-react": "^3.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^4.7.4",
+    "vite": "^4.2.1",
+    "vite-plugin-dts": "^2.3.0",
+    "vite-tsconfig-paths": "^4.2.0"
+  },
+  "peerDependencies": {
+    "react": "16.8.0 || >=17.x",
+    "react-dom": "16.8.0 || >=17.x"
+  },
+  "dependencies": {
+    "@annotorious/react": "file:../../../../annotorious/annotorious-v3/packages/annotorious-react",
+    "@neodrag/react": "^2.0.3"
+  }
+}
