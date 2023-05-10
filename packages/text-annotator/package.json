@@ -1,0 +1,39 @@
+{
+  "name": "@recogito/text-annotator",
+  "version": "3.0.0-pre-alpha-10",
+  "description": "Experimental rewrite of the Recogito JS text annotation library",
+  "author": "Rainer Simon",
+  "license": "BSD-3-Clause",
+  "type": "module",
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "echo 'Skipping tests in @recogito/text-annotator package'"
+  },
+  "main": "./dist/text-annotator.umd.js",
+  "module": "./dist/text-annotator.es.js",
+  "types": "./dist/src/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/text-annotator.es.js",
+      "require": "./dist/text-annotator.umd.js"
+    },
+    "./dist/text-annotator.css": "./dist/text-annotator.css"
+  },
+  "devDependencies": {
+    "@types/rbush": "^3.0.0",
+    "@types/uuid": "^9.0.1",
+    "typescript": "^4.9.5",
+    "vite": "^4.2.1",
+    "vite-plugin-dts": "^2.3.0"
+  },
+  "dependencies": {
+    "@annotorious/core": "file:../../../../annotorious/annotorious-v3/packages/annotorious-core",
+    "rbush": "^3.0.1",
+    "uuid": "^9.0.0"
+  }
+}

@@ -10,7 +10,7 @@
     "isolatedModules": true,
     "module": "ESNext",
     "moduleResolution": "Node",
-    "outDir": "./dist",
+    "outDir": "dist",
     "resolveJsonModule": true,
     "skipLibCheck": false,
     "sourceMap": true,

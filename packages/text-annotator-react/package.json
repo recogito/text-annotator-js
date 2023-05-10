@@ -1,28 +1,29 @@
 {
-  "name": "@recogito/react",
+  "name": "@recogito/react-text-annotator",
   "version": "3.0.0-pre-alpha-10",
-  "description": "Experimental rewrite of RecogitoJS",
+  "description": "Experimental rewrite of the Recogito JS text annotation library",
   "author": "Rainer Simon",
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
     "start": "vite",
     "build": "tsc && vite build",
-    "test": "echo 'Skipping tests in @recogito/react package'"
+    "preview": "vite preview",
+    "test": "echo 'Skipping tests in @recogito/text-annotator-react package'"
   },
+  "main": "./dist/react-text-annotator.umd.js",
+  "module": "./dist/react-text-annotator.es.js",
+  "types": "./dist/src/index.d.ts",
   "files": [
     "dist"
   ],
   "exports": {
     ".": {
-      "import": "./dist/recogito-react.es.js",
-      "require": "./dist/recogito-react.umd.js"
+      "import": "./dist/react-text-annotator.es.js",
+      "require": "./dist/react-text-annotator.umd.js"
     },
-    "./dist/style.css": "./dist/style.css"
+    "./dist/react-text-annotator.css": "./dist/react-text-annotator.css"
   },
-  "main": "./dist/recogito-react.umd.js",
-  "module": "./dist/recogito-react.es.js",
-  "types": "./dist/src/index.d.ts",
   "devDependencies": {
     "@types/react-dom": "^18.0.11",
     "@vitejs/plugin-react": "^3.1.0",

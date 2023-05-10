@@ -1,8 +1,8 @@
 import { ReactNode, useContext, useEffect } from 'react';
-import { TextAnnotatorOptions, RecogitoJS } from '@recogito/recogito-js';
+import { TextAnnotatorOptions, RecogitoJS } from '@recogito/text-annotator';
 import { AnnotoriousContext } from '@annotorious/react';
 
-import '@recogito/recogito-js/dist/text-annotator.css';
+import '@recogito/text-annotator/dist/text-annotator.css';
 
 export type TextAnnotatorProps = TextAnnotatorOptions & {
 

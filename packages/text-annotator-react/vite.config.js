@@ -20,13 +20,14 @@ export default defineConfig(({ command, mode }) => ({
   build: {
     lib: {
       entry: './src/index.ts',
-      name: 'RecogitoReact',
+      name: 'ReactTextAnnotator',
       formats: ['es', 'umd'],
-      fileName: (format) => `recogito-react.${format}.js`
+      fileName: (format) => `react-text-annotator.${format}.js`
     },
     rollupOptions: {
       external: [...Object.keys(packageJson.peerDependencies)],
       output: {
+        assetFileNames: 'react-text-annotator.[ext]',
         globals: {
           '@annotorious/react': 'AnnotoriousReact',
           'openseadragon': 'OpenSeadragon',
