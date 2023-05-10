@@ -34,11 +34,12 @@
     "vite-tsconfig-paths": "^4.2.0"
   },
   "peerDependencies": {
+    "@annotorious/react": "file:../../../../annotorious/annotorious-v3/packages/annotorious-react",
+    "openseadragon": "^3.1.0",
     "react": "16.8.0 || >=17.x",
     "react-dom": "16.8.0 || >=17.x"
   },
   "dependencies": {
-    "@annotorious/react": "file:../../../../annotorious/annotorious-v3/packages/annotorious-react",
     "@neodrag/react": "^2.0.3"
   }
 }

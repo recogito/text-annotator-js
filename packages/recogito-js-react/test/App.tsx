@@ -1,12 +1,13 @@
 import React from 'react';
-import { Recogito, TextAnnotator } from '../src';
+import { Annotorious } from '@annotorious/react';
+import { TextAnnotator } from '../src'
 
 export const App = () => {
-
+  
   return (
-    <Recogito>
+    <Annotorious>
       <TextAnnotator element="annotatable" />
-    </Recogito>
+    </Annotorious>
   )
 
 }

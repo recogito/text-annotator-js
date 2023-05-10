@@ -14,7 +14,7 @@
     "module": "ESNext",
     "moduleResolution": "node",
     "noEmit": true,
-    "outDir": "./dist",
+    "outDir": "dist",
     "paths": {
       "@recogito/react": ["src/index.ts"]
     },
@@ -24,7 +24,7 @@
     "target": "ESNext",
     "useDefineForClassFields": true
   },
-  "include": ["./src/**/*", "./test/**/*"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist"],
   "references": [{ "path": "./tsconfig.node.json" }],
 }

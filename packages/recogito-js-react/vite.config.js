@@ -10,6 +10,7 @@ export default defineConfig(({ command, mode }) => ({
     react(),
     tsConfigPaths(),
     dts({ 
+      include: ['./src/'],
       entryRoot: '.'
     })
   ],
@@ -27,8 +28,9 @@ export default defineConfig(({ command, mode }) => ({
       external: [...Object.keys(packageJson.peerDependencies)],
       output: {
         globals: {
-          react: 'React',
-          openseadragon: 'OpenSeadragon'
+          '@annotorious/react': 'AnnotoriousReact',
+          'openseadragon': 'OpenSeadragon',
+          'react': 'React'
         }
       }
     }
