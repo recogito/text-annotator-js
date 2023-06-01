@@ -14,14 +14,20 @@ const equalOrSubset = (a: Set<string>, b: Set<string>) =>
 
 export const createHighlightLayer = (container: HTMLElement, store: TextAnnotationStore) => {
 
+  let renderedIds = new Set<string>();
+
   let currentPainter: HighlightPainter = null;
 
   container.classList.add('r6o-annotatable');
 
   const canvas = document.createElement('canvas');
-  canvas.width = container.offsetWidth * 2;
-  canvas.height = container.offsetHeight * 2;
+  canvas.width = container.offsetWidth;
+  canvas.height = container.offsetHeight;
   canvas.className = 'r6o-highlight-layer';
+
+  const context = canvas.getContext('2d');
+  context.scale(2, 2);
+  context.translate(0.5, 0.5);
 
   container.appendChild(canvas);
 
@@ -39,11 +45,6 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
         store.hover.set(null);
     }
   });
-
-  const context = canvas.getContext('2d');
-  context.scale(2, 2);
-
-  let renderedIds = new Set<string>();
 
   const getViewport = () => {
     const { top, left } = container.getBoundingClientRect();
@@ -63,9 +64,13 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
   document.addEventListener('scroll', onScroll, true);
 
   const onResize = new ResizeObserver(() => {
-    canvas.width = container.offsetWidth;
-    canvas.height = container.offsetHeight;
-
+    canvas.width = 2 * container.offsetWidth;
+    canvas.height = 2 * container.offsetHeight;
+    
+    const context = canvas.getContext('2d');
+    context.scale(2, 2);
+    context.translate(0.5, 0.5);
+    
     store.recalculatePositions();
 
     redraw(false);
