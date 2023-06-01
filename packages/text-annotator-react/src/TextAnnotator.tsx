@@ -14,7 +14,7 @@ export type TextAnnotatorProps = TextAnnotatorOptions & {
 
 export const TextAnnotator = (props: TextAnnotatorProps) => {
 
-  const { element, ...opts } = props;
+  const { element, children, ...opts } = props;
 
   const { setAnno } = useContext(AnnotoriousContext);
   
@@ -24,6 +24,6 @@ export const TextAnnotator = (props: TextAnnotatorProps) => {
     setAnno(r);
   }, []);
 
-  return props.children ? <>{props.children}</> : null;
+  return children ? <>{children}</> : null;
 
 }
