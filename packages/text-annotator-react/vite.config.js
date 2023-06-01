@@ -18,6 +18,7 @@ export default defineConfig(({ command, mode }) => ({
     open: '/test/index.html'
   },
   build: {
+    sourcemap: true,
     lib: {
       entry: './src/index.ts',
       name: 'ReactTextAnnotator',
