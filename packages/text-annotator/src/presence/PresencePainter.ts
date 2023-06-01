@@ -32,23 +32,20 @@ export const createPainter = (provider: PresenceProvider, opts: PresencePainterO
       const { x, y, height } = rects[0];
 
       // Draw presence indicator
-      context.fillStyle = user.color;
+      context.fillStyle = user.appearance.color;
       context.fillRect(x - offset.x - 2, y - offset.y - 2.5, 2, height + 5);
 
       // Draw name label
-      const label =
-        user.user.name || user.user.email?.substring(0, user.user.email.indexOf('@')) || user.user.id;
-
-      const metrics = context.measureText(label);
+      const metrics = context.measureText(user.appearance.label);
       const textWidth = metrics.width;
       const textHeight = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent;
 
       context.fillRect(x - offset.x - 2, y - offset.y - textHeight - 4, textWidth + 8, textHeight + 2);
       
       context.fillStyle = '#fff';
-      context.fillText(label, x - offset.x + 1, y - offset.y - 6.5);
+      context.fillText(user.appearance.label, x - offset.x + 1, y - offset.y - 6.5);
       
-      return { fill: user.color + '33' };
+      return { fill: user.appearance.color + '33' };
     } else {
       return { fill: 'rgba(0, 128, 255, 0.2)' }
     }
