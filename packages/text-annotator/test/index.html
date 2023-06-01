@@ -68,11 +68,11 @@
     </div>
 
     <script type="module">
-      import { TextAnnotator } from '../src/index.ts';
+      import { RecogitoJS } from '../src/index.ts';
       import { SupabasePlugin } from '@annotorious/supabase';
 
       window.onload = async function() {
-        var r = TextAnnotator(document.getElementById('content'), { 
+        var r = RecogitoJS(document.getElementById('content'), { 
           presence: { font: 'bold 14px Arial' }
         });
 

@@ -19,8 +19,8 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
   container.classList.add('r6o-annotatable');
 
   const canvas = document.createElement('canvas');
-  canvas.width = container.offsetWidth;
-  canvas.height = container.offsetHeight;
+  canvas.width = container.offsetWidth * 2;
+  canvas.height = container.offsetHeight * 2;
   canvas.className = 'r6o-highlight-layer';
 
   container.appendChild(canvas);
@@ -41,6 +41,7 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
   });
 
   const context = canvas.getContext('2d');
+  context.scale(2, 2);
 
   let renderedIds = new Set<string>();
 
