@@ -23,7 +23,6 @@ export const createPainter = (provider: PresenceProvider, opts: PresencePainterO
   });  
 
   const paint = (annotation: TextAnnotation, rects: DOMRect[], context: CanvasRenderingContext2D, offset: DOMRect) => {
-    // Keep font, set size
     if (opts.font)
       context.font = opts.font;
 
