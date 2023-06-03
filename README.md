@@ -1,3 +1,3 @@
-# recogito-js-3
+# Recogito Text Annotator
 
-Exploratory code for the next major release of RecogitoJS, with support for collaborative annotation.
+Work in progress on the __Recogito Text Annotator__, a JavaScript package for adding text annotation to any web page. Official successor to [RecogitoJS](https://github.com/recogito/recogito-js).
