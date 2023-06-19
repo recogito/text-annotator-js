@@ -1,6 +1,10 @@
 {
   "name": "@recogito/react-text-annotator",
+<<<<<<< HEAD
   "version": "3.0.0-pre-alpha-15",
+=======
+  "version": "3.0.0-pre-alpha-16",
+>>>>>>> 1520194 (Bumped version)
   "description": "Experimental rewrite of the Recogito JS text annotation library",
   "author": "Rainer Simon",
   "license": "BSD-3-Clause",
@@ -35,7 +39,7 @@
     "vite-tsconfig-paths": "^4.2.0"
   },
   "peerDependencies": {
-    "@annotorious/react": "^3.0.0-pre-alpha-14",
+    "@annotorious/react": "^3.0.0-pre-alpha-16",
     "openseadragon": "^3.1.0",
     "react": "16.8.0 || >=17.x",
     "react-dom": "16.8.0 || >=17.x"

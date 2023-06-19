@@ -1,6 +1,10 @@
 {
   "name": "@recogito/text-annotator",
+<<<<<<< HEAD
   "version": "3.0.0-pre-alpha-15",
+=======
+  "version": "3.0.0-pre-alpha-16",
+>>>>>>> 1520194 (Bumped version)
   "description": "Experimental rewrite of the Recogito JS text annotation library",
   "author": "Rainer Simon",
   "license": "BSD-3-Clause",
@@ -25,7 +29,7 @@
     "./dist/text-annotator.css": "./dist/text-annotator.css"
   },
   "devDependencies": {
-    "@annotorious/supabase": "^3.0.0-pre-alpha-14",
+    "@annotorious/supabase": "^3.0.0-pre-alpha-16",
     "@types/rbush": "^3.0.0",
     "@types/uuid": "^9.0.1",
     "typescript": "^4.9.5",
@@ -33,7 +37,7 @@
     "vite-plugin-dts": "^2.3.0"
   },
   "dependencies": {
-    "@annotorious/core": "^3.0.0-pre-alpha-14",
+    "@annotorious/core": "^3.0.0-pre-alpha-16",
     "rbush": "^3.0.1",
     "uuid": "^9.0.0"
   }
