@@ -38,9 +38,7 @@ export const TextAnnotatorPopup = (props: TextAnnotatorPopupProps) => {
   const equal = (a: string[], b: string[]) => 
     a.every(str => b.includes(str)) && b.every(str => a.includes(str));
 
-  useEffect(() => {
-    console.log('Selection: ', selected);
-    
+  useEffect(() => {    
     // Reset drag flag if selected IDs have changed
     const nextIds = selected.map(a => a.id);
 
@@ -51,10 +49,16 @@ export const TextAnnotatorPopup = (props: TextAnnotatorPopupProps) => {
   }, [selected]);
 
   useEffect(() => {
+    if (selected.length === 0)
+      console.log('close popup');
+      
+    if (pointerEvent?.type === 'pointerup')
+      console.log('Show popup!');
+
     if (!el.current) return;
 
     if (!dragged) updatePosition();
-  }, [selected, dragged]);
+  }, [pointerEvent, selected, dragged]);
   
   return selected.length > 0 ? (
     <Draggable ref={el} key={selected.map(a => a.id).join('-')} className="a9s-popup a9s-osd-popup" onDragStart={onDragStart}>

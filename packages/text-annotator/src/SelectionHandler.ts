@@ -44,7 +44,7 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
     delete container.dataset.native;
   });
 
-  document.addEventListener('selectionchange', () => {   
+  document.addEventListener('selectionchange', (event: PointerEvent) => {   
     const selection = document.getSelection();
 
     if (!selection.isCollapsed) {
@@ -66,6 +66,8 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
           bodies: [],
           target: updatedTarget
         });
+
+        store.selection.clickSelect(updatedTarget.annotation, event);
       }
 
       currentTarget = updatedTarget;
@@ -80,7 +82,7 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
 
       clearNativeSelection();
       currentTarget = null;
-    } else {
+    } else {   
       const { x, y } = container.getBoundingClientRect();
     
       const hovered = store.getAt(event.clientX - x, event.clientY - y);
@@ -88,7 +90,7 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
         const { selected } = store.selection;
         
         if (selected.length !== 1 || selected[0] !== hovered.id)
-          store.selection.setSelected(hovered.id);
+          store.selection.clickSelect(hovered.id, event);
       } else if (!store.selection.isEmpty()) {
         store.selection.clear();
       }

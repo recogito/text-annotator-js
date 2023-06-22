@@ -27,12 +27,13 @@
   "devDependencies": {
     "@types/rbush": "^3.0.0",
     "@types/uuid": "^9.0.1",
+    "svelte": "^4.0.0",
     "typescript": "^4.9.5",
     "vite": "^4.2.1",
     "vite-plugin-dts": "^2.3.0"
   },
   "dependencies": {
-    "@annotorious/core": "file:../../../../annotorious/annotorious-v3/packages/annotorious-core",
+    "@annotorious/core": "3.0.0-pre-alpha-18",
     "nanoevents": "^7.0.1",
     "rbush": "^3.0.1",
     "uuid": "^9.0.0"
