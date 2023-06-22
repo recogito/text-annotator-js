@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotationStore } from './state';
 import type { TextSelector } from './model';
 
-const clearSelection = () => {
+const clearNativeSelection = () => {
   if (window.getSelection) {
     if (window.getSelection().empty) {  // Chrome
       window.getSelection().empty();
@@ -82,9 +82,8 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
     if (currentTarget) {
       store.updateTarget(currentTarget, Origin.LOCAL);
       
-      // Clear the selection (will trigger lifecycle event)
-      clearSelection();
-      store.selection.clear();
+      clearNativeSelection();
+      // store.selection.clear();
       currentTarget = null;
     }
 

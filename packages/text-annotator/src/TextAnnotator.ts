@@ -16,10 +16,6 @@ export const RecogitoJS = (container: HTMLElement, options: TextAnnotatorOptions
 
   const lifecycle = createLifecyleObserver(store.selection, store);
 
-  store.hover.subscribe(id => {
-    // console.log('hover change', id ? store.getAnnotation(id) : null);
-  });
-
   let currentUser: User = options.readOnly ? null : createAnonymousGuest();
 
   const highlightLayer = createHighlightLayer(container, store);

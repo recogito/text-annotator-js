@@ -77,17 +77,27 @@
         });
 
         r.on('createAnnotation', annotation => {
-          // console.log('[index] created', annotation);
+          console.log('createAnnotation', annotation);
         });
 
-        r.on('updateAnnotation', annotation => {
-          // console.log('[index] updated', annotation);
+        r.on('updateAnnotation', (annotation, previous) => {
+          console.log('updateAnnotation', annotation, previous);
         });
 
+        r.on('deleteAnnotation', (annotation) => {
+          console.log('deleteAnnotation', annotation);
+        });
+
+        r.on('selectionChanged', (annotations) => {
+          console.log('selectionChanged', annotations);
+        });
+
+        /*
         var config = await fetch('config.json').then((response) => response.json());
 
         var supabase = SupabasePlugin(r, config);
         supabase.connect();
+        */
       }
     </script>
   </body>

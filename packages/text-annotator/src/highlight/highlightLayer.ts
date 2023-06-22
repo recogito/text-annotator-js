@@ -35,14 +35,21 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
     const {x, y} = container.getBoundingClientRect();
     const hovered = store.getAt(event.clientX - x, event.clientY - y);
     if (hovered) {
-      canvas.classList.add('hover');
-
       if (store.hover.current !== hovered.id)
         store.hover.set(hovered.id);
     } else {
-      canvas.classList.remove('hover');
       if (store.hover.current)
         store.hover.set(null);
+    }
+  });
+
+  container.addEventListener('pointerdown', (event: PointerEvent) => {
+    const {x, y} = container.getBoundingClientRect();
+    const hovered = store.getAt(event.clientX - x, event.clientY - y);
+    if (hovered) {
+      store.selection.setSelected(hovered.id);
+    } else if (!store.selection.isEmpty()) {
+      store.selection.clear();
     }
   });
 
