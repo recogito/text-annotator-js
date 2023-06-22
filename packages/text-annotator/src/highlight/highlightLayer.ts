@@ -43,20 +43,6 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
     }
   });
 
-  container.addEventListener('pointerdown', (event: PointerEvent) => {
-    const {x, y} = container.getBoundingClientRect();
-
-    const hovered = store.getAt(event.clientX - x, event.clientY - y);
-    if (hovered) {
-      const { selected } = store.selection;
-      
-      if (selected.length !== 1 || selected[0] !== hovered.id)
-        store.selection.setSelected(hovered.id);
-    } else if (!store.selection.isEmpty()) {
-      store.selection.clear();
-    }
-  });
-
   const getViewport = () => {
     const { top, left } = container.getBoundingClientRect();
      

@@ -10,7 +10,7 @@ export const TextAnnotatorPopup = (props: TextAnnotatorPopupProps) => {
 
   const el = useRef<HTMLDivElement>(null);
 
-  const selection = useSelection<TextAnnotation>();
+  const { selected, pointerEvent } = useSelection<TextAnnotation>();
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
@@ -39,25 +39,25 @@ export const TextAnnotatorPopup = (props: TextAnnotatorPopupProps) => {
     a.every(str => b.includes(str)) && b.every(str => a.includes(str));
 
   useEffect(() => {
-    console.log('Selection: ', selection);
+    console.log('Selection: ', selected);
     
     // Reset drag flag if selected IDs have changed
-    const nextIds = selection.map(a => a.id);
+    const nextIds = selected.map(a => a.id);
 
     if (!equal(selectedIds, nextIds)) {
       setDragged(false);
       setSelectedIds(nextIds);
     }
-  }, [selection]);
+  }, [selected]);
 
   useEffect(() => {
     if (!el.current) return;
 
     if (!dragged) updatePosition();
-  }, [selection, dragged]);
+  }, [selected, dragged]);
   
-  return selection.length > 0 ? (
-    <Draggable ref={el} key={selection.map(a => a.id).join('-')} className="a9s-popup a9s-osd-popup" onDragStart={onDragStart}>
+  return selected.length > 0 ? (
+    <Draggable ref={el} key={selected.map(a => a.id).join('-')} className="a9s-popup a9s-osd-popup" onDragStart={onDragStart}>
       
     </Draggable>
   ) : null;

@@ -72,18 +72,26 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
     }
   });
 
-  document.addEventListener('pointerup', (evt: PointerEvent) => {
-    const selection = document.getSelection();
-    if (selection.isCollapsed)
-      return;
-
+  document.addEventListener('pointerup', (event: PointerEvent) => {
     if (currentTarget) {
       store.updateTarget(currentTarget, Origin.LOCAL);
 
-      store.selection.clickSelect(currentTarget.annotation, evt);
+      store.selection.clickSelect(currentTarget.annotation, event);
 
       clearNativeSelection();
       currentTarget = null;
+    } else {
+      const { x, y } = container.getBoundingClientRect();
+    
+      const hovered = store.getAt(event.clientX - x, event.clientY - y);
+      if (hovered) {
+        const { selected } = store.selection;
+        
+        if (selected.length !== 1 || selected[0] !== hovered.id)
+          store.selection.setSelected(hovered.id);
+      } else if (!store.selection.isEmpty()) {
+        store.selection.clear();
+      }
     }
 
     // Hide native browser selection
