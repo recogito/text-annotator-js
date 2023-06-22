@@ -66,24 +66,23 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
           bodies: [],
           target: updatedTarget
         });
-
-        store.selection.setSelected(updatedTarget.annotation);
       }
 
       currentTarget = updatedTarget;
     }
   });
 
-  document.addEventListener('pointerup', () => {
+  document.addEventListener('pointerup', (evt: PointerEvent) => {
     const selection = document.getSelection();
     if (selection.isCollapsed)
       return;
 
     if (currentTarget) {
       store.updateTarget(currentTarget, Origin.LOCAL);
-      
+
+      store.selection.clickSelect(currentTarget.annotation, evt);
+
       clearNativeSelection();
-      // store.selection.clear();
       currentTarget = null;
     }
 
