@@ -25,7 +25,6 @@
     "./dist/text-annotator.css": "./dist/text-annotator.css"
   },
   "devDependencies": {
-    "@annotorious/supabase": "file:../../../../annotorious/annotorious-v3/packages/annotorious-supabase",
     "@types/rbush": "^3.0.0",
     "@types/uuid": "^9.0.1",
     "typescript": "^4.9.5",

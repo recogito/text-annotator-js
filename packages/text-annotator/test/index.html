@@ -69,7 +69,6 @@
 
     <script type="module">
       import { RecogitoJS } from '../src/index.ts';
-      import { SupabasePlugin } from '@annotorious/supabase';
 
       window.onload = async function() {
         var r = RecogitoJS(document.getElementById('content'), { 
@@ -91,13 +90,6 @@
         r.on('selectionChanged', (annotations) => {
           console.log('selectionChanged', annotations);
         });
-
-        /*
-        var config = await fetch('config.json').then((response) => response.json());
-
-        var supabase = SupabasePlugin(r, config);
-        supabase.connect();
-        */
       }
     </script>
   </body>
