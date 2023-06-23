@@ -7,7 +7,10 @@ export const App = () => {
   return (
     <Annotorious>
       <TextAnnotator element="annotatable">
-        <TextAnnotatorPopup />
+        <TextAnnotatorPopup 
+          popup={props => (
+            <div>Just a test</div>
+          )} />
       </TextAnnotator>
     </Annotorious>
   )

@@ -34,6 +34,7 @@ export const RecogitoJS = (container: HTMLElement, options: TextAnnotatorOptions
     highlightLayer.setPainter(createPainter(provider, options.presence));
 
   return {
+    element: container,
     getUser,
     setUser,
     setPresenceProvider,

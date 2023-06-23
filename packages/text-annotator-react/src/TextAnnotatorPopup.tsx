@@ -1,69 +1,68 @@
-import { useEffect, useRef, useState } from 'react';
-import { TextAnnotation } from '@recogito/text-annotator';
-import { Draggable, useSelection } from '@annotorious/react';
+import { createPortal } from 'react-dom';
+import { ReactNode, useEffect, useRef, useState } from 'react';
+import { TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
+import { useAnnotator, useSelection } from '@annotorious/react';
+
+const getOffset = (event: PointerEvent, parent: Element) => {
+  const { left, top } = parent.getBoundingClientRect();
+  const offsetX = event.clientX - left;
+  const offsetY = event.clientY - top;
+  return { offsetX, offsetY };
+}
 
 export interface TextAnnotatorPopupProps {
 
+  selected: TextAnnotation[];
+
 }
 
-export const TextAnnotatorPopup = (props: TextAnnotatorPopupProps) => {
+export interface TextAnnotatorPopupContainerProps {
+
+  popup(props: TextAnnotatorPopupProps): ReactNode;
+
+}
+
+export const TextAnnotatorPopup = (props: TextAnnotatorPopupContainerProps) => {
 
   const el = useRef<HTMLDivElement>(null);
 
+  const r = useAnnotator<TextAnnotator>();
+
+  const [open, setOpen] = useState(false);
+
   const { selected, pointerEvent } = useSelection<TextAnnotation>();
 
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  useEffect(() => {
+    if (selected.length === 0 && open) {
+      // Close on deselect
+      setOpen(false);
+    } else if (selected.length > 0) {
+      // Ignore all selection changes except those
+      // accompanied by a pointerup event.
+      if (pointerEvent?.type !== 'pointerup')
+        return;
 
-  const [dragged, setDragged] = useState(false);
-
-  const onDragStart = () => setDragged(true);
-
-  const updatePosition = () => {
-    /*
-    // Note: this popup only supports a single selection
-    const annotation = selection[0];
-
-    const { minX, minY, maxX, maxY } = annotation.target.selector.geometry.bounds;
-
-    const PADDING = 14;
-
-    const topLeft = viewer.viewport.imageToViewerElementCoordinates(new OpenSeadragon.Point(minX, minY));
-    const bottomRight = viewer.viewport.imageToViewerElementCoordinates(new OpenSeadragon.Point(maxX, maxY));
-
-    el.current.style.left = `${bottomRight.x + PADDING}px`;
-    el.current.style.top = `${topLeft.y}px`;
-    */
-  }
-
-  const equal = (a: string[], b: string[]) => 
-    a.every(str => b.includes(str)) && b.every(str => a.includes(str));
-
-  useEffect(() => {    
-    // Reset drag flag if selected IDs have changed
-    const nextIds = selected.map(a => a.id);
-
-    if (!equal(selectedIds, nextIds)) {
-      setDragged(false);
-      setSelectedIds(nextIds);
+      setOpen(true);
     }
-  }, [selected]);
+  }, [pointerEvent, selected]);
 
   useEffect(() => {
-    if (selected.length === 0)
-      console.log('close popup');
-      
-    if (pointerEvent?.type === 'pointerup')
-      console.log('Show popup!');
+    if (!(pointerEvent && open && r))
+      return;
 
-    if (!el.current) return;
+    const { offsetX, offsetY } = getOffset(pointerEvent, r.element);
 
-    if (!dragged) updatePosition();
-  }, [pointerEvent, selected, dragged]);
+    el.current.style.left = `${offsetX}px`;
+    el.current.style.top = `${offsetY}px`;
+  }, [open, pointerEvent, r?.element]);
   
-  return selected.length > 0 ? (
-    <Draggable ref={el} key={selected.map(a => a.id).join('-')} className="a9s-popup a9s-osd-popup" onDragStart={onDragStart}>
-      
-    </Draggable>
-  ) : null;
+  return (open) && createPortal(
+    <div 
+      ref={el}
+      className="a9s-popup r6o-popup"
+      style={{ position: 'absolute' }}>
+      {props.popup({ selected })}
+    </div>, r.element
+  );
 
 }
