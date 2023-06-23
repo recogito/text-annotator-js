@@ -32,7 +32,8 @@ export default defineConfig(({ command, mode }) => ({
         globals: {
           '@annotorious/react': 'AnnotoriousReact',
           'openseadragon': 'OpenSeadragon',
-          'react': 'React'
+          'react': 'React',
+          'react-dom': 'ReactDOM'
         }
       }
     }
