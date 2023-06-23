@@ -30,8 +30,13 @@ export const RecogitoJS = (container: HTMLElement, options: TextAnnotatorOptions
 
   const getUser = () => currentUser;
 
-  const setPresenceProvider = (provider: PresenceProvider) =>
-    highlightLayer.setPainter(createPainter(provider, options.presence));
+  const setPresenceProvider = (provider: PresenceProvider) => {
+    if (provider) {
+      provider.on('selectionChange', () => highlightLayer.redraw());
+      highlightLayer.setPainter(createPainter(provider, options.presence));
+    }
+
+  }
 
   return {
     element: container,

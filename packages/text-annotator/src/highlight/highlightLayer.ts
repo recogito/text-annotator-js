@@ -123,6 +123,7 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
   });
 
   return {
+    redraw,
     setPainter: (painter: HighlightPainter) => currentPainter = painter
   }
 
