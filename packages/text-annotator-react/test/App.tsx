@@ -1,6 +1,16 @@
 import React from 'react';
 import { Annotorious } from '@annotorious/react';
-import { TextAnnotator, TextAnnotatorPopup } from '../src'
+import { TextAnnotator, TextAnnotatorPopup, TextAnnotatorPopupProps } from '../src';
+
+const TestPopup = (props: TextAnnotatorPopupProps) => {
+
+  console.log(props.selected);
+
+  return (
+    <div className="popup">Test Popup</div>
+  )
+
+}
 
 export const App = () => {
   
@@ -9,7 +19,7 @@ export const App = () => {
       <TextAnnotator element="annotatable">
         <TextAnnotatorPopup 
           popup={props => (
-            <div>Just a test</div>
+            <TestPopup {...props} />
           )} />
       </TextAnnotator>
     </Annotorious>

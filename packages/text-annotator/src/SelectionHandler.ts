@@ -37,14 +37,27 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
 
   let currentTarget: AnnotationTarget = null;
 
+  let selectionStarted = false;
+
   const setUser = (user: User) => currentUser = user;
 
-  container.addEventListener('selectstart', () => {
-    // Show native browser selection
-    delete container.dataset.native;
+  container.addEventListener('selectstart', (evt: PointerEvent) => {
+    // Make sure we don't listen to selection changes that
+    // were not started on the container, or which are not supposed to 
+    // be annotatable (like the popup)
+    const annotatable = !(evt.target as Node).parentElement.closest('.not-annotatable');
+    if (annotatable) {
+      selectionStarted = true;
+
+      // Show native browser selection
+      delete container.dataset.native;
+    }
   });
 
   document.addEventListener('selectionchange', (event: PointerEvent) => {   
+    if (!selectionStarted)
+      return;
+
     const selection = document.getSelection();
 
     if (!selection.isCollapsed) {
@@ -82,6 +95,7 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
 
       clearNativeSelection();
       currentTarget = null;
+      selectionStarted = false;
     } else {   
       const { x, y } = container.getBoundingClientRect();
     
