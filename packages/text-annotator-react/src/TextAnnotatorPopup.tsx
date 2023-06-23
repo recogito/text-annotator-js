@@ -50,35 +50,24 @@ export const TextAnnotatorPopup = (props: TextAnnotatorPopupContainerProps) => {
     if (!(pointerEvent && open && r))
       return;
 
-    el.current.addEventListener('selectstart', evt => {
-      console.log('dasafdasd');
-      // evt.stopPropagation();
-    });
-
     const { offsetX, offsetY } = getOffset(pointerEvent, r.element);
 
     el.current.style.left = `${offsetX}px`;
     el.current.style.top = `${offsetY}px`;
   }, [open, pointerEvent, r?.element]);
 
-  const onPointerUp = (evt: React.PointerEvent<HTMLDivElement>) => {
-    console.log('cancelling pointer up event');
+  const onPointerUp = (evt: React.PointerEvent<HTMLDivElement>) =>
     evt.stopPropagation();
-  }
-
-  const onSelect = (evt: React.PointerEvent<HTMLDivElement>) => {
-    console.log('canceling select event');
-    evt.stopPropagation();
-  }
   
   return (open && selected.length > 0) && createPortal(
     <div 
       ref={el}
       className="a9s-popup r6o-popup not-annotatable"
       style={{ position: 'absolute' }}
-      onPointerUp={onPointerUp}
-      onSelect={onSelect}>
+      onPointerUp={onPointerUp}>
+
       {props.popup({ selected })}
+      
     </div>, r.element
   );
 

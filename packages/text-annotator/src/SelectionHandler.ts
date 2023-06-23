@@ -49,6 +49,9 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
     if (annotatable) {
       selectionStarted = true;
 
+      // Hide native browser selection
+      container.dataset.native = 'hidden';
+    } else {
       // Show native browser selection
       delete container.dataset.native;
     }
@@ -109,9 +112,6 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
         store.selection.clear();
       }
     }
-
-    // Hide native browser selection
-    container.dataset.native = 'hidden';
   });
 
   return {
