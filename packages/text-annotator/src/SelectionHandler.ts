@@ -11,7 +11,7 @@ const clearNativeSelection = () => {
       window.getSelection().removeAllRanges();
     }
   // @ts-ignore
-  } else if (document.selection) {  // IE?
+  } else if (document.selection) {
     // @ts-ignore
     document.selection.empty();
   }
@@ -112,6 +112,8 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
         store.selection.clear();
       }
     }
+
+    delete container.dataset.native;
   });
 
   return {
