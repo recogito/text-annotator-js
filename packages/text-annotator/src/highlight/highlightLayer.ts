@@ -35,11 +35,15 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
     const {x, y} = container.getBoundingClientRect();
     const hovered = store.getAt(event.clientX - x, event.clientY - y);
     if (hovered) {
-      if (store.hover.current !== hovered.id)
+      if (store.hover.current !== hovered.id) {
+        container.classList.add('hovered');
         store.hover.set(hovered.id);
+      }
     } else {
-      if (store.hover.current)
+      if (store.hover.current) {
+        container.classList.remove('hovered');
         store.hover.set(null);
+      }
     }
   });
 

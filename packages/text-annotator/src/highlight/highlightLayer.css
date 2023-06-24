@@ -2,6 +2,10 @@
   position: relative;
 }
 
+.r6o-annotatable.hovered {
+  cursor: pointer;
+}
+
 .r6o-highlight-layer {
   height: 100%;
   left: 0;
