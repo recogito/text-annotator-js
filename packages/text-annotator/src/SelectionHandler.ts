@@ -90,7 +90,7 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
     }
   });
 
-  document.addEventListener('pointerup', (event: PointerEvent) => {
+  container.addEventListener('pointerup', (event: PointerEvent) => {
     if (currentTarget) {
       store.updateTarget(currentTarget, Origin.LOCAL);
 
