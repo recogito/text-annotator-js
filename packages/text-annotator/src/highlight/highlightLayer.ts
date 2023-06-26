@@ -119,11 +119,19 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
   }
 
   store.observe(({ changes }) => {
-    const updatedIds = (changes.updated || []).map(update => update.newValue.id);
+    const { created, deleted, updated } = changes;
 
-    // Check if any rendered annotations are affected by updates
-    const affectsRendered = updatedIds.some(id => renderedIds.has(id));
-    redraw(!affectsRendered);
+    if (created?.length > 0) {
+      redraw();
+    } else {
+      const affectedIds = [
+        ...(deleted || []).map(a => a.id),
+        ...(updated || []).map(u => u.newValue.id)
+      ];
+
+      const affectsRendered = affectedIds.some(id => renderedIds.has(id));
+      redraw(!affectsRendered);
+    }
   });
 
   return {
