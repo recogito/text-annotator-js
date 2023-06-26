@@ -27,6 +27,8 @@ export const createPainter = (provider: PresenceProvider, opts: PresencePainterO
       context.font = opts.font;
 
     const user = trackedAnnotations.get(annotation.id);
+    console.log('user for annotation', user);
+    
     if (user) {
       const { x, y, height } = rects[0];
 
@@ -36,13 +38,16 @@ export const createPainter = (provider: PresenceProvider, opts: PresencePainterO
 
       // Draw name label
       const metrics = context.measureText(user.appearance.label);
-      const textWidth = metrics.width;
-      const textHeight = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent;
+      const labelWidth = metrics.width + 6;
+      const labelHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent + 8;
+      
+      // Sigh... different between FF and Chrome
+      const paddingBottom = metrics.fontBoundingBoxAscent ? 8 : 6.5;
 
-      context.fillRect(x - offset.x - 2, y - offset.y - textHeight - 4, textWidth + 8, textHeight + 2);
+      context.fillRect(x - offset.x - 2, y - offset.y - 2.5 - labelHeight, labelWidth, labelHeight);
       
       context.fillStyle = '#fff';
-      context.fillText(user.appearance.label, x - offset.x + 1, y - offset.y - 6.5);
+      context.fillText(user.appearance.label, x - offset.x + 1, y - offset.y - paddingBottom);
       
       return { fill: user.appearance.color + '33' };
     } else {

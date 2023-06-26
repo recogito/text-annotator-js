@@ -90,7 +90,11 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
     }
   });
 
-  container.addEventListener('pointerup', (event: PointerEvent) => {
+  document.addEventListener('pointerup', (event: PointerEvent) => {
+    const annotatable = !(event.target as Node).parentElement.closest('.not-annotatable');
+    if (!annotatable)
+      return;
+      
     if (currentTarget) {
       store.updateTarget(currentTarget, Origin.LOCAL);
 
