@@ -27,8 +27,6 @@ export const createPainter = (provider: PresenceProvider, opts: PresencePainterO
       context.font = opts.font;
 
     const user = trackedAnnotations.get(annotation.id);
-    console.log('user for annotation', user);
-    
     if (user) {
       const { x, y, height } = rects[0];
 
