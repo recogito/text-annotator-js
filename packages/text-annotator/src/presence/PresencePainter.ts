@@ -22,7 +22,7 @@ export const createPainter = (provider: PresenceProvider, opts: PresencePainterO
       selection.forEach(id => trackedAnnotations.set(id, p));
   });  
 
-  const paint = (annotation: TextAnnotation, rects: DOMRect[], context: CanvasRenderingContext2D, offset: DOMRect) => {
+  const paint = (annotation: TextAnnotation, rects: DOMRect[], context: CanvasRenderingContext2D, offset: DOMRect, isSelected: boolean = false) => {
     if (opts.font)
       context.font = opts.font;
 
@@ -47,9 +47,9 @@ export const createPainter = (provider: PresenceProvider, opts: PresencePainterO
       context.fillStyle = '#fff';
       context.fillText(user.appearance.label, x - offset.x + 1, y - offset.y - paddingBottom);
       
-      return { fill: user.appearance.color + '33' };
+      return { fill: isSelected ? user.appearance.color + '33' : user.appearance.color + '62' };
     } else {
-      return { fill: 'rgba(0, 128, 255, 0.2)' }
+      return { fill:  isSelected ? 'rgba(0, 128, 255, 0.4)' : 'rgba(0, 128, 255, 0.18)' };
     }
   }
 
