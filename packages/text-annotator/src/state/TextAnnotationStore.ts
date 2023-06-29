@@ -112,7 +112,10 @@ export const createTextStore = (container: HTMLElement): TextAnnotationStore => 
 
   const getIntersecting = (minX: number, minY: number, maxX: number, maxY: number) => {
     const ids = tree.getIntersecting(minX, minY, maxX, maxY);
-    return ids.map(id => store.getAnnotation(id));
+
+    // Note that the tree could be slightly out of sync (because it updates
+    // by listening to changes, just like anyone else)
+    return ids.map(id => store.getAnnotation(id)).filter(a => a);
   }
 
   const recalculatePositions = () => tree.recalculate();

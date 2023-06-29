@@ -86,7 +86,7 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
   const redraw = (lazy: boolean = true) => {
     const offset = container.getBoundingClientRect();
 
-    const { minX, minY, maxX, maxY } = getViewport();      
+    const { minX, minY, maxX, maxY } = getViewport();   
     const annotationsInView = store.getIntersecting(minX, minY, maxX, maxY);
 
     const ids = new Set(annotationsInView.map(a => a.id));
