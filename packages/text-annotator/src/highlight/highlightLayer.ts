@@ -3,6 +3,10 @@ import type { HighlightPainter } from './HighlightPainter';
 
 import './highlightLayer.css';
 
+const DEFAULT_STYLE = { fill: 'rgba(0, 128, 255, 0.18)' };
+
+const SELECTED_STYLE = { fill: 'rgba(0, 128, 255, 0.4)' };
+
 /**
  * Returns true if set a is equal to b, or if a is a subset of b. 
  * @param a set A
@@ -91,27 +95,25 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
       return;
 
     requestAnimationFrame(() => {
+      // New render loop - clear canvas
       context.clearRect(0, 0, canvas.width, canvas.height);
 
-      if (!currentPainter)
-        context.fillStyle = 'rgba(0, 128, 255, 0.2)';
+      // Get current selection
+      const selected = new Set(store.selection.selected);
 
       annotationsInView.forEach(annotation => {
+        const isSelected = selected.has(annotation.id);
+
         const rects = Array.from(annotation.target.selector.range.getClientRects());
+
+        const style = 
+          (currentPainter && currentPainter(annotation, rects, context, offset, isSelected)) || 
+          (isSelected ? SELECTED_STYLE : DEFAULT_STYLE);
         
-        if (currentPainter) {
-          const style = currentPainter(annotation, rects, context, offset);
+        context.fillStyle = style.fill;
 
-          if (style) {
-            context.fillStyle = style.fill;
-
-            rects.forEach(({ x, y, width, height }) =>
-              context.fillRect(x - offset.x, y - offset.y - 2.5, width, height + 5));
-          }
-        } else {
-          rects.forEach(({ x, y, width, height }) =>
-            context.fillRect(x - offset.x, y - offset.y - 2.5, width, height + 5));
-        }
+        rects.forEach(({ x, y, width, height }) =>
+          context.fillRect(x - offset.x, y - offset.y - 2.5, width, height + 5));
       });
     });
 
@@ -133,6 +135,10 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
       redraw(!affectsRendered);
     }
   });
+
+  // Selection should only ever affect visible annotations,
+  // need need for extra check
+  store.selection.subscribe(() => redraw(false));
 
   return {
     redraw,
