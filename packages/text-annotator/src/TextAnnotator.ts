@@ -1,10 +1,12 @@
-import { createAnonymousGuest, type Annotator, type User, createLifecyleObserver, type PresenceProvider } from '@annotorious/core';
-import type { TextAnnotation } from './model/TextAnnotation';
-import { SelectionHandler } from './SelectionHandler';
+import { createAnonymousGuest, createLifecyleObserver } from '@annotorious/core';
+import type { Annotator, User, PresenceProvider } from '@annotorious/core';
+import { createPainter } from './presence';
+import { createHighlightLayer } from './highlight';
+import { scrollIntoView } from './api';
 import { createTextStore, type TextAnnotationStore } from './state';
-import { createHighlightLayer } from './highlight/highlightLayer';
-import { createPainter } from './presence/PresencePainter';
+import type { TextAnnotation } from './model';
 import type { TextAnnotatorOptions } from './TextAnnotatorOptions';
+import { SelectionHandler } from './SelectionHandler';
 
 import './TextAnnotator.css';
 
@@ -35,7 +37,6 @@ export const RecogitoJS = (container: HTMLElement, options: TextAnnotatorOptions
       highlightLayer.setPainter(createPainter(provider, options.presence));
       provider.on('selectionChange', () => highlightLayer.redraw(false));
     }
-
   }
 
   return {
@@ -45,6 +46,7 @@ export const RecogitoJS = (container: HTMLElement, options: TextAnnotatorOptions
     setPresenceProvider,
     on: lifecycle.on,
     off: lifecycle.off,
+    scrollIntoView: scrollIntoView(container),
     selection: store.selection,
     store
   }
