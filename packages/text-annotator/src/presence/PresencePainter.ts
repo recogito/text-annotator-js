@@ -47,7 +47,7 @@ export const createPainter = (provider: PresenceProvider, opts: PresencePainterO
       context.fillStyle = '#fff';
       context.fillText(user.appearance.label, x - offset.x + 1, y - offset.y - paddingBottom);
       
-      return { fill: isSelected ? user.appearance.color + '33' : user.appearance.color + '62' };
+      return { fill: isSelected ? user.appearance.color + '62' : user.appearance.color + '33' };
     } else {
       return { fill:  isSelected ? 'rgba(0, 128, 255, 0.4)' : 'rgba(0, 128, 255, 0.18)' };
     }
