@@ -25,8 +25,8 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
   container.classList.add('r6o-annotatable');
 
   const canvas = document.createElement('canvas');
-  canvas.width = container.offsetWidth;
-  canvas.height = container.offsetHeight;
+  canvas.width = 2 * window.innerWidth;
+  canvas.height = 2 * window.innerHeight;
   canvas.className = 'r6o-highlight-layer';
 
   const context = canvas.getContext('2d');
@@ -64,13 +64,13 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
     return { minX, minY, maxX, maxY };
   }
 
-  const onScroll = () => redraw(true);
+  const onScroll = () => redraw();
 
   document.addEventListener('scroll', onScroll, true);
 
   const onResize = new ResizeObserver(() => {
-    canvas.width = 2 * container.offsetWidth;
-    canvas.height = 2 * container.offsetHeight;
+    canvas.width = 2 * window.innerWidth;
+    canvas.height = 2 * window.innerHeight;
     
     const context = canvas.getContext('2d');
     context.scale(2, 2);
@@ -78,25 +78,20 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
     
     store.recalculatePositions();
 
-    redraw(false);
+    redraw();
   });
 
   onResize.observe(container);
 
-  const redraw = (lazy: boolean = true) => {
+  const redraw = () => {
     const offset = container.getBoundingClientRect();
 
     const { minX, minY, maxX, maxY } = getViewport();   
     const annotationsInView = store.getIntersecting(minX, minY, maxX, maxY);
 
-    const ids = new Set(annotationsInView.map(a => a.id));
-    if (lazy && equalOrSubset(ids, renderedIds))
-      // Don't re-render if there are no new annotations
-      return;
-
     requestAnimationFrame(() => {
       // New render loop - clear canvas
-      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.clearRect(-0.5, -0.5, canvas.width + 1, canvas.height + 1);
 
       // Get current selection
       const selected = new Set(store.selection.selected);
@@ -106,39 +101,22 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
 
         const rects = Array.from(annotation.target.selector.range.getClientRects());
 
-        const style = 
+        const style =
           (currentPainter && currentPainter(annotation, rects, context, offset, isSelected)) || 
           (isSelected ? SELECTED_STYLE : DEFAULT_STYLE);
         
         context.fillStyle = style.fill;
 
-        rects.forEach(({ x, y, width, height }) =>
-          context.fillRect(x - offset.x, y - offset.y - 2.5, width, height + 5));
+        rects.forEach(({ x, y, width, height }) => context.fillRect(x, y - 2.5, width, height + 5));
       });
     });
-
-    renderedIds = ids;
   }
 
-  store.observe(({ changes }) => {
-    const { created, deleted, updated } = changes;
-
-    if (created?.length > 0) {
-      redraw();
-    } else {
-      const affectedIds = [
-        ...(deleted || []).map(a => a.id),
-        ...(updated || []).map(u => u.newValue.id)
-      ];
-
-      const affectsRendered = affectedIds.some(id => renderedIds.has(id));
-      redraw(!affectsRendered);
-    }
-  });
+  store.observe(() => redraw());
 
   // Selection should only ever affect visible annotations,
   // need need for extra check
-  store.selection.subscribe(() => redraw(false));
+  store.selection.subscribe(() => redraw());
 
   return {
     redraw,
