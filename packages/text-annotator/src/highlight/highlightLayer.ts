@@ -7,18 +7,16 @@ const DEFAULT_STYLE = { fill: 'rgba(0, 128, 255, 0.18)' };
 
 const SELECTED_STYLE = { fill: 'rgba(0, 128, 255, 0.4)' };
 
-/**
- * Returns true if set a is equal to b, or if a is a subset of b. 
- * @param a set A
- * @param b set B
- * @returns true if a is equal or a subset to b
- */
-const equalOrSubset = (a: Set<string>, b: Set<string>) =>
-  a.size <= b.size && [...a].every(value => b.has(value));
+const debounce = <T extends (...args: any[]) => void>(func: T, delay: number = 10): T => {
+  let timeoutId: number;
+
+  return ((...args: any[]) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func.apply(this, args), delay);
+  }) as T;
+}
 
 export const createHighlightLayer = (container: HTMLElement, store: TextAnnotationStore) => {
-
-  let renderedIds = new Set<string>();
 
   let currentPainter: HighlightPainter = null;
 
@@ -68,7 +66,7 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
 
   document.addEventListener('scroll', onScroll, true);
 
-  const onResize = new ResizeObserver(() => {
+  const onResize = debounce(() => {
     canvas.width = 2 * window.innerWidth;
     canvas.height = 2 * window.innerHeight;
     
@@ -81,7 +79,16 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
     redraw();
   });
 
-  onResize.observe(container);
+  // Note that in cases where the element resized due to a 
+  // window resize, onResize will be triggered twice. This is
+  // probably not a huge issue. But definitely an area for
+  // future optimization. In terms of how to do this: there's 
+  // probably no ideal solution, but one straightforward way
+  // would be to just set a flag in 
+  window.addEventListener('resize', onResize);
+
+  const resizeObserver = new ResizeObserver(onResize);
+  resizeObserver.observe(container);
 
   const redraw = () => {
     const offset = container.getBoundingClientRect();
