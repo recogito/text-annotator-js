@@ -1,25 +1,3 @@
- /*   // https://www.benpickles.com/articles/51-finding-a-dom-nodes-common-ancestor-using-javascript
-    getCommonAncestor : function(node1, node2) {
-      var parents = function(node) {
-            var nodes = [ node ];
-            for (; node; node = node.parentNode) {
-              nodes.unshift(node);
-            }
-            return nodes;
-          },
-
-          parents1 = parents(node1),
-          parents2 = parents(node2);
-
-      // No common ancestor
-      if (parents1[0] !== parents2[0]) return;
-
-      for (var i=0; i<parents1.length; i++) {
-        if (parents1[i] !== parents2[i]) return parents1[i - 1];
-      }
-    },
-*/
-
 const getXPath = (node: Node, path: string[] = []) => {
   let xpath: string;
   let count: number;
@@ -85,7 +63,7 @@ const toTEIPaths = (container: Element, startPath: string[], endPath: string[], 
   return { start, end }; 
 }
 
-export const rangeToXPathSelector = (container: Element, selectedRange: Range) => {
+export const rangeToXPathRangeSelector = (container: Element, selectedRange: Range) => {
 
   const startDOMPath = getXPath(selectedRange.startContainer);
   const endDOMPath = getXPath(selectedRange.endContainer);
@@ -103,4 +81,4 @@ export const rangeToXPathSelector = (container: Element, selectedRange: Range) =
       value: end
     }
   };
-};
+}

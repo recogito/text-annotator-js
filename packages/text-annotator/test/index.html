@@ -68,10 +68,10 @@
     </div>
 
     <script type="module">
-      import { RecogitoJS } from '../src/index.ts';
+      import { TextAnnotator } from '../src/index.ts';
 
       window.onload = async function() {
-        var r = RecogitoJS(document.getElementById('content'));
+        var r = TextAnnotator(document.getElementById('content'));
 
         r.on('createAnnotation', annotation => {
           console.log('createAnnotation', annotation);

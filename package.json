@@ -14,7 +14,7 @@
   },
   "workspaces": [
     "./packages/text-annotator",
-    "./packages/text-annotator-plugin-tei",
-    "./packages/text-annotator-react"
+    "./packages/text-annotator-react",
+    "./packages/plugin-tei"
   ]
 }

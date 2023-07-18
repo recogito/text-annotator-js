@@ -30,6 +30,7 @@
     "vite-plugin-dts": "^2.3.0"
   },
   "dependencies": {
+    "@annotorious/core": "^3.0.0-pre-alpha-26",
     "CETEIcean": "^1.8.0"
   }
 }

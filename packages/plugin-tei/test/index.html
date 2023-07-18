@@ -42,7 +42,9 @@
 
     <script type="module">
       import CETEI from 'CETEIcean';
-      import { RecogitoJS } from '@recogito/text-annotator';
+      import { TextAnnotator } from '@recogito/text-annotator';
+      import { TEIPlugin } from '../src/index.ts';
+
       import '@recogito/text-annotator/dist/text-annotator.css';
 
       window.onload = async function() {
@@ -52,21 +54,23 @@
           document.getElementById('content').appendChild(data);
         });
 
-        var r = RecogitoJS(document.getElementById('content'));
+        var t = TextAnnotator(document.getElementById('content'));
+        
+        TEIPlugin(t);
 
-        r.on('createAnnotation', annotation => {
+        t.on('createAnnotation', annotation => {
           console.log('createAnnotation', annotation);
         });
 
-        r.on('updateAnnotation', (annotation, previous) => {
+        t.on('updateAnnotation', (annotation, previous) => {
           console.log('updateAnnotation', annotation, previous);
         });
 
-        r.on('deleteAnnotation', (annotation) => {
+        t.on('deleteAnnotation', (annotation) => {
           console.log('deleteAnnotation', annotation);
         });
 
-        r.on('selectionChanged', (annotations) => {
+        t.on('selectionChanged', (annotations) => {
           console.log('selectionChanged', annotations);
         });
       }

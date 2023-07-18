@@ -10,9 +10,9 @@ import { SelectionHandler } from './SelectionHandler';
 
 import './TextAnnotator.css';
 
-export type TextAnnotator = Annotator<TextAnnotation> & ReturnType<typeof RecogitoJS>;
+export interface TextAnnotator extends ReturnType<typeof TextAnnotator>, Annotator<TextAnnotation> {};
 
-export const RecogitoJS = (container: HTMLElement, options: TextAnnotatorOptions = {}): Annotator<TextAnnotation> & ReturnType<typeof RecogitoJS> => {
+export const TextAnnotator = (container: HTMLElement, options: TextAnnotatorOptions = {}): Annotator<TextAnnotation> & ReturnType<typeof TextAnnotator> => {
 
   const store: TextAnnotationStore = createTextStore(container);
 

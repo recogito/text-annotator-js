@@ -1,5 +1,5 @@
 import { ReactNode, useContext, useEffect } from 'react';
-import { TextAnnotatorOptions, RecogitoJS } from '@recogito/text-annotator';
+import { TextAnnotatorOptions, TextAnnotator as VanillaTextAnnotator } from '@recogito/text-annotator';
 import { AnnotoriousContext } from '@annotorious/react';
 
 import '@recogito/text-annotator/dist/text-annotator.css';
@@ -20,7 +20,7 @@ export const TextAnnotator = (props: TextAnnotatorProps) => {
   
   useEffect(() => {
     const el = element ? document.getElementById(element) : null;
-    const r = RecogitoJS(el, opts);
+    const r = VanillaTextAnnotator(el, opts);
     setAnno(r);
   }, []);
 
