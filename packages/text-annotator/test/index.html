@@ -3,7 +3,6 @@
   <head>
     <meta charset="utf-8" />
     <title>RecogitoJS 3</title>
-    <script type="module" src="../src/index.ts"></script>
     <style>
       html, body {
         background: #e2e2e2;
@@ -72,9 +71,7 @@
       import { RecogitoJS } from '../src/index.ts';
 
       window.onload = async function() {
-        var r = RecogitoJS(document.getElementById('content'), { 
-          presence: { font: 'bold 14px Arial' }
-        });
+        var r = RecogitoJS(document.getElementById('content'));
 
         r.on('createAnnotation', annotation => {
           console.log('createAnnotation', annotation);

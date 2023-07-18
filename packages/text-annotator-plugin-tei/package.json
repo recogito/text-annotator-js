@@ -1,5 +1,5 @@
 {
-  "name": "@recogito/text-annotator",
+  "name": "@recogito/text-annotator-tei",
   "version": "3.0.0-pre-alpha-27",
   "description": "Experimental rewrite of the Recogito JS text annotation library",
   "author": "Rainer Simon",
@@ -11,31 +11,25 @@
     "preview": "vite preview",
     "test": "echo 'Skipping tests in @recogito/text-annotator package'"
   },
-  "main": "./dist/text-annotator.umd.js",
-  "module": "./dist/text-annotator.es.js",
+  "main": "./dist/text-annotator-tei.umd.js",
+  "module": "./dist/text-annotator-tei.es.js",
   "types": "./dist/src/index.d.ts",
   "files": [
     "dist"
   ],
   "exports": {
     ".": {
-      "import": "./dist/text-annotator.es.js",
-      "require": "./dist/text-annotator.umd.js"
+      "import": "./dist/text-annotator-tei.es.js",
+      "require": "./dist/text-annotator-tei.umd.js"
     },
-    "./dist/text-annotator.css": "./dist/text-annotator.css"
+    "./dist/text-annotator.css": "./dist/text-annotator-tei.css"
   },
   "devDependencies": {
-    "@types/rbush": "^3.0.0",
-    "@types/uuid": "^9.0.1",
-    "svelte": "^4.0.0",
     "typescript": "^4.9.5",
     "vite": "^4.2.1",
     "vite-plugin-dts": "^2.3.0"
   },
   "dependencies": {
-    "@annotorious/core": "^3.0.0-pre-alpha-26",
-    "nanoevents": "^7.0.1",
-    "rbush": "^3.0.1",
-    "uuid": "^9.0.0"
+    "CETEIcean": "^1.8.0"
   }
 }
