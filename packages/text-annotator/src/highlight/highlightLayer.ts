@@ -91,8 +91,6 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
   resizeObserver.observe(container);
 
   const redraw = () => {
-    const offset = container.getBoundingClientRect();
-
     const { minX, minY, maxX, maxY } = getViewport();   
     const annotationsInView = store.getIntersecting(minX, minY, maxX, maxY);
 
@@ -109,7 +107,7 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
         const rects = Array.from(annotation.target.selector.range.getClientRects());
 
         const style =
-          (currentPainter && currentPainter(annotation, rects, context, offset, isSelected)) || 
+          (currentPainter && currentPainter(annotation, rects, context, isSelected)) || 
           (isSelected ? SELECTED_STYLE : DEFAULT_STYLE);
         
         context.fillStyle = style.fill;

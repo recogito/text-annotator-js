@@ -8,8 +8,6 @@ export type HighlightPainter = (
   
   context: CanvasRenderingContext2D,
 
-  offset: DOMRect,
-
   isSelected?: boolean
   
 ) => HighlightStyle | void;

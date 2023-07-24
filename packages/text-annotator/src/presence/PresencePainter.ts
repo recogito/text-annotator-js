@@ -22,7 +22,7 @@ export const createPainter = (provider: PresenceProvider, opts: PresencePainterO
       selection.forEach(id => trackedAnnotations.set(id, p));
   });  
 
-  const paint = (annotation: TextAnnotation, rects: DOMRect[], context: CanvasRenderingContext2D, offset: DOMRect, isSelected: boolean = false) => {
+  const paint = (annotation: TextAnnotation, rects: DOMRect[], context: CanvasRenderingContext2D, isSelected: boolean = false) => {
     if (opts.font)
       context.font = opts.font;
 
@@ -32,7 +32,7 @@ export const createPainter = (provider: PresenceProvider, opts: PresencePainterO
 
       // Draw presence indicator
       context.fillStyle = user.appearance.color;
-      context.fillRect(x - offset.x - 2, y - offset.y - 2.5, 2, height + 5);
+      context.fillRect(x - 2, y - 2.5, 2, height + 5);
 
       // Draw name label
       const metrics = context.measureText(user.appearance.label);
@@ -42,10 +42,10 @@ export const createPainter = (provider: PresenceProvider, opts: PresencePainterO
       // Sigh... different between FF and Chrome
       const paddingBottom = metrics.fontBoundingBoxAscent ? 8 : 6.5;
 
-      context.fillRect(x - offset.x - 2, y - offset.y - 2.5 - labelHeight, labelWidth, labelHeight);
+      context.fillRect(x - 2, y - 2.5 - labelHeight, labelWidth, labelHeight);
       
       context.fillStyle = '#fff';
-      context.fillText(user.appearance.label, x - offset.x + 1, y - offset.y - paddingBottom);
+      context.fillText(user.appearance.label, x + 1, y - paddingBottom);
       
       return { fill: isSelected ? user.appearance.color + '62' : user.appearance.color + '33' };
     } else {
