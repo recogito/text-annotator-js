@@ -1,6 +1,6 @@
 {
   "name": "@recogito/text-annotator",
-  "version": "3.0.0-pre-alpha-27",
+  "version": "3.0.0-pre-alpha-28",
   "description": "Experimental rewrite of the Recogito JS text annotation library",
   "author": "Rainer Simon",
   "license": "BSD-3-Clause",
@@ -33,7 +33,7 @@
     "vite-plugin-dts": "^2.3.0"
   },
   "dependencies": {
-    "@annotorious/core": "^3.0.0-pre-alpha-26",
+    "@annotorious/core": "^3.0.0-pre-alpha-28",
     "nanoevents": "^7.0.1",
     "rbush": "^3.0.1",
     "uuid": "^9.0.0"
