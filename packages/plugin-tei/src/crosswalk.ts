@@ -1,3 +1,6 @@
+import type { TextSelector } from '@recogito/text-annotator';
+import type { TEIRangeSelector } from './TEIAnnotation';
+
 const getXPath = (node: Node, path: string[] = []) => {
   let xpath: string;
   let count: number;
@@ -63,12 +66,13 @@ const toTEIPaths = (container: Element, startPath: string[], endPath: string[], 
   return { start, end }; 
 }
 
-export const rangeToXPathRangeSelector = (container: Element, selectedRange: Range) => {
+export const rangeToXPathRangeSelector = (container: Element, selector: TextSelector): TEIRangeSelector => {
+  const { range } = selector;
 
-  const startDOMPath = getXPath(selectedRange.startContainer);
-  const endDOMPath = getXPath(selectedRange.endContainer);
+  const startDOMPath = getXPath(range.startContainer);
+  const endDOMPath = getXPath(range.endContainer);
 
-  const { start, end } = toTEIPaths(container, startDOMPath, endDOMPath, selectedRange);
+  const { start, end } = toTEIPaths(container, startDOMPath, endDOMPath, range);
 
   return {
     type: 'RangeSelector',
@@ -79,6 +83,8 @@ export const rangeToXPathRangeSelector = (container: Element, selectedRange: Ran
     endSelector: {
       type: 'XPathSelector',
       value: end
-    }
+    },
+    quote: selector.quote,
+    range
   };
 }

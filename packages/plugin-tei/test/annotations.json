@@ -1,0 +1,52 @@
+[
+  {
+    "id": "b06971d9-0aba-4924-99b2-6c88e0faa9b4",
+    "bodies": [],
+    "target": {
+      "annotation": "b06971d9-0aba-4924-99b2-6c88e0faa9b4",
+      "selector": {
+        "type": "RangeSelector",
+        "startSelector": {
+          "type": "XPathSelector",
+          "value": "/TEI[1]/text[1]/body[1]/div[1]/p[1]::31"
+        },
+        "endSelector": {
+          "type": "XPathSelector",
+          "value": "/TEI[1]/text[1]/body[1]/div[1]/p[1]::131"
+        },
+        "range": {},
+        "quote": "that ingenious hero who travelled far and wide after he had\n          sacked the famous town of Troy"
+      },
+      "creator": {
+        "isGuest": true,
+        "id": "B47KLoTkCNdPkWPQ2NsH"
+      },
+      "created": "2023-07-25T07:04:31.005Z"
+    }
+  },
+  {
+    "id": "639e4609-821a-46de-8683-264381ba93ff",
+    "bodies": [],
+    "target": {
+      "annotation": "639e4609-821a-46de-8683-264381ba93ff",
+      "selector": {
+        "type": "RangeSelector",
+        "startSelector": {
+          "type": "XPathSelector",
+          "value": "/TEI[1]/text[1]/body[1]/div[1]/p[3]::11"
+        },
+        "endSelector": {
+          "type": "XPathSelector",
+          "value": "/TEI[1]/text[1]/body[1]/div[1]/p[3]::156"
+        },
+        "range": {},
+        "quote": "Now Neptune had gone off to the Ethiopians, who are at the world's end, and lie in\n          two halves, the one looking West and the other East."
+      },
+      "creator": {
+        "isGuest": true,
+        "id": "B47KLoTkCNdPkWPQ2NsH"
+      },
+      "created": "2023-07-25T07:05:11.472Z"
+    }
+  }
+]

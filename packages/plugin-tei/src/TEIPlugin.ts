@@ -1,6 +1,7 @@
 import type { TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
 import type { LifecycleEvents } from '@annotorious/core';
 import { rangeToXPathRangeSelector } from './crosswalk';
+import type { TEIAnnotation } from './TEIAnnotation';
 
 type TextEvents = LifecycleEvents<TextAnnotation>;
 
@@ -8,8 +9,9 @@ export const TEIPlugin = (a: TextAnnotator) => {
 
   const container: HTMLElement = a.element;
 
-  const teiify = (a: TextAnnotation) => {
-    const selector = rangeToXPathRangeSelector(container, a.target.selector.range);
+  // Forward crosswalk - text offset to XPath selector
+  const fwd = (a: TextAnnotation): TEIAnnotation => {
+    const selector = rangeToXPathRangeSelector(container, a.target.selector);
 
     return {
       ...a,
@@ -24,19 +26,40 @@ export const TEIPlugin = (a: TextAnnotator) => {
     }
   }
 
-  const _on = a.on;
+  // TODO reverse crosswalk - XPath to text offset selector
+  const rvs = (a: TextAnnotation): TEIAnnotation => {
+    return null;
+  }
 
-  a.on = <E extends keyof TextEvents>(event: E, callback: TextEvents[E]) => {
+  const on = <E extends keyof TextEvents>(event: E, callback: TextEvents[E]) => {
     if (event === 'createAnnotation' || event === 'deleteAnnotation') {
       // @ts-ignore
-      _on(event, (a: TextAnnotation) => callback(teiify(a)));
+      a.on(event, (a: TextAnnotation) => callback(fwd(a)));
     } else if (event === 'selectionChanged') {
       // @ts-ignore
-      _on(event, (a: TextAnnotation[]) => callback(a.map(teiify)));
+      a.on(event, (a: TextAnnotation[]) => callback(a.map(fwd)));
     } else if (event === 'updateAnnotation') {
       // @ts-ignore
-      _on(event, (a: TextAnnotation, b: TextAnnotation) => callback(teiify(a), teiify(b)));
+      a.on(event, (a: TextAnnotation, b: TextAnnotation) => callback(fwd(a), fwd(b)));
     }
+  }
+
+  const loadAnnotations = (url: string) =>
+    fetch(url)
+      .then((response) => response.json())
+      .then(annotations => {
+        setAnnotations(annotations);
+        return annotations;
+      });
+
+  const setAnnotations = (annotations: TEIAnnotation[]) => {
+    console.log('setting', annotations);
+  }
+
+  return {
+    loadAnnotations,
+    on,
+    setAnnotations
   }
 
 }

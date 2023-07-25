@@ -55,24 +55,26 @@
         });
 
         var t = TextAnnotator(document.getElementById('content'));
-        
-        TEIPlugin(t);
 
-        t.on('createAnnotation', annotation => {
+        var tei = TEIPlugin(t);
+
+        tei.on('createAnnotation', annotation => {
           console.log('createAnnotation', annotation);
         });
 
-        t.on('updateAnnotation', (annotation, previous) => {
+        tei.on('updateAnnotation', (annotation, previous) => {
           console.log('updateAnnotation', annotation, previous);
         });
 
-        t.on('deleteAnnotation', (annotation) => {
+        tei.on('deleteAnnotation', (annotation) => {
           console.log('deleteAnnotation', annotation);
         });
 
-        t.on('selectionChanged', (annotations) => {
+        tei.on('selectionChanged', (annotations) => {
           console.log('selectionChanged', annotations);
         });
+
+        tei.loadAnnotations('annotations.json');
       }
     </script>
   </body>
