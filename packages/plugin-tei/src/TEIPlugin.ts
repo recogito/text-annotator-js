@@ -1,6 +1,7 @@
 import type { TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
-import type { LifecycleEvents } from '@annotorious/core';
+import { Origin, type LifecycleEvents } from '@annotorious/core';
 import { rangeToXPathRangeSelector } from './crosswalk';
+import { teiSelectorToRange } from './reverse';
 import type { TEIAnnotation } from './TEIAnnotation';
 
 type TextEvents = LifecycleEvents<TextAnnotation>;
@@ -27,8 +28,23 @@ export const TEIPlugin = (a: TextAnnotator) => {
   }
 
   // TODO reverse crosswalk - XPath to text offset selector
-  const rvs = (a: TextAnnotation): TEIAnnotation => {
-    return null;
+  const rvs = (a: TEIAnnotation): TextAnnotation => {
+    const range = teiSelectorToRange(a.target.selector, container);
+
+    return {
+      ...a,
+      target: {
+        ...a.target,
+        selector: {
+          // Ideally, we'd populate these values. But they are never
+          // used in practice - AT THE MOMENT...
+          start: null,
+          end: null,
+          quote: a.target.selector.quote,
+          range
+        }
+      }
+    }
   }
 
   const on = <E extends keyof TextEvents>(event: E, callback: TextEvents[E]) => {
@@ -53,7 +69,8 @@ export const TEIPlugin = (a: TextAnnotator) => {
       });
 
   const setAnnotations = (annotations: TEIAnnotation[]) => {
-    console.log('setting', annotations);
+    const crosswalked = annotations.map(rvs);
+    a.store.bulkAddAnnotation(crosswalked, true, Origin.REMOTE);
   }
 
   return {
