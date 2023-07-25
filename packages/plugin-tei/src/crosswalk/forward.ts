@@ -1,18 +1,24 @@
 import type { TextSelector } from '@recogito/text-annotator';
-import type { TEIRangeSelector } from './TEIAnnotation';
+import type { TEIRangeSelector } from '../TEIAnnotation';
 
+/**
+ * Helper: Returns the given XPath for a DOM node, in the form of 
+ * a list of segments.
+ * 
+ * Note that this method is used recursively,
+ */
 const getXPath = (node: Node, path: string[] = []) => {
   let xpath: string;
   let count: number;
   let predicate: string;
 
-  if (node.nodeType == Node.ELEMENT_NODE && (node as Element).hasAttribute('xml:id')) {
+  if (node.nodeType === Node.ELEMENT_NODE && (node as Element).hasAttribute('xml:id')) {
     path.push('/');
   } else if (node.parentNode) {
     path = getXPath(node.parentNode, path);
   }
 
-  if (node.nodeType == Node.ELEMENT_NODE && node.nodeName.toLowerCase().startsWith("tei-")) {
+  if (node.nodeType === Node.ELEMENT_NODE && node.nodeName.toLowerCase().startsWith('tei-')) {
     const el = node as Element;
 
     if (el.hasAttribute('xml:id')) {
@@ -31,9 +37,11 @@ const getXPath = (node: Node, path: string[] = []) => {
   return path;
 }
 
-const toTEIPaths = (container: Element, startPath: string[], endPath: string[], selectedRange: Range) => {
-  const pathStart = `${container.nodeName.toLowerCase()}[@id='${container.id}']`;
-
+/**
+ * For the given path sgement lists, this function returns the the
+ * start & end XPath expression pair.
+ */
+const toTEIXPaths = (startPath: string[], endPath: string[], selectedRange: Range) => {
   // For a given node, returns the closest parent that is a TEI element
   const getClosestTEINode = (node: Node | null) => {
     if (!node) return null;
@@ -66,13 +74,20 @@ const toTEIPaths = (container: Element, startPath: string[], endPath: string[], 
   return { start, end }; 
 }
 
-export const rangeToXPathRangeSelector = (container: Element, selector: TextSelector): TEIRangeSelector => {
+
+/**
+ * Using the DOM Range from a (revived!) TextSelector, this function computes
+ * the TEIRangeSelector corresponding to that range.
+ */
+export const rangeToTEIRangeSelector = (selector: TextSelector): TEIRangeSelector => {
   const { range } = selector;
 
-  const startDOMPath = getXPath(range.startContainer);
-  const endDOMPath = getXPath(range.endContainer);
+  // XPath segments for Range start and end nodes as a list
+  const startPathSegments: string[] = getXPath(range.startContainer);
+  const endPathSegments: string[] = getXPath(range.endContainer);
 
-  const { start, end } = toTEIPaths(container, startDOMPath, endDOMPath, range);
+  // TEI XPath expressions
+  const { start, end } = toTEIXPaths(startPathSegments, endPathSegments, range);
 
   return {
     type: 'RangeSelector',

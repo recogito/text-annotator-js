@@ -1,7 +1,6 @@
 import type { TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
 import { Origin, type LifecycleEvents } from '@annotorious/core';
-import { rangeToXPathRangeSelector } from './crosswalk';
-import { teiSelectorToRange } from './reverse';
+import { rangeToTEIRangeSelector, teiRangeSelectorToRange } from './crosswalk';
 import type { TEIAnnotation } from './TEIAnnotation';
 
 type TextEvents = LifecycleEvents<TextAnnotation>;
@@ -12,7 +11,7 @@ export const TEIPlugin = (a: TextAnnotator) => {
 
   // Forward crosswalk - text offset to XPath selector
   const fwd = (a: TextAnnotation): TEIAnnotation => {
-    const selector = rangeToXPathRangeSelector(container, a.target.selector);
+    const selector = rangeToTEIRangeSelector(a.target.selector);
 
     return {
       ...a,
@@ -29,7 +28,7 @@ export const TEIPlugin = (a: TextAnnotator) => {
 
   // TODO reverse crosswalk - XPath to text offset selector
   const rvs = (a: TEIAnnotation): TextAnnotation => {
-    const range = teiSelectorToRange(a.target.selector, container);
+    const range = teiRangeSelectorToRange(a.target.selector, container);
 
     return {
       ...a,

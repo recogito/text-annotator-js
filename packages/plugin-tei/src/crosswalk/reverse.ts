@@ -1,6 +1,10 @@
-import type { TEIRangeSelector } from './TEIAnnotation';
+import type { TEIRangeSelector } from '../TEIAnnotation';
 
-const xpathToRange = (path: string, container: Element) => {
+/**
+ * Helper: converts the given XPath string and DOM container element
+ * to a DOM position (parent node + text offset).
+ */
+const xpathToDOMPosition = (path: string, container: Element) => {
   const offsetIdx = path.indexOf('::');
 
   // CETEIcean-specific: prefix all path elements with 'tei-'!
@@ -22,9 +26,12 @@ const xpathToRange = (path: string, container: Element) => {
   return { node, offset };
 }
 
-export const teiSelectorToRange = (selector: TEIRangeSelector, container: Element) => {
-  const start = xpathToRange(selector.startSelector.value, container);
-  const end = xpathToRange(selector.endSelector.value, container)
+/**
+ * Computes the DOM Range corresponding to the given TEIRangeSelector.
+ */
+export const teiRangeSelectorToRange = (selector: TEIRangeSelector, container: Element) => {
+  const start = xpathToDOMPosition(selector.startSelector.value, container);
+  const end = xpathToDOMPosition(selector.endSelector.value, container)
   
   const range = document.createRange();
   range.setStart(start.node, start.offset);
