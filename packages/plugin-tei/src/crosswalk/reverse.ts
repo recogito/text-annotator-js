@@ -1,4 +1,5 @@
-import type { TEIRangeSelector } from '../TEIAnnotation';
+import type { TextAnnotation, TextAnnotationTarget } from '@recogito/text-annotator';
+import type { TEIAnnotation, TEIAnnotationTarget, TEIRangeSelector } from '../TEIAnnotation';
 
 /**
  * Helper: converts the given XPath string and DOM container element
@@ -39,3 +40,25 @@ export const teiRangeSelectorToRange = (selector: TEIRangeSelector, container: E
 
   return range;
 }
+
+export const teiToTextAnnotation = (container: HTMLElement) => (a: TEIAnnotation): TextAnnotation => ({
+  ...a,
+  target: teiToTextTarget(container)(a.target)
+})
+
+export const teiToTextTarget = (container: HTMLElement) => (t: TEIAnnotationTarget): TextAnnotationTarget => {
+  const range = teiRangeSelectorToRange(t.selector, container);
+
+  return {
+    ...t,
+    selector: {
+      // Ideally, we'd populate these values. But they are never
+      // used in practice - AT THE MOMENT...
+      start: null,
+      end: null,
+      quote: t.selector.quote,
+      range
+    }
+  }
+}
+

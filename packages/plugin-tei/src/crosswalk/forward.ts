@@ -1,5 +1,5 @@
-import type { TextSelector } from '@recogito/text-annotator';
-import type { TEIRangeSelector } from '../TEIAnnotation';
+import type { TextAnnotation, TextAnnotationTarget, TextSelector } from '@recogito/text-annotator';
+import type { TEIAnnotation, TEIAnnotationTarget, TEIRangeSelector } from '../TEIAnnotation';
 
 /**
  * Helper: Returns the given XPath for a DOM node, in the form of 
@@ -103,3 +103,21 @@ export const rangeToTEIRangeSelector = (selector: TextSelector): TEIRangeSelecto
     range
   };
 }
+
+export const textToTEITarget = (t: TextAnnotationTarget): TEIAnnotationTarget => {
+  const selector = rangeToTEIRangeSelector(t.selector);
+  return {
+    ...t,
+    selector: {
+      ...selector,
+      range: t.selector.range,
+      quote: t.selector.quote
+    }
+  }
+}
+
+export const textToTEIAnnotation = (a: TextAnnotation): TEIAnnotation => ({
+  ...a,
+  target: textToTEITarget(a.target)
+})
+

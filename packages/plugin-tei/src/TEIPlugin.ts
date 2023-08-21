@@ -1,6 +1,6 @@
 import type { TextAnnotation, TextAnnotationTarget, TextAnnotator } from '@recogito/text-annotator';
-import type { Origin, LifecycleEvents, ChangeSet, StoreChangeEvent, StoreObserveOptions } from '@annotorious/core';
-import { rangeToTEIRangeSelector, teiRangeSelectorToRange } from './crosswalk';
+import type { Origin, LifecycleEvents, StoreChangeEvent, StoreObserveOptions } from '@annotorious/core';
+import { rangeToTEIRangeSelector, teiRangeSelectorToRange, teiToTextAnnotation, teiToTextTarget, textToTEIAnnotation, textToTEITarget } from './crosswalk';
 import type { TEIAnnotation, TEIAnnotationTarget } from './TEIAnnotation';
 import type { TextAnnotatorState } from '@recogito/text-annotator/dist/src/state';
 
@@ -10,134 +10,84 @@ export const TEIPlugin = (anno: TextAnnotator) => {
 
   const container: HTMLElement = anno.element;
 
-  // Forward crosswalk - text offset to XPath selector
-  const fwd = (a: TextAnnotation): TEIAnnotation => {
-    const selector = rangeToTEIRangeSelector(a.target.selector);
+  const observers: Array<{
+    onChange: (event: StoreChangeEvent<TEIAnnotation>) => void,
+    wrapped: (event: StoreChangeEvent<TextAnnotation>) => void
+  }> = [];
 
-    return {
-      ...a,
-      target: {
-        ...a.target,
-        selector: {
-          ...selector,
-          range: a.target.selector.range,
-          quote: a.target.selector.quote
-        }
-      }
-    }
-  }
-
-  // TODO reverse crosswalk - XPath to text offset selector
-  const rvs = (a: TEIAnnotation): TextAnnotation => {
-    const range = teiRangeSelectorToRange(a.target.selector, container);
-
-    return {
-      ...a,
-      target: {
-        ...a.target,
-        selector: {
-          // Ideally, we'd populate these values. But they are never
-          // used in practice - AT THE MOMENT...
-          start: null,
-          end: null,
-          quote: a.target.selector.quote,
-          range
-        }
-      }
-    }
-  }
-
-  const fwdTarget = (t: TextAnnotationTarget): TEIAnnotationTarget => {
-    const selector = rangeToTEIRangeSelector(t.selector);
-    return {
-      ...t,
-      selector: {
-        ...selector,
-        range: t.selector.range,
-        quote: t.selector.quote
-      }
-    }
-  }
-
-  const rvsTarget = (t: TEIAnnotationTarget): TextAnnotationTarget => {
-    const range = teiRangeSelectorToRange(t.selector, container);
-    return {
-      ...t,
-      selector: {
-        // Ideally, we'd populate these values. But they are never
-        // used in practice - AT THE MOMENT...
-        start: null,
-        end: null,
-        quote: t.selector.quote,
-        range
-      }
-    }
-  }
-
+  // Wrap lifecycle handlers
   const on = <E extends keyof TextEvents>(event: E, callback: TextEvents[E]) => {
     if (event === 'createAnnotation' || event === 'deleteAnnotation') {
       // @ts-ignore
-      anno.on(event, (a: TextAnnotation) => callback(fwd(a)));
+      anno.on(event, (a: TextAnnotation) => callback(textToTEIAnnotation(a)));
     } else if (event === 'selectionChanged') {
       // @ts-ignore
-      anno.on(event, (a: TextAnnotation[]) => callback(a.map(fwd)));
+      anno.on(event, (a: TextAnnotation[]) => callback(a.map(textToTEIAnnotation)));
     } else if (event === 'updateAnnotation') {
       // @ts-ignore
-      anno.on(event, (a: TextAnnotation, b: TextAnnotation) => callback(fwd(a), fwd(b)));
+      anno.on(event, (a: TextAnnotation, b: TextAnnotation) => callback(textToTEIAnnotation(a), textToTEIAnnotation(b)));
     }
   }
 
-  // Wrap state
+  // Wrap store
+  const { store } = anno.state as TextAnnotatorState;
 
-  const state = anno.state as TextAnnotatorState;
+  const toText = teiToTextAnnotation(container);
+
+  const toTextTarget = teiToTextTarget(container);
 
   const addAnnotation = (annotation: TEIAnnotation, origin: Origin) =>
-    state.store.addAnnotation(rvs(annotation), origin);
+    store.addAnnotation(teiToTextAnnotation(container)(annotation), origin);
 
+  // TODO cache this!
   const all = () => 
-    state.store.all().map(fwd);
+    store.all().map(textToTEIAnnotation)
 
   const bulkAddAnnotation = (annotations: TEIAnnotation[], replace = true, origin: Origin) =>
-    state.store.bulkAddAnnotation(annotations.map(rvs), replace, origin);
+    store.bulkAddAnnotation(annotations.map(toText), replace, origin);
 
   const bulkUpdateTargets = (targets: TEIAnnotationTarget[], origin: Origin) =>
-    state.store.bulkUpdateTargets(targets.map(rvsTarget), origin); 
+    store.bulkUpdateTargets(targets.map(toTextTarget), origin); 
   
   const getAnnotation = (id: string) => {
-    const a = state.store.getAnnotation(id);
-    if (a)
-      return fwd(a);
+    const textAnnotation = store.getAnnotation(id);
+    if (textAnnotation)
+      return textToTEIAnnotation(textAnnotation);
   }
 
   const getAt = (x: number, y: number): TEIAnnotation | undefined => {
-    const a = state.store.getAt(x, y);
-    if (a)
-      return fwd(a);
+    const textAnnotation = store.getAt(x, y);
+    if (textAnnotation)
+      return textToTEIAnnotation(textAnnotation);
   }
 
   const getIntersecting = (minX: number, minY: number, maxX: number, maxY: number) =>
-    state.store.getIntersecting(minX, minY, maxX, maxY).map(fwd);
+    store.getIntersecting(minX, minY, maxX, maxY).map(textToTEIAnnotation);
   
   const updateAnnotation = (annotation: TEIAnnotation, origin: Origin) =>
-    state.store.updateAnnotation(rvs(annotation), origin);
+    store.updateAnnotation(toText(annotation), origin);
 
   const updateTarget = (target: TEIAnnotationTarget, origin: Origin) => 
-    state.store.updateTarget(rvsTarget(target), origin);
+    store.updateTarget(toTextTarget(target), origin);
 
-  const observe = (onChange: { (event: StoreChangeEvent<TEIAnnotation>): void }, options: StoreObserveOptions = {}) => {
+  // Wrap observe/unobserve
+  const observe = (
+    onChange: { (event: StoreChangeEvent<TEIAnnotation>): void }, 
+    options: StoreObserveOptions = {}
+  ) => {
     const wrapped = (event: StoreChangeEvent<TextAnnotation>) => {
       const { changes, origin, state } = event;
 
       const crosswalkedChanges = {
-        created: (changes.created || []).map(fwd),
-        deleted: (changes.deleted || []).map(fwd),
+        created: (changes.created || []).map(textToTEIAnnotation),
+        deleted: (changes.deleted || []).map(textToTEIAnnotation),
         updated: (changes.updated || []).map(update => ({
           ...update,
-          oldValue: fwd(update.oldValue),
-          newValue: fwd(update.newValue),
+          oldValue: textToTEIAnnotation(update.oldValue),
+          newValue: textToTEIAnnotation(update.newValue),
           targetUpdated: update.targetUpdated ? ({ 
-            oldTarget: fwdTarget(update.targetUpdated.oldTarget as TextAnnotationTarget), 
-            newTarget: fwdTarget(update.targetUpdated.newTarget as TextAnnotationTarget)
+            oldTarget: textToTEITarget(update.targetUpdated.oldTarget as TextAnnotationTarget), 
+            newTarget: textToTEITarget(update.targetUpdated.newTarget as TextAnnotationTarget)
           }) : undefined
         }))
       }
@@ -147,12 +97,22 @@ export const TEIPlugin = (anno: TextAnnotator) => {
         origin, 
         // TODO keep local copies. Otherwise every store change
         // would mean we'll re-compute all DOM ranges!
-        state: [] as TEIAnnotation[] 
+        state: state as unknown as TEIAnnotation[] 
       });
     };
 
+    observers.push({ onChange, wrapped });
+
     // TODO need to keep a record of 'wrapped' and intercept the unobserve method
-    state.store.observe(wrapped);
+    store.observe(wrapped, options);
+  }
+
+  const unobserve = (onChange: { (event: StoreChangeEvent<TEIAnnotation>): void }) => {
+    const idx = observers.findIndex(observer => observer.onChange == onChange);
+    if (idx > -1) {
+      store.unobserve(observers[idx].wrapped);
+      observers.splice(idx, 1);
+    }
   }
 
   return {
@@ -170,6 +130,7 @@ export const TEIPlugin = (anno: TextAnnotator) => {
         getAt,
         getIntersecting,
         observe,
+        unobserve,
         updateAnnotation,
         updateTarget
       }
