@@ -101,10 +101,10 @@ export const TEIPlugin = (anno: TextAnnotator) => {
       });
     };
 
-    observers.push({ onChange, wrapped });
-
     // TODO need to keep a record of 'wrapped' and intercept the unobserve method
     store.observe(wrapped, options);
+
+    return observers.push({ onChange, wrapped });
   }
 
   const unobserve = (onChange: { (event: StoreChangeEvent<TEIAnnotation>): void }) => {
