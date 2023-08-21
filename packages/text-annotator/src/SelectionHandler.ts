@@ -1,6 +1,6 @@
 import { Origin, type AnnotationTarget, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
-import type { TextAnnotationStore } from './state';
+import type { TextAnnotationStore, TextAnnotatorState } from './state';
 import type { TextSelector } from './model';
 
 const clearNativeSelection = () => {
@@ -31,7 +31,9 @@ export const rangeToSelector = (range: Range, container: HTMLElement): TextSelec
   return {  quote, start, end, range };
 }
 
-export const SelectionHandler = (container: HTMLElement, store: TextAnnotationStore) => {
+export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorState) => {
+
+  const { store, selection } = state;
 
   let currentUser: User;
 
@@ -61,11 +63,11 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
     if (!selectionStarted)
       return;
 
-    const selection = document.getSelection();
+    const sel = document.getSelection();
 
-    if (!selection.isCollapsed) {
-      const ranges = Array.from(Array(selection.rangeCount).keys())
-        .map(idx => selection.getRangeAt(idx));
+    if (!sel.isCollapsed) {
+      const ranges = Array.from(Array(sel.rangeCount).keys())
+        .map(idx => sel.getRangeAt(idx));
 
       const updatedTarget = {
         annotation: currentTarget?.annotation || uuidv4(),
@@ -83,7 +85,7 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
           target: updatedTarget
         });
 
-        store.selection.clickSelect(updatedTarget.annotation, event);
+        selection.clickSelect(updatedTarget.annotation, event);
       }
 
       currentTarget = updatedTarget;
@@ -98,7 +100,7 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
     if (currentTarget) {
       store.updateTarget(currentTarget, Origin.LOCAL);
 
-      store.selection.clickSelect(currentTarget.annotation, event);
+      selection.clickSelect(currentTarget.annotation, event);
 
       clearNativeSelection();
       currentTarget = null;
@@ -108,12 +110,12 @@ export const SelectionHandler = (container: HTMLElement, store: TextAnnotationSt
     
       const hovered = store.getAt(event.clientX - x, event.clientY - y);
       if (hovered) {
-        const { selected } = store.selection;
+        const { selected } = selection;
         
         if (selected.length !== 1 || selected[0] !== hovered.id)
-          store.selection.clickSelect(hovered.id, event);
-      } else if (!store.selection.isEmpty()) {
-        store.selection.clear();
+          selection.clickSelect(hovered.id, event);
+      } else if (!selection.isEmpty()) {
+        selection.clear();
       }
     }
 

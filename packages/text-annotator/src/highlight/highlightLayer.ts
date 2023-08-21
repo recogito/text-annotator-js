@@ -1,4 +1,4 @@
-import type { TextAnnotationStore } from '../state';
+import type { TextAnnotationStore, TextAnnotatorState } from '../state';
 import type { HighlightPainter } from './HighlightPainter';
 
 import './highlightLayer.css';
@@ -16,7 +16,9 @@ const debounce = <T extends (...args: any[]) => void>(func: T, delay: number = 1
   }) as T;
 }
 
-export const createHighlightLayer = (container: HTMLElement, store: TextAnnotationStore) => {
+export const createHighlightLayer = (container: HTMLElement, state: TextAnnotatorState) => {
+
+  const { store, selection, hover } = state;
 
   let currentPainter: HighlightPainter = null;
 
@@ -37,14 +39,14 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
     const {x, y} = container.getBoundingClientRect();
     const hovered = store.getAt(event.clientX - x, event.clientY - y);
     if (hovered) {
-      if (store.hover.current !== hovered.id) {
+      if (hover.current !== hovered.id) {
         container.classList.add('hovered');
-        store.hover.set(hovered.id);
+        hover.set(hovered.id);
       }
     } else {
-      if (store.hover.current) {
+      if (hover.current) {
         container.classList.remove('hovered');
-        store.hover.set(null);
+        hover.set(null);
       }
     }
   });
@@ -99,7 +101,7 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
       context.clearRect(-0.5, -0.5, canvas.width + 1, canvas.height + 1);
 
       // Get current selection
-      const selected = new Set(store.selection.selected);
+      const selected = new Set(selection.selected);
 
       annotationsInView.forEach(annotation => {
         const isSelected = selected.has(annotation.id);
@@ -121,7 +123,7 @@ export const createHighlightLayer = (container: HTMLElement, store: TextAnnotati
 
   // Selection should only ever affect visible annotations,
   // need need for extra check
-  store.selection.subscribe(() => redraw());
+  selection.subscribe(() => redraw());
 
   return {
     redraw,

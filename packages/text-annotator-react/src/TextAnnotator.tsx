@@ -20,6 +20,7 @@ export const TextAnnotator = (props: TextAnnotatorProps) => {
   
   useEffect(() => {
     const el = element ? document.getElementById(element) : null;
+    
     const r = VanillaTextAnnotator(el, opts);
     setAnno(r);
   }, []);

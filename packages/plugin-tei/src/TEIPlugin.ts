@@ -5,9 +5,9 @@ import type { TEIAnnotation } from './TEIAnnotation';
 
 type TextEvents = LifecycleEvents<TextAnnotation>;
 
-export const TEIPlugin = (a: TextAnnotator) => {
+export const TEIPlugin = (anno: TextAnnotator) => {
 
-  const container: HTMLElement = a.element;
+  const container: HTMLElement = anno.element;
 
   // Forward crosswalk - text offset to XPath selector
   const fwd = (a: TextAnnotation): TEIAnnotation => {
@@ -49,13 +49,13 @@ export const TEIPlugin = (a: TextAnnotator) => {
   const on = <E extends keyof TextEvents>(event: E, callback: TextEvents[E]) => {
     if (event === 'createAnnotation' || event === 'deleteAnnotation') {
       // @ts-ignore
-      a.on(event, (a: TextAnnotation) => callback(fwd(a)));
+      anno.on(event, (a: TextAnnotation) => callback(fwd(a)));
     } else if (event === 'selectionChanged') {
       // @ts-ignore
-      a.on(event, (a: TextAnnotation[]) => callback(a.map(fwd)));
+      anno.on(event, (a: TextAnnotation[]) => callback(a.map(fwd)));
     } else if (event === 'updateAnnotation') {
       // @ts-ignore
-      a.on(event, (a: TextAnnotation, b: TextAnnotation) => callback(fwd(a), fwd(b)));
+      anno.on(event, (a: TextAnnotation, b: TextAnnotation) => callback(fwd(a), fwd(b)));
     }
   }
 
@@ -69,7 +69,7 @@ export const TEIPlugin = (a: TextAnnotator) => {
 
   const setAnnotations = (annotations: TEIAnnotation[]) => {
     const crosswalked = annotations.map(rvs);
-    a.store.bulkAddAnnotation(crosswalked, true, Origin.REMOTE);
+    anno.state.store.bulkAddAnnotation(crosswalked, true, Origin.REMOTE);
   }
 
   return {
