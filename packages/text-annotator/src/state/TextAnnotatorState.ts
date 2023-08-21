@@ -1,4 +1,15 @@
-import { type Store, Origin, createHoverState, createSelectionState, createStore, AnnotatorState, SelectionState, HoverState, HighlightState, createHighlightState} from '@annotorious/core';
+import type { Store } from '@annotorious/core';
+import { 
+  createHighlightState,
+  createHoverState, 
+  createSelectionState, 
+  createStore, 
+  AnnotatorState, 
+  SelectionState, 
+  HoverState, 
+  HighlightState,  
+  Origin
+} from '@annotorious/core';
 import { createSpatialTree } from './spatialTree';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
 import type { TextAnnotationStore } from './TextAnnotationStore';
