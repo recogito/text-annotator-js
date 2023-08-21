@@ -21,8 +21,8 @@ export const TextAnnotator = (props: TextAnnotatorProps) => {
   useEffect(() => {
     const el = element ? document.getElementById(element) : null;
     
-    const r = VanillaTextAnnotator(el, opts);
-    setAnno(r);
+    const anno = VanillaTextAnnotator(el, opts);
+    setAnno(anno);
   }, []);
 
   return children ? <>{children}</> : null;
