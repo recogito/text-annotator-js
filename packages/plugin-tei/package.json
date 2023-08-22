@@ -27,10 +27,10 @@
   "devDependencies": {
     "typescript": "^4.9.5",
     "vite": "^4.2.1",
-    "vite-plugin-dts": "^2.3.0"
+    "vite-plugin-dts": "^2.3.0",
+    "CETEIcean": "^1.8.0"
   },
   "dependencies": {
-    "@annotorious/core": "^3.0.0-pre-alpha-32",
-    "CETEIcean": "^1.8.0"
+    "@annotorious/core": "^3.0.0-pre-alpha-32"
   }
 }

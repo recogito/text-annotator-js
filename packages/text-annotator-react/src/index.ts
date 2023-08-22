@@ -1,4 +1,4 @@
-export * from './TEIAnnotator';
+export * from './tei';
 export * from './TextAnnotator';
 export * from './TextAnnotatorPopup';
 

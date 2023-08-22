@@ -1,6 +1,6 @@
 import type { TextAnnotation, TextAnnotationTarget, TextAnnotator } from '@recogito/text-annotator';
 import type { Origin, LifecycleEvents, StoreChangeEvent, StoreObserveOptions } from '@annotorious/core';
-import { rangeToTEIRangeSelector, teiRangeSelectorToRange, teiToTextAnnotation, teiToTextTarget, textToTEIAnnotation, textToTEITarget } from './crosswalk';
+import { teiToTextAnnotation, teiToTextTarget, textToTEIAnnotation, textToTEITarget } from './crosswalk';
 import type { TEIAnnotation, TEIAnnotationTarget } from './TEIAnnotation';
 import type { TextAnnotatorState } from '@recogito/text-annotator/dist/src/state';
 

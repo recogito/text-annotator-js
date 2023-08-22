@@ -41,6 +41,7 @@
     "react-dom": "16.8.0 || >=17.x"
   },
   "dependencies": {
-    "@neodrag/react": "^2.0.3"
+    "@neodrag/react": "^2.0.3",
+    "CETEIcean": "^1.8.0"
   }
 }

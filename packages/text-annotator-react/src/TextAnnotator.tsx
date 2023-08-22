@@ -23,7 +23,7 @@ export const TextAnnotator = (props: TextAnnotatorProps) => {
     
     const anno = VanillaTextAnnotator(el, opts);
     setAnno(anno);
-  }, []);
+  }, [element]);
 
   return children ? <>{children}</> : null;
 
