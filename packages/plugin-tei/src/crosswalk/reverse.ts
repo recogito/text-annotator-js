@@ -65,8 +65,6 @@ export const teiRangeSelectorToRange = (selector: TEIRangeSelector, container: E
   const start = xpathToDOMPosition(selector.startSelector.value, container);
   const end = xpathToDOMPosition(selector.endSelector.value, container);
 
-  console.log(start, end);
-  
   const range = document.createRange();
   range.setStart(start.node, start.offset);
   range.setEnd(end.node, end.offset);
