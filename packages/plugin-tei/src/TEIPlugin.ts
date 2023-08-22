@@ -10,6 +10,8 @@ export const TEIPlugin = (anno: TextAnnotator) => {
 
   const container: HTMLElement = anno.element;
 
+  console.log('tei plugin container', container)
+
   const observers: Array<{
     onChange: (event: StoreChangeEvent<TEIAnnotation>) => void,
     wrapped: (event: StoreChangeEvent<TextAnnotation>) => void
@@ -64,8 +66,9 @@ export const TEIPlugin = (anno: TextAnnotator) => {
   const getIntersecting = (minX: number, minY: number, maxX: number, maxY: number) =>
     store.getIntersecting(minX, minY, maxX, maxY).map(textToTEIAnnotation);
   
-  const updateAnnotation = (annotation: TEIAnnotation, origin: Origin) =>
+  const updateAnnotation = (annotation: TEIAnnotation, origin: Origin) => {
     store.updateAnnotation(toText(annotation), origin);
+  }
 
   const updateTarget = (target: TEIAnnotationTarget, origin: Origin) => 
     store.updateTarget(toTextTarget(target), origin);

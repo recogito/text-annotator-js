@@ -37,8 +37,19 @@ const MockStorage = () => {
 
   useEffect(() => {
     if (anno) {
-      anno.on('createAnnotation', (annotation: TextAnnotation) => {
-        console.log('create', annotation);
+      anno.on('createAnnotation', (a: TextAnnotation) => {
+        console.log('create', a);
+
+        const versioned = {
+          ...a,
+          target: {
+            ...a.target,
+            version: 1
+          }
+        };
+    
+        // @ts-ignore
+        anno.state.store.updateAnnotation(versioned,'REMOTE');
       });
 
       anno.on('deleteAnnotation', (annotation: TextAnnotation) => {
