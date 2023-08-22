@@ -20,11 +20,42 @@ const xpathToDOMPosition = (path: string, container: Element) => {
   if (parentNode.firstChild.nodeType !== Node.TEXT_NODE)
     console.warn('XPath not pointing to text node', path);
 
-  const node = parentNode.firstChild;
+  const node: Node = parentNode.firstChild;
 
   const offset = parseInt(path.substring(offsetIdx + 2));
 
-  return { node, offset };
+  const reanchor = (originalNode: Text | null, originalOffset: number) => {
+    let node = originalNode;
+
+    let offset = originalOffset;
+
+    const it = document.createNodeIterator(parentNode, NodeFilter.SHOW_TEXT);
+
+    let currentNode = it.nextNode();
+
+    let run = true;
+
+    do {
+      if (currentNode instanceof Text) {
+        if (currentNode.length < offset) {
+          offset -= currentNode.length;
+        } else {
+          node = currentNode;
+          run = false;
+        }
+      }
+
+      currentNode = it.nextNode();
+    } while (currentNode && run);
+
+    return { node, offset };
+  };
+
+  if (node instanceof Text && (!node.length || offset > node.length)) {
+    return reanchor(node, offset);
+  } else {
+    return { node, offset };
+  }
 }
 
 /**
@@ -32,7 +63,9 @@ const xpathToDOMPosition = (path: string, container: Element) => {
  */
 export const teiRangeSelectorToRange = (selector: TEIRangeSelector, container: Element) => {
   const start = xpathToDOMPosition(selector.startSelector.value, container);
-  const end = xpathToDOMPosition(selector.endSelector.value, container)
+  const end = xpathToDOMPosition(selector.endSelector.value, container);
+
+  console.log(start, end);
   
   const range = document.createRange();
   range.setStart(start.node, start.offset);
