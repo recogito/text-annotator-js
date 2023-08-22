@@ -1,6 +1,6 @@
 import { Origin, type AnnotationTarget, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
-import type { TextAnnotationStore, TextAnnotatorState } from './state';
+import type { TextAnnotatorState } from './state';
 import type { TextSelector } from './model';
 
 const clearNativeSelection = () => {
@@ -93,7 +93,7 @@ export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorSta
   });
 
   document.addEventListener('pointerup', (event: PointerEvent) => {
-    const annotatable = !(event.target as Node).parentElement.closest('.not-annotatable');
+    const annotatable = !(event.target as Node).parentElement?.closest('.not-annotatable');
     if (!annotatable)
       return;
       
