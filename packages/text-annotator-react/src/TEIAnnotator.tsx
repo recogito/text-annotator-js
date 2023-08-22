@@ -5,7 +5,7 @@ import { AnnotoriousContext } from '@annotorious/react';
 
 import '@recogito/text-annotator/dist/text-annotator.css';
 
-export type TextAnnotatorProps = TextAnnotatorOptions & {
+export type TEIAnnotatorProps = TextAnnotatorOptions & {
 
   element: string,
 
@@ -13,7 +13,7 @@ export type TextAnnotatorProps = TextAnnotatorOptions & {
 
 }
 
-export const TextAnnotator = (props: TextAnnotatorProps) => {
+export const TEIAnnotator = (props: TEIAnnotatorProps) => {
 
   const { element, children, ...opts } = props;
 

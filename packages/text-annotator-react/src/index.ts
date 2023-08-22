@@ -1,3 +1,4 @@
+export * from './TEIAnnotator';
 export * from './TextAnnotator';
 export * from './TextAnnotatorPopup';
 
