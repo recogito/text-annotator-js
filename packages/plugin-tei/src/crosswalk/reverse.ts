@@ -24,7 +24,7 @@ const xpathToDOMPosition = (path: string, container: Element) => {
 
   const offset = parseInt(path.substring(offsetIdx + 2));
 
-  const reanchor = (originalNode: Text | null, originalOffset: number) => {
+  const reanchor = (originalNode: Node, originalOffset: number) => {
     let node = originalNode;
 
     let offset = originalOffset;
@@ -51,7 +51,7 @@ const xpathToDOMPosition = (path: string, container: Element) => {
     return { node, offset };
   };
 
-  if (node instanceof Text && (!node.length || offset > node.length)) {
+  if (!(node instanceof Text) || offset > node.length) {
     return reanchor(node, offset);
   } else {
     return { node, offset };
