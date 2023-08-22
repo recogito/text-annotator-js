@@ -22,6 +22,11 @@
         border-style: solid;
         border-color: #cfcfcf;
         border-width: 0 1px;
+        position: relative;
+      }
+
+      #content img {
+        max-width: 100%;
       }
 
       h1 {
@@ -50,7 +55,7 @@
       window.onload = async function() {
         var CETEIcean = new CETEI();
 
-        CETEIcean.getHTML5('sample.xml', data => {
+        CETEIcean.getHTML5('perseus-tei.xml', data => {
           document.getElementById('content').appendChild(data);
         });
 

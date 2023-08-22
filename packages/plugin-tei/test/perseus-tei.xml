@@ -1,0 +1,2185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model https://raw.githubusercontent.com/i-d-e/ride/master/schema/ride.rng application/xml http://relaxng.org/ns/structure/1.0?>
+<?xml-model https://raw.githubusercontent.com/i-d-e/ride/master/schema/ride.rng application/xml http://purl.oclc.org/dsdl/schematron?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="ride.8.3">
+   <teiHeader>
+      <fileDesc>
+         <titleStmt>
+            <title>Review of Perseus Digital Library</title>
+            <author ref="https://orcid.org/0000-0002-4618-9481">
+               <name>
+                  <forename>Sarah</forename>
+                  <surname>Lang</surname>
+               </name>
+               <affiliation>
+                  <orgName>Zentrum für Informationsmodellierung (ZIM-ACDH)</orgName>
+                  <placeName>Graz</placeName>
+               </affiliation>
+               <email>sarah.lang@uni-graz.at</email>
+            </author>
+         </titleStmt>
+         <publicationStmt>
+            <publisher>Institut für Dokumentologie und Editorik e. V.</publisher>
+            <date when="2018-02">February 2018</date>
+            <idno type="URI">http://ride.i-d-e.de/issues/issue-8/perseus</idno>
+            <idno type="DOI">10.18716/ride.a.8.3</idno>
+            <idno type="archive"
+               >https://github.com/i-d-e/ride/raw/master/issues/issue08/perseus/perseus.pdf</idno>
+            <availability>
+               <licence target="http://creativecommons.org/licenses/by/4.0/"/>
+            </availability>
+         </publicationStmt>
+         <seriesStmt>
+            <title level="j">RIDE - A review journal for digital editions and resources</title>
+            <editor ref="https://orcid.org/0000-0003-2852-065X">Ulrike Henny-Krahmer</editor>
+            <editor ref="https://orcid.org/0000-0001-8279-9298">Frederike Neuber</editor>
+            <editor ref="https://orcid.org/0000-0002-6457-0913" role="managing">Philipp
+               Steinkrüger</editor>
+            <editor ref="http://viaf.org/viaf/80243768" role="technical">Bernhard Assmann</editor>
+            <editor ref="https://orcid.org/0000-0003-2852-065X" role="technical">Ulrike
+               Henny-Krahmer</editor>
+            <editor ref="https://orcid.org/0000-0001-8279-9298" role="technical">Frederike
+               Neuber</editor>
+            <biblScope unit="issue" n="8">Digital Text Collections</biblScope>
+            <idno type="URI">http://ride.i-d-e.de/issues/issue-8</idno>
+         </seriesStmt>
+         <notesStmt>
+            <relatedItem type="reviewed_resource">
+               <bibl>
+                  <title>Perseus Digital Library</title>
+                  <editor>Gregory Crane</editor>
+                  <respStmt>
+                     <resp>Editor</resp>
+                     <persName>
+                        <name>Gregory Crane</name>
+                     </persName>
+                  </respStmt>
+                  <respStmt>
+                     <resp>Editor</resp>
+                     <persName>
+                        <name>Marie-Claire Beaulieu</name>
+                     </persName>
+                  </respStmt>
+                  <respStmt>
+                     <resp>Programmer</resp>
+                     <persName>
+                        <name>Bridget Almas</name>
+                     </persName>
+                  </respStmt>
+                  <respStmt>
+                     <resp>Contributor</resp>
+                     <persName>
+                        <name>Alison Babeu</name>
+                     </persName>
+                  </respStmt>
+                  <respStmt>
+                     <resp>Contributor</resp>
+                     <persName>
+                        <name>Frederik Baumgardt</name>
+                     </persName>
+                  </respStmt>
+                  <respStmt>
+                     <resp>Contributor</resp>
+                     <persName>
+                        <name>Tim Buckingham</name>
+                     </persName>
+                  </respStmt>
+                  <respStmt>
+                     <resp>Editor</resp>
+                     <persName>
+                        <name>Lisa Cerrato</name>
+                     </persName>
+                  </respStmt>
+                  <respStmt>
+                     <resp>Programmer</resp>
+                     <persName>
+                        <name>Shawn Doughty</name>
+                     </persName>
+                  </respStmt>
+                  <respStmt>
+                     <resp>Programmer</resp>
+                     <persName>
+                        <name>Anna Krohn</name>
+                     </persName>
+                  </respStmt>
+                  <date type="publication">1985-2017</date>
+                  <idno type="URI">http://www.perseus.tufts.edu/hopper/</idno>
+                  <date type="accessed">2017-12-10</date>
+               </bibl>
+            </relatedItem>
+            <relatedItem type="reviewing_criteria">
+               <bibl>
+                  <ref
+                     target="http://www.i-d-e.de/publikationen/weitereschriften/criteria-text-collections-version-1-0/"
+                     >Criteria for Reviewing Digital Text Collections</ref>
+               </bibl>
+            </relatedItem>
+         </notesStmt>
+         <sourceDesc>
+            <p>born digital</p>
+         </sourceDesc>
+      </fileDesc>
+      <encodingDesc>
+         <classDecl>
+            <taxonomy
+               xml:base="https://www.i-d-e.de/publikationen/weitereschriften/criteria-text-collections-version-1-0/">
+               <category xml:id="general_information">
+                  <category xml:id="bibl_desc">
+                     <catDesc>
+                        <ref target="#K1.1">cf. Catalogue 1.1</ref>
+                     </catDesc>
+                     <catDesc>Can the text collection be identified in terms similar to traditional
+                        bibliographic descriptions (title, responsible editors, institution, date(s)
+                        of publication, identifier/address)?</catDesc>
+                     <catDesc>
+                        <num type="boolean" value="1"/>
+                     </catDesc>
+                  </category>
+                  <category xml:id="contributors">
+                     <catDesc>
+                        <ref target="#K1.3">cf. Catalogue 1.3</ref>
+                     </catDesc>
+                     <catDesc>Are the contributors (editors, institutions, associates) of the
+                        project documented?</catDesc>
+                     <catDesc>
+                        <num type="boolean" value="1"/>
+                     </catDesc>
+                  </category>
+                  <category xml:id="contacts">
+                     <catDesc>
+                        <ref target="#K1.4">cf. Catalogue 1.4</ref>
+                     </catDesc>
+                     <catDesc>Is contact information given?</catDesc>
+                     <catDesc>
+                        <num type="boolean" value="1"/>
+                     </catDesc>
+                  </category>
+               </category>
+               <category xml:id="aims">
+                  <category xml:id="doc_contents">
+                     <catDesc>
+                        <ref target="#K2.1">cf. Catalogue 2.1</ref>
+                     </catDesc>
+                     <catDesc>Is there a description of the aims and contents of the text
+                        collection?</catDesc>
+                     <catDesc>
+                        <num type="boolean" value="1"/>
+                     </catDesc>
+                  </category>
+                  <category xml:id="purpose">
+                     <catDesc>
+                        <ref target="#K2.2">cf. Catalogue 2.2</ref>
+                     </catDesc>
+                     <catDesc>What is the purpose of the text collection?</catDesc>
+                     <category xml:id="research">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="teaching">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="general_purpose">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category corresp="#other">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                        <category corresp="#free">
+                           <desc/>
+                        </category>
+                     </category>
+                  </category>
+                  <category xml:id="research_type">
+                     <catDesc>
+                        <ref target="#K3.1.8">cf. Catalogue 3.1.8</ref>
+                     </catDesc>
+                     <catDesc>What kind of research does the collection allow to conduct
+                        primarily?</catDesc>
+                     <category xml:id="qualitative">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="quantitative">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category corresp="#none">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                  </category>
+                  <category xml:id="classification">
+                     <catDesc>
+                        <ref target="#K2.3">cf. Catalogue 2.3</ref>
+                     </catDesc>
+                     <catDesc>How does the text collection classify itself (e.g. in its title or
+                        documentation)?</catDesc>
+                     <category xml:id="collection">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="corpus">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="digital_archive">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="digital_library">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="digital_edition">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="portal">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="database">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="no_classification">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category corresp="#other">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                        <category corresp="#free">
+                           <desc/>
+                        </category>
+                     </category>
+                  </category>
+                  <category xml:id="research_fields">
+                     <catDesc>
+                        <ref target="#K2.2">cf. Catalogue 2.2</ref>
+                     </catDesc>
+                     <catDesc>To which field(s) of research does the text collection
+                        contribute?</catDesc>
+                     <category xml:id="field_history">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="field_literary_studies">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="field_linguistics">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="field_musicology">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="field_art_history">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="field_archaeology">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="field_philosophy">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="field_religious_studies">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="field_sociology">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category corresp="#other">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                        <category corresp="#free">
+                           <desc/>
+                        </category>
+                     </category>
+                     <category corresp="#none">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                  </category>
+               </category>
+               <category xml:id="content">
+                  <category xml:id="era">
+                     <catDesc>
+                        <ref target="#K2.5">cf. Catalogue 2.5</ref>
+                     </catDesc>
+                     <catDesc>What era(s) do the texts belong to?</catDesc>
+                     <category xml:id="era_classics">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="era_medieval">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="era_early_modern">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="era_modern">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="era_contemporary">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                  </category>
+                  <category xml:id="language">
+                     <catDesc>
+                        <ref target="#K2.5">cf. Catalogue 2.5</ref>
+                     </catDesc>
+                     <catDesc>What languages are the texts in?</catDesc>
+                     <category xml:id="arabic">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="chinese">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="danish">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="english">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="finnish">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="french">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="german">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="greek">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="hebrew">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="hindi">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="italian">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="japanese">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="latin">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="norwegian">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="polish">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="portuguese">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="russian">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="spanish">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="swedish">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="turkish">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category corresp="#other">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                        <category corresp="#free">
+                           <desc>Germanic</desc>
+                        </category>
+                     </category>
+                     <category corresp="#free" xml:id="language_note">
+                        <desc/>
+                     </category>
+                  </category>
+                  <category xml:id="text_type">
+                     <catDesc>
+                        <ref target="#K2.5">cf. Catalogue 2.5</ref>
+                     </catDesc>
+                     <catDesc>What kind of texts are in the collection?</catDesc>
+                     <category xml:id="literary_works">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="private_documents">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="essays">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="newspaper_articles">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="charters">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="inscriptions">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="files_records">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="protocols">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="scientific_papers">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="speech_transcripts">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category corresp="#other">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                        <category corresp="#free">
+                           <desc/>
+                        </category>
+                     </category>
+                  </category>
+                  <category xml:id="add_information">
+                     <catDesc>
+                        <ref target="#K2.5">cf. Catalogue 2.5</ref>
+                     </catDesc>
+                     <catDesc>What kind of information is published in addition to the
+                        texts?</catDesc>
+                     <category xml:id="introduction">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="commentary">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="context_material">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="bibliography">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="facsimile">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category corresp="#other">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                        <category corresp="#free">
+                           <desc/>
+                        </category>
+                     </category>
+                     <category corresp="#none">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                  </category>
+               </category>
+               <category xml:id="composition">
+                  <category xml:id="documentation_methods">
+                     <catDesc>
+                        <ref target="#K3.1.1">cf. Catalogue 3.1.1-3.1.3</ref>
+                     </catDesc>
+                     <catDesc>Are the principles and decisions regarding the design of the text
+                        collection, its composition and the selection of texts documented?</catDesc>
+                     <catDesc>
+                        <num type="boolean" value="0"/>
+                     </catDesc>
+                  </category>
+                  <category xml:id="selection">
+                     <catDesc>
+                        <ref target="#K3.1">cf. Catalogue 3.1</ref>
+                     </catDesc>
+                     <catDesc>What selection criteria have been chosen for the text
+                        collection?</catDesc>
+                     <category xml:id="selection_language">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="selection_author">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="selection_country">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="selection_epoch">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="selection_genre">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="selection_topic">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="selection_style">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="selection_linguistic_characteristics">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category corresp="#other">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                        <category corresp="#free">
+                           <desc/>
+                        </category>
+                     </category>
+                  </category>
+                  <category xml:id="size">
+                     <category xml:id="size_texts">
+                        <catDesc>
+                           <ref target="#K3.1.4">cf. Catalogue 3.1.4</ref>
+                        </catDesc>
+                        <catDesc>How large is the text collection in number of
+                           texts/records?</catDesc>
+                        <category xml:id="texts_le10">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="texts_11-50">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="texts_51-100">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="texts_gt100_">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="texts_gt1000">
+                           <catDesc>
+                              <num type="boolean" value="1"/>
+                           </catDesc>
+                        </category>
+                        <category corresp="#unknown">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                     </category>
+                     <category xml:id="size_tokens">
+                        <catDesc>
+                           <ref target="#K3.1.4">cf. Catalogue 3.1.4</ref>
+                        </catDesc>
+                        <catDesc>How large is the text collection in number of tokens?</catDesc>
+                        <category xml:id="tokens_lt100.000">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="tokens_100.000-1mio">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="tokens_gt1mio">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="tokens_gt10mio">
+                           <catDesc>
+                              <num type="boolean" value="1"/>
+                           </catDesc>
+                        </category>
+                        <category corresp="#unknown">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                     </category>
+                  </category>
+                  <category xml:id="structure">
+                     <catDesc>
+                        <ref target="#K3.1.5">cf. Catalogue 3.1.5</ref>
+                     </catDesc>
+                     <catDesc>Does the text collection have identifiable sub-collections or
+                        components?</catDesc>
+                     <catDesc>
+                        <num type="boolean" value="1"/>
+                     </catDesc>
+                  </category>
+                  <category xml:id="acquisition">
+                     <category xml:id="text_recording">
+                        <catDesc>
+                           <ref target="#K3.1.6">cf. Catalogue 3.1.6</ref>
+                        </catDesc>
+                        <catDesc>Does the text collection record or transcribe the textual data for
+                           the first time?</catDesc>
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="text_integration">
+                        <catDesc>
+                           <ref target="#K3.1.6">cf. Catalogue 3.1.6</ref>
+                        </catDesc>
+                        <catDesc>What kind of material has been taken over from other
+                           sources?</catDesc>
+                        <category xml:id="full_text">
+                           <catDesc>
+                              <num type="boolean" value="1"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="reuse_metadata">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="reuse_annotation">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category corresp="#other">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                           <category corresp="#free">
+                              <desc/>
+                           </category>
+                        </category>
+                        <category corresp="#none">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                     </category>
+                  </category>
+                  <category xml:id="quality">
+                     <catDesc>
+                        <ref target="#K3.1.7">cf. Catalogue 3.1.7</ref>
+                     </catDesc>
+                     <catDesc>Has the quality of the data (transcriptions, metadata, annotations,
+                        etc.) been checked?</catDesc>
+                     <catDesc>
+                        <num type="boolean" value="1"/>
+                     </catDesc>
+                  </category>
+                  <category xml:id="typology">
+                     <catDesc>
+                        <ref target="#K3.1.8">cf. Catalogue 3.1.8</ref>
+                     </catDesc>
+                     <catDesc>Considering aims and methods of the text collection, how would you
+                        classify it further? For definitions please consider the
+                        help-texts.</catDesc>
+                     <category xml:id="typology_general_purpose">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="typology_corpus">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="typology_collection_records">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="typology_canon">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="typology_oeuvre">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="typology_reference_corpus">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="typology_contrastive_corpus">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="typology_parallel_corpus">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="typology_diachronic_corpus">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category corresp="#other">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                        <category corresp="#free">
+                           <desc/>
+                        </category>
+                     </category>
+                  </category>
+               </category>
+               <category xml:id="data_modelling">
+                  <category xml:id="text_treatment">
+                     <catDesc>
+                        <ref target="#K3.2.1">cf. Catalogue 3.2.1</ref>
+                     </catDesc>
+                     <catDesc>How are the textual sources represented in the digital
+                        collection?</catDesc>
+                     <category xml:id="normalized_transcription">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="orthographic_transcription">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="phonetic_transcription">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="diplomatic_transcription">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="transliteration">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="edited_text">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="translated_text">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="summarized_text">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="sampled_text">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category corresp="#other">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                        <category corresp="#free">
+                           <desc/>
+                        </category>
+                     </category>
+                  </category>
+                  <category xml:id="basic_format">
+                     <catDesc>
+                        <ref target="#K3.2.4">cf. Catalogue 3.2.4</ref>
+                     </catDesc>
+                     <catDesc>In which basic format are the texts encoded?</catDesc>
+                     <category xml:id="plain_text">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="xml">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="html">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category corresp="#other">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                        <category corresp="#free">
+                           <desc/>
+                        </category>
+                     </category>
+                  </category>
+                  <category xml:id="annotation">
+                     <category xml:id="annotation_type">
+                        <catDesc>
+                           <ref target="#K3.2.2">cf. Catalogue 3.2.2</ref>
+                        </catDesc>
+                        <catDesc>With what information are the texts further enriched?</catDesc>
+                        <category xml:id="semantic_annotations">
+                           <catDesc>
+                              <num type="boolean" value="1"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="linguistic_annotations">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="editorial_annotations">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="structural_information">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category corresp="#other">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                           <category corresp="#free">
+                              <desc/>
+                           </category>
+                        </category>
+                        <category corresp="#none">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                     </category>
+                     <category xml:id="annotation_integration">
+                        <catDesc>
+                           <ref target="#K3.2.2">cf. Catalogue 3.2.2</ref>
+                        </catDesc>
+                        <catDesc>How are the annotations linked to the texts themselves?</catDesc>
+                        <category xml:id="embedded">
+                           <catDesc>
+                              <num type="boolean" value="1"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="stand-off">
+                           <catDesc>
+                              <num type="boolean" value="1"/>
+                           </catDesc>
+                        </category>
+                        <category corresp="#other">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                           <category corresp="#free">
+                              <desc/>
+                           </category>
+                        </category>
+                        <category corresp="#not_applicable">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                     </category>
+                  </category>
+                  <category xml:id="metadata">
+                     <category xml:id="metadata_type">
+                        <catDesc>
+                           <ref target="#K3.2.3">cf. Catalogue 3.2.3</ref>
+                        </catDesc>
+                        <catDesc>What kind of metadata are included in the text
+                           collection?</catDesc>
+                        <category xml:id="descriptive">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="structural">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="administrative">
+                           <catDesc>
+                              <num type="boolean" value="1"/>
+                           </catDesc>
+                        </category>
+                        <category corresp="#other">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                           <category corresp="#free">
+                              <desc/>
+                           </category>
+                        </category>
+                        <category corresp="#none">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                     </category>
+                     <category xml:id="metadata_level">
+                        <catDesc>
+                           <ref target="#K3.2.2">cf. Catalogue 3.2.2</ref>
+                        </catDesc>
+                        <catDesc>On which level are the metadata included?</catDesc>
+                        <category xml:id="whole_collection">
+                           <catDesc>
+                              <num type="boolean" value="1"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="collection_parts">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="individual_texts">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category corresp="#other">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                           <category corresp="#free">
+                              <desc/>
+                           </category>
+                        </category>
+                        <category corresp="#not_applicable">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                     </category>
+                  </category>
+                  <category xml:id="data_standards">
+                     <category xml:id="data_schema">
+                        <catDesc>
+                           <ref target="#K3.2.4">cf. Catalogue 3.2.4</ref>
+                        </catDesc>
+                        <catDesc>What kind of data/metadata/annotation schemas are used for the text
+                           collection?</catDesc>
+                        <category xml:id="standardized_schema">
+                           <catDesc>
+                              <num type="boolean" value="1"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="customized_standard_schema">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="project_specific">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category corresp="#none">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category corresp="#unknown">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                     </category>
+                     <category xml:id="standard_format">
+                        <catDesc>
+                           <ref target="#K3.2.4">cf. Catalogue 3.2.4</ref>
+                        </catDesc>
+                        <catDesc>Which standards for text encoding, metadata and annotation are used
+                           in the text collection?</catDesc>
+                        <category xml:id="tei">
+                           <catDesc>
+                              <num type="boolean" value="1"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="cei">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="ead">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="xces">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="dublin_core">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="edm">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="mets">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="mods">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="skos">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="owl">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="imdi">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="cmdi">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="tcf">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="olac">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="eagles">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="pos_tagsets">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category corresp="#other">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                           <category corresp="#free">
+                              <desc/>
+                           </category>
+                        </category>
+                        <category corresp="#none">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                     </category>
+                  </category>
+               </category>
+               <category xml:id="provision">
+                  <category xml:id="basic_data_accessible">
+                     <catDesc>
+                        <ref target="#K4.1">cf. Catalogue 4.1</ref>
+                     </catDesc>
+                     <catDesc>Is the textual data accessible in a source format (e.g. XML,
+                        TXT)?</catDesc>
+                     <catDesc>
+                        <num type="boolean" value="1"/>
+                     </catDesc>
+                  </category>
+                  <category xml:id="download">
+                     <catDesc>
+                        <ref target="#K4.2">cf. Catalogue 4.2</ref>
+                     </catDesc>
+                     <catDesc>Can the entire raw data of the project be downloaded (as a
+                        whole)?</catDesc>
+                     <catDesc>
+                        <num type="boolean" value="1"/>
+                     </catDesc>
+                  </category>
+                  <category xml:id="technical_interfaces">
+                     <catDesc>
+                        <ref target="#K4.2">cf. Catalogue 4.2</ref>
+                     </catDesc>
+                     <catDesc>Are there technical interfaces which allow the reuse of the data of
+                        the text collection in other contexts?</catDesc>
+                     <category xml:id="OAI-PMH">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="REST">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="SPARQL_endpoint">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="general_API">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category corresp="#other">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                        <category corresp="#free">
+                           <desc/>
+                        </category>
+                     </category>
+                     <category corresp="#none">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                  </category>
+                  <category xml:id="analytical_data">
+                     <catDesc>
+                        <ref target="#K4.3">cf. Catalogue 4.3</ref>
+                     </catDesc>
+                     <catDesc>Besides the textual data, does the project provide analytical data
+                        (e.g. statistics) to download or harvest?</catDesc>
+                     <catDesc>
+                        <num type="boolean" value="0"/>
+                     </catDesc>
+                  </category>
+                  <category xml:id="reuse">
+                     <catDesc>
+                        <ref target="#K4.4">cf. Catalogue 4.4</ref>
+                     </catDesc>
+                     <catDesc>Can you use the data with other tools useful for this kind of
+                        content?</catDesc>
+                     <catDesc>
+                        <num type="boolean" value="1"/>
+                     </catDesc>
+                  </category>
+               </category>
+               <category xml:id="user_interface">
+                  <category xml:id="interface_provision">
+                     <catDesc>
+                        <ref target="#K5.1">cf. Catalogue 5.1</ref>
+                     </catDesc>
+                     <catDesc>Does the text collection have a dedicated user interface designed for
+                        the collection at hand in which the texts of the collection are represented
+                        and/or in which the data is analyzable?</catDesc>
+                     <catDesc>
+                        <num type="boolean" value="1"/>
+                     </catDesc>
+                  </category>
+                  <category xml:id="user_interface_sub">
+                     <category xml:id="usability">
+                        <catDesc>
+                           <ref target="#K5.3">cf. Catalogue 5.3</ref>
+                        </catDesc>
+                        <catDesc>From your point of view, is the interface of the text collection
+                           clearly arranged and easy to navigate so that the user can quickly
+                           identify the purpose, the content and the main access methods of the
+                           resource?</catDesc>
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="access_modes">
+                        <category xml:id="browsing">
+                           <catDesc>
+                              <ref target="#K5.4">cf. Catalogue 5.4</ref>
+                           </catDesc>
+                           <catDesc>Does the project offer the possibility to browse the contents by
+                              simple browsing options or advanced structured access via indices
+                              (e.g. by author, year, genre)?</catDesc>
+                           <catDesc>
+                              <num type="boolean" value="1"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="full_text_search">
+                           <catDesc>
+                              <ref target="#K5.4">cf. Catalogue 5.4</ref>
+                           </catDesc>
+                           <catDesc>Does the project offer a fulltext search?</catDesc>
+                           <catDesc>
+                              <num type="boolean" value="1"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="advanced_search">
+                           <catDesc>
+                              <ref target="#K5.4">cf. Catalogue 5.4</ref>
+                           </catDesc>
+                           <catDesc>Does the project offer an advanced search?</catDesc>
+                           <catDesc>
+                              <num type="boolean" value="1"/>
+                           </catDesc>
+                        </category>
+                     </category>
+                     <category xml:id="analysis">
+                        <category xml:id="analysis_tools">
+                           <catDesc>
+                              <ref target="#K5.5">cf. Catalogue 5.5</ref>
+                           </catDesc>
+                           <catDesc>Does the text collection integrate tools for analyses of the
+                              data?</catDesc>
+                           <catDesc>
+                              <num type="boolean" value="1"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="analysis_customization">
+                           <catDesc>
+                              <ref target="#K5.5">cf. Catalogue 5.5</ref>
+                           </catDesc>
+                           <catDesc>Can the user alter the interface in order to affect the outcomes
+                              of representation and analysis of the text collection (besides basic
+                              search functionalities), e.g. by applying his or her own queries or by
+                              choosing analysis parameters?</catDesc>
+                           <catDesc>
+                              <num type="boolean" value="1"/>
+                           </catDesc>
+                        </category>
+                     </category>
+                     <category xml:id="visualization">
+                        <catDesc>
+                           <ref target="#K5.6">cf. Catalogue 5.6</ref>
+                        </catDesc>
+                        <catDesc>Does the text collection provide particular visualizations of the
+                           data?</catDesc>
+                        <category xml:id="networks">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="charts">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="treemaps">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="wordclouds">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category corresp="#other">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                           <category corresp="#free">
+                              <desc/>
+                           </category>
+                        </category>
+                        <category xml:id="no_visualization">
+                           <catDesc>
+                              <num type="boolean" value="1"/>
+                           </catDesc>
+                        </category>
+                     </category>
+                     <category xml:id="personalization">
+                        <catDesc>
+                           <ref target="#K5.7">cf. Catalogue 5.7</ref>
+                        </catDesc>
+                        <catDesc>Is there a personalisation mode that enables the users e.g. to
+                           create their own sub-collections of the existing text
+                           collection?</catDesc>
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                  </category>
+               </category>
+               <category xml:id="preservation">
+                  <category xml:id="documentation_project">
+                     <catDesc>
+                        <ref target="#K6.1">cf. Catalogue 6.1</ref>
+                     </catDesc>
+                     <catDesc>Does the text collection provide sufficient documentation about the
+                        project in general as well as about the aims, contents and methods of the
+                        text collection?</catDesc>
+                     <catDesc>
+                        <num type="boolean" value="1"/>
+                     </catDesc>
+                  </category>
+                  <category xml:id="open_access">
+                     <catDesc>
+                        <ref target="#K6.2">cf. Catalogue 6.2</ref>
+                     </catDesc>
+                     <catDesc>Is the text collection Open Access?</catDesc>
+                     <catDesc>
+                        <num type="boolean" value="1"/>
+                     </catDesc>
+                  </category>
+                  <category xml:id="rights">
+                     <category xml:id="rights_declared">
+                        <catDesc>
+                           <ref target="#K6.2">cf. Catalogue 6.2</ref>
+                        </catDesc>
+                        <catDesc>Are the rights to (re)use the content declared?</catDesc>
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="rights_license">
+                        <catDesc>
+                           <ref target="#K6.2">cf. Catalogue 6.2</ref>
+                        </catDesc>
+                        <catDesc>Under what license are the contents released?</catDesc>
+                        <category xml:id="CC0">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="CC-BY_only">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="CC-BY-ND">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="CC-BY-NC">
+                           <catDesc>
+                              <num type="boolean" value="1"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="CC-BY-SA">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="CC-BY-NC-ND">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="CC-BY-NC-SA">
+                           <catDesc>
+                              <num type="boolean" value="1"/>
+                           </catDesc>
+                        </category>
+                        <category xml:id="PDM">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                        <category corresp="#other">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                           <category corresp="#free">
+                              <desc/>
+                           </category>
+                        </category>
+                        <category xml:id="no_license">
+                           <catDesc>
+                              <num type="boolean" value="0"/>
+                           </catDesc>
+                        </category>
+                     </category>
+                  </category>
+                  <category xml:id="persistent_identification">
+                     <catDesc>
+                        <ref target="#K6.3">cf. Catalogue 6.3</ref>
+                     </catDesc>
+                     <catDesc>Are there persistent identifiers and an addressing system for the text
+                        collection and/or parts/objects of it and which mechanism is used to that
+                        end?</catDesc>
+                     <category xml:id="DOI">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="ARK">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="URN">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category xml:id="PURL.ORG">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category corresp="#other">
+                        <catDesc>
+                           <num type="boolean" value="1"/>
+                        </catDesc>
+                        <category corresp="#free">
+                           <desc>CTS</desc>
+                        </category>
+                     </category>
+                     <category xml:id="persistent_URLs">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                     <category corresp="#none">
+                        <catDesc>
+                           <num type="boolean" value="0"/>
+                        </catDesc>
+                     </category>
+                  </category>
+                  <category xml:id="citation">
+                     <catDesc>
+                        <ref target="#K6.3">cf. Catalogue 6.3</ref>
+                     </catDesc>
+                     <catDesc>Does the text collection supply citation guidelines?</catDesc>
+                     <catDesc>
+                        <num type="boolean" value="1"/>
+                     </catDesc>
+                  </category>
+                  <category xml:id="archiving">
+                     <catDesc>
+                        <ref target="#K6.4">cf. Catalogue 6.4</ref>
+                     </catDesc>
+                     <catDesc>Does the documentation include information about the long term
+                        sustainability of the basic data (archiving of the data)?</catDesc>
+                     <catDesc>
+                        <num type="boolean" value="1"/>
+                     </catDesc>
+                  </category>
+                  <category xml:id="curation">
+                     <catDesc>
+                        <ref target="#K6.4">cf. Catalogue 6.4</ref>
+                     </catDesc>
+                     <catDesc>Does the project provide information about institutional support for
+                        the curation and sustainability of the project?</catDesc>
+                     <catDesc>
+                        <num type="boolean" value="1"/>
+                     </catDesc>
+                  </category>
+                  <category xml:id="completion">
+                     <catDesc>
+                        <ref target="#K6.4">cf. Catalogue 6.4</ref>
+                     </catDesc>
+                     <catDesc>Is the text collection completed?</catDesc>
+                     <catDesc>
+                        <num type="boolean" value="0"/>
+                     </catDesc>
+                  </category>
+               </category>
+            </taxonomy>
+         </classDecl>
+      </encodingDesc>
+      <profileDesc>
+         <langUsage>
+            <language ident="en"/>
+         </langUsage>
+         <textClass>
+            <keywords xml:lang="en">
+               <term>canonical text services</term>
+               <term>classics</term>
+               <term>digital library</term>
+               <term>out-of-print edition</term>
+               <term>treebank</term>
+               <term>vocabulary</term>
+               <term>word study tool</term>
+            </keywords>
+         </textClass>
+      </profileDesc>
+   </teiHeader>
+   <text>
+      <front>
+         <div type="abstract">
+            <p>
+               <emph>Perseus Digital Library</emph> is a well-established Digital Humanities project
+               providing a library of out-of-copyright editions of canonical world literature with a
+               focus on the Classical languages while expanding its scope beyond its original field.
+               Apart from being a text collection, <emph>Perseus </emph>also provides a plethora of
+               tools for the analysis of its text material and builds upon a sound base of
+               methodological grounding. The digital library is made up of one main collection
+               (Greek and Roman materials) and several smaller sub-collections spanning a range of
+               other subjects. Data acquisition is achieved semi-automatically. The contents of the
+               library consist of out-of-print text editions, dictionaries and commentaries being
+               enriched by the supply of digital tools for analysis. <emph>Perseus Digital
+                  Library</emph> is reviewed as a whole but a special focus of the review lies on
+               the Greek and Roman sub-collection and sub-projects.</p>
+         </div>
+      </front>
+      <body>
+         <div xml:id="div1">
+            <head>Introduction</head>
+            <p xml:id="p1">
+               <figure xml:id="img1">
+                  <graphic
+                     url="http://ride.i-d-e.de/wp-content/uploads/issue_8/perseus/pictures/picture-1.png"/>
+                  <head type="legend"><emph>Perseus</emph> home page.</head>
+               </figure> The <emph>Perseus Digital Library</emph><note xml:id="ftn1">To be found at:
+                     <ref target="http://www.perseus.tufts.edu/hopper/"
+                     >http://www.perseus.tufts.edu/hopper/</ref>, archived link: <ref
+                     target="https://web.archive.org/web/20171210180948/http://www.perseus.tufts.edu/hopper/"
+                     >https://web.archive.org/web/20171210180948/http://www.perseus.tufts.edu/hopper/</ref>.
+               </note> is a collection of out-of-copyright late 19th century to early 20th century
+               text editions, started at the Department of Classics at Tufts University at Medford,
+               Massachusetts (US). The current version is <emph>Perseus 4.0</emph>, also known as
+               the <emph>Perseus Hopper</emph> (<ref type="crossref" target="#img1">Fig. 1</ref>).
+               Formerly known as the ‘Perseus Project”, <emph>Perseus</emph> defines and classifies
+               itself as a digital library that collects primary and secondary text sources.</p>
+            <p xml:id="p2">Following in the footsteps of 3rd century BCE scholars at the library of
+               Alexandria, the self-defined mission of <emph>Perseus</emph> is ‘to make the full
+               record of humanity – linguistic sources, physical artifacts, historical spaces – as
+               intellectually accessible as possible to every human being, regardless of linguistic
+               or cultural background”.<note xml:id="ftn2">See <ref
+                     target="https://web.archive.org/web/20171210181632/http://www.perseus.tufts.edu/hopper/research"
+                     >https://web.archive.org/web/20171210181632/http://www.perseus.tufts.edu/hopper/research</ref>. </note>
+               <emph>Perseus</emph> thus targets research-driven academic audiences just as much as
+               the general public. Furthermore, its purpose is the promotion of Digital Humanities
+               research as much as the democratization of cultural heritage through improved
+               accessibility. Beside human readable information as provided throughout the various
+               text collections, <emph>Perseus</emph> aims at creating a network of
+               machine-actionable as well as machine-generated knowledge, as they state in their
+               project description.</p>
+            <p xml:id="p3">
+               <figure xml:id="img2">
+                  <graphic
+                     url="http://ride.i-d-e.de/wp-content/uploads/issue_8/perseus/pictures/picture-2.png"/>
+                  <head type="legend">Overview of the collections.</head>
+               </figure> The digital library itself now contains, in addition to the original base
+               of Greek and Roman materials Arabic, Germanic, Renaissance and 19th century American
+               documents, Italian poetry in Latin as well as papyri (<ref type="crossref"
+                  target="#img2">Fig. 2</ref>). As a part of the digital library,
+                  <emph>Perseus</emph> offers a digital collection of museum objects, the <emph>Art
+                  &amp; Archaeology Artifact Browser</emph>. The scope of each component is
+               visualized in a ‘Word Count per Text Collection’ Graph showing that after Classics
+               (68 million words), 19th Century American (58 million words) and Rich Times Dispatch
+               Issues (19 million words) dominate the overall collection. The opening of the project
+               past the Western cultural sphere has begun with the inclusion of Arabic
+               materials.</p>
+            <p xml:id="p4">Responsibilities in the project are fairly transparent. Among others,
+               Gregory Crane (Editor –in-Chief), Marie-Claire Beaulieu (Associate Editor), Bridget
+               Almas (Software Developer), Alison Babeu (Digital Librarian) and collaborators from
+               external institutions are mentioned. An extensive overview of past grants and
+               projects documents the projects’ resources. Originally started at the Classics
+               Department of Tufts University in 1985, <emph>Perseus</emph> of today features a
+               great magnitude of cooperation partners and extended its scope way past the original
+               field of Classics. The project has collected a number of science and government funds
+               alike as well as private donations. Thus it was able to adopt a broader research
+               agenda in 1998 (Digital Library Initiative Phase 2). Its goal was to create a digital
+               library for the humanities as a whole which would enlarge the digital infrastructure
+               with a mass of non-text materials and side-projects supplying Digital Humanities
+               technologies. A plethora of child projects has sprouted from <emph>Perseus</emph>
+               (such as the <emph>Perseus Catalog</emph>,<note xml:id="ftn3">
+                  <ref
+                     target="https://web.archive.org/web/20171210181722/http://catalog.perseus.org/"
+                     >https://web.archive.org/web/20171210181722/http://catalog.perseus.org/</ref>.
+               </note> the <emph>Perseids Project</emph>,<note xml:id="ftn4">
+                  <ref
+                     target="https://web.archive.org/web/20171210181806/http://sites.tufts.edu/perseids/"
+                     >https://web.archive.org/web/20171210181806/http://sites.tufts.edu/perseids/</ref>.
+               </note>) and the project now starts to span the world with greater international
+               cooperation and a second base at Leipzig University (<emph>Ancient Greek and Latin
+                  Dependency Treebank</emph>,<note xml:id="ftn5">
+                  <ref target="https://perseusdl.github.io/treebank_data/"
+                     >https://perseusdl.github.io/treebank_data/</ref> [Accessed 02.10.2017].</note>
+               <emph>Leipzig Open Fragmentary Texts Series</emph>,<note xml:id="ftn6">
+                  <ref
+                     target="https://web.archive.org/web/20171210182005/http://www.dh.uni-leipzig.de/wo/lofts/"
+                     >https://web.archive.org/web/20171210182005/http://www.dh.uni-leipzig.de/wo/lofts/</ref>.</note>
+               <emph>Open Greek and Latin Project</emph>,<note xml:id="ftn7">
+                  <ref
+                     target="https://web.archive.org/web/20171210182145/http://www.dh.uni-leipzig.de/wo/projects/open-greek-and-latin-project/"
+                     >https://web.archive.org/web/20171210182145/http://www.dh.uni-leipzig.de/wo/projects/open-greek-and-latin-project/</ref>. </note>
+               <emph>Open Persian</emph><note xml:id="ftn8">
+                  <ref
+                     target="https://web.archive.org/web/20171210182305/http://www.dh.uni-leipzig.de/wo/open-philology-project/open-persian/"
+                     >https://web.archive.org/web/20171210182305/http://www.dh.uni-leipzig.de/wo/open-philology-project/open-persian/</ref>.
+               </note>). While every generation of <emph>Perseus</emph> texts followed a different
+               paradigm of production, the fourth generation collections (beginning in 2006) now
+               integrate not only transcribed texts and original page images but forms of deeper
+               annotation and TEI-compliant mark-up. The catalogue aims for a standards-compliant
+               library infrastructure and a Canonical Text Services Protocol (see section 3 on
+               related projects) starts to provide new means of reference apart from the already
+               supported conventional scholarly citations.<note xml:id="ftn9">See <ref
+                     target="https://web.archive.org/web/20171210182441/http://www.perseus.tufts.edu/hopper/research/current"
+                     >https://web.archive.org/web/20171210182441/http://www.perseus.tufts.edu/hopper/research/current</ref>
+                  , <ref
+                     target="https://web.archive.org/web/20171210182638/http://www.perseus.tufts.edu/hopper/research/background"
+                     >https://web.archive.org/web/20171210182638/http://www.perseus.tufts.edu/hopper/research/background</ref>.
+               </note>
+            </p>
+         </div>
+         <div xml:id="div2">
+            <head>Aims and Content</head>
+            <div xml:id="div2.1">
+               <head>Aims</head>
+               <p xml:id="p5">
+                  <figure xml:id="img3">
+                     <graphic
+                        url="http://ride.i-d-e.de/wp-content/uploads/issue_8/perseus/pictures/picture-3.png"/>
+                     <head type="legend">View of a primary text in Perseus.</head>
+                  </figure> The digital library classifies itself primarily as a research project,
+                  providing services alongside their internal research, such as the aggregation of
+                  primary texts (<ref type="crossref" target="#img3">Fig. 3</ref>) and related,
+                  tough out-of-date commentaries. Formerly a Classics project, <emph>Perseus
+                  </emph>has evolved into a Digital Humanities dominated project, exploring the
+                  limits of the known world like the ancient hero the project was named after – as
+                  they state in their self-description.<note xml:id="ftn10">
+                     <ref
+                        target="https://web.archive.org/web/20171210182638/http://www.perseus.tufts.edu/hopper/research/background"
+                        >https://web.archive.org/web/20171210182638/http://www.perseus.tufts.edu/hopper/research/background</ref>.
+                  </note> Providing new content does not seem their primary focus anymore but rather
+                  the provision of means to make use of the resources already present using Digital
+                  Humanities technologies and the automation of the creation of new content. The FAQ
+                  clearly state the research focus of the project as opposed to being a pure service
+                  provider. Paradoxically, they state as well that personalization features are one
+                  of <emph>Perseus</emph>’ main endeavours at the moment, which might be due to the
+                  slightly confusing and seemingly out-of-date project descriptions.</p>
+               <p xml:id="p6">
+                  <emph>Perseus </emph>Editor-in-Chief Gregory Crane stresses that ‘access to the
+                  cultural heritage of humanity is a right, not a privilege” (Crane 2002, 626-63).
+                  The project does not want to continue restriction of academic resources to
+                  institutions paying expensive fees and thus feed information to a limited
+                  audience. <emph>Perseus Digital Library</emph> thus represents a democratization
+                  of cultural heritage which is being made accessible to everyone. Already in the
+                  early 2000s it disseminated its contents ‘far beyond traditional academia’ (Crane
+                  2002, 626-63). Crane also points out the need for user customization of digital
+                  library contents for diverse audiences in general. A logistic problem with this is
+                  that the practical use of libraries as places for reading for the public can
+                  sometimes conflict with the internal needs of cataloguing and organizing the
+                  material (Crane 2002, 626-63). <emph>Perseus Digital Library</emph> is showing
+                  good efforts in both user-customization and advanced forms of internal
+                  organization.</p>
+            </div>
+            <div xml:id="div2.2">
+               <head>Corpus Design and Representativeness of the Corpus</head>
+               <p xml:id="p7">The purpose of <emph>Perseus</emph> is to make texts in the field of
+                  the Humanities available online in a very complete way. The criteria for text
+                  selection seem to be the popularity and the (canonical) status of the texts. It is
+                  not specified, however, whether works largely ignored to this day are going to
+                  follow, such as, for example, early modern Latin literature that has not been
+                  re-edited ever since its beginnings. <emph>Perseus</emph> so far provides texts
+                  which were edited in the 19th century and beyond and which are in circulation.
+                     <emph>Perseus</emph> does not represent a library of rare works, but rather of
+                  commonly found ones in specialized academic libraries. Seeing that the canonical
+                  versions of ancient texts, sectioned according to today’s accepted order were
+                  established mostly in the 20th century, it can sometimes be problematic that
+                     <emph>Perseus Digital Library</emph> uses old text versions from the late 19th
+                  century. While certain text versions have undergone thorough corrections and
+                  intense research since the late 19th century, others have stayed virtually the
+                  same since then. Also, the exact wording isn’t perceived as essential for every
+                  research purpose. In these cases, the 19th century version remains the current
+                  accepted version until now. In the case of these not frequently re-edited, less
+                  frequently read ones especially – which might for that reason be more difficult to
+                  acquire and less available for a potential non-academic user (such as Dionysius of
+                  Halicarnassus, for example) –, <emph>Perseus Digital Library</emph> is a very
+                  valuable tool. <emph>Perseus Digital Library</emph>’s selection criteria are the
+                  epoch and the representativeness of the texts in the sense of being part of
+                  canonical ‘world literature’.</p>
+               <p xml:id="p8">If the goal of <emph>Perseus</emph> is to provide a complete Digital
+                  Library for the Humanities, they have of course not yet reached a high degree of
+                  completeness. <emph>Perseus Digital Library</emph> remains a work in progress and
+                  further development can be expected. Compared to other text collection
+                     projects,<note xml:id="ftn11">See other projects reviewed in the RIDE digital
+                     text collection issue.</note> however, <emph>Perseus</emph> is an
+                  extraordinarily broad and ‘complete’ collection. In terms of representativeness,
+                     <emph>Perseus</emph> provides a good representative sample of Classical texts,
+                  which after all was the primary purpose of the now very much expanded collection.
+                  While being fairly representative of the Classical world, it has to be noted that
+                  the term ‘representative’ operates within the scope of the canonical Classical
+                  literature having been the focus of research until today. However, it is less
+                  balanced towards less frequently read works. Therefore the question of whether
+                     <emph>Perseus</emph> is a well-balanced text collection remains unsolved and
+                  depends largely on the definition of what is chosen as a point of reference for
+                  what we consider as <emph>the corpus</emph> of Classical language literature in
+                  the whole.</p>
+               <p xml:id="p9">The texts <emph>Perseus</emph> offers outside its Classical collection
+                  cannot yet be considered representative or balanced within the ideological
+                  framework of a library for the Humanities in general. However, certain
+                  sub-collections are representative of their sub-fields,<note xml:id="ftn12">As far
+                     as the author of this review is qualified to judge. The Digital Library however
+                     does not explain how they understand completeness and what degree of
+                     representativeness they want to reach in the end.</note> such as the <emph>19th
+                     century American</emph> materials, the <emph>Richmond Times Dispatch</emph> and
+                  the <emph>Humanist and Renaissance Italian Poetry in Latin</emph> collection as
+                  their scopes are defined in a more narrow way. The Arabic collection contains only
+                  the Quran, the general <emph>Renaissance materials</emph> section contains 7
+                  million words and well-known works but yet can be considered neither
+                  representative nor balanced nor complete. The <emph>Germanic </emph>collection
+                  though seems already fairly well developed considering the fact that this one is
+                  probably the globally least widely studied topic of the selection
+                     <emph>Perseus</emph> provides so far.</p>
+               <p xml:id="p10">The <emph>Perseus </emph>collection is dynamic and growing, though
+                  the Classical literature part might be considered fairly complete.<note
+                     xml:id="ftn13">Even though it lacks certain works of even Aristotle and Plato,
+                     probably no other similar text collection can claim Perseus‘ degree of
+                     completeness and representativeness.</note> It has, however, to be stressed
+                  that the <emph>Perseus</emph> project already now offers three sub-collections
+                  that can claim relative completeness, balance and representativeness in a general
+                  sense. <emph>Perseus</emph> is very extensive and even very complete depending on
+                  the definition of completeness. It is rich in content, functionalities and
+                  sub-projects. It has reached sufficient maturity and consistency to serve as a
+                  base for further research and the integration of further sub-collections.</p>
+            </div>
+            <div xml:id="div2.3">
+               <head>Usage scenarios</head>
+               <p xml:id="p11">The Roman and Greek materials collection could be defined as a
+                  digital access to late 19th, early 20th century editions of Latin and Greek
+                  primary texts where each segment can be viewed in the context of its translations
+                  and dictionary entries. This provides a good base for studying the primary texts
+                  and probably the best one can possibly get without bigger copyright issues or more
+                  generally, for free. However, it has to be mentioned that the critical apparatus
+                  from the original editions is not contained in <emph>Perseus</emph>. Depending on
+                  the research interests in working with the material, the reused editions might not
+                  be sufficient in every case. From personal interviews, I received the feedback
+                  that scholars of ancient history see no problem whatsoever in citing <emph>Perseus
+                  </emph>texts in scientific publications, whereas Classics scholars with interest
+                  in literary texts insist that the provided editions are too old to be used in a
+                  philological publication, especially as the main portion of material deals with
+                  well-researched texts where there would be newer, more text critical editions
+                  available. For Classical philology, the <emph>Perseus Digital Library</emph> is a
+                  great study tool to be used in learning and teaching ancient languages but not of
+                  sufficient quality in order to do qualitative research on a certain text. An
+                  exception to this are the treebanks and linguistic features of course, although
+                  they provide a very specific type of research opportunity where they are immensely
+                  useful for quantitative research and the analysis of certain recurring grammatical
+                  structures. This is a very specialized branch of Classical philology where the
+                     <emph>Perseus</emph> project is a scientific pioneer but this cannot be said of
+                  Classics as a whole discipline.</p>
+            </div>
+         </div>
+         <div xml:id="div3">
+            <head>Related projects</head>
+            <p xml:id="p12">The Perseids side-project provides a platform for ‚collaborative
+               editing, annotation, and publication of born-digital editions of source documents in
+               the classics‘ coupling different tools and services, inspired among others by the
+               Harvard Homer Multitext Project which has laid the foundations for the Canonical Text
+               Services (CTS) protocol, of which the CTS URNs are a part (Berti et. al. 2014, 3;
+               Smith 2009). The CTS is built upon FRBR metadata. It allows for the citation of
+               single verses and serves as the link between Perseus Catalog and the TEI XML based
+               textual content of the Perseus Digital Library.</p>
+            <p xml:id="p13">The <emph>Leipzig Open Fragmentary Texts Series</emph> (LOFTS) is
+               developed in conjunction with <emph>Perseus Digital Library</emph>. Texts from
+               fragmentary Greek historians in the LOFTS project were obtained by OCR processing of
+               scans of the Internet Archive.<note xml:id="ftn14">
+                  <ref target="https://archive.org/">https://archive.org/</ref> [Accessed
+                  02.10.2017].</note> The error-prone Greek output was first corrected
+               semi-automatically and completely rectified manually in the encoding process where
+               the output was integrated in a <emph>Perseus Digital Library </emph>and <emph>Leipzig
+                  Open Greek and Latin</emph> (OGL) Project compatible EpiDoc template (Berti et.
+               al. 2014, 14). The Perseus Library data are reused by other projects, though mostly
+               in the associated ones briefly described in this review.</p>
+            <p xml:id="p14">Research uses of <emph>Perseus</emph> span from first quantified studies
+               of Greek grammar (Celano 2014, 97–110) and morphology via treebanking and the
+               creation of extensive digital libraries in general. Further uses also include social
+               networks for the characters of Greek tragedy (Rydberg-Cox 2011) and the
+               implementation of historical and geospatial data (Smith &amp; Crane 2001,
+               127–136).</p>
+         </div>
+         <div xml:id="div4">
+            <head>Data model</head>
+            <p xml:id="p15">
+               <figure xml:id="img4">
+                  <graphic
+                     url="http://ride.i-d-e.de/wp-content/uploads/issue_8/perseus/pictures/picture-4.png"/>
+                  <head type="legend">Base XML of Homer’s Odyssey.</head>
+               </figure>
+               <figure xml:id="img5">
+                  <graphic
+                     url="http://ride.i-d-e.de/wp-content/uploads/issue_8/perseus/pictures/picture-5.png"/>
+                  <head type="legend">View of the Perseus search, at the left-hand side, word study
+                     and vocabulary tools.</head>
+               </figure>
+               <emph>Perseus</emph> offers computationally processable text and specifies the
+               creation of machine-readable and even machine-created knowledge as core goals.
+               Engagement with the text of the Roman and Greek materials happens mostly in
+               sub-projects or associated projects and not so much in the main library where we
+               primarily find a broad text base that is provided book-wise or chapter-wise. It is
+               integrated in a user interface with visualization and analysis tools and as XML
+               documents with basic, mostly not semantically very rich, mark-up. Every word contains
+               a link to its respective dictionary entry which probably is the greatest innovation,
+               though these annotations are all stand-off and not part of the XML base of data (<ref
+                  type="crossref" target="#img4">Fig. 4</ref>). The link will trigger a dictionary
+               search, not the word itself is annotated or referenced. This feature makes of
+                  <emph>Perseus </emph>a text collection following the digital paradigm in the way
+               that it links different materials, makes them searchable (<ref type="crossref"
+                  target="#img5">Fig. 5</ref>) and machine-processable, even while it sticks closely
+               to the form of the books which served as a text base.</p>
+            <p xml:id="p16">All mark-up and annotations are created automatically which explains the
+               not very rich mark-up in older generation texts, but shows impressive results in
+               newer parts of the collection. A good example for this is the mark-up of historical
+               names and places in the 19th century American materials section. Stable identifiers
+               are available in the form of four different URIs (text, citation, work, catalog
+               record) containing URNs. The choice to use a TEI-compliant SGML format was meant as a
+               commitment to long-term usability. Ancient Greek is stored as beta code. Maybe
+               Unicode would be a better option here. One regrettable fact regarding the XML
+               representation is the lack of a TEI-header containing bibliographical information and
+               metadata about the respective source. Although admittedly this information can be
+               found in the <emph>Perseus Catalog,</emph> metadata and transcription of a source
+               should be stored together in a single file.</p>
+            <p xml:id="p17">The actual text presentation is segmented in books, chapters and
+               sections – full text versions are not available due to copyright reasons. The
+               segments however include notes, a bibliographic reference of the resource, display
+               preferences, a vocabulary tool, translations, commentaries and different versions of
+               the text. The segments are enhanced further, if available, with stable identifiers, a
+               Creative Commons licence and a TEI XML version of varied quality.</p>
+         </div>
+         <div xml:id="div5">
+            <head>User Interface</head>
+            <p xml:id="p18">The text collection provides a user interface where segments of primary
+               texts can be viewed side by side with their translations and commentaries (if
+               available). Apart from that, the word study tool and thereby dictionary entries are
+               accessible. Notes from the used edition are also represented. The
+                  <emph>Perseus</emph> text collection engages with its texts in various ways but
+               texts are not associated with their material carriers – <emph>Perseus</emph> is in
+               that respect a library following the digital paradigm as opposed to a digitized
+               library focusing on facsimiles or text presentation of the base documents.</p>
+            <p xml:id="p19">Works (original and related) can be found via the list of authors as
+               well as the simple (metadata, not full text) search. Once one version of a text is
+               found, one can comfortably switch to related versions or access commentaries and the
+               like. The simple search does not always yield results straightaway – if for example
+               the user does not enter the English naming conventions for ancient names and titles
+               –, and so it can sometimes be difficult to find the text one was looking for. The
+               ‘view abbreviations” link does help here though.</p>
+            <p xml:id="p20">The help section features a <emph>Perseus 4 Quick Start Guide</emph>,
+               information on copyright and reuse as well as an FAQ page last updated in May 2016.
+               It also suggests starting points for the exploration of the platform as well as help
+               with the texts, the vocabulary tool and <emph>Perseus </emph>search. With the lookup
+               tool, <emph>Perseus</emph> provides a map to its own contents, enabling users to
+               search topics they are interested in.</p>
+            <p xml:id="p21">The user interface combines the view of the primary text with study
+               tools such as translations, comments and the word study tools even if the project
+               description stresses the fact that <emph>Perseus Digital Library</emph> focuses on
+               their own Digital Humanities research over services for an audience.
+                  <emph>Perseus</emph> does not provide introductory texts but it provides old
+               commentaries to primary sources. Further introductions of the Perseus editors to the
+               text collection could, however, still improve the overall impression and usability of
+               resource.</p>
+            <p xml:id="p22">
+               <figure xml:id="img6">
+                  <graphic
+                     url="http://ride.i-d-e.de/wp-content/uploads/issue_8/perseus/pictures/picture-6.png"/>
+                  <head type="legend">Word count tool result for the beginning of Vergil’s
+                     Aeneid.</head>
+               </figure> The word study tool provides statistical word counts (<ref type="crossref"
+                  target="#img6">Fig. 6</ref>). Visualization is provided with word counts, but user
+               empowerment in the form of personalization is provided only by the ability of adding
+               additional materials to the primary texts by adding them to the view.</p>
+            <p xml:id="p23">Navigating <emph>Perseus </emph>in its full complexity is not intuitive
+               and does take some getting used to. This is partly due to the vastness and complexity
+               of the collection but it still could be improved by a clearer layout. The visual
+               patterns of <emph>Perseus </emph>also seem a bit old-fashioned and – while the
+               project stresses the research focus over the presentation for the audience – it still
+               is one of the biggest and best funded Digital Humanities projects out there and some
+               more effort on the visual side would be desirable. While functional, the layout
+               diminishes usability in parts, and especially the organization of the main navigation
+               containing the ‘About” sections is very confusing. It seems redundant and is not
+               intuitively logical. A user new to <emph>Perseus</emph> will have a very hard time
+               finding orientation and will probably overlook good parts of the project trying to
+               get to the desired content as fast as possible.</p>
+            <p xml:id="p24">
+               <emph>Perseus</emph> does not encourage accidental findings by browsing very much.
+               The fact that one finds ‘news” from 2009 on the page for current research is a bit
+               irritating, especially as the project is in fact still very active today. It has to
+               be admitted though that the publications section is perfectly up-to-date and provides
+               the newest research papers on and by <emph>Perseus</emph>. But as even the sections
+               supposed to explain the project are a bit confusing and although one usually finds
+               what one was looking for in the end, there definitely is room for improvement.</p>
+         </div>
+         <div xml:id="div6">
+            <head>Provision and sustainability</head>
+            <p xml:id="p25">XML documents can be downloaded for single text segments, automated
+               downloading is not permitted. <emph>Perseus</emph> offers download packages for their
+               public materials and does not allow automated downloading so as not to endanger
+               restricted items, such as images under reuse from external rights holders that
+                  <emph>Perseus </emph>offers in the <emph>Artifact Browser</emph>. Every single
+               text segment has its own Creative Commons rights information indicating the
+               conditions of reuse. But not all texts contain this information and, wherever it is
+               not available, XMLs aren’t for download either. There is no other way of (automated)
+               downloading such as an API.<note xml:id="ftn15">
+                  <ref
+                     target="https://web.archive.org/web/20171210184220/http://www.perseus.tufts.edu/hopper/help/faq"
+                     >https://web.archive.org/web/20171210184220/http://www.perseus.tufts.edu/hopper/help/faq</ref>.
+               </note> But each text as well as bundles of text (sub-collections) can be
+                  downloaded.<note xml:id="ftn16">
+                  <ref
+                     target="https://web.archive.org/web/20171210184603/http://www.perseus.tufts.edu/hopper/opensource/download"
+                     >https://web.archive.org/web/20171210184603/http://www.perseus.tufts.edu/hopper/opensource/download</ref>.
+               </note>
+            </p>
+            <p xml:id="p26">In terms of reliability and sustainability, the <emph>Perseus</emph>
+               project is convincing by its long history and the resulting vast amount of
+               experience. The fact that the project has now spread from its base at Tufts to a
+               whole network of institutions vouches for more sustainability. The <emph>digital
+                  library</emph> is also mirrored by the University of Chicago.<note xml:id="ftn17"
+                  >To be found at: <ref
+                     target="https://web.archive.org/web/20171210184634/http://perseus.uchicago.edu/"
+                     >https://web.archive.org/web/20171210184634/http://perseus.uchicago.edu/</ref>.</note>
+               In terms of long-term preservation, a Fedora backend is supposed to facilitate data
+               management and thus – according to Perseus’ self-description – provide the base for
+               good long-term preservation.<note xml:id="ftn18">
+                  <ref
+                     target="https://web.archive.org/web/20171210184755/http://www.perseus.tufts.edu/hopper/research/current"
+                     >https://web.archive.org/web/20171210184755/http://www.perseus.tufts.edu/hopper/research/current</ref>.
+               </note>
+            </p>
+            <p xml:id="p27">The Perseus Hopper (the current version, released in 2007) is available
+               as Open Source Java code that has been built with extensibility in mind, but the site
+               also states major restructuring work since 2016 that is supposed to result in a
+               completely new version.<note xml:id="ftn19">
+                  <ref
+                     target="https://web.archive.org/web/20171210184809/http://www.perseus.tufts.edu/hopper/opensource"
+                     >https://web.archive.org/web/20171210184809/http://www.perseus.tufts.edu/hopper/opensource</ref>.</note>
+            </p>
+         </div>
+         <div xml:id="div7">
+            <head>Conclusion</head>
+            <p xml:id="p28">
+               <emph>Perseus Digital Library</emph> is a well-established Digital Humanities project
+               providing a library of out-of-copyright editions of canonical world literature with a
+               focus on the Classical languages. Furthermore, it is expanding its scope way beyond
+               its original field of Classics. <emph>Perseus Digital Library </emph>has lots of
+               goals just as impressive as they are noble and shows great productivity in achieving
+               them, thus creating – step by step – a digital library of and for the Humanities as
+               well as humanity as a whole.</p>
+            <div xml:id="div7.1">
+               <head>Suggestions for improvement</head>
+               <p xml:id="p29">The Vocabulary tool already provides great help in language education
+                  but it would be nice to have a more print-friendly output available for the
+                  results of the word count tool as to make use of it for vocabulary building. It
+                  might also be interesting to provide a print-friendly option that includes a
+                  chosen segment of text and its vocabulary list which could serve as an automated
+                  work sheet-generator in teaching. Knowing from personal experience that
+                     <emph>Perseus</emph> is already now established as an irreplaceable tool in
+                  teaching Classical languages, I think that this is a great functionality and field
+                  of use of the library and am happy to see that this aspect is already being
+                  extended in the <emph>Leipzig Open Greek and Latin Project</emph>.</p>
+               <p xml:id="p30">Text selection criteria of such an important library do actively
+                  judge the texts it provides and de-value those not chosen for publication in this
+                  digital library of the Humanities. It has to be noted that so far
+                     <emph>Perseus</emph> is a collection of canonical world literature mostly and
+                  so reinforces the paradigm of a canonical world literature. Works which do not
+                  fall into this narrowly defined scope remain endangered as a work not re-edited is
+                  prone to getting lost over time. <emph>Perseus </emph>could and should make a step
+                  in the direction of active preservation of less read, ‘rare’ texts by making room
+                  in its selection criteria for works that might be considered less representative
+                  but which are in danger of being lost or forgotten. Adopting the archival practise
+                  of including random samples might be an approach worth considering.<note
+                     xml:id="ftn20">This sample could, for example, be taken from the libraries and
+                     institutions providing the base (text) material.</note> Still, I encourage the
+                  project to broaden its definition regarding the question what the cultural
+                  heritage of humankind is, what the responsibility of an influential project like
+                     <emph>Perseus Digital Library</emph> could be in that context, and to reflect
+                  on whether they really want to ‘write the history of the winners’ only.</p>
+            </div>
+            <div xml:id="div7.2">
+               <head>Synopsis</head>
+               <p xml:id="p31">The amount of material already available in <emph>Perseus Digital
+                     Library </emph>is vast; sub-collections can claim relative completeness and
+                  representativeness. Apart from the textual material made available, <emph>Perseus
+                  </emph>excels in its initiatives to provide tools for deep analysis of these
+                  texts. The project can already now look back on 30 years of experience and a
+                  wealth of ground-breaking achievements and publications in the promotion and
+                  theoretical grounding of Digital Libraries for the Humanities.
+                     <emph>Perseus</emph> remains one of the most interesting projects in the
+                  Digital Humanities and has been so for a long time. The project has had a great
+                  methodological impact on the discussion of best practises for the Digital
+                  Humanities and has been a pioneer of the field.</p>
+               <p xml:id="p32">To sum it all up: <emph>Perseus Digital Library</emph> is a big and
+                  important Digital Humanities text collection project with lots of methodological
+                  background research, a good choice of texts available, and provides a very
+                  well-known and established online resource for learners and academics alike. The
+                  project involves a plethora of very interesting functionalities and data.
+                     <emph>Perseus </emph>already now is a most powerful tool and any further
+                  development is highly anticipated.</p>
+            </div>
+         </div>
+      </body>
+      <back>
+         <div type="bibliography">
+            <listBibl>
+               <bibl>Berti, Monica, Bridget Almas, David Dubin, Greta Franzini, Simona Stoyanova and
+                  Gregory R. Crane. 2014. “The Linked Fragment: TEI and the Encoding of Text Reuses
+                  of Lost Authors”. <emph>Selected Papers from the 2013 TEI Conference, Journal of
+                     the Text Encoding Initiative</emph> 8.</bibl>
+               <bibl>Celano, Giuseppe G. A.. 2014. “A computational study on preverbal and
+                  postverbal accusative object nouns and pronouns in Ancient Greek”. <emph>The
+                     Prague Bulletin of Mathematical Linguistics</emph> 101: 97–110.</bibl>
+               <bibl>Crane, Gregory. 2002. “Cultural Heritage Digital Libraries: Needs and
+                  Components”. <emph>Proceedings of the 6th European Conference on Research and
+                     Advanced Technology for Digital Libraries</emph>. London: 626-63. <ref
+                     target="http://www.perseus.tufts.edu/~ababeu/ecdl2002.pdf"
+                     >http://www.perseus.tufts.edu/~ababeu/ecdl2002.pdf</ref>.</bibl>
+               <bibl>Crane, Gregory (ed.). 1985—2017. <emph>Perseus Digital Library</emph>, <ref
+                     target="https://web.archive.org/web/20171210180948/http://www.perseus.tufts.edu/hopper/."
+                     >https://web.archive.org/web/20171210180948/http://www.perseus.tufts.edu/hopper/.</ref>
+               </bibl>
+               <bibl>Rydberg-Cox, Jeff. 2011. “Social Networks and the Language of Greek Tragedy”.
+                     <emph>Journal of the Chicago Colloquium on Digital Humanities and Computer
+                     Science </emph>1/3.</bibl>
+               <bibl>Smith, David A. and Gregory Crane. 2011. “Disambiguating Geographic Names in a
+                  Historical Digital Library?” <emph>Proceedings of the 5th European Conference on
+                     Research and Advanced Technology for Digital Libraries, September 04–09</emph>.
+                  London: 127–136.</bibl>
+               <bibl>Smith, Neel. 2009. “Citation in Classical Studies”.<emph> Changing the Center
+                     of Gravity: Transforming Classical Studies Through Cyberinfrastructure</emph>
+                  3/1. Accessed 02.10.2017. <ref
+                     target="https://web.archive.org/save/http://www.digitalhumanities.org/dhq/vol/3/1/000028/000028.html"
+                     >https://web.archive.org/save/http://www.digitalhumanities.org/dhq/vol/3/1/000028/000028.html</ref>.
+               </bibl>
+            </listBibl>
+         </div>
+      </back>
+
+   </text>
+</TEI>
