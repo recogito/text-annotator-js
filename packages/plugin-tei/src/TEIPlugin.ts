@@ -1,16 +1,31 @@
-import type { TextAnnotation, TextAnnotationTarget, TextAnnotator } from '@recogito/text-annotator';
-import type { Origin, LifecycleEvents, StoreChangeEvent, StoreObserveOptions } from '@annotorious/core';
-import { teiToTextAnnotation, teiToTextTarget, textToTEIAnnotation, textToTEITarget } from './crosswalk';
-import type { TEIAnnotation, TEIAnnotationTarget } from './TEIAnnotation';
-import type { TextAnnotatorState } from '@recogito/text-annotator/dist/src/state';
+import type { 
+  TextAnnotation, 
+  TextAnnotationTarget, 
+  TextAnnotator, 
+  TextAnnotatorState 
+} from '@recogito/text-annotator';
+import type { 
+  LifecycleEvents,
+  Origin,  
+  StoreChangeEvent,
+  StoreObserveOptions 
+} from '@annotorious/core';
+import { 
+  teiToTextAnnotation, 
+  teiToTextTarget, 
+  textToTEIAnnotation, 
+  textToTEITarget 
+} from './crosswalk';
+import type { 
+  TEIAnnotation, 
+  TEIAnnotationTarget 
+} from './TEIAnnotation';
 
 type TextEvents = LifecycleEvents<TextAnnotation>;
 
 export const TEIPlugin = (anno: TextAnnotator) => {
 
   const container: HTMLElement = anno.element;
-
-  console.log('tei plugin container', container)
 
   const observers: Array<{
     onChange: (event: StoreChangeEvent<TEIAnnotation>) => void,

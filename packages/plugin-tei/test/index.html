@@ -58,6 +58,9 @@
 
         anno.on('createAnnotation', annotation => {
           console.log('createAnnotation', annotation);
+
+          // @ts-ignore
+          anno.state.store.updateAnnotation(annotation,'REMOTE');
         });
 
         anno.on('updateAnnotation', (annotation, previous) => {

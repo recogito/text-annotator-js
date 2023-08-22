@@ -14,12 +14,8 @@ const xpathToDOMPosition = (path: string, container: Element) => {
       return "/tei-" + p1.toLowerCase();
     }).replace(/xml:/g, '');
 
-  console.log('normalized', normalized);
-
   const parentNode = document.evaluate('.' + normalized,
     container, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-
-  console.log('parentNode', parentNode);
 
   if (parentNode.firstChild.nodeType !== Node.TEXT_NODE)
     console.warn('XPath not pointing to text node', path);

@@ -18,7 +18,7 @@ export const CETEIcean = (props: CETEIceanProps) => {
       const ceteicean = new CETEI();
       ceteicean.makeHTML5(props.tei, (data: Element) => {
         el.current.appendChild(data);
-        props.onLoad(data);
+        props.onLoad(el.current);
       });
     }
   }, [props.tei]);
