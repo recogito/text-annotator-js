@@ -1,4 +1,5 @@
-import type { TextAnnotationStore, TextAnnotatorState } from '../state';
+import { mergeClientRects } from '../utils';
+import type { TextAnnotatorState } from '../state';
 import type { HighlightPainter } from './HighlightPainter';
 
 import './highlightLayer.css';
@@ -107,14 +108,15 @@ export const createHighlightLayer = (container: HTMLElement, state: TextAnnotato
         const isSelected = selected.has(annotation.id);
 
         const rects = Array.from(annotation.target.selector.range.getClientRects());
+        const merged = mergeClientRects(rects);
 
         const style =
-          (currentPainter && currentPainter(annotation, rects, context, isSelected)) || 
+          (currentPainter && currentPainter(annotation, merged, context, isSelected)) || 
           (isSelected ? SELECTED_STYLE : DEFAULT_STYLE);
         
         context.fillStyle = style.fill;
 
-        rects.forEach(({ x, y, width, height }) => context.fillRect(x, y - 2.5, width, height + 5));
+        merged.forEach(({ x, y, width, height }) => context.fillRect(x, y - 2.5, width, height + 5));
       });
     });
   }

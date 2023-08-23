@@ -1,6 +1,7 @@
 import RBush from 'rbush';
 import type { Store } from '@annotorious/core';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
+import { mergeClientRects } from '../utils';
 
 interface IndexedHighlightRect {
 
@@ -25,8 +26,9 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
     const offset = container.getBoundingClientRect();
 
     const rects = Array.from(target.selector.range.getClientRects());
+    const merged = mergeClientRects(rects);
 
-    return rects.map(rect => {
+    return merged.map(rect => {
       const { x, y, width, height } = rect;
 
       return {
