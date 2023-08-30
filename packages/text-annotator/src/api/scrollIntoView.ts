@@ -13,16 +13,18 @@ export const scrollIntoView = (container: HTMLElement) => (annotation: TextAnnot
 
   // Get closest scrollable parent
   const scrollParent: Element = getScrollParent(container);
-  const bounds = scrollParent.getBoundingClientRect();
+  if (scrollParent) {
+    const bounds = scrollParent.getBoundingClientRect();
 
-  // Get position of the annotation relative to scroll parent
-  const { x, y, width, height } = annotation.target.selector.range.getBoundingClientRect();
-  const offsetTop = y - bounds.y;
-  const offsetLeft = x - bounds.x;
+    // Get position of the annotation relative to scroll parent
+    const { x, y, width, height } = annotation.target.selector.range.getBoundingClientRect();
+    const offsetTop = y - bounds.y;
+    const offsetLeft = x - bounds.x;
 
-  // Set scroll so that annotation is in the middle of the parent
-  const top = offsetTop + height / 2 - scrollParent.clientHeight / 2;
-  const left = offsetLeft + width / 2 - scrollParent.clientWidth / 2;
+    // Set scroll so that annotation is in the middle of the parent
+    const top = offsetTop + height / 2 - scrollParent.clientHeight / 2;
+    const left = offsetLeft + width / 2 - scrollParent.clientWidth / 2;
 
-  scrollParent.scroll({ top, left, behavior: 'smooth' });
+    scrollParent.scroll({ top, left, behavior: 'smooth' });
+  }
 }
