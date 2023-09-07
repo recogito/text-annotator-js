@@ -60,12 +60,14 @@ export const createTextAnnotatorState = (container: HTMLElement): TextAnnotatorS
       if (hasCollapsedRanges) {
         if (retriesLeft > 0) {
           console.warn('Found collapsed ranges - waiting');
+          console.log(revived.filter(a => a.target.selector.range.collapsed));
           setTimeout(() => bulkAdd(retriesLeft - 1), 500);
         } else {
-          console.warn('Could not revive all text ranges', 
-            revived.filter(a => a.target.selector.range.collapsed));
+          console.warn('Could not revive all text ranges');
+          console.log(revived.filter(a => a.target.selector.range.collapsed));
 
-          store.bulkAddAnnotation(revived, replace, origin);
+          const successful = revived.filter(a => !a.target.selector.range.collapsed);
+          store.bulkAddAnnotation(successful, replace, origin);
         }
       } else {
         store.bulkAddAnnotation(revived, replace, origin);
