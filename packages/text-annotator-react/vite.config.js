@@ -11,23 +11,23 @@ export default defineConfig(({ command, mode }) => ({
     tsConfigPaths(),
     dts({ 
       include: ['./src/'],
-      entryRoot: '.'
+      entryRoot: './src'
     })
   ],
   server: {
     open: '/test/index.html'
   },
   build: {
-    sourcemap: true,
     lib: {
       entry: './src/index.ts',
       name: 'ReactTextAnnotator',
-      formats: ['es', 'umd'],
+      formats: ['es'],
       fileName: (format) => `react-text-annotator.${format}.js`
     },
     rollupOptions: {
       external: [...Object.keys(packageJson.peerDependencies)],
       output: {
+        preserveModules: true,
         assetFileNames: 'react-text-annotator.[ext]',
         globals: {
           '@annotorious/react': 'AnnotoriousReact',
@@ -36,6 +36,7 @@ export default defineConfig(({ command, mode }) => ({
           'react-dom': 'ReactDOM'
         }
       }
-    }
+    },
+    sourcemap: true
   }
 }));

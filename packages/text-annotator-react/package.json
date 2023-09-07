@@ -11,19 +11,18 @@
     "preview": "vite preview",
     "test": "echo 'Skipping tests in @recogito/text-annotator-react package'"
   },
-  "main": "./dist/react-text-annotator.umd.js",
-  "module": "./dist/react-text-annotator.es.js",
-  "types": "./dist/src/index.d.ts",
   "files": [
     "dist"
   ],
   "exports": {
     ".": {
-      "import": "./dist/react-text-annotator.es.js",
-      "require": "./dist/react-text-annotator.umd.js"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/react-text-annotator.es.js"
     },
-    "./dist/react-text-annotator.css": "./dist/react-text-annotator.css"
+    "./react-text-annotator.css": "./dist/react-text-annotator.css"
   },
+  "module": "./dist/react-text-annotator.es.js",
+  "types": "./dist/index.d.ts",
   "devDependencies": {
     "@types/react-dom": "^18.0.11",
     "@vitejs/plugin-react": "^3.1.0",
