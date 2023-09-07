@@ -8,9 +8,12 @@ import type { TextAnnotationTarget } from '../model';
  * @returns the DOM range
  */
 export const reviveTarget = (target: TextAnnotationTarget, container: HTMLElement): TextAnnotationTarget => {
+  console.log('reviving text range', container, target);
+
   const { quote, start, end } = target.selector;
 
   const iterator = document.createNodeIterator(container, NodeFilter.SHOW_TEXT);
+  console.log(iterator);
 
   let runningOffset = 0;
 
@@ -45,6 +48,8 @@ export const reviveTarget = (target: TextAnnotationTarget, container: HTMLElemen
 
     n = iterator.nextNode();
   }
+
+  console.log('result range', range);
 
   return {
     ...target,
