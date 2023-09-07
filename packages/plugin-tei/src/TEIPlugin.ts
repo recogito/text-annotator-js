@@ -1,7 +1,7 @@
 import type { 
+  RecogitoTextAnnotator,
   TextAnnotation, 
   TextAnnotationTarget, 
-  TextAnnotator, 
   TextAnnotatorState 
 } from '@recogito/text-annotator';
 import type { 
@@ -23,7 +23,7 @@ import type {
 
 type TextEvents = LifecycleEvents<TextAnnotation>;
 
-export const TEIPlugin = (anno: TextAnnotator) => {
+export const TEIPlugin = (anno: RecogitoTextAnnotator) => {
 
   const container: HTMLElement = anno.element;
 

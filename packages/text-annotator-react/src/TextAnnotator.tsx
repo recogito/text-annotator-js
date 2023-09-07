@@ -20,6 +20,7 @@ export const TextAnnotator = (props: TextAnnotatorProps) => {
   
   useEffect(() => {    
     const anno = VanillaTextAnnotator(el.current, opts);
+    //@ts-ignore
     setAnno(anno);
   }, []);
 

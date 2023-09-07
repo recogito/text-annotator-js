@@ -1,6 +1,6 @@
 import { createPortal } from 'react-dom';
 import { ReactNode, useEffect, useRef, useState } from 'react';
-import { TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
+import { RecogitoTextAnnotator, TextAnnotation } from '@recogito/text-annotator';
 import { useAnnotator, useSelection } from '@annotorious/react';
 
 const getOffset = (event: PointerEvent, parent: Element) => {
@@ -26,7 +26,7 @@ export const TextAnnotatorPopup = (props: TextAnnotatorPopupContainerProps) => {
 
   const el = useRef<HTMLDivElement>(null);
 
-  const r = useAnnotator<TextAnnotator>();
+  const r = useAnnotator<RecogitoTextAnnotator>();
 
   const [open, setOpen] = useState(false);
 

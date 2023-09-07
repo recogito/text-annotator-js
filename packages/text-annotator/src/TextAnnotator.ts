@@ -1,4 +1,4 @@
-import { createAnonymousGuest, createLifecyleObserver } from '@annotorious/core';
+import { Origin, createAnonymousGuest, createLifecyleObserver, parseAll } from '@annotorious/core';
 import type { Annotator, User, PresenceProvider } from '@annotorious/core';
 import { createPainter } from './presence';
 import { createHighlightLayer } from './highlight';
@@ -10,7 +10,7 @@ import { SelectionHandler } from './SelectionHandler';
 
 import './TextAnnotator.css';
 
-export interface TextAnnotator extends Annotator<TextAnnotation> {
+export interface RecogitoTextAnnotator<T extends unknown = TextAnnotation> extends Annotator<TextAnnotation, T> {
 
   element: HTMLElement;
 
@@ -18,38 +18,84 @@ export interface TextAnnotator extends Annotator<TextAnnotation> {
 
 }
 
-export const TextAnnotator = (container: HTMLElement, options: TextAnnotatorOptions = {}): TextAnnotator => {
+export const TextAnnotator = <T extends unknown = TextAnnotation>(
+  container: HTMLElement, 
+  opts: TextAnnotatorOptions<T> = {}
+): RecogitoTextAnnotator<T> => {
 
   const state: TextAnnotatorState = createTextAnnotatorState(container);
 
-  const { selection, store } = state;
+  const { hover, selection, store } = state;
 
-  const lifecycle = createLifecyleObserver(selection, store);
+  const lifecycle = createLifecyleObserver<TextAnnotation, T | TextAnnotation>(store, selection, hover);
 
-  let currentUser: User = options.readOnly ? null : createAnonymousGuest();
+  let currentUser: User = opts.readOnly ? null : createAnonymousGuest();
 
   const highlightLayer = createHighlightLayer(container, state);
 
   const selectionHandler = SelectionHandler(container, state);
   selectionHandler.setUser(currentUser);
 
+  /*************************/
+  /*      External API     */
+  /******++++++*************/
+
+  const addAnnotation = (annotation: T) => {
+    // TODO
+  }
+
+  const getAnnotationById = (id: string): T | undefined => {
+    const annotation = store.getAnnotation(id);
+    return (opts.adapter && annotation) ?
+      opts.adapter.serialize(annotation) as T : annotation as T | undefined;
+  }
+
+  const getAnnotations = () =>
+    (opts.adapter ? store.all().map(opts.adapter.serialize) : store.all()) as T[];
+
+  const getUser = () => currentUser;
+
+  const loadAnnotations = (url: string) =>
+    fetch(url)
+      .then((response) => response.json())
+      .then((annotations) => {
+        setAnnotations(annotations);
+        return annotations;
+      });
+
+  const setAnnotations = (annotations: T[]) => {
+    if (opts.adapter) {
+      const { parsed, failed } = parseAll(opts.adapter)(annotations);
+
+      if (failed.length > 0)
+        console.warn(`Discarded ${failed.length} invalid annotations`, failed);
+
+      store.bulkAddAnnotation(parsed, true, Origin.REMOTE);
+    } else {
+      store.bulkAddAnnotation(annotations as TextAnnotation[], true, Origin.REMOTE);
+    }
+  }
+
   const setUser = (user: User) => {
     currentUser = user;
     selectionHandler.setUser(user);
   }
 
-  const getUser = () => currentUser;
-
   const setPresenceProvider = (provider: PresenceProvider) => {
     if (provider) {
-      highlightLayer.setPainter(createPainter(provider, options.presence));
+      highlightLayer.setPainter(createPainter(provider, opts.presence));
       provider.on('selectionChange', () => highlightLayer.redraw());
     }
   }
 
   return {
+    addAnnotation,
     element: container,
+    getAnnotationById,
+    getAnnotations,
     getUser,
+    loadAnnotations,
+    setAnnotations,
     setUser,
     setPresenceProvider,
     on: lifecycle.on,

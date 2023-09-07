@@ -17,6 +17,7 @@ export const TEIAnnotator = (props: TEIAnnotatorProps) => {
 
   const onLoad = (element: HTMLElement) => {
     const anno = TEIPlugin(VanillaTextAnnotator(element));
+    // @ts-ignore
     setAnno(anno);
   }
 
