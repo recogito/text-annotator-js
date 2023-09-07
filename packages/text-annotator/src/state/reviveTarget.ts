@@ -18,7 +18,7 @@ export const reviveTarget = (target: TextAnnotationTarget, container: HTMLElemen
 
   let n = iterator.nextNode();
   if (n === null)
-    console.warn('Empty node iterator!');
+    console.error('Could not revive annotation target. Content missing.');
 
   // set range start
   while (n !== null) {

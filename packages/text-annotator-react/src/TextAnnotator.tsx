@@ -25,7 +25,9 @@ export const TextAnnotator = (props: TextAnnotatorProps) => {
   }, []);
 
   return (
-    <div ref={el}>{children}</div>
+    <div ref={el}>
+      {children}
+    </div>
   )
 
 }
