@@ -102,10 +102,10 @@ export const createHighlightLayer = (container: HTMLElement, state: TextAnnotato
       context.clearRect(-0.5, -0.5, canvas.width + 1, canvas.height + 1);
 
       // Get current selection
-      const selected = new Set(selection.selected);
+      const selectedIds = new Set(selection.selected.map(({ id }) => id));
 
       annotationsInView.forEach(annotation => {
-        const isSelected = selected.has(annotation.id);
+        const isSelected = selectedIds.has(annotation.id);
 
         const rects = Array.from(annotation.target.selector.range.getClientRects());
         const merged = mergeClientRects(rects);

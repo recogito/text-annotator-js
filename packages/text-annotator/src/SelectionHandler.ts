@@ -112,7 +112,7 @@ export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorSta
       if (hovered) {
         const { selected } = selection;
         
-        if (selected.length !== 1 || selected[0] !== hovered.id)
+        if (selected.length !== 1 || selected[0].id !== hovered.id)
           selection.clickSelect(hovered.id, event);
       } else if (!selection.isEmpty()) {
         selection.clear();

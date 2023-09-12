@@ -31,6 +31,6 @@
     "CETEIcean": "^1.8.0"
   },
   "dependencies": {
-    "@annotorious/core": "^3.0.0-pre-alpha-36"
+    "@annotorious/core": "^3.0.0-pre-alpha-37"
   }
 }

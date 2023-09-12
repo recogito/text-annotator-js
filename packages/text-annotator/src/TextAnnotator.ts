@@ -23,7 +23,7 @@ export const TextAnnotator = <T extends unknown = TextAnnotation>(
   opts: TextAnnotatorOptions<T> = {}
 ): RecogitoTextAnnotator<T> => {
 
-  const state: TextAnnotatorState = createTextAnnotatorState(container);
+  const state: TextAnnotatorState = createTextAnnotatorState(container, opts.pointerAction);
 
   const { hover, selection, store } = state;
 

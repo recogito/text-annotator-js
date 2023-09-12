@@ -1,19 +1,18 @@
-import type { Store } from '@annotorious/core';
+import type { PointerAction, Store } from '@annotorious/core';
 import { 
-  createHighlightState,
   createHoverState, 
   createSelectionState, 
   createStore, 
   AnnotatorState, 
   SelectionState, 
   HoverState, 
-  HighlightState,  
   Origin
 } from '@annotorious/core';
 import { createSpatialTree } from './spatialTree';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
 import type { TextAnnotationStore } from './TextAnnotationStore';
 import { reviveTarget } from './reviveTarget';
+import type { TextAnnotatorOptions } from 'src/TextAnnotatorOptions';
 
 export type TextAnnotatorState = AnnotatorState<TextAnnotation> & {
 
@@ -23,21 +22,20 @@ export type TextAnnotatorState = AnnotatorState<TextAnnotation> & {
 
   hover: HoverState<TextAnnotation>;
 
-  highlight: HighlightState<TextAnnotation>;
-
 }
 
-export const createTextAnnotatorState = (container: HTMLElement): TextAnnotatorState => {
+export const createTextAnnotatorState = (
+  container: HTMLElement,
+  defaultPointerAction?: PointerAction | ((annotation: TextAnnotation) => PointerAction)
+): TextAnnotatorState => {
 
   const store: Store<TextAnnotation> = createStore<TextAnnotation>();
 
   const tree = createSpatialTree(store, container);
 
-  const selection = createSelectionState<TextAnnotation>(store);
+  const selection = createSelectionState<TextAnnotation>(store, defaultPointerAction);
 
   const hover = createHoverState(store);
-
-  const highlight = createHighlightState(store);
 
   // Wrap store interface to intercept annotations and revive DOM ranges, if needed
   const addAnnotation = (annotation: TextAnnotation, origin = Origin.LOCAL) => {
@@ -127,8 +125,7 @@ export const createTextAnnotatorState = (container: HTMLElement): TextAnnotatorS
       updateTarget
     },
     selection,
-    hover,
-    highlight
+    hover
   }
 
 }

@@ -12,7 +12,7 @@ const getOffset = (event: PointerEvent, parent: Element) => {
 
 export interface TextAnnotatorPopupProps {
 
-  selected: TextAnnotation[];
+  selected: { annotation: TextAnnotation, editable?: boolean }[];
 
 }
 
