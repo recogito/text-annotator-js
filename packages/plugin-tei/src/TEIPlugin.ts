@@ -1,12 +1,14 @@
 import type { 
   RecogitoTextAnnotator,
   TextAnnotation, 
+  TextAnnotationStore, 
   TextAnnotationTarget, 
-  TextAnnotatorState 
 } from '@recogito/text-annotator';
 import type { 
+  Annotator,
   LifecycleEvents,
   Origin,  
+  Store,  
   StoreChangeEvent,
   StoreObserveOptions 
 } from '@annotorious/core';
@@ -21,9 +23,21 @@ import type {
   TEIAnnotationTarget 
 } from './TEIAnnotation';
 
-type TextEvents = LifecycleEvents<TextAnnotation>;
+type TEIEvents = LifecycleEvents<TEIAnnotation>;
 
-export const TEIPlugin = (anno: RecogitoTextAnnotator) => {
+export type TEIAnnotationStore = Store<TEIAnnotation> & {
+
+  getAt(x: number, y: number): TEIAnnotation | undefined;
+  
+  getIntersecting(minX: number, minY: number, maxX: number, maxY: number): TEIAnnotation[];
+  
+  recalculatePositions(): void;
+
+}
+
+export interface RecogitoTEIAnnotator<T extends unknown = TEIAnnotation> extends Annotator<TEIAnnotation, T> { }
+
+export const TEIPlugin = (anno: RecogitoTextAnnotator): RecogitoTEIAnnotator => {
 
   const container: HTMLElement = anno.element;
 
@@ -33,7 +47,7 @@ export const TEIPlugin = (anno: RecogitoTextAnnotator) => {
   }> = [];
 
   // Wrap lifecycle handlers
-  const on = <E extends keyof TextEvents>(event: E, callback: TextEvents[E]) => {
+  const on = <E extends keyof TEIEvents>(event: E, callback: TEIEvents[E]) => {
     if (event === 'createAnnotation' || event === 'deleteAnnotation') {
       // @ts-ignore
       anno.on(event, (a: TextAnnotation) => callback(textToTEIAnnotation(a)));
@@ -47,7 +61,7 @@ export const TEIPlugin = (anno: RecogitoTextAnnotator) => {
   }
 
   // Wrap store
-  const { store } = anno.state as TextAnnotatorState;
+  const store = anno.state.store as TextAnnotationStore;
 
   const toText = teiToTextAnnotation(container);
 
@@ -138,6 +152,7 @@ export const TEIPlugin = (anno: RecogitoTextAnnotator) => {
     on,
     state: {
       ...anno.state,
+
       store: {
         ...anno.state.store,
         addAnnotation,
@@ -145,6 +160,7 @@ export const TEIPlugin = (anno: RecogitoTextAnnotator) => {
         bulkAddAnnotation,
         bulkUpdateTargets,
         getAnnotation,
+        //@ts-ignore
         getAt,
         getIntersecting,
         observe,

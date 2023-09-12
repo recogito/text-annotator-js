@@ -1,6 +1,6 @@
-import type { PresenceProvider, PresentUser } from '@annotorious/core';
+import type { Formatter, PresenceProvider, PresentUser } from '@annotorious/core';
 import type { TextAnnotation } from '../model';
-import type { Formatter, HighlightPainter } from '../highlight';
+import type { HighlightPainter } from '../highlight';
 import type { PresencePainterOptions } from './PresencePainterOptions';
 import { defaultPainter } from '../highlight';
 

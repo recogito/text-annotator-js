@@ -1,7 +1,7 @@
 import { Origin, createAnonymousGuest, createLifecyleObserver, parseAll } from '@annotorious/core';
-import type { Annotator, User, PresenceProvider } from '@annotorious/core';
+import type { Annotator, User, PresenceProvider, Formatter } from '@annotorious/core';
 import { createPainter } from './presence';
-import { createHighlightLayer, Formatter } from './highlight';
+import { createHighlightLayer } from './highlight';
 import { scrollIntoView } from './api';
 import { TextAnnotatorState, createTextAnnotatorState } from './state';
 import type { TextAnnotation } from './model';
@@ -13,8 +13,6 @@ import './TextAnnotator.css';
 export interface RecogitoTextAnnotator<T extends unknown = TextAnnotation> extends Annotator<TextAnnotation, T> {
 
   element: HTMLElement;
-
-  setFormatter(formatter: Formatter): void;
 
   scrollIntoView(annotation: TextAnnotation): void;
 

@@ -1,6 +1,7 @@
+import type { Formatter } from '@annotorious/core';
 import { mergeClientRects } from '../utils';
 import type { TextAnnotatorState } from '../state';
-import { defaultPainter, Formatter, type HighlightPainter } from './HighlightPainter';
+import { defaultPainter, type HighlightPainter } from './HighlightPainter';
 
 import './highlightLayer.css';
 

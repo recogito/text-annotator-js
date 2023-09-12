@@ -12,7 +12,6 @@ import { createSpatialTree } from './spatialTree';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
 import type { TextAnnotationStore } from './TextAnnotationStore';
 import { reviveTarget } from './reviveTarget';
-import type { TextAnnotatorOptions } from 'src/TextAnnotatorOptions';
 
 export type TextAnnotatorState = AnnotatorState<TextAnnotation> & {
 

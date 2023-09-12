@@ -1,10 +1,9 @@
+import type { Formatter } from '@annotorious/core';
 import type { TextAnnotation } from '../model';
 
 const DEFAULT_STYLE = { fill: 'rgba(0, 128, 255, 0.18)' };
 
 const DEFAULT_SELECTED_STYLE = { fill: 'rgba(0, 128, 255, 0.4)' };
-
-export type Formatter = (annotation: TextAnnotation, isSelected: boolean) => HighlightStyle;
 
 /** 
  * A painter implements the actual CANVAS highlight drawing logic.
