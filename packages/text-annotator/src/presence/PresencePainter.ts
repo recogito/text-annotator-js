@@ -1,7 +1,8 @@
 import type { PresenceProvider, PresentUser } from '@annotorious/core';
 import type { TextAnnotation } from '../model';
-import type { HighlightPainter } from '../highlight';
+import type { Formatter, HighlightPainter } from '../highlight';
 import type { PresencePainterOptions } from './PresencePainterOptions';
+import { defaultPainter } from '../highlight';
 
 export const createPainter = (provider: PresenceProvider, opts: PresencePainterOptions = {}): HighlightPainter => {
 
@@ -22,7 +23,13 @@ export const createPainter = (provider: PresenceProvider, opts: PresencePainterO
       selection.forEach(id => trackedAnnotations.set(id, p));
   });  
 
-  const paint = (annotation: TextAnnotation, rects: DOMRect[], context: CanvasRenderingContext2D, isSelected: boolean = false) => {
+  const paint = (
+    annotation: TextAnnotation, 
+    rects: DOMRect[], 
+    context: CanvasRenderingContext2D, 
+    isSelected?: boolean,
+    formatter?: Formatter
+  ) => {
     if (opts.font)
       context.font = opts.font;
 
@@ -46,13 +53,14 @@ export const createPainter = (provider: PresenceProvider, opts: PresencePainterO
       
       context.fillStyle = '#fff';
       context.fillText(user.appearance.label, x + 1, y - paddingBottom);
-      
-      return { fill: isSelected ? user.appearance.color + '62' : user.appearance.color + '33' };
+
+      context.fillStyle = isSelected ? user.appearance.color + '62' : user.appearance.color + '33';
+      rects.forEach(({ x, y, width, height }) => context.fillRect(x, y - 2.5, width, height + 5));
     } else {
-      return { fill:  isSelected ? 'rgba(0, 128, 255, 0.4)' : 'rgba(0, 128, 255, 0.18)' };
+      defaultPainter.paint(annotation, rects, context, isSelected, formatter);
     }
   }
 
-  return paint;
+  return { paint };
   
 }

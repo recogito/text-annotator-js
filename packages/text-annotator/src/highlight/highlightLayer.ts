@@ -1,12 +1,8 @@
 import { mergeClientRects } from '../utils';
 import type { TextAnnotatorState } from '../state';
-import type { HighlightPainter } from './HighlightPainter';
+import { defaultPainter, Formatter, type HighlightPainter } from './HighlightPainter';
 
 import './highlightLayer.css';
-
-const DEFAULT_STYLE = { fill: 'rgba(0, 128, 255, 0.18)' };
-
-const SELECTED_STYLE = { fill: 'rgba(0, 128, 255, 0.4)' };
 
 const debounce = <T extends (...args: any[]) => void>(func: T, delay: number = 10): T => {
   let timeoutId: number;
@@ -21,7 +17,9 @@ export const createHighlightLayer = (container: HTMLElement, state: TextAnnotato
 
   const { store, selection, hover } = state;
 
-  let currentPainter: HighlightPainter = null;
+  let currentFormatter: Formatter | undefined;
+
+  let currentPainter: HighlightPainter = defaultPainter;
 
   container.classList.add('r6o-annotatable');
 
@@ -110,13 +108,7 @@ export const createHighlightLayer = (container: HTMLElement, state: TextAnnotato
         const rects = Array.from(annotation.target.selector.range.getClientRects());
         const merged = mergeClientRects(rects);
 
-        const style =
-          (currentPainter && currentPainter(annotation, merged, context, isSelected)) || 
-          (isSelected ? SELECTED_STYLE : DEFAULT_STYLE);
-        
-        context.fillStyle = style.fill;
-
-        merged.forEach(({ x, y, width, height }) => context.fillRect(x, y - 2.5, width, height + 5));
+        currentPainter.paint(annotation, merged, context, isSelected, currentFormatter);
       });
     });
   }
@@ -129,6 +121,7 @@ export const createHighlightLayer = (container: HTMLElement, state: TextAnnotato
 
   return {
     redraw,
+    setFormatter: (formatter: Formatter) => currentFormatter = formatter,
     setPainter: (painter: HighlightPainter) => currentPainter = painter
   }
 

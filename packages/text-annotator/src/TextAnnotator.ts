@@ -1,7 +1,7 @@
 import { Origin, createAnonymousGuest, createLifecyleObserver, parseAll } from '@annotorious/core';
 import type { Annotator, User, PresenceProvider } from '@annotorious/core';
 import { createPainter } from './presence';
-import { createHighlightLayer } from './highlight';
+import { createHighlightLayer, Formatter } from './highlight';
 import { scrollIntoView } from './api';
 import { TextAnnotatorState, createTextAnnotatorState } from './state';
 import type { TextAnnotation } from './model';
@@ -13,6 +13,8 @@ import './TextAnnotator.css';
 export interface RecogitoTextAnnotator<T extends unknown = TextAnnotation> extends Annotator<TextAnnotation, T> {
 
   element: HTMLElement;
+
+  setFormatter(formatter: Formatter): void;
 
   scrollIntoView(annotation: TextAnnotation): void;
 
@@ -34,6 +36,7 @@ export const TextAnnotator = <T extends unknown = TextAnnotation>(
   const highlightLayer = createHighlightLayer(container, state);
 
   const selectionHandler = SelectionHandler(container, state);
+
   selectionHandler.setUser(currentUser);
 
   /*************************/
@@ -75,6 +78,9 @@ export const TextAnnotator = <T extends unknown = TextAnnotation>(
       store.bulkAddAnnotation(annotations as TextAnnotation[], true, Origin.REMOTE);
     }
   }
+  
+  const setFormatter = (formatter: Formatter) =>
+    highlightLayer.setFormatter(formatter);
 
   const setUser = (user: User) => {
     currentUser = user;
@@ -96,6 +102,7 @@ export const TextAnnotator = <T extends unknown = TextAnnotation>(
     getUser,
     loadAnnotations,
     setAnnotations,
+    setFormatter,
     setUser,
     setPresenceProvider,
     on: lifecycle.on,
