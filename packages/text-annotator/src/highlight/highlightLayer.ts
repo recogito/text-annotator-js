@@ -120,9 +120,14 @@ export const createHighlightLayer = (container: HTMLElement, state: TextAnnotato
   // need need for extra check
   selection.subscribe(() => redraw());
 
+  const setFormatter = (formatter: Formatter) => {
+    currentFormatter = formatter;
+    redraw();
+  }
+
   return {
     redraw,
-    setFormatter: (formatter: Formatter) => currentFormatter = formatter,
+    setFormatter,
     setPainter: (painter: HighlightPainter) => currentPainter = painter
   }
 
