@@ -1,4 +1,4 @@
-import type { PointerAction, Store } from '@annotorious/core';
+import type { PointerSelectAction, Store } from '@annotorious/core';
 import { 
   createHoverState, 
   createSelectionState, 
@@ -25,7 +25,7 @@ export type TextAnnotatorState = AnnotatorState<TextAnnotation> & {
 
 export const createTextAnnotatorState = (
   container: HTMLElement,
-  defaultPointerAction?: PointerAction | ((annotation: TextAnnotation) => PointerAction)
+  defaultPointerAction?: PointerSelectAction | ((annotation: TextAnnotation) => PointerSelectAction)
 ): TextAnnotatorState => {
 
   const store: Store<TextAnnotation> = createStore<TextAnnotation>();
