@@ -1,8 +1,8 @@
-import type { Formatter } from '@annotorious/core';
-import type { TextAnnotation } from '../model';
+import type { Formatter, ViewportState } from '@annotorious/core';
 import type { TextAnnotatorState } from '../state';
 import { mergeClientRects } from '../utils';
 import { defaultPainter, type HighlightPainter } from './HighlightPainter';
+import { trackViewport } from './trackViewport';
 
 import './highlightLayer.css';
 
@@ -18,7 +18,7 @@ const debounce = <T extends (...args: any[]) => void>(func: T, delay: number = 1
 export const createHighlightLayer = (
   container: HTMLElement, 
   state: TextAnnotatorState,
-  onDraw: ((visible: TextAnnotation[]) => void)
+  viewport: ViewportState
 ) => {
 
   const { store, selection, hover } = state;
@@ -26,6 +26,8 @@ export const createHighlightLayer = (
   let currentFormatter: Formatter | undefined;
 
   let currentPainter: HighlightPainter = defaultPainter;
+
+  const onDraw = trackViewport(viewport);
 
   container.classList.add('r6o-annotatable');
 

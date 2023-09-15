@@ -1,4 +1,4 @@
-import { Origin, createAnonymousGuest, parseAll } from '@annotorious/core';
+import { Origin, createAnonymousGuest, createLifecyleObserver, parseAll } from '@annotorious/core';
 import type { Annotator, User, PresenceProvider, Formatter } from '@annotorious/core';
 import { createPainter } from './presence';
 import { createHighlightLayer } from './highlight';
@@ -6,7 +6,6 @@ import { scrollIntoView } from './api';
 import { TextAnnotatorState, createTextAnnotatorState } from './state';
 import type { TextAnnotation } from './model';
 import type { TextAnnotatorOptions } from './TextAnnotatorOptions';
-import { createTextLifecycleObserver } from './lifecycle';
 import { SelectionHandler } from './SelectionHandler';
 
 import './TextAnnotator.css';
@@ -26,13 +25,13 @@ export const TextAnnotator = <T extends unknown = TextAnnotation>(
 
   const state: TextAnnotatorState = createTextAnnotatorState(container, opts.pointerAction);
 
-  const { hover, selection, store } = state;
+  const { hover, selection, store, viewport } = state;
 
-  const { onDraw, lifecycle } = createTextLifecycleObserver<T | TextAnnotation>(store, selection, hover);
-
+  const lifecycle = createLifecyleObserver<TextAnnotation, TextAnnotation | T>(store, selection, hover, viewport);
+  
   let currentUser: User = opts.readOnly ? null : createAnonymousGuest();
 
-  const highlightLayer = createHighlightLayer(container, state, onDraw);
+  const highlightLayer = createHighlightLayer(container, state, viewport);
 
   const selectionHandler = SelectionHandler(container, state);
 

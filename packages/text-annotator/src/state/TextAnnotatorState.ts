@@ -1,4 +1,4 @@
-import type { PointerSelectAction, Store } from '@annotorious/core';
+import type { PointerSelectAction, Store, ViewportState } from '@annotorious/core';
 import { 
   createHoverState, 
   createSelectionState, 
@@ -6,7 +6,8 @@ import {
   AnnotatorState, 
   SelectionState, 
   HoverState, 
-  Origin
+  Origin,
+  createViewportState
 } from '@annotorious/core';
 import { createSpatialTree } from './spatialTree';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
@@ -20,6 +21,8 @@ export type TextAnnotatorState = AnnotatorState<TextAnnotation> & {
   selection: SelectionState<TextAnnotation>;
 
   hover: HoverState<TextAnnotation>;
+
+  viewport: ViewportState;
 
 }
 
@@ -35,6 +38,8 @@ export const createTextAnnotatorState = (
   const selection = createSelectionState<TextAnnotation>(store, defaultPointerAction);
 
   const hover = createHoverState(store);
+
+  const viewport = createViewportState();
 
   // Wrap store interface to intercept annotations and revive DOM ranges, if needed
   const addAnnotation = (annotation: TextAnnotation, origin = Origin.LOCAL) => {
@@ -115,7 +120,8 @@ export const createTextAnnotatorState = (
       updateTarget
     },
     selection,
-    hover
+    hover,
+    viewport
   }
 
 }
