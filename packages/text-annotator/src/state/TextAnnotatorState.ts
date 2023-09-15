@@ -45,7 +45,7 @@ export const createTextAnnotatorState = (
   }
 
   const bulkAddAnnotation = (annotations: TextAnnotation[], replace = true, origin = Origin.LOCAL) => {
-    const bulkAdd = (retriesLeft: number = 5) => { 
+    const bulkAdd = (retriesLeft: number = 1) => { 
       const revived = annotations.map(a => a.target.selector.range instanceof Range ?
         a : { ...a, target: reviveTarget(a.target, container )});
   
@@ -55,7 +55,7 @@ export const createTextAnnotatorState = (
       if (hasCollapsedRanges) {
         if (retriesLeft > 0) {
           console.warn('Found collapsed ranges - retrying');
-          setTimeout(() => bulkAdd(retriesLeft - 1), 500);
+          setTimeout(() => bulkAdd(retriesLeft - 1), 100);
         } else {
           console.warn('Could not revive all targets');
           console.warn(revived.filter(a => a.target.selector.range.collapsed));
