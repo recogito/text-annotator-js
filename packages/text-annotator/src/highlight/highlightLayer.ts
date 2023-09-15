@@ -96,7 +96,7 @@ export const createHighlightLayer = (container: HTMLElement, state: TextAnnotato
     const { minX, minY, maxX, maxY } = getViewport();   
     const annotationsInView = store.getIntersecting(minX, minY, maxX, maxY);
 
-    // requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
       // New render loop - clear canvas
       context.clearRect(-0.5, -0.5, canvas.width + 1, canvas.height + 1);
 
@@ -111,7 +111,7 @@ export const createHighlightLayer = (container: HTMLElement, state: TextAnnotato
 
         currentPainter.paint(annotation, merged, context, isSelected, currentFormatter);
       });
-    // });
+    });
   }
 
   store.observe(() => redraw());
