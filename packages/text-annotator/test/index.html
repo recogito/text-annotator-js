@@ -107,6 +107,10 @@
         r.on('selectionChanged', (annotations) => {
           console.log('selectionChanged', annotations);
         });
+
+        r.on('viewportIntersect', (annotations) => {
+          console.log('viewport', annotations);
+        });
       }
     </script>
   </body>

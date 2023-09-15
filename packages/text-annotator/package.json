@@ -33,8 +33,7 @@
     "vite-plugin-dts": "^2.3.0"
   },
   "dependencies": {
-    "@annotorious/core": "^3.0.0-pre-alpha-40",
-    "nanoevents": "^7.0.1",
+    "@annotorious/core": "file:../../../../annotorious/annotorious-v3/packages/annotorious-core",
     "rbush": "^3.0.1",
     "uuid": "^9.0.0"
   }

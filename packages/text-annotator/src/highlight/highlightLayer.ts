@@ -1,6 +1,7 @@
 import type { Formatter } from '@annotorious/core';
-import { mergeClientRects } from '../utils';
+import type { TextAnnotation } from '../model';
 import type { TextAnnotatorState } from '../state';
+import { mergeClientRects } from '../utils';
 import { defaultPainter, type HighlightPainter } from './HighlightPainter';
 
 import './highlightLayer.css';
@@ -14,10 +15,14 @@ const debounce = <T extends (...args: any[]) => void>(func: T, delay: number = 1
   }) as T;
 }
 
-export const createHighlightLayer = (container: HTMLElement, state: TextAnnotatorState) => {
+export const createHighlightLayer = (
+  container: HTMLElement, 
+  state: TextAnnotatorState,
+  onDraw: ((visible: TextAnnotation[]) => void)
+) => {
 
   const { store, selection, hover } = state;
-
+  
   let currentFormatter: Formatter | undefined;
 
   let currentPainter: HighlightPainter = defaultPainter;
@@ -112,6 +117,8 @@ export const createHighlightLayer = (container: HTMLElement, state: TextAnnotato
         currentPainter.paint(annotation, merged, context, isSelected, currentFormatter);
       });
     });
+
+    onDraw(annotationsInView);
   }
 
   store.observe(() => redraw());
