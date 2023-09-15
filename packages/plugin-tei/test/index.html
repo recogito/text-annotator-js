@@ -79,6 +79,10 @@
         anno.on('selectionChanged', (annotations) => {
           console.log('selectionChanged', annotations);
         });
+
+        anno.on('viewportIntersect', (annotations) => {
+          console.log('viewport', annotations);
+        });
       }
     </script>
   </body>

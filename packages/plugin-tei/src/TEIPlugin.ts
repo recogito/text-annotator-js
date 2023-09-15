@@ -57,6 +57,9 @@ export const TEIPlugin = (anno: RecogitoTextAnnotator): RecogitoTEIAnnotator => 
     } else if (event === 'updateAnnotation') {
       // @ts-ignore
       anno.on(event, (a: TextAnnotation, b: TextAnnotation) => callback(textToTEIAnnotation(a), textToTEIAnnotation(b)));
+    } else if (event === 'viewportIntersect') {
+      // @ts-ignore
+      anno.on(event, (a: TextAnnotation[]) => callback(a.map(textToTEIAnnotation)));
     }
   }
 
