@@ -91,10 +91,12 @@ export const rangeToTEIRangeSelector = (selector: TextSelector): TEIRangeSelecto
 
   return {
     type: 'RangeSelector',
+    start: selector.start,
     startSelector: {
       type: 'XPathSelector',
       value: start
     },
+    end: selector.end,
     endSelector: {
       type: 'XPathSelector',
       value: end

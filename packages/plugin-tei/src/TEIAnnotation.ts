@@ -1,4 +1,5 @@
 import type { Annotation, AnnotationTarget } from '@annotorious/core';
+import type { TextSelector } from '@recogito/text-annotator';
 
 export interface TEIAnnotation extends Annotation {
 
@@ -12,28 +13,24 @@ export interface TEIAnnotationTarget extends AnnotationTarget {
 
 }
 
-export interface TEIRangeSelector {
+export interface TEIRangeSelector extends TextSelector {
 
-  type: 'RangeSelector'
+  type: 'RangeSelector';
 
   startSelector: {
 
-    type: 'XPathSelector'
+    type: 'XPathSelector';
 
-    value: string
+    value: string;
 
   }
 
   endSelector: {
 
-    type: 'XPathSelector'
+    type: 'XPathSelector';
 
-    value: string
+    value: string;
 
   }
-
-  quote: string;
-
-  range: Range;
 
 }
