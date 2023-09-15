@@ -45,30 +45,21 @@ export const createTextAnnotatorState = (
   }
 
   const bulkAddAnnotation = (annotations: TextAnnotation[], replace = true, origin = Origin.LOCAL) => {
-    const bulkAdd = (retriesLeft: number = 1) => { 
-      const revived = annotations.map(a => a.target.selector.range instanceof Range ?
-        a : { ...a, target: reviveTarget(a.target, container )});
-  
-      // Initial page load might take some time. Retry for more robustness.
-      const hasCollapsedRanges = revived.some(a => a.target.selector.range.collapsed);
+    const revived = annotations.map(a => a.target.selector.range instanceof Range ?
+      a : { ...a, target: reviveTarget(a.target, container )});
 
-      if (hasCollapsedRanges) {
-        if (retriesLeft > 0) {
-          console.warn('Found collapsed ranges - retrying');
-          setTimeout(() => bulkAdd(retriesLeft - 1), 100);
-        } else {
-          console.warn('Could not revive all targets');
-          console.warn(revived.filter(a => a.target.selector.range.collapsed));
+    // Initial page load might take some time. Retry for more robustness.
+    const hasCollapsedRanges = revived.some(a => a.target.selector.range.collapsed);
 
-          const successful = revived.filter(a => !a.target.selector.range.collapsed);
-          store.bulkAddAnnotation(successful, replace, origin);
-        }
-      } else {
-        store.bulkAddAnnotation(revived, replace, origin);
-      } 
+    if (hasCollapsedRanges) {
+      console.warn('Could not revive all targets');
+      console.warn(revived.filter(a => a.target.selector.range.collapsed));
+
+      const successful = revived.filter(a => !a.target.selector.range.collapsed);
+      store.bulkAddAnnotation(successful, replace, origin);
+    } else {
+      store.bulkAddAnnotation(revived, replace, origin);
     }
-
-    bulkAdd();
   }
 
   const updateTarget = (target: TextAnnotationTarget, origin = Origin.LOCAL) => {
