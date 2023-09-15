@@ -90,7 +90,6 @@ export const rangeToTEIRangeSelector = (selector: TextSelector): TEIRangeSelecto
   const { start, end } = toTEIXPaths(startPathSegments, endPathSegments, range);
 
   return {
-    type: 'RangeSelector',
     start: selector.start,
     startSelector: {
       type: 'XPathSelector',

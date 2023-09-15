@@ -15,8 +15,6 @@ export interface TEIAnnotationTarget extends AnnotationTarget {
 
 export interface TEIRangeSelector extends TextSelector {
 
-  type: 'RangeSelector';
-
   startSelector: {
 
     type: 'XPathSelector';
