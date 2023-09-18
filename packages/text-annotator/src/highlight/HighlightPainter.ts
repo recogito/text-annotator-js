@@ -1,9 +1,9 @@
 import type { Formatter } from '@annotorious/core';
 import type { TextAnnotation } from '../model';
 
-const DEFAULT_STYLE = { fill: 'rgba(0, 128, 255, 0.18)' };
+const DEFAULT_STYLE = { fill: 'rgb(0, 128, 255', fillOpacity: 0.18 };
 
-const DEFAULT_SELECTED_STYLE = { fill: 'rgba(0, 128, 255, 0.4)' };
+const DEFAULT_SELECTED_STYLE = { fill: 'rgb(0, 128, 255)', fillOpacity: 0.45 };
 
 /** 
  * A painter implements the actual CANVAS highlight drawing logic.
