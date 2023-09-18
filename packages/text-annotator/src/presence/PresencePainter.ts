@@ -26,38 +26,39 @@ export const createPainter = (provider: PresenceProvider, opts: PresencePainterO
   const paint = (
     annotation: TextAnnotation, 
     rects: DOMRect[], 
-    context: CanvasRenderingContext2D, 
+    bg: CanvasRenderingContext2D, 
+    fg: CanvasRenderingContext2D,
     isSelected?: boolean,
     formatter?: Formatter
   ) => {
     if (opts.font)
-      context.font = opts.font;
+      fg.font = opts.font;
 
     const user = trackedAnnotations.get(annotation.id);
     if (user) {
       const { x, y, height } = rects[0];
 
       // Draw presence indicator
-      context.fillStyle = user.appearance.color;
-      context.fillRect(x - 2, y - 2.5, 2, height + 5);
+      fg.fillStyle = user.appearance.color;
+      fg.fillRect(x - 2, y - 2.5, 2, height + 5);
 
       // Draw name label
-      const metrics = context.measureText(user.appearance.label);
+      const metrics = fg.measureText(user.appearance.label);
       const labelWidth = metrics.width + 6;
       const labelHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent + 8;
       
       // Sigh... different between FF and Chrome
       const paddingBottom = metrics.fontBoundingBoxAscent ? 8 : 6.5;
 
-      context.fillRect(x - 2, y - 2.5 - labelHeight, labelWidth, labelHeight);
+      fg.fillRect(x - 2, y - 2.5 - labelHeight, labelWidth, labelHeight);
       
-      context.fillStyle = '#fff';
-      context.fillText(user.appearance.label, x + 1, y - paddingBottom);
+      fg.fillStyle = '#fff';
+      fg.fillText(user.appearance.label, x + 1, y - paddingBottom);
 
-      context.fillStyle = isSelected ? user.appearance.color + '62' : user.appearance.color + '33';
-      rects.forEach(({ x, y, width, height }) => context.fillRect(x, y - 2.5, width, height + 5));
+      bg.fillStyle = isSelected ? user.appearance.color + '62' : user.appearance.color + '33';
+      rects.forEach(({ x, y, width, height }) => fg.fillRect(x, y - 2.5, width, height + 5));
     } else {
-      defaultPainter.paint(annotation, rects, context, isSelected, formatter);
+      defaultPainter.paint(annotation, rects, bg, fg, isSelected, formatter);
     }
   }
 
