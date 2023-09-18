@@ -43,7 +43,12 @@ export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorSta
 
   const setUser = (user: User) => currentUser = user;
 
+  let isLeftClick = false;
+
   container.addEventListener('selectstart', (evt: PointerEvent) => {
+    if (selectionStarted || !isLeftClick)
+      return;
+
     // Make sure we don't listen to selection changes that
     // were not started on the container, or which are not supposed to 
     // be annotatable (like the popup)
@@ -59,8 +64,8 @@ export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorSta
     }
   });
 
-  document.addEventListener('selectionchange', (event: PointerEvent) => {   
-    if (!selectionStarted)
+  document.addEventListener('selectionchange', (evt: PointerEvent) => {   
+    if (!selectionStarted || !isLeftClick)
       return;
 
     const sel = document.getSelection();
@@ -85,14 +90,23 @@ export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorSta
           target: updatedTarget
         });
 
-        selection.clickSelect(updatedTarget.annotation, event);
+        selection.clickSelect(updatedTarget.annotation, evt);
       }
 
       currentTarget = updatedTarget;
     }
   });
 
-  document.addEventListener('pointerup', (event: PointerEvent) => {
+  // Select events don't carry information about the mouse button
+  // Therefore, to prevent right-click selection, we need to listen
+  // to the initial pointerdown event and remember the button
+  container.addEventListener('pointerdown', (evt: PointerEvent) =>
+    isLeftClick = evt.button === 0);
+
+  document.addEventListener('pointerup', (evt: PointerEvent) => {
+    // Rest left click flag
+    isLeftClick = false;
+
     const annotatable = !(event.target as Node).parentElement?.closest('.not-annotatable');
     if (!annotatable)
       return;
@@ -100,7 +114,7 @@ export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorSta
     if (currentTarget) {
       store.updateTarget(currentTarget, Origin.LOCAL);
 
-      selection.clickSelect(currentTarget.annotation, event);
+      selection.clickSelect(currentTarget.annotation, evt);
 
       clearNativeSelection();
       currentTarget = null;
@@ -108,12 +122,12 @@ export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorSta
     } else {   
       const { x, y } = container.getBoundingClientRect();
     
-      const hovered = store.getAt(event.clientX - x, event.clientY - y);
+      const hovered = store.getAt(evt.clientX - x, evt.clientY - y);
       if (hovered) {
         const { selected } = selection;
         
         if (selected.length !== 1 || selected[0].id !== hovered.id)
-          selection.clickSelect(hovered.id, event);
+          selection.clickSelect(hovered.id, evt);
       } else if (!selection.isEmpty()) {
         selection.clear();
       }
