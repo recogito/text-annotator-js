@@ -13,7 +13,8 @@ export type HighlightPainter = {
   paint(  
     annotation: TextAnnotation, 
     rects: DOMRect[],
-    context: CanvasRenderingContext2D,
+    bg: CanvasRenderingContext2D,
+    fg: CanvasRenderingContext2D,
     isSelected?: boolean,
     formatter?: Formatter
   ): void;
@@ -25,16 +26,16 @@ export type HighlightPainter = {
  */
 export const defaultPainter: HighlightPainter = {
 
-  paint: (annotation, rects, context, isSelected, formatter) => {
+  paint: (annotation, rects, bg, fg, isSelected, formatter) => {
     const style: HighlightStyle = formatter ? 
       formatter(annotation, isSelected) :
       isSelected ? DEFAULT_SELECTED_STYLE : 
       DEFAULT_STYLE;
 
-    context.fillStyle = style.fill;
-    context.globalAlpha = style.fillOpacity || 1;
+    bg.fillStyle = style.fill;
+    bg.globalAlpha = style.fillOpacity || 1;
     
-    rects.forEach(({ x, y, width, height }) => context.fillRect(x, y - 2.5, width, height + 5));
+    rects.forEach(({ x, y, width, height }) => bg.fillRect(x, y - 2.5, width, height + 5));
   }
 
 }

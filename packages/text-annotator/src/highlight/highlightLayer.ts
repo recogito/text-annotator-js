@@ -15,6 +15,29 @@ const debounce = <T extends (...args: any[]) => void>(func: T, delay: number = 1
   }) as T;
 }
 
+const createCanvas = (className: string) => {
+  const canvas = document.createElement('canvas');
+  canvas.width = 2 * window.innerWidth;
+  canvas.height = 2 * window.innerHeight;
+  canvas.className = className;
+
+  const context = canvas.getContext('2d');
+  context.scale(2, 2);
+  context.translate(0.5, 0.5);
+
+  return canvas;
+}
+
+const resetCanvas = (canvas: HTMLCanvasElement) => {
+  canvas.width = 2 * window.innerWidth;
+  canvas.height = 2 * window.innerHeight;
+
+  // Note that resizing the canvas resets the context
+  const context = canvas.getContext('2d');
+  context.scale(2, 2);
+  context.translate(0.5, 0.5);
+}
+
 export const createHighlightLayer = (
   container: HTMLElement, 
   state: TextAnnotatorState,
@@ -31,16 +54,14 @@ export const createHighlightLayer = (
 
   container.classList.add('r6o-annotatable');
 
-  const canvas = document.createElement('canvas');
-  canvas.width = 2 * window.innerWidth;
-  canvas.height = 2 * window.innerHeight;
-  canvas.className = 'r6o-highlight-layer';
+  const bgCanvas = createCanvas('r6o-highlight-layer bg');
+  const fgCanvas = createCanvas('r6o-highlight-layer fg');
 
-  const context = canvas.getContext('2d');
-  context.scale(2, 2);
-  context.translate(0.5, 0.5);
+  const bgContext = bgCanvas.getContext('2d');
+  const fgContext = fgCanvas.getContext('2d');
 
-  container.appendChild(canvas);
+  container.insertBefore(bgCanvas, container.firstChild);
+  container.appendChild(fgCanvas);
 
   container.addEventListener('pointermove', (event: PointerEvent) => {
     const {x, y} = container.getBoundingClientRect();
@@ -76,13 +97,9 @@ export const createHighlightLayer = (
   document.addEventListener('scroll', onScroll, true);
 
   const onResize = debounce(() => {
-    canvas.width = 2 * window.innerWidth;
-    canvas.height = 2 * window.innerHeight;
-    
-    const context = canvas.getContext('2d');
-    context.scale(2, 2);
-    context.translate(0.5, 0.5);
-    
+    resetCanvas(bgCanvas);
+    resetCanvas(fgCanvas);
+
     store.recalculatePositions();
 
     redraw();
@@ -103,9 +120,12 @@ export const createHighlightLayer = (
     const { minX, minY, maxX, maxY } = getViewport();   
     const annotationsInView = store.getIntersecting(minX, minY, maxX, maxY);
 
+    const { width, height } = fgCanvas;
+
     requestAnimationFrame(() => {
-      // New render loop - clear canvas
-      context.clearRect(-0.5, -0.5, canvas.width + 1, canvas.height + 1);
+      // New render loop - clear canvases
+      fgContext.clearRect(-0.5, -0.5, width + 1, height + 1);
+      bgContext.clearRect(-0.5, -0.5, width + 1, height + 1);
 
       // Get current selection
       const selectedIds = new Set(selection.selected.map(({ id }) => id));
@@ -116,7 +136,7 @@ export const createHighlightLayer = (
         const rects = Array.from(annotation.target.selector.range.getClientRects());
         const merged = mergeClientRects(rects);
 
-        currentPainter.paint(annotation, merged, context, isSelected, currentFormatter);
+        currentPainter.paint(annotation, merged, bgContext, fgContext, isSelected, currentFormatter);
       });
     });
 
