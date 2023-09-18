@@ -83,10 +83,8 @@ export const teiToTextTarget = (container: HTMLElement) => (t: TEIAnnotationTarg
   return {
     ...t,
     selector: {
-      // Ideally, we'd populate these values. But they are never
-      // used in practice - AT THE MOMENT...
-      start: null,
-      end: null,
+      start: t.selector.start,
+      end: t.selector.end,
       quote: t.selector.quote,
       range
     }

@@ -46,20 +46,43 @@ export const TEIPlugin = (anno: RecogitoTextAnnotator): RecogitoTEIAnnotator => 
     wrapped: (event: StoreChangeEvent<TextAnnotation>) => void
   }> = [];
 
+  const listeners: Array<{
+    callback: TEIEvents[keyof TEIEvents],
+    wrapped: LifecycleEvents<TextAnnotation>[keyof TEIEvents]
+  }> = [];
+
   // Wrap lifecycle handlers
   const on = <E extends keyof TEIEvents>(event: E, callback: TEIEvents[E]) => {
+    let wrapped: LifecycleEvents<TextAnnotation>[E]; 
+
     if (event === 'createAnnotation' || event === 'deleteAnnotation') {
       // @ts-ignore
-      anno.on(event, (a: TextAnnotation) => callback(textToTEIAnnotation(a)));
+      wrapped = (a: TextAnnotation) => callback(textToTEIAnnotation(a), undefined);
+      anno.on(event, wrapped);
     } else if (event === 'selectionChanged') {
       // @ts-ignore
-      anno.on(event, (a: TextAnnotation[]) => callback(a.map(textToTEIAnnotation)));
+      wrapped = (a: TextAnnotation[]) => callback(a.map(textToTEIAnnotation));
+      anno.on(event, wrapped);
     } else if (event === 'updateAnnotation') {
       // @ts-ignore
-      anno.on(event, (a: TextAnnotation, b: TextAnnotation) => callback(textToTEIAnnotation(a), textToTEIAnnotation(b)));
+      wrapped =  (a: TextAnnotation, b: TextAnnotation) => callback(textToTEIAnnotation(a), textToTEIAnnotation(b));
+      anno.on(event, wrapped);
     } else if (event === 'viewportIntersect') {
       // @ts-ignore
-      anno.on(event, (a: TextAnnotation[]) => callback(a.map(textToTEIAnnotation)));
+      wrapped = (a: TextAnnotation[]) => callback(a.map(textToTEIAnnotation));
+      anno.on(event, wrapped);
+    }
+
+    if (wrapped)
+      listeners.push({ callback, wrapped });
+  }
+
+  const off = <E extends keyof TEIEvents>(event: E, callback: TEIEvents[E]) => {
+    const idx = listeners.findIndex(listener => listener.callback === callback);
+    if (idx > -1) {
+      // @ts-ignore
+      anno.off(event, listeners[idx].wrapped);
+      listeners.splice(idx, 1);
     }
   }
 
@@ -136,7 +159,6 @@ export const TEIPlugin = (anno: RecogitoTextAnnotator): RecogitoTEIAnnotator => 
       });
     };
 
-    // TODO need to keep a record of 'wrapped' and intercept the unobserve method
     store.observe(wrapped, options);
 
     return observers.push({ onChange, wrapped });
@@ -153,9 +175,9 @@ export const TEIPlugin = (anno: RecogitoTextAnnotator): RecogitoTEIAnnotator => 
   return {
     ...anno,
     on,
+    off,
     state: {
       ...anno.state,
-
       store: {
         ...anno.state.store,
         addAnnotation,

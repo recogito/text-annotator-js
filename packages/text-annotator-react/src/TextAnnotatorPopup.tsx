@@ -33,18 +33,16 @@ export const TextAnnotatorPopup = (props: TextAnnotatorPopupContainerProps) => {
   const { selected, pointerEvent } = useSelection<TextAnnotation>();
 
   useEffect(() => {
-    if (selected.length === 0 && open) {
-      // Close on deselect
-      setOpen(false);
-    } else if (selected.length > 0) {
-      // Ignore all selection changes except those
-      // accompanied by a pointerup event.
-      if (pointerEvent?.type !== 'pointerup')
-        return;
-
-      setOpen(true);
+    // Ignore all selection changes except those
+    // accompanied by a pointer event.
+    if (pointerEvent) {
+      if (selected.length > 0 && pointerEvent?.type === 'pointerup') {
+        setOpen(true);
+      } else {
+        setOpen(false);
+      }
     }
-  }, [pointerEvent, selected]);
+  }, [pointerEvent, selected.map(a => a.annotation.id).join('-')]);
 
   useEffect(() => {
     if (!(pointerEvent && open && r))
