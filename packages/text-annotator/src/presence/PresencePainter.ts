@@ -55,8 +55,9 @@ export const createPainter = (provider: PresenceProvider, opts: PresencePainterO
       fg.fillStyle = '#fff';
       fg.fillText(user.appearance.label, x + 1, y - paddingBottom);
 
-      bg.fillStyle = isSelected ? user.appearance.color + '62' : user.appearance.color + '33';
-      rects.forEach(({ x, y, width, height }) => fg.fillRect(x, y - 2.5, width, height + 5));
+      bg.fillStyle = user.appearance.color;
+      bg.globalAlpha = isSelected ? 0.45 : 0.18;
+      rects.forEach(({ x, y, width, height }) => bg.fillRect(x, y - 2.5, width, height + 5));
     } else {
       defaultPainter.paint(annotation, rects, bg, fg, isSelected, formatter);
     }
