@@ -14,7 +14,24 @@ type Relation =
 // Note that this is not a general topology test. Takes a 
 // few shortcuts to test ONLY the situations we'll encounter
 // with text selections.
-const getRelation = (a: DOMRect, b: DOMRect): Relation | undefined => {
+const getRelation = (rectA: DOMRect, rectB: DOMRect): Relation | undefined => {
+  const round = (num: number ) => Math.round(num * 100) / 100;
+
+  // Some browsers have fractional pixel differences (looking at you FF!)
+  const a = {
+    top: round(rectA.top),
+    bottom: round(rectA.bottom),
+    left: round(rectA.left),
+    right: round(rectA.right)
+  };
+
+  const b = {
+    top: round(rectB.top),
+    bottom: round(rectB.bottom),
+    left: round(rectB.left),
+    right: round(rectB.right)
+  };
+
   if (a.top === b.top && a.bottom === b.bottom) {
     // Same height - check for containment and adjacency
     if (a.left === b.right || a.right === b.left)
@@ -49,6 +66,9 @@ const union = (a: DOMRect, b: DOMRect): DOMRect => {
 }
 
 export const mergeClientRects = (rects: DOMRect[]) => rects.reduce((merged, rectA) => {
+  // Some browser report empty rects - discard
+  if (rectA.width === 0 || rectA.height === 0)
+    return merged;
 
   let next = [...merged];
 
