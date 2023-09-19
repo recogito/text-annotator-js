@@ -9,9 +9,9 @@ import {
   Origin,
   createViewportState
 } from '@annotorious/core';
-import { createSpatialTree } from './spatialTree';
+import { IndexedHighlightRect, createSpatialTree } from './spatialTree';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
-import type { TextAnnotationStore } from './TextAnnotationStore';
+import type { AnnotationRects, TextAnnotationStore } from './TextAnnotationStore';
 import { reviveTarget } from './reviveTarget';
 
 export type TextAnnotatorState = AnnotatorState<TextAnnotation> & {
@@ -92,6 +92,28 @@ export const createTextAnnotatorState = (
     return ids.map(id => store.getAnnotation(id)).filter(a => a);
   }
 
+  const getIntersectingRects = (
+    minX: number, 
+    minY: number, 
+    maxX: number, 
+    maxY: number
+  ): AnnotationRects[] => {
+    const rects = tree.getIntersectingRects(minX, minY, maxX, maxY);
+
+    // Group by annotation ID
+    const groupedByAnnotationId: { [key:string]: IndexedHighlightRect[] } = rects.reduce((grouped, rect) => {
+      (grouped[rect.annotationId] = grouped[rect.annotationId] || []).push(rect);
+      return grouped;
+    }, {});
+
+    // Resolve annotation IDs
+    return Object.entries(groupedByAnnotationId).map(([annotationId, rects]) => ({
+      annotation: store.getAnnotation(annotationId),
+      rects: rects.map(({ minX, minY, maxX, maxY }) => 
+        ({ x: minX, y: minY, width: maxX - minX, height: maxY - minY }))
+    }));
+  }
+
   const recalculatePositions = () => tree.recalculate();
 
   store.observe(({ changes }) => {
@@ -116,6 +138,7 @@ export const createTextAnnotatorState = (
       bulkUpdateTargets,
       getAt,
       getIntersecting,
+      getIntersectingRects,
       recalculatePositions,
       updateTarget
     },

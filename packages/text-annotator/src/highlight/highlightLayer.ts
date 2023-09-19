@@ -1,6 +1,5 @@
 import type { Formatter, ViewportState } from '@annotorious/core';
 import type { TextAnnotatorState } from '../state';
-import { mergeClientRects } from '../utils';
 import { defaultPainter, type HighlightPainter } from './HighlightPainter';
 import { trackViewport } from './trackViewport';
 
@@ -81,7 +80,7 @@ export const createHighlightLayer = (
 
   const getViewport = () => {
     const { top, left } = container.getBoundingClientRect();
-     
+
     const { innerWidth, innerHeight } = window;
 
     const minX = - left;
@@ -89,7 +88,7 @@ export const createHighlightLayer = (
     const maxX = innerWidth - left;
     const maxY = innerHeight - top;
 
-    return { minX, minY, maxX, maxY };
+    return { top, left, minX, minY, maxX, maxY };
   }
 
   const onScroll = () => redraw();
@@ -117,8 +116,9 @@ export const createHighlightLayer = (
   resizeObserver.observe(container);
 
   const redraw = () => {
-    const { minX, minY, maxX, maxY } = getViewport();   
-    const annotationsInView = store.getIntersecting(minX, minY, maxX, maxY);
+    const { top, left, minX, minY, maxX, maxY } = getViewport();   
+
+    const annotationsInView = store.getIntersectingRects(minX, minY, maxX, maxY);
 
     const { width, height } = fgCanvas;
 
@@ -130,17 +130,22 @@ export const createHighlightLayer = (
       // Get current selection
       const selectedIds = new Set(selection.selected.map(({ id }) => id));
 
-      annotationsInView.forEach(annotation => {
+      annotationsInView.forEach(({ annotation, rects }) => {
         const isSelected = selectedIds.has(annotation.id);
 
-        const rects = Array.from(annotation.target.selector.range.getClientRects());
-        const merged = mergeClientRects(rects);
+        // Offset annotation rects by current scroll position
+        const offsetRects = rects.map(({ x, y, width, height }) => ({ 
+          x: x + left, 
+          y: y + top, 
+          width, 
+          height 
+        }));
 
-        currentPainter.paint(annotation, merged, bgContext, fgContext, isSelected, currentFormatter);
+        currentPainter.paint(annotation, offsetRects, bgContext, fgContext, isSelected, currentFormatter);
       });
     });
 
-    onDraw(annotationsInView);
+    onDraw(annotationsInView.map(({ annotation }) => annotation));
   }
 
   store.observe(() => redraw());

@@ -1,5 +1,6 @@
 import type { Formatter } from '@annotorious/core';
-import type { TextAnnotation } from '../model';
+import type { TextAnnotation } from 'src/model';
+import type { Rect } from 'src/state';
 
 const DEFAULT_STYLE = { fill: 'rgb(0, 128, 255', fillOpacity: 0.18 };
 
@@ -11,8 +12,8 @@ const DEFAULT_SELECTED_STYLE = { fill: 'rgb(0, 128, 255)', fillOpacity: 0.45 };
 export type HighlightPainter = { 
   
   paint(  
-    annotation: TextAnnotation, 
-    rects: DOMRect[],
+    annotation: TextAnnotation,
+    rects: Rect[], 
     bg: CanvasRenderingContext2D,
     fg: CanvasRenderingContext2D,
     isSelected?: boolean,

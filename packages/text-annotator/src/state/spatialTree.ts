@@ -3,7 +3,7 @@ import type { Store } from '@annotorious/core';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
 import { mergeClientRects } from '../utils';
 
-interface IndexedHighlightRect {
+export interface IndexedHighlightRect {
 
   minX: number;
 
@@ -91,6 +91,9 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
     return Array.from(new Set(hits.map(item => item.annotationId)));
   }
 
+  const getIntersectingRects = (minX: number, minY: number, maxX: number, maxY: number) =>
+    tree.search({ minX, minY, maxX, maxY });
+
   const size = () => tree.all().length;
 
   const recalculate = () => set(store.all().map(a => a.target), true);
@@ -100,6 +103,7 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
     clear,
     getAt,
     getIntersecting,
+    getIntersectingRects,
     insert,
     recalculate,
     remove,
