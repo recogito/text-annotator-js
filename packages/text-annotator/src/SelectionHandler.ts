@@ -64,12 +64,12 @@ export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorSta
     }
   });
 
-  document.addEventListener('selectionchange', (evt: PointerEvent) => {   
+  document.addEventListener('selectionchange', (evt: PointerEvent) => {  
     if (!selectionStarted || !isLeftClick)
       return;
 
     const sel = document.getSelection();
-
+    
     if (!sel.isCollapsed) {
       const ranges = Array.from(Array(sel.rangeCount).keys())
         .map(idx => sel.getRangeAt(idx));
@@ -107,7 +107,7 @@ export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorSta
     // Rest left click flag
     isLeftClick = false;
 
-    const annotatable = !(event.target as Node).parentElement?.closest('.not-annotatable');
+    const annotatable = !(evt.target as Node).parentElement?.closest('.not-annotatable');
     if (!annotatable)
       return;
       

@@ -16,25 +16,27 @@ const debounce = <T extends (...args: any[]) => void>(func: T, delay: number = 1
 
 const createCanvas = (className: string) => {
   const canvas = document.createElement('canvas');
-  canvas.width = 2 * window.innerWidth;
-  canvas.height = 2 * window.innerHeight;
+  canvas.width = /* 2 * */ window.innerWidth;
+  canvas.height = /*2 * */ window.innerHeight;
   canvas.className = className;
 
+  /*
   const context = canvas.getContext('2d');
   context.scale(2, 2);
   context.translate(0.5, 0.5);
+  */
 
   return canvas;
 }
 
 const resetCanvas = (canvas: HTMLCanvasElement) => {
-  canvas.width = 2 * window.innerWidth;
-  canvas.height = 2 * window.innerHeight;
+  canvas.width = /*2 *  */ window.innerWidth;
+  canvas.height = /* 2 *  */ window.innerHeight;
 
   // Note that resizing the canvas resets the context
-  const context = canvas.getContext('2d');
-  context.scale(2, 2);
-  context.translate(0.5, 0.5);
+  // const context = canvas.getContext('2d');
+  // context.scale(2, 2);
+  // context.translate(0.5, 0.5);
 }
 
 export const createHighlightLayer = (
@@ -122,17 +124,15 @@ export const createHighlightLayer = (
 
     const { width, height } = fgCanvas;
 
+    // Get current selection
+    const selectedIds = new Set(selection.selected.map(({ id }) => id));
+
     requestAnimationFrame(() => {
       // New render loop - clear canvases
       fgContext.clearRect(-0.5, -0.5, width + 1, height + 1);
       bgContext.clearRect(-0.5, -0.5, width + 1, height + 1);
-
-      // Get current selection
-      const selectedIds = new Set(selection.selected.map(({ id }) => id));
-
+      
       annotationsInView.forEach(({ annotation, rects }) => {
-        const isSelected = selectedIds.has(annotation.id);
-
         // Offset annotation rects by current scroll position
         const offsetRects = rects.map(({ x, y, width, height }) => ({ 
           x: x + left, 
@@ -141,11 +141,12 @@ export const createHighlightLayer = (
           height 
         }));
 
+        const isSelected = selectedIds.has(annotation.id);
         currentPainter.paint(annotation, offsetRects, bgContext, fgContext, isSelected, currentFormatter);
       });
-    });
 
-    onDraw(annotationsInView.map(({ annotation }) => annotation));
+      onDraw(annotationsInView.map(({ annotation }) => annotation));
+    });
   }
 
   store.observe(() => redraw());

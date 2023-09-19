@@ -43,7 +43,7 @@ export const mergeClientRects = (rects: DOMRect[]) => rects.reduce((merged, rect
   for (const rectB of merged) {
     const relation = getRelation(rectA, rectB);
 
-    if (relation === 'contains') {
+    if (relation === 'contains' || relation === 'adjacent') {
       canMergeWith.push(rectB);
     } else if (relation === 'is_inside') {
       return merged;
@@ -55,9 +55,27 @@ export const mergeClientRects = (rects: DOMRect[]) => rects.reduce((merged, rect
   } else {
     const union = computeUnionRect([...canMergeWith, rectA]);
 
-    return [
+    const m = [
       ...merged.filter(rect => !canMergeWith.includes(rect)),
       union
     ];
+
+    let minHeight = Number.POSITIVE_INFINITY;
+    m.forEach(m => {
+      if (m.height > 0 && m.height < minHeight)
+        minHeight = m.height;
+    });
+
+    console.log(minHeight);
+
+    const deduped = m.reduce((prev, rect) => {
+      if (rect.height > minHeight)
+        return prev;
+
+      const exists = prev.find(r => r.x === rect.x && r.y === rect.y && r.width === rect.width && r.height === rect.height);
+      return exists ? prev : [...prev, rect];
+    }, [] as DOMRect[]);
+
+    return deduped;
   }
 }, [] as DOMRect[]);

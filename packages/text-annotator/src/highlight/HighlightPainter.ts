@@ -1,6 +1,6 @@
 import type { Formatter } from '@annotorious/core';
-import type { TextAnnotation } from 'src/model';
-import type { Rect } from 'src/state';
+import type { TextAnnotation } from '../model';
+import type { Rect } from '../state';
 
 const DEFAULT_STYLE = { fill: 'rgb(0, 128, 255', fillOpacity: 0.18 };
 

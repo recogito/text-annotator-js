@@ -26,7 +26,6 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
     const offset = container.getBoundingClientRect();
 
     const rects = Array.from(target.selector.range.getClientRects());
-
     const merged = mergeClientRects(rects);
 
     return merged.map(rect => {
