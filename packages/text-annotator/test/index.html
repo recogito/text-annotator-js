@@ -70,28 +70,10 @@
     <script type="module">
       import { TextAnnotator } from '../src/index.ts';
 
-      // A dummy formatter that cycles through these colors
-      var colors = [
-        '#1a73e8',
-        '#e81a1e',
-        '#34e81a',
-        '#a1570c'
-      ];
-
-      var counter = -1;
-
       window.onload = async function() {
         var r = TextAnnotator(document.getElementById('content'));
 
-        r.setFormatter(annotation => {
-          counter = counter + 1;
-          
-          return {
-            fill: colors[counter % colors.length],
-            fillOpacity: 0.18
-          };
-        });
-
+        /*
         r.on('createAnnotation', annotation => {
           console.log('createAnnotation', annotation);
         });
@@ -111,6 +93,7 @@
         r.on('viewportIntersect', (annotations) => {
           console.log('viewport', annotations);
         });
+        */
       }
     </script>
   </body>

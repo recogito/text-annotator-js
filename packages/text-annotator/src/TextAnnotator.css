@@ -1,16 +1,8 @@
-/** *[data-native="hidden"]::selection, *[data-native="hidden"] ::selection {
-  background: transparent;
-}
-
-*[data-native="hidden"]::-moz-selection, *[data-native="hidden"] ::-moz-selection{
-  background: transparent;
-} **/
-
 *::selection, ::selection {
-  background: rgba(255, 0, 0, 0.1);
+  background: rgba(255, 0, 0, 0.2);
 }
 
 ::-moz-selection, ::-moz-selection{
-  background: rgba(255, 0, 0, 0.1);
+  background: rgba(255, 0, 0, 0.2);
 }
 

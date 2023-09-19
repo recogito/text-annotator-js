@@ -1,21 +1,7 @@
-import { Origin, type AnnotationTarget, type User } from '@annotorious/core';
+import { Origin, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotatorState } from './state';
-import type { TextSelector } from './model';
-
-const clearNativeSelection = () => {
-  if (window.getSelection) {
-    if (window.getSelection().empty) {  // Chrome
-      window.getSelection().empty();
-    } else if (window.getSelection().removeAllRanges) {  // Firefox
-      window.getSelection().removeAllRanges();
-    }
-  // @ts-ignore
-  } else if (document.selection) {
-    // @ts-ignore
-    document.selection.empty();
-  }
-}
+import type { TextSelector, TextAnnotationTarget } from './model';
 
 export const rangeToSelector = (range: Range, container: HTMLElement): TextSelector => {
   const rangeBefore = document.createRange();
@@ -37,16 +23,14 @@ export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorSta
 
   let currentUser: User;
 
-  let currentTarget: AnnotationTarget = null;
-
-  let selectionStarted = false;
+  let currentTarget: TextAnnotationTarget = null;
 
   const setUser = (user: User) => currentUser = user;
 
   let isLeftClick = false;
 
   container.addEventListener('selectstart', (evt: PointerEvent) => {
-    if (selectionStarted || !isLeftClick)
+    if (!isLeftClick)
       return;
 
     // Make sure we don't listen to selection changes that
@@ -54,46 +38,38 @@ export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorSta
     // be annotatable (like the popup)
     const annotatable = !(evt.target as Node).parentElement.closest('.not-annotatable');
     if (annotatable) {
-      selectionStarted = true;
-
-      // Hide native browser selection
-      container.dataset.native = 'hidden';
-    } else {
-      // Show native browser selection
-      delete container.dataset.native;
-    }
-  });
-
-  document.addEventListener('selectionchange', (evt: PointerEvent) => {  
-    if (!selectionStarted || !isLeftClick)
-      return;
-
-    const sel = document.getSelection();
-    
-    if (!sel.isCollapsed) {
-      const ranges = Array.from(Array(sel.rangeCount).keys())
-        .map(idx => sel.getRangeAt(idx));
-
-      const updatedTarget = {
-        annotation: currentTarget?.annotation || uuidv4(),
-        selector: rangeToSelector(ranges[0], container),
+      currentTarget = {
+        annotation: uuidv4(),
+        selector: undefined,
         creator: currentUser,
         created: new Date()
       };
+    }
+  });
+
+  document.addEventListener('selectionchange', (evt: PointerEvent) => { 
+    const sel = document.getSelection();
+
+    if (!sel.isCollapsed && isLeftClick) {
+      const ranges = Array.from(Array(sel.rangeCount).keys())
+        .map(idx => sel.getRangeAt(idx));
+    
+      currentTarget = {
+        ...currentTarget,
+        selector: rangeToSelector(ranges[0], container)
+      };
   
-      if (currentTarget) {
-        store.updateTarget(updatedTarget, Origin.LOCAL);
+      if (store.getAnnotation(currentTarget.annotation)) {
+        store.updateTarget(currentTarget, Origin.LOCAL);
       } else {
         store.addAnnotation({
-          id: updatedTarget.annotation,
+          id: currentTarget.annotation,
           bodies: [],
-          target: updatedTarget
+          target: currentTarget
         });
 
-        selection.clickSelect(updatedTarget.annotation, evt);
+        selection.clickSelect(currentTarget.annotation, evt);
       }
-
-      currentTarget = updatedTarget;
     }
   });
 
@@ -104,36 +80,30 @@ export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorSta
     isLeftClick = evt.button === 0);
 
   document.addEventListener('pointerup', (evt: PointerEvent) => {
-    // Rest left click flag
-    isLeftClick = false;
-
     const annotatable = !(evt.target as Node).parentElement?.closest('.not-annotatable');
-    if (!annotatable)
+    if (!annotatable || !isLeftClick)
       return;
-      
-    if (currentTarget) {
-      store.updateTarget(currentTarget, Origin.LOCAL);
 
-      selection.clickSelect(currentTarget.annotation, evt);
+    setTimeout(() => {
+      if (currentTarget?.selector) {
+        store.updateTarget(currentTarget, Origin.LOCAL);
 
-      clearNativeSelection();
-      currentTarget = null;
-      selectionStarted = false;
-    } else {   
-      const { x, y } = container.getBoundingClientRect();
-    
-      const hovered = store.getAt(evt.clientX - x, evt.clientY - y);
-      if (hovered) {
-        const { selected } = selection;
+        selection.clickSelect(currentTarget.annotation, evt);
+        currentTarget = null;
+      } else {            
+        const { x, y } = container.getBoundingClientRect();
         
-        if (selected.length !== 1 || selected[0].id !== hovered.id)
-          selection.clickSelect(hovered.id, evt);
-      } else if (!selection.isEmpty()) {
-        selection.clear();
+        const hovered = store.getAt(evt.clientX - x, evt.clientY - y);
+        if (hovered) {
+          const { selected } = selection;
+          
+          if (selected.length !== 1 || selected[0].id !== hovered.id)
+            selection.clickSelect(hovered.id, evt);
+        } else if (!selection.isEmpty()) {
+          selection.clear();
+        }
       }
-    }
-
-    delete container.dataset.native;
+    }, 10);
   });
 
   return {
