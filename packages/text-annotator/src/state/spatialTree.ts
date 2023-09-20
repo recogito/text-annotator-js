@@ -107,9 +107,15 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
     }
   }
 
-  const getIntersecting = (minX: number, minY: number, maxX: number, maxY: number): string[] => {
-    const hits = tree.search({ minX, minY, maxX, maxY });
-    return Array.from(new Set(hits.map(item => item.annotation.id)));
+  const getDOMRectsForAnnotation = (id: string): DOMRect[] => {
+    const indexed = index.get(id);
+    if (indexed) {
+      // Reminder: *each* IndexedHighlightRect stores *all*
+      // DOMRects for the annotation for convenience
+      return indexed[0].annotation.rects;
+    } else {
+      return [];
+    }
   }
 
   const getIntersectingRects = (minX: number, minY: number, maxX: number, maxY: number) =>
@@ -123,7 +129,7 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
     all,
     clear,
     getAt,
-    getIntersecting,
+    getDOMRectsForAnnotation,
     getIntersectingRects,
     insert,
     recalculate,

@@ -1,6 +1,6 @@
 import { createPortal } from 'react-dom';
 import { ReactNode, useEffect, useRef, useState } from 'react';
-import { RecogitoTextAnnotator, TextAnnotation } from '@recogito/text-annotator';
+import { RecogitoTextAnnotator, TextAnnotation, TextAnnotatorState } from '@recogito/text-annotator';
 import { useAnnotator, useSelection } from '@annotorious/react';
 
 const getOffset = (event: PointerEvent, parent: Element) => {
@@ -48,10 +48,26 @@ export const TextAnnotatorPopup = (props: TextAnnotatorPopupContainerProps) => {
     if (!(pointerEvent && open && r))
       return;
 
-    const { offsetX, offsetY } = getOffset(pointerEvent, r.element);
+    const { left, top } = r.element.getBoundingClientRect();
+    let x = pointerEvent.clientX - left;
+    let y = pointerEvent.clientY - top;
 
-    el.current.style.left = `${offsetX}px`;
-    el.current.style.top = `${offsetY}px`;
+    const { id } = selected[0].annotation;
+    const { offsetX, offsetY } = pointerEvent;
+    const bounds = (r.state as TextAnnotatorState).store.getAnnotationBounds(id, offsetX, offsetY);
+    
+    if (bounds.length > 0) {
+      const b = bounds[0];
+
+      x = Math.max(x, b.x - left);
+      x = Math.min(x, b.right - left);
+
+      y = Math.max(y, b.y - top);
+      y = Math.min(y, b.bottom - top);
+    }
+
+    el.current.style.left = `${x}px`;
+    el.current.style.top = `${y}px`;
   }, [open, pointerEvent, r?.element]);
 
   const onPointerUp = (evt: React.PointerEvent<HTMLDivElement>) =>

@@ -85,11 +85,28 @@ export const createTextAnnotatorState = (
   }
 
   const getIntersecting = (minX: number, minY: number, maxX: number, maxY: number) => {
-    const ids = tree.getIntersecting(minX, minY, maxX, maxY);
+    const rects = tree.getIntersectingRects(minX, minY, maxX, maxY);
+    const ids = Array.from(new Set(rects.map(item => item.annotation.id)));
 
     // Note that the tree could be slightly out of sync (because it updates
     // by listening to changes, just like anyone else)
     return ids.map(id => store.getAnnotation(id)).filter(a => a);
+  }
+
+  const getAnnotationBounds = (id: string, x?: number, y?: number, buffer = 5) => {
+    const rects = tree.getDOMRectsForAnnotation(id);
+    if (rects.length > 0) {
+      if (x && y) {
+        const match = rects.find(({ top, right, bottom, left }) =>
+          x >= left - buffer && x <= right + buffer && y >= top - buffer && y <= bottom + buffer);
+
+        if (match)
+          // Preferred bounds: the rectangle 
+          return [match];
+      }
+        
+      return rects;
+    }
   }
 
   const getIntersectingRects = (
@@ -136,6 +153,7 @@ export const createTextAnnotatorState = (
       addAnnotation,
       bulkAddAnnotation,
       bulkUpdateTargets,
+      getAnnotationBounds,
       getAt,
       getIntersecting,
       getIntersectingRects,
