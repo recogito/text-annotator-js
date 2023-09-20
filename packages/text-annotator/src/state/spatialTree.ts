@@ -13,7 +13,13 @@ export interface IndexedHighlightRect {
 
   maxY: number;
 
-  annotationId: string;
+  annotation: {
+    
+    id: string;
+
+    rects: DOMRect[];
+
+  }
 
 }
 
@@ -36,12 +42,15 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
         minY: y - offset.y,
         maxX: x - offset.x + width,
         maxY: y - offset.y + height,
-        annotationId: target.annotation
+        annotation: {
+          id: target.annotation,
+          rects: merged
+        }
       }
     });
   }
 
-  const all = () => tree.all().map(item => item.annotationId);
+  const all = () => tree.all().map(item => item.annotation.id);
 
   const clear = () => tree.clear();
 
@@ -52,7 +61,7 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
 
   const remove = (target: TextAnnotationTarget) => {
     const rects = toItems(target);
-    rects.forEach(rect => tree.remove(rect, (a, b) => a.annotationId === b.annotationId));
+    rects.forEach(rect => tree.remove(rect, (a, b) => a.annotation.id === b.annotation.id));
   }
 
   const update = (previous: TextAnnotationTarget, updated: TextAnnotationTarget) => {
@@ -75,19 +84,20 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
       maxY: y
     });
 
-    const area = (rect: IndexedHighlightRect) => 
-      (rect.maxX - rect.minX) * (rect.maxY - rect.minY);
+    const area = (rect: IndexedHighlightRect) =>
+      rect.annotation.rects.reduce((area, r) =>
+        r.width * r.height, 0);
 
     // Get smallest rect
     if (hits.length > 0) {
       hits.sort((a, b) => area(a) - area(b));
-      return hits[0].annotationId;
+      return hits[0].annotation.id;
     }
   }
 
   const getIntersecting = (minX: number, minY: number, maxX: number, maxY: number): string[] => {
     const hits = tree.search({ minX, minY, maxX, maxY });
-    return Array.from(new Set(hits.map(item => item.annotationId)));
+    return Array.from(new Set(hits.map(item => item.annotation.id)));
   }
 
   const getIntersectingRects = (minX: number, minY: number, maxX: number, maxY: number) =>
