@@ -3,13 +3,6 @@ import { ReactNode, useEffect, useRef, useState } from 'react';
 import { RecogitoTextAnnotator, TextAnnotation, TextAnnotatorState } from '@recogito/text-annotator';
 import { useAnnotator, useSelection } from '@annotorious/react';
 
-const getOffset = (event: PointerEvent, parent: Element) => {
-  const { left, top } = parent.getBoundingClientRect();
-  const offsetX = event.clientX - left;
-  const offsetY = event.clientY - top;
-  return { offsetX, offsetY };
-}
-
 export interface TextAnnotatorPopupProps {
 
   selected: { annotation: TextAnnotation, editable?: boolean }[];
