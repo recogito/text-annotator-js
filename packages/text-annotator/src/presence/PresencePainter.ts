@@ -1,7 +1,8 @@
 import type { Formatter, PresenceProvider, PresentUser } from '@annotorious/core';
-import type { TextAnnotation } from '../model';
 import type { HighlightPainter } from '../highlight';
 import type { PresencePainterOptions } from './PresencePainterOptions';
+import type { TextAnnotation } from '../model';
+import type { Rect } from '../state';
 import { defaultPainter } from '../highlight';
 
 export const createPainter = (provider: PresenceProvider, opts: PresencePainterOptions = {}): HighlightPainter => {
@@ -24,8 +25,8 @@ export const createPainter = (provider: PresenceProvider, opts: PresencePainterO
   });  
 
   const paint = (
-    annotation: TextAnnotation, 
-    rects: DOMRect[], 
+    annotation: TextAnnotation,
+    rects: Rect[], 
     bg: CanvasRenderingContext2D, 
     fg: CanvasRenderingContext2D,
     isSelected?: boolean,

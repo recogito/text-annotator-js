@@ -55,12 +55,13 @@
       window.onload = async function() {
         var CETEIcean = new CETEI();
 
-        CETEIcean.getHTML5('odyssey-gregorycrane-github.xml', data => {
+        CETEIcean.getHTML5('macbeth.xml', data => {
           document.getElementById('content').appendChild(data);
         });
 
         var anno = TEIPlugin(TextAnnotator(document.getElementById('content')));
 
+        /*
         anno.on('createAnnotation', annotation => {
           console.log('createAnnotation', annotation);
 
@@ -83,6 +84,7 @@
         anno.on('viewportIntersect', (annotations) => {
           console.log('viewport', annotations);
         });
+        */
       }
     </script>
   </body>

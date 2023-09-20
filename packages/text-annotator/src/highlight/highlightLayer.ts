@@ -1,6 +1,5 @@
 import type { Formatter, ViewportState } from '@annotorious/core';
 import type { TextAnnotatorState } from '../state';
-import { mergeClientRects } from '../utils';
 import { defaultPainter, type HighlightPainter } from './HighlightPainter';
 import { trackViewport } from './trackViewport';
 
@@ -15,27 +14,31 @@ const debounce = <T extends (...args: any[]) => void>(func: T, delay: number = 1
   }) as T;
 }
 
-const createCanvas = (className: string) => {
+const createCanvas = (className: string, highres?: boolean) => {
   const canvas = document.createElement('canvas');
-  canvas.width = 2 * window.innerWidth;
-  canvas.height = 2 * window.innerHeight;
+  canvas.width = highres ? 2 * window.innerWidth : window.innerWidth;
+  canvas.height = highres ? 2 * window.innerHeight : window.innerHeight;
   canvas.className = className;
 
-  const context = canvas.getContext('2d');
-  context.scale(2, 2);
-  context.translate(0.5, 0.5);
+  if (highres) {
+    const context = canvas.getContext('2d');
+    context.scale(2, 2);
+    context.translate(0.5, 0.5);
+  }
 
   return canvas;
 }
 
-const resetCanvas = (canvas: HTMLCanvasElement) => {
-  canvas.width = 2 * window.innerWidth;
-  canvas.height = 2 * window.innerHeight;
+const resetCanvas = (canvas: HTMLCanvasElement, highres?: boolean) => {
+  canvas.width = highres ? 2 * window.innerWidth : window.innerWidth;
+  canvas.height = highres ? 2 * window.innerHeight : window.innerHeight;
 
-  // Note that resizing the canvas resets the context
-  const context = canvas.getContext('2d');
-  context.scale(2, 2);
-  context.translate(0.5, 0.5);
+  if (highres) {
+    // Note that resizing the canvas resets the context
+    const context = canvas.getContext('2d');
+    context.scale(2, 2);
+    context.translate(0.5, 0.5);
+  }
 }
 
 export const createHighlightLayer = (
@@ -55,7 +58,7 @@ export const createHighlightLayer = (
   container.classList.add('r6o-annotatable');
 
   const bgCanvas = createCanvas('r6o-highlight-layer bg');
-  const fgCanvas = createCanvas('r6o-highlight-layer fg');
+  const fgCanvas = createCanvas('r6o-highlight-layer fg', true);
 
   const bgContext = bgCanvas.getContext('2d');
   const fgContext = fgCanvas.getContext('2d');
@@ -81,7 +84,7 @@ export const createHighlightLayer = (
 
   const getViewport = () => {
     const { top, left } = container.getBoundingClientRect();
-     
+
     const { innerWidth, innerHeight } = window;
 
     const minX = - left;
@@ -89,16 +92,16 @@ export const createHighlightLayer = (
     const maxX = innerWidth - left;
     const maxY = innerHeight - top;
 
-    return { minX, minY, maxX, maxY };
+    return { top, left, minX, minY, maxX, maxY };
   }
 
   const onScroll = () => redraw();
 
-  document.addEventListener('scroll', onScroll, true);
+  document.addEventListener('scroll', onScroll, { capture: true, passive: true });
 
   const onResize = debounce(() => {
     resetCanvas(bgCanvas);
-    resetCanvas(fgCanvas);
+    resetCanvas(fgCanvas, true);
 
     store.recalculatePositions();
 
@@ -116,32 +119,35 @@ export const createHighlightLayer = (
   const resizeObserver = new ResizeObserver(onResize);
   resizeObserver.observe(container);
 
-  const redraw = () => {
-    const { minX, minY, maxX, maxY } = getViewport();   
-    const annotationsInView = store.getIntersecting(minX, minY, maxX, maxY);
+  const redraw = () => requestAnimationFrame(() => {
+    const { top, left, minX, minY, maxX, maxY } = getViewport();   
+    
+    const annotationsInView = store.getIntersectingRects(minX, minY, maxX, maxY);
 
     const { width, height } = fgCanvas;
 
-    requestAnimationFrame(() => {
-      // New render loop - clear canvases
-      fgContext.clearRect(-0.5, -0.5, width + 1, height + 1);
-      bgContext.clearRect(-0.5, -0.5, width + 1, height + 1);
+    // Get current selection
+    const selectedIds = new Set(selection.selected.map(({ id }) => id));
 
-      // Get current selection
-      const selectedIds = new Set(selection.selected.map(({ id }) => id));
+    // New render loop - clear canvases
+    fgContext.clearRect(-0.5, -0.5, width + 1, height + 1);
+    bgContext.clearRect(-0.5, -0.5, width + 1, height + 1);
+    
+    annotationsInView.forEach(({ annotation, rects }) => {
+      // Offset annotation rects by current scroll position
+      const offsetRects = rects.map(({ x, y, width, height }) => ({ 
+        x: x + left, 
+        y: y + top, 
+        width, 
+        height 
+      }));
 
-      annotationsInView.forEach(annotation => {
-        const isSelected = selectedIds.has(annotation.id);
-
-        const rects = Array.from(annotation.target.selector.range.getClientRects());
-        const merged = mergeClientRects(rects);
-
-        currentPainter.paint(annotation, merged, bgContext, fgContext, isSelected, currentFormatter);
-      });
+      const isSelected = selectedIds.has(annotation.id);
+      currentPainter.paint(annotation, offsetRects, bgContext, fgContext, isSelected, currentFormatter);
     });
 
-    onDraw(annotationsInView);
-  }
+    setTimeout(() => onDraw(annotationsInView.map(({ annotation }) => annotation)), 1);
+  });
 
   store.observe(() => redraw());
 
