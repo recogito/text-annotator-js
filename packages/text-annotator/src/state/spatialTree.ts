@@ -34,7 +34,8 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
   const toItems = (target: TextAnnotationTarget, firefoxInterop = false): IndexedHighlightRect[] => {
     const offset = container.getBoundingClientRect();
 
-    const rects = false ? 
+    // TODO we could change this to use the firefoxInterop flag!
+    const rects = true ? 
       getClientRectsPonyfill(target.selector.range) :
       Array.from(target.selector.range.getClientRects());
 

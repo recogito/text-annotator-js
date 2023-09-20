@@ -83,7 +83,10 @@ export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorSta
         ranges[0].startContainer.nodeType === Node.TEXT_NODE &&
         ranges[0].endContainer.nodeType === Node.TEXT_NODE;
 
-      if (isValid) {
+      const hasChanged =
+        ranges[0].toString() !== currentTarget.selector?.range?.toString();
+
+      if (isValid && hasChanged) {
         currentTarget = {
           ...currentTarget,
           selector: rangeToSelector(ranges[0], container)

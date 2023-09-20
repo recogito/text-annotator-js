@@ -123,7 +123,7 @@ export const createHighlightLayer = (
     const { top, left, minX, minY, maxX, maxY } = getViewport();   
     
     const annotationsInView = store.getIntersectingRects(minX, minY, maxX, maxY);
-
+    
     const { width, height } = fgCanvas;
 
     // Get current selection

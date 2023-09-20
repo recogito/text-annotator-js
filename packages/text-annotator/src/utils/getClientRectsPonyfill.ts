@@ -1,3 +1,37 @@
+/** Returns the index of this node in the node-iterator of the given root **/
+const findIndex = (node: Node, root: Node) => {
+  const ni = document.createNodeIterator(root);
+
+  let index = 0;
+  
+  let n = ni.nextNode();
+
+  while (n !== null) {
+    if (n === node)
+      return index;
+
+    index += 1;
+
+    n = ni.nextNode();
+  }
+}
+
+/** 
+ * Returns the node that has the given index in the node 
+ * iterator of the given root node.
+ */
+const getNodeAtIndex = (index: number, root: Node) => {
+  const ni = document.createNodeIterator(root);
+
+  let node: Node;
+
+  for (let i=0; i<index + 1; i++) {
+    node = ni.nextNode();
+  }
+
+  return node;
+}
+
 /**
  * Wraps a DOM range CLEVERLY! If the range spans multiple
  * elements, it's broken apart appropriately, and each segment
@@ -12,11 +46,30 @@ const wrapRange = (range: Range) => {
     endOffset
   } = range;
 
-  const originalChildren = commonAncestorContainer.childNodes;
 
-  // Function to reverse the wrapping operation
-  const unwrap = () =>
-    (commonAncestorContainer as Element).replaceChildren(...originalChildren);
+  // Clone the original children, so we can re-generate the original DOM
+  const originalChildren = 
+    Array.from(commonAncestorContainer.childNodes).map(n => {
+      const cloned = n.cloneNode(true);
+      return n.nodeName === 'CANVAS' ? n : cloned;
+    });
+
+  // Rember range start/end indices, so we can re-generate the range in the clone
+  const startContainerIndex = findIndex(startContainer, commonAncestorContainer);
+  const endContainerIndex = findIndex(endContainer, commonAncestorContainer);
+
+  // Reverse the wrapping operation, regenerate the range
+  const unwrap = () => {
+    const root = commonAncestorContainer as Element;
+
+    root.replaceChildren(...originalChildren);
+
+    const startContainer = getNodeAtIndex(startContainerIndex, root);
+    const endContainer = getNodeAtIndex(endContainerIndex, root);
+
+    range.setStart(startContainer, startOffset);
+    range.setEnd(endContainer, endOffset);
+  }
 
   // Shorthand
   const surround = (range: Range) => {
