@@ -44,6 +44,8 @@ export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorSta
 
   let isLeftClick = false;
 
+  let lastPointerEvent: PointerEvent;
+
   container.addEventListener('selectstart', (evt: PointerEvent) => {
     if (!isLeftClick)
       return;
@@ -97,7 +99,8 @@ export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorSta
             target: currentTarget
           });
 
-          selection.clickSelect(currentTarget.annotation, evt);
+          // Reminder: select events don't have offsetX/offsetY - reuse last up/down
+          selection.clickSelect(currentTarget.annotation, lastPointerEvent);
         }
       } else {
         console.warn('Invalid text selection', ranges);
@@ -109,10 +112,14 @@ export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorSta
   // Select events don't carry information about the mouse button
   // Therefore, to prevent right-click selection, we need to listen
   // to the initial pointerdown event and remember the button
-  container.addEventListener('pointerdown', (evt: PointerEvent) =>
-    isLeftClick = evt.button === 0);
+  container.addEventListener('pointerdown', (evt: PointerEvent) => {
+    lastPointerEvent = evt;
+    isLeftClick = evt.button === 0;
+  });
 
   document.addEventListener('pointerup', (evt: PointerEvent) => {
+    lastPointerEvent = evt;
+
     const annotatable = !(evt.target as Node).parentElement?.closest('.not-annotatable');
     if (!annotatable || !isLeftClick)
       return;
@@ -123,6 +130,7 @@ export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorSta
 
         selection.clickSelect(currentTarget.annotation, evt);
         currentTarget = null;
+        lastPointerEvent = undefined;
       } else {            
         const { x, y } = container.getBoundingClientRect();
         
@@ -130,8 +138,10 @@ export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorSta
         if (hovered) {
           const { selected } = selection;
           
-          if (selected.length !== 1 || selected[0].id !== hovered.id)
+          if (selected.length !== 1 || selected[0].id !== hovered.id) {
             selection.clickSelect(hovered.id, evt);
+            lastPointerEvent = undefined;
+          }
         } else if (!selection.isEmpty()) {
           selection.clear();
         }
