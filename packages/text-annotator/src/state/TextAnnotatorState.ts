@@ -102,7 +102,7 @@ export const createTextAnnotatorState = (
 
     // Group by annotation ID
     const groupedByAnnotationId: { [key:string]: IndexedHighlightRect[] } = rects.reduce((grouped, rect) => {
-      (grouped[rect.annotationId] = grouped[rect.annotationId] || []).push(rect);
+      (grouped[rect.annotation.id] = grouped[rect.annotation.id] || []).push(rect);
       return grouped;
     }, {});
 

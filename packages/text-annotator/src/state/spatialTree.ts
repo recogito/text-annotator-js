@@ -87,7 +87,7 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
     const area = (rect: IndexedHighlightRect) =>
       rect.annotation.rects.reduce((area, r) =>
         r.width * r.height, 0);
-
+    
     // Get smallest rect
     if (hits.length > 0) {
       hits.sort((a, b) => area(a) - area(b));
