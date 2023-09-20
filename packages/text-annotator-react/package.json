@@ -1,6 +1,6 @@
 {
   "name": "@recogito/react-text-annotator",
-  "version": "3.0.0-pre-alpha-52",
+  "version": "3.0.0-pre-alpha-53",
   "description": "Experimental rewrite of the Recogito JS text annotation library",
   "author": "Rainer Simon",
   "license": "BSD-3-Clause",
