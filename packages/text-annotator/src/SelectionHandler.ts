@@ -1,7 +1,7 @@
 import { Origin, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotatorState } from './state';
-import type { TextSelector, TextAnnotationTarget } from './model';
+import type { TextSelector, TextAnnotationTarget, TextAnnotation } from './model';
 
 const clearNativeSelection = () => {
   if (window.getSelection) {
@@ -29,7 +29,6 @@ export const rangeToSelector = (range: Range, container: HTMLElement): TextSelec
   const end = start + quote.length;
 
   return {  quote, start, end, range };
-
 }
 
 export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorState) => {
@@ -70,10 +69,10 @@ export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorSta
     if (debounceTimer)
       clearTimeout(debounceTimer);
 
-    debounceTimer = setTimeout(() => onSelectionChange(evt), 50);
+    debounceTimer = setTimeout(() => onSelectionChange(), 50);
   });
 
-  const onSelectionChange = (evt: PointerEvent) => { 
+  const onSelectionChange = () => { 
     const sel = document.getSelection();
 
     if (!sel.isCollapsed && isLeftClick && currentTarget) {
@@ -126,9 +125,10 @@ export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorSta
 
     setTimeout(() => {
       if (currentTarget?.selector) {
-        store.updateTarget(currentTarget, Origin.LOCAL);
+        store.updateTarget(currentTarget, Origin.LOCAL, true);
 
         selection.clickSelect(currentTarget.annotation, evt);
+
         currentTarget = null;
         lastPointerEvent = undefined;
       } else {            

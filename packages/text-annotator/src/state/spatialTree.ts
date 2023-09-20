@@ -2,6 +2,7 @@ import RBush from 'rbush';
 import type { Store } from '@annotorious/core';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
 import { mergeClientRects } from '../utils';
+import { getClientRectsPonyfill } from '../utils/getClientRectsPonyfill';
 
 export interface IndexedHighlightRect {
 
@@ -30,10 +31,13 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
   const index = new Map<string, IndexedHighlightRect[]>();
 
   // Helper: converts a single text annotation target to a list of hightlight rects
-  const toItems = (target: TextAnnotationTarget): IndexedHighlightRect[] => {
+  const toItems = (target: TextAnnotationTarget, firefoxInterop = false): IndexedHighlightRect[] => {
     const offset = container.getBoundingClientRect();
 
-    const rects = Array.from(target.selector.range.getClientRects());
+    const rects = false ? 
+      getClientRectsPonyfill(target.selector.range) :
+      Array.from(target.selector.range.getClientRects());
+
     const merged = mergeClientRects(rects);
 
     return merged.map(rect => {
@@ -60,8 +64,8 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
     index.clear();
   }
 
-  const insert = (target: TextAnnotationTarget) => {
-    const rects = toItems(target);
+  const insert = (target: TextAnnotationTarget, firefoxInterop = false) => {
+    const rects = toItems(target, firefoxInterop);
     rects.forEach(rect => tree.insert(rect));
     index.set(target.annotation, rects);
   }
@@ -72,9 +76,9 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
     index.delete(target.annotation);
   }
 
-  const update = (previous: TextAnnotationTarget, updated: TextAnnotationTarget) => {
-    remove(previous);
-    insert(updated);
+  const update = (target: TextAnnotationTarget, firefoxInterop = false) => {
+    remove(target);
+    insert(target, firefoxInterop);
   }
 
   const set = (targets: TextAnnotationTarget[], replace: boolean = true) => {
