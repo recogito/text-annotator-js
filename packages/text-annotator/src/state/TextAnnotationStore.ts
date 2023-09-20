@@ -1,5 +1,5 @@
-import type { Store } from '@annotorious/core';
-import type { TextAnnotation } from '../model';
+import type { Origin, Store } from '@annotorious/core';
+import type { TextAnnotation, TextAnnotationTarget } from '../model';
 
 export type TextAnnotationStore = Store<TextAnnotation> & {
 
@@ -12,6 +12,8 @@ export type TextAnnotationStore = Store<TextAnnotation> & {
   getIntersectingRects(minX: number, minY: number, maxX: number, maxY: number): AnnotationRects[];
   
   recalculatePositions(): void;
+
+  updateTarget(target: TextAnnotationTarget, origin?: Origin, firefoxInterop?: boolean): void;
 
 }
 

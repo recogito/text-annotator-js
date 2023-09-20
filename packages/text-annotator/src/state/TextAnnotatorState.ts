@@ -67,11 +67,13 @@ export const createTextAnnotatorState = (
     }
   }
 
-  const updateTarget = (target: TextAnnotationTarget, origin = Origin.LOCAL) => {
+  const updateTarget = (target: TextAnnotationTarget, origin = Origin.LOCAL, firefoxInterop = false) => {
     const revived = target.selector.range instanceof Range ?
       target : reviveTarget(target, container);
 
     store.updateTarget(revived, origin);
+
+    tree.update(target, firefoxInterop);
   }
 
   const bulkUpdateTargets = (targets: TextAnnotationTarget[], origin = Origin.LOCAL) => {
@@ -142,9 +144,11 @@ export const createTextAnnotatorState = (
     if (deleted?.length > 0)
       deleted.forEach(a => tree.remove(a.target));
 
+    /*
     if (updated?.length > 0)
       updated.forEach(({ oldValue, newValue}) =>
         tree.update(oldValue.target, newValue.target));
+    */
   });
 
   return {
@@ -159,7 +163,7 @@ export const createTextAnnotatorState = (
       getIntersectingRects,
       recalculatePositions,
       updateTarget
-    },
+    } as TextAnnotationStore,
     selection,
     hover,
     viewport
