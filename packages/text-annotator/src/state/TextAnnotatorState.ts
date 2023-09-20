@@ -118,7 +118,7 @@ export const createTextAnnotatorState = (
 
   store.observe(({ changes }) => {
     const { created, deleted, updated } = changes;
-
+    
     if (created?.length > 0)
       tree.set(created.map(a => a.target), false);
 

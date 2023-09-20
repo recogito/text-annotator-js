@@ -15,7 +15,7 @@ type Relation =
 // few shortcuts to test ONLY the situations we'll encounter
 // with text selections.
 const getRelation = (rectA: DOMRect, rectB: DOMRect): Relation | undefined => {
-  const round = (num: number ) => Math.round(num * 100) / 100;
+  const round = (num: number ) => Math.round(num * 10) / 10;
 
   // Some browsers have fractional pixel differences (looking at you FF!)
   const a = {

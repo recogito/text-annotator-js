@@ -3,6 +3,20 @@ import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotatorState } from './state';
 import type { TextSelector, TextAnnotationTarget } from './model';
 
+const clearNativeSelection = () => {
+  if (window.getSelection) {
+    if (window.getSelection().empty) {  // Chrome
+      window.getSelection().empty();
+    } else if (window.getSelection().removeAllRanges) {  // Firefox
+      window.getSelection().removeAllRanges();
+    }
+  // @ts-ignore
+  } else if (document.selection) {
+    // @ts-ignore
+    document.selection.empty();
+  }
+}
+
 export const rangeToSelector = (range: Range, container: HTMLElement): TextSelector => {
   const rangeBefore = document.createRange();
 
@@ -15,6 +29,7 @@ export const rangeToSelector = (range: Range, container: HTMLElement): TextSelec
   const end = start + quote.length;
 
   return {  quote, start, end, range };
+
 }
 
 export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorState) => {
@@ -47,31 +62,49 @@ export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorSta
     }
   });
 
-  document.addEventListener('selectionchange', (evt: PointerEvent) => { 
+  let debounceTimer: ReturnType<typeof setTimeout> = undefined;
+
+  document.addEventListener('selectionchange', (evt: PointerEvent) => {
+    if (debounceTimer)
+      clearTimeout(debounceTimer);
+
+    debounceTimer = setTimeout(() => onSelectionChange(evt), 50);
+  });
+
+  const onSelectionChange = (evt: PointerEvent) => { 
     const sel = document.getSelection();
 
-    if (!sel.isCollapsed && isLeftClick) {
+    if (!sel.isCollapsed && isLeftClick && currentTarget) {
       const ranges = Array.from(Array(sel.rangeCount).keys())
         .map(idx => sel.getRangeAt(idx));
-    
-      currentTarget = {
-        ...currentTarget,
-        selector: rangeToSelector(ranges[0], container)
-      };
-  
-      if (store.getAnnotation(currentTarget.annotation)) {
-        store.updateTarget(currentTarget, Origin.LOCAL);
-      } else {
-        store.addAnnotation({
-          id: currentTarget.annotation,
-          bodies: [],
-          target: currentTarget
-        });
 
-        selection.clickSelect(currentTarget.annotation, evt);
+      const isValid = 
+        ranges[0].startContainer.nodeType === Node.TEXT_NODE &&
+        ranges[0].endContainer.nodeType === Node.TEXT_NODE;
+
+      if (isValid) {
+        currentTarget = {
+          ...currentTarget,
+          selector: rangeToSelector(ranges[0], container)
+        };
+    
+        if (store.getAnnotation(currentTarget.annotation)) {
+          store.updateTarget(currentTarget, Origin.LOCAL);
+        } else {
+          store.addAnnotation({
+            id: currentTarget.annotation,
+            bodies: [],
+            target: currentTarget
+          });
+
+          selection.clickSelect(currentTarget.annotation, evt);
+        }
+      } else {
+        console.warn('Invalid text selection', ranges);
+        clearNativeSelection();
       }
     }
-  });
+  }
 
   // Select events don't carry information about the mouse button
   // Therefore, to prevent right-click selection, we need to listen
@@ -103,7 +136,7 @@ export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorSta
           selection.clear();
         }
       }
-    }, 10);
+    }, 50);
   });
 
   return {

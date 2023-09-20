@@ -27,6 +27,8 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
 
   const tree = new RBush<IndexedHighlightRect>();
 
+  const index = new Map<string, IndexedHighlightRect[]>();
+
   // Helper: converts a single text annotation target to a list of hightlight rects
   const toItems = (target: TextAnnotationTarget): IndexedHighlightRect[] => {
     const offset = container.getBoundingClientRect();
@@ -50,18 +52,24 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
     });
   }
 
-  const all = () => tree.all().map(item => item.annotation.id);
+  const all = () => // tree.all().map(item => item.annotation.id);
+    [...index.values()];
 
-  const clear = () => tree.clear();
+  const clear = () => {
+    tree.clear();
+    index.clear();
+  }
 
   const insert = (target: TextAnnotationTarget) => {
     const rects = toItems(target);
     rects.forEach(rect => tree.insert(rect));
+    index.set(target.annotation, rects);
   }
 
   const remove = (target: TextAnnotationTarget) => {
-    const rects = toItems(target);
-    rects.forEach(rect => tree.remove(rect, (a, b) => a.annotation.id === b.annotation.id));
+    const rects = index.get(target.annotation);
+    rects.forEach(rect => tree.remove(rect));
+    index.delete(target.annotation);
   }
 
   const update = (previous: TextAnnotationTarget, updated: TextAnnotationTarget) => {
@@ -70,10 +78,14 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
   }
 
   const set = (targets: TextAnnotationTarget[], replace: boolean = true) => {
-    if (replace) tree.clear();
+    if (replace)
+      clear();
 
-    const rects = targets.reduce((all, target) => [...all, ...toItems(target)], []);
-    tree.load(rects);
+    const rectsByTarget = targets.map(target => ({ target, rects: toItems(target) }));
+    rectsByTarget.forEach(({ target, rects }) => index.set(target.annotation, rects));
+
+    const allRects = rectsByTarget.reduce((all, { rects }) => [...all, ...rects], []);
+    tree.load(allRects);
   }
 
   const getAt = (x: number, y: number): string | undefined => {
