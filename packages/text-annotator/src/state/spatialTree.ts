@@ -69,8 +69,7 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
     });
   }
 
-  const all = () => // tree.all().map(item => item.annotation.id);
-    [...index.values()];
+  const all = () => [...index.values()];
 
   const clear = () => {
     tree.clear();
