@@ -5,7 +5,7 @@ import { mergeClientRects } from '../utils';
 import { getClientRectsPonyfill } from '../utils/getClientRectsPonyfill';
 import { reviveTarget } from './reviveTarget';
 
-const isFirefox = navigator.userAgent.match(/firefox|fxios/i);
+const isFirefox = false; //navigator.userAgent.match(/firefox|fxios/i);
 
 if (isFirefox) console.warn('Firefox interop enabled');
 
