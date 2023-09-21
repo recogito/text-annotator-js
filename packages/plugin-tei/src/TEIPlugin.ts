@@ -1,7 +1,7 @@
 import type { 
   RecogitoTextAnnotator,
   TextAnnotation, 
-  TextAnnotationStore, 
+  TextAnnotationStore,
   TextAnnotationTarget, 
 } from '@recogito/text-annotator';
 import type { 
@@ -9,21 +9,21 @@ import type {
   LifecycleEvents,
   Origin,  
   Store,  
-  StoreChangeEvent,
-  StoreObserveOptions 
+  // StoreChangeEvent,
+  // StoreObserveOptions 
 } from '@annotorious/core';
 import { 
-  teiToTextAnnotation, 
-  teiToTextTarget, 
+  // teiToTextAnnotation, 
+  // teiToTextTarget, 
   textToTEIAnnotation, 
   textToTEITarget 
 } from './crosswalk';
 import type { 
-  TEIAnnotation, 
-  TEIAnnotationTarget 
+  TEIAnnotation,
+  TEIAnnotationTarget
 } from './TEIAnnotation';
 
-type TEIEvents = LifecycleEvents<TEIAnnotation>;
+// type TEIEvents = LifecycleEvents<TEIAnnotation>;
 
 export type TEIAnnotationStore = Store<TEIAnnotation> & {
 
@@ -41,6 +41,11 @@ export const TEIPlugin = (anno: RecogitoTextAnnotator): RecogitoTEIAnnotator => 
 
   const container: HTMLElement = anno.element;
 
+  const toTEI = textToTEIAnnotation(container);
+
+  const toTEITarget = textToTEITarget(container);
+
+  /*
   const observers: Array<{
     onChange: (event: StoreChangeEvent<TEIAnnotation>) => void,
     wrapped: (event: StoreChangeEvent<TextAnnotation>) => void
@@ -57,19 +62,19 @@ export const TEIPlugin = (anno: RecogitoTextAnnotator): RecogitoTEIAnnotator => 
 
     if (event === 'createAnnotation' || event === 'deleteAnnotation') {
       // @ts-ignore
-      wrapped = (a: TextAnnotation) => callback(textToTEIAnnotation(a), undefined);
+      wrapped = (a: TextAnnotation) => callback(toTEI(a), undefined);
       anno.on(event, wrapped);
     } else if (event === 'selectionChanged') {
       // @ts-ignore
-      wrapped = (a: TextAnnotation[]) => callback(a.map(textToTEIAnnotation));
+      wrapped = (a: TextAnnotation[]) => callback(a.map(toTEI));
       anno.on(event, wrapped);
     } else if (event === 'updateAnnotation') {
       // @ts-ignore
-      wrapped =  (a: TextAnnotation, b: TextAnnotation) => callback(textToTEIAnnotation(a), textToTEIAnnotation(b));
+      wrapped =  (a: TextAnnotation, b: TextAnnotation) => callback(toTEI(a), teiTEI(b));
       anno.on(event, wrapped);
     } else if (event === 'viewportIntersect') {
       // @ts-ignore
-      wrapped = (a: TextAnnotation[]) => callback(a.map(textToTEIAnnotation));
+      wrapped = (a: TextAnnotation[]) => callback(a.map(teiTEI));
       anno.on(event, wrapped);
     }
 
@@ -85,51 +90,39 @@ export const TEIPlugin = (anno: RecogitoTextAnnotator): RecogitoTEIAnnotator => 
       listeners.splice(idx, 1);
     }
   }
+  */
 
-  // Wrap store
+  // Monkey-patch the store
   const store = anno.state.store as TextAnnotationStore;
 
-  const toText = teiToTextAnnotation(container);
-
-  const toTextTarget = teiToTextTarget(container);
-
-  const addAnnotation = (annotation: TEIAnnotation, origin: Origin) =>
-    store.addAnnotation(teiToTextAnnotation(container)(annotation), origin);
-
-  // TODO cache this!
-  const all = () => 
-    store.all().map(textToTEIAnnotation)
-
-  const bulkAddAnnotation = (annotations: TEIAnnotation[], replace = true, origin: Origin) =>
-    store.bulkAddAnnotation(annotations.map(toText), replace, origin);
-
-  const bulkUpdateTargets = (targets: TEIAnnotationTarget[], origin: Origin) =>
-    store.bulkUpdateTargets(targets.map(toTextTarget), origin); 
-  
-  const getAnnotation = (id: string) => {
-    const textAnnotation = store.getAnnotation(id);
-    if (textAnnotation)
-      return textToTEIAnnotation(textAnnotation);
+  const _addAnnotation = store.addAnnotation;
+  store.addAnnotation = (annotation: TEIAnnotation | TextAnnotation, origin: Origin) => {
+    const { selector } = annotation.target;
+    if (!('startSelector' in selector))
+      _addAnnotation(toTEI(annotation), origin);
   }
 
-  const getAt = (x: number, y: number): TEIAnnotation | undefined => {
-    const textAnnotation = store.getAt(x, y);
-    if (textAnnotation)
-      return textToTEIAnnotation(textAnnotation);
+  const _bulkAddAnnotation = store.bulkAddAnnotation;
+  store.bulkAddAnnotation = (annotations: Array<TEIAnnotation | TextAnnotation>, replace = true, origin: Origin) => {
+    const teiAnnotations = annotations.map(a => {
+      const { selector } = a.target;
+      return 'startSelector' in selector ? a : toTEI(a);
+    });
+    
+    _bulkAddAnnotation(teiAnnotations, replace, origin);
   }
 
-  const getIntersecting = (minX: number, minY: number, maxX: number, maxY: number) =>
-    store.getIntersecting(minX, minY, maxX, maxY).map(textToTEIAnnotation);
-  
-  const updateAnnotation = (annotation: TEIAnnotation, origin: Origin) => {
-    store.updateAnnotation(toText(annotation), origin);
-  }
+  const _updateAnnotation = store.updateAnnotation;
+  store.updateAnnotation = (annotation: TEIAnnotation | TextAnnotation, origin: Origin) =>
+    _updateAnnotation(toTEI(annotation), origin);
 
-  const updateTarget = (target: TEIAnnotationTarget, origin: Origin) => 
-    store.updateTarget(toTextTarget(target), origin);
+  const _updateTarget = store.updateTarget;
+  store.updateTarget = (target: TEIAnnotationTarget | TextAnnotationTarget, origin: Origin) => 
+    _updateTarget(toTEITarget(target), origin);
 
-  // Wrap observe/unobserve
-  const observe = (
+  /*
+  const _observe = store.observe;
+  store.observe = (
     onChange: { (event: StoreChangeEvent<TEIAnnotation>): void }, 
     options: StoreObserveOptions = {}
   ) => {
@@ -137,15 +130,15 @@ export const TEIPlugin = (anno: RecogitoTextAnnotator): RecogitoTEIAnnotator => 
       const { changes, origin, state } = event;
 
       const crosswalkedChanges = {
-        created: (changes.created || []).map(textToTEIAnnotation),
-        deleted: (changes.deleted || []).map(textToTEIAnnotation),
+        created: (changes.created || []).map(toTEI),
+        deleted: (changes.deleted || []).map(toTEI),
         updated: (changes.updated || []).map(update => ({
           ...update,
-          oldValue: textToTEIAnnotation(update.oldValue),
-          newValue: textToTEIAnnotation(update.newValue),
+          oldValue: toTEI(update.oldValue),
+          newValue: toTEI(update.newValue),
           targetUpdated: update.targetUpdated ? ({ 
-            oldTarget: textToTEITarget(update.targetUpdated.oldTarget as TextAnnotationTarget), 
-            newTarget: textToTEITarget(update.targetUpdated.newTarget as TextAnnotationTarget)
+            oldTarget: textToTEITarget(container)(update.targetUpdated.oldTarget as TextAnnotationTarget), 
+            newTarget: textToTEITarget(container)(update.targetUpdated.newTarget as TextAnnotationTarget)
           }) : undefined
         }))
       }
@@ -159,40 +152,28 @@ export const TEIPlugin = (anno: RecogitoTextAnnotator): RecogitoTEIAnnotator => 
       });
     };
 
-    store.observe(wrapped, options);
+    _observe(wrapped, options);
 
     return observers.push({ onChange, wrapped });
   }
 
-  const unobserve = (onChange: { (event: StoreChangeEvent<TEIAnnotation>): void }) => {
+  const _unobserve = store.unobserve;
+  store.unobserve = (onChange: { (event: StoreChangeEvent<TEIAnnotation>): void }) => {
     const idx = observers.findIndex(observer => observer.onChange == onChange);
     if (idx > -1) {
-      store.unobserve(observers[idx].wrapped);
+      _unobserve(observers[idx].wrapped);
       observers.splice(idx, 1);
     }
-  }
+  }*/
 
   return {
     ...anno,
-    on,
-    off,
+    // on,
+    // off,
     state: {
       ...anno.state,
-      store: {
-        ...anno.state.store,
-        addAnnotation,
-        all,
-        bulkAddAnnotation,
-        bulkUpdateTargets,
-        getAnnotation,
-        //@ts-ignore
-        getAt,
-        getIntersecting,
-        observe,
-        unobserve,
-        updateAnnotation,
-        updateTarget
-      }
+      // @ts-ignore
+      store
     }
   }
 

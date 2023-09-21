@@ -57,36 +57,33 @@
 
         CETEIcean.getHTML5('macbeth.xml', data => {
           document.getElementById('content').appendChild(data);
-        });
+          
+          var anno = TEIPlugin(TextAnnotator(document.getElementById('content')));
 
-        var anno = TEIPlugin(TextAnnotator(document.getElementById('content')));
+          anno.loadAnnotations('annotations.json');
 
-        anno.loadAnnotations('annotations.json');
+          anno.on('createAnnotation', annotation => {
+            console.log('createAnnotation', annotation);
+          });
 
-        anno.on('createAnnotation', annotation => {
-          console.log('createAnnotation', annotation);
+          anno.on('updateAnnotation', (annotation, previous) => {
+            console.log('updateAnnotation', annotation);
+          });
 
-          // @ts-ignore
-          anno.state.store.updateAnnotation(annotation,'REMOTE');
-        });
+          /*
+          anno.on('deleteAnnotation', (annotation) => {
+            console.log('deleteAnnotation', annotation);
+          });
 
-        anno.on('updateAnnotation', (annotation, previous) => {
-          console.log('updateAnnotation', JSON.stringify(annotation, null, 2));
-        });
+          anno.on('selectionChanged', (annotations) => {
+            console.log('selectionChanged', annotations);
+          });
 
-        /*
-        anno.on('deleteAnnotation', (annotation) => {
-          console.log('deleteAnnotation', annotation);
-        });
-
-        anno.on('selectionChanged', (annotations) => {
-          console.log('selectionChanged', annotations);
-        });
-
-        anno.on('viewportIntersect', (annotations) => {
-          console.log('viewport', annotations);
-        });
+          anno.on('viewportIntersect', (annotations) => {
+            console.log('viewport', annotations);
+          });
         */
+        });
       }
     </script>
   </body>

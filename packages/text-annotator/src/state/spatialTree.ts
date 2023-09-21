@@ -3,6 +3,11 @@ import type { Store } from '@annotorious/core';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
 import { mergeClientRects } from '../utils';
 import { getClientRectsPonyfill } from '../utils/getClientRectsPonyfill';
+import { reviveTarget } from './reviveTarget';
+
+const isFirefox = navigator.userAgent.match(/firefox|fxios/i);
+
+if (isFirefox) console.warn('Firefox interop enabled');
 
 export interface IndexedHighlightRect {
 
@@ -31,13 +36,18 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
   const index = new Map<string, IndexedHighlightRect[]>();
 
   // Helper: converts a single text annotation target to a list of hightlight rects
-  const toItems = (target: TextAnnotationTarget, firefoxInterop = false): IndexedHighlightRect[] => {
+  const toItems = (target: TextAnnotationTarget): IndexedHighlightRect[] => {
     const offset = container.getBoundingClientRect();
 
-    // TODO we could change this to use the firefoxInterop flag!
-    const rects = true ? 
-      getClientRectsPonyfill(target.selector.range) :
-      Array.from(target.selector.range.getClientRects());
+    const isValidRange = 
+      target.selector.range instanceof Range && 
+      !target.selector.range.collapsed;
+
+    const t = isValidRange ? target : reviveTarget(target, container);
+
+    const rects = isFirefox ? 
+      getClientRectsPonyfill(t.selector.range) :
+      Array.from(t.selector.range.getClientRects());
 
     const merged = mergeClientRects(rects);
 
@@ -65,8 +75,8 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
     index.clear();
   }
 
-  const insert = (target: TextAnnotationTarget, firefoxInterop = false) => {
-    const rects = toItems(target, firefoxInterop);
+  const insert = (target: TextAnnotationTarget) => {
+    const rects = toItems(target);
     rects.forEach(rect => tree.insert(rect));
     index.set(target.annotation, rects);
   }
@@ -77,9 +87,9 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
     index.delete(target.annotation);
   }
 
-  const update = (target: TextAnnotationTarget, firefoxInterop = false) => {
+  const update = (target: TextAnnotationTarget) => {
     remove(target);
-    insert(target, firefoxInterop);
+    insert(target);
   }
 
   const set = (targets: TextAnnotationTarget[], replace: boolean = true) => {
@@ -103,7 +113,7 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
 
     const area = (rect: IndexedHighlightRect) =>
       rect.annotation.rects.reduce((area, r) =>
-        r.width * r.height, 0);
+        area + r.width * r.height, 0);
     
     // Get smallest rect
     if (hits.length > 0) {
@@ -128,7 +138,10 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
 
   const size = () => tree.all().length;
 
-  const recalculate = () => set(store.all().map(a => a.target), true);
+  const recalculate = () => {
+    console.log('Recalculating annotation rects');
+    set(store.all().map(a => a.target), true);
+  }
 
   return {
     all,

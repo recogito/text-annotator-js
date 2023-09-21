@@ -1,29 +1,4 @@
 [{
-  "id": "faa9cc3c-b1f2-4621-a3c1-5d180b67b902",
-  "bodies": [],
-  "target": {
-    "annotation": "faa9cc3c-b1f2-4621-a3c1-5d180b67b902",
-    "selector": {
-      "start": 3892,
-      "startSelector": {
-        "type": "XPathSelector",
-        "value": "//castItem[@xml:id='Macbeth_Mac']/role[1]/name[1]::6"
-      },
-      "end": 4479,
-      "endSelector": {
-        "type": "XPathSelector",
-        "value": "/TEI[1]/text[1]/front[1]/castList[1]/castGroup[4]::11"
-      },
-      "quote": "h thane of Glamis Lady Macbeth Seyton attendant to Macbeth Three Murderers in Macbeth’s service both attending upon Lady Macbeth A Doctor A Gentlewoman A Porter ",
-      "range": {}
-    },
-    "creator": {
-      "isGuest": true,
-      "id": "gZvD3VBJwjX2z_vaucrV"
-    },
-    "created": "2023-09-21T05:48:09.054Z"
-  }
-}, {
   "id": "5430edac-706b-4943-9b87-fd6e8f281b39",
   "bodies": [],
   "target": {

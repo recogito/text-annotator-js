@@ -46,7 +46,6 @@ const wrapRange = (range: Range) => {
     endOffset
   } = range;
 
-
   // Clone the original children, so we can re-generate the original DOM
   const originalChildren = 
     Array.from(commonAncestorContainer.childNodes).map(n => {
@@ -148,19 +147,13 @@ const getTextNodesBetween = (range: Range): Node[] => {
 }
 
 export const getClientRectsPonyfill = (range: Range) => {
-  const { startContainer, endContainer } = range;
+  const { unwrap, nodes } = wrapRange(range);
 
-  if (startContainer === endContainer) {
-    return Array.from(range.getClientRects());
-  } else {
-    const { unwrap, nodes } = wrapRange(range);
+  const rects = nodes.reduce((rects, node) => {
+    return [...rects, ...node.getClientRects()];
+  }, [] as DOMRect[]);
 
-    const rects = nodes.reduce((rects, node) => {
-      return [...rects, ...node.getClientRects()];
-    }, [] as DOMRect[]);
+  unwrap();
   
-    unwrap();
-    
-    return rects;
-  }
+  return rects;
 }

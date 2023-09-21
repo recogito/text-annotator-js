@@ -1,24 +1,8 @@
 import { Origin, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotatorState } from './state';
-import type { TextSelector, TextAnnotationTarget, TextAnnotation } from './model';
+import type { TextSelector, TextAnnotationTarget } from './model';
 import { trimRange } from './utils';
-
-/*
-const clearNativeSelection = () => {
-  if (window.getSelection) {
-    if (window.getSelection().empty) {  // Chrome
-      window.getSelection().empty();
-    } else if (window.getSelection().removeAllRanges) {  // Firefox
-      window.getSelection().removeAllRanges();
-    }
-  // @ts-ignore
-  } else if (document.selection) {
-    // @ts-ignore
-    document.selection.empty();
-  }
-}
-*/
 
 export const rangeToSelector = (range: Range, container: HTMLElement): TextSelector => {
   const rangeBefore = document.createRange();
@@ -126,7 +110,7 @@ export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorSta
 
     setTimeout(() => {
       if (currentTarget?.selector) {
-        store.updateTarget(currentTarget, Origin.LOCAL, true);
+        store.updateTarget(currentTarget, Origin.LOCAL);
 
         selection.clickSelect(currentTarget.annotation, evt);
 

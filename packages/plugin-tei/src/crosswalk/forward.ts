@@ -1,4 +1,9 @@
-import type { TextAnnotation, TextAnnotationTarget, TextSelector } from '@recogito/text-annotator';
+import { reviveTarget } from '@recogito/text-annotator';
+import type { 
+  TextAnnotation, 
+  TextAnnotationTarget, 
+  TextSelector
+} from '@recogito/text-annotator';
 import type { TEIAnnotation, TEIAnnotationTarget, TEIRangeSelector } from '../TEIAnnotation';
 
 /**
@@ -105,8 +110,12 @@ export const rangeToTEIRangeSelector = (selector: TextSelector): TEIRangeSelecto
   };
 }
 
-export const textToTEITarget = (t: TextAnnotationTarget): TEIAnnotationTarget => {
-  const selector = rangeToTEIRangeSelector(t.selector);
+export const textToTEITarget =  (container: HTMLElement) => (t: TextAnnotationTarget): TEIAnnotationTarget => {
+  const isValidRange = t.selector.range instanceof Range && !t.selector.range.collapsed;
+
+  const target = isValidRange ? t : reviveTarget(t, container);
+  const selector = rangeToTEIRangeSelector(target.selector);
+
   return {
     ...t,
     selector: {
@@ -117,8 +126,8 @@ export const textToTEITarget = (t: TextAnnotationTarget): TEIAnnotationTarget =>
   }
 }
 
-export const textToTEIAnnotation = (a: TextAnnotation): TEIAnnotation => ({
+export const textToTEIAnnotation = (container: HTMLElement) => (a: TextAnnotation): TEIAnnotation => ({
   ...a,
-  target: textToTEITarget(a.target)
+  target: textToTEITarget(container)(a.target)
 })
 

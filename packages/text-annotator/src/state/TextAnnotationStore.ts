@@ -13,8 +13,6 @@ export type TextAnnotationStore = Store<TextAnnotation> & {
   
   recalculatePositions(): void;
 
-  updateTarget(target: TextAnnotationTarget, origin?: Origin, firefoxInterop?: boolean): void;
-
 }
 
 export interface AnnotationRects {
