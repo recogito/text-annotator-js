@@ -1,52 +1,101 @@
-[
-  {
-    "id": "b06971d9-0aba-4924-99b2-6c88e0faa9b4",
-    "bodies": [],
-    "target": {
-      "annotation": "b06971d9-0aba-4924-99b2-6c88e0faa9b4",
-      "selector": {
-        "type": "RangeSelector",
-        "startSelector": {
-          "type": "XPathSelector",
-          "value": "/TEI[1]/text[1]/body[1]/div[1]/p[1]::31"
-        },
-        "endSelector": {
-          "type": "XPathSelector",
-          "value": "/TEI[1]/text[1]/body[1]/div[1]/p[1]::131"
-        },
-        "range": {},
-        "quote": "that ingenious hero who travelled far and wide after he had\n          sacked the famous town of Troy"
+[{
+  "id": "faa9cc3c-b1f2-4621-a3c1-5d180b67b902",
+  "bodies": [],
+  "target": {
+    "annotation": "faa9cc3c-b1f2-4621-a3c1-5d180b67b902",
+    "selector": {
+      "start": 3892,
+      "startSelector": {
+        "type": "XPathSelector",
+        "value": "//castItem[@xml:id='Macbeth_Mac']/role[1]/name[1]::6"
       },
-      "creator": {
-        "isGuest": true,
-        "id": "B47KLoTkCNdPkWPQ2NsH"
+      "end": 4479,
+      "endSelector": {
+        "type": "XPathSelector",
+        "value": "/TEI[1]/text[1]/front[1]/castList[1]/castGroup[4]::11"
       },
-      "created": "2023-07-25T07:04:31.005Z"
-    }
-  },
-  {
-    "id": "639e4609-821a-46de-8683-264381ba93ff",
-    "bodies": [],
-    "target": {
-      "annotation": "639e4609-821a-46de-8683-264381ba93ff",
-      "selector": {
-        "type": "RangeSelector",
-        "startSelector": {
-          "type": "XPathSelector",
-          "value": "/TEI[1]/text[1]/body[1]/div[1]/p[3]::11"
-        },
-        "endSelector": {
-          "type": "XPathSelector",
-          "value": "/TEI[1]/text[1]/body[1]/div[1]/p[3]::156"
-        },
-        "range": {},
-        "quote": "Now Neptune had gone off to the Ethiopians, who are at the world's end, and lie in\n          two halves, the one looking West and the other East."
-      },
-      "creator": {
-        "isGuest": true,
-        "id": "B47KLoTkCNdPkWPQ2NsH"
-      },
-      "created": "2023-07-25T07:05:11.472Z"
-    }
+      "quote": "h thane of Glamis Lady Macbeth Seyton attendant to Macbeth Three Murderers in Macbeth’s service both attending upon Lady Macbeth A Doctor A Gentlewoman A Porter ",
+      "range": {}
+    },
+    "creator": {
+      "isGuest": true,
+      "id": "gZvD3VBJwjX2z_vaucrV"
+    },
+    "created": "2023-09-21T05:48:09.054Z"
   }
-]
+}, {
+  "id": "5430edac-706b-4943-9b87-fd6e8f281b39",
+  "bodies": [],
+  "target": {
+    "annotation": "5430edac-706b-4943-9b87-fd6e8f281b39",
+    "selector": {
+      "start": 3436,
+      "startSelector": {
+        "type": "XPathSelector",
+        "value": "//castItem[@xml:id='WITCHES_Mac']::13"
+      },
+      "end": 5102,
+      "endSelector": {
+        "type": "XPathSelector",
+        "value": "//castItem[@xml:id='Ross_Mac']/role[1]/name[1]::4"
+      },
+      "quote": "Three Witches, the Weïrd Sisters Duncan king of Scotland Malcolm his elder son Donalbain Duncan’s younger son Macbeth thane of Glamis Lady Macbeth Seyton attendant to Macbeth Three Murderers in Macbeth’s service both attending upon Lady Macbeth A Doctor A Gentlewoman A Porter Banquo commander, with Macbeth, of Duncan’s army Fleance his son Macduff a Scottish noble Lady Macduff Their son Scottish Nobles Lennox Ross",
+      "range": {}
+    },
+    "creator": {
+      "isGuest": true,
+      "id": "DwQPXeG3uLHfsSLnvTV8"
+    },
+    "created": "2023-09-21T05:47:51.594Z"
+  }
+}, {
+  "id": "fa049492-020b-4eaf-ba93-3d595e9d624f",
+  "bodies": [],
+  "target": {
+    "annotation": "fa049492-020b-4eaf-ba93-3d595e9d624f",
+    "selector": {
+      "start": 6464,
+      "startSelector": {
+        "type": "XPathSelector",
+        "value": "//w[@xml:id='fs-mac-0000010']::0"
+      },
+      "end": 6828,
+      "endSelector": {
+        "type": "XPathSelector",
+        "value": "//pc[@xml:id='fs-mac-0000190']::1"
+      },
+      "quote": "ACT 1 Scene 1 Thunder and Lightning . Enter three Witches .",
+      "range": {}
+    },
+    "creator": {
+      "isGuest": true,
+      "id": "jzgy0s50ZDZBGakEHfTU"
+    },
+    "created": "2023-09-21T05:29:04.847Z"
+  }
+},{
+  "id": "091078e1-4073-4efc-a82a-bee79774dbf0",
+  "bodies": [],
+  "target": {
+    "annotation": "091078e1-4073-4efc-a82a-bee79774dbf0",
+    "selector": {
+      "start": 3671,
+      "startSelector": {
+        "type": "XPathSelector",
+        "value": "//castItem[@xml:id='Malcolm_Mac']/role[1]/name[1]::4"
+      },
+      "end": 4578,
+      "endSelector": {
+        "type": "XPathSelector",
+        "value": "//castItem[@xml:id='Banquo_Mac']/roleDesc[1]::39"
+      },
+      "quote": "olm his elder son Donalbain Duncan’s younger son Macbeth thane of Glamis Lady Macbeth Seyton attendant to Macbeth Three Murderers in Macbeth’s service both attending upon Lady Macbeth A Doctor A Gentlewoman A Porter Banquo commander, with Macbeth, of Duncan’s ar",
+      "range": {}
+    },
+    "creator": {
+      "isGuest": true,
+      "id": "2G7YULxo_qVPC2wCYxfW"
+    },
+    "created": "2023-09-21T05:47:24.687Z"
+  }
+}]

@@ -2,7 +2,9 @@ import { Origin, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotatorState } from './state';
 import type { TextSelector, TextAnnotationTarget, TextAnnotation } from './model';
+import { trimRange } from './utils';
 
+/*
 const clearNativeSelection = () => {
   if (window.getSelection) {
     if (window.getSelection().empty) {  // Chrome
@@ -16,6 +18,7 @@ const clearNativeSelection = () => {
     document.selection.empty();
   }
 }
+*/
 
 export const rangeToSelector = (range: Range, container: HTMLElement): TextSelector => {
   const rangeBefore = document.createRange();
@@ -79,14 +82,12 @@ export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorSta
       const ranges = Array.from(Array(sel.rangeCount).keys())
         .map(idx => sel.getRangeAt(idx));
 
-      const isValid = 
-        ranges[0].startContainer.nodeType === Node.TEXT_NODE &&
-        ranges[0].endContainer.nodeType === Node.TEXT_NODE;
+      const trimmed = trimRange(ranges[0]);
 
       const hasChanged =
-        ranges[0].toString() !== currentTarget.selector?.range?.toString();
+        trimmed.toString() !== currentTarget.selector?.range?.toString();
 
-      if (isValid && hasChanged) {
+      if (hasChanged) {
         currentTarget = {
           ...currentTarget,
           selector: rangeToSelector(ranges[0], container)
@@ -104,9 +105,6 @@ export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorSta
           // Reminder: select events don't have offsetX/offsetY - reuse last up/down
           selection.clickSelect(currentTarget.annotation, lastPointerEvent);
         }
-      } else {
-        console.warn('Invalid text selection', ranges);
-        clearNativeSelection();
       }
     }
   }

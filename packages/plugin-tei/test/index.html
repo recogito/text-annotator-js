@@ -61,7 +61,8 @@
 
         var anno = TEIPlugin(TextAnnotator(document.getElementById('content')));
 
-        /*
+        anno.loadAnnotations('annotations.json');
+
         anno.on('createAnnotation', annotation => {
           console.log('createAnnotation', annotation);
 
@@ -70,9 +71,10 @@
         });
 
         anno.on('updateAnnotation', (annotation, previous) => {
-          console.log('updateAnnotation', annotation, previous);
+          console.log('updateAnnotation', JSON.stringify(annotation, null, 2));
         });
 
+        /*
         anno.on('deleteAnnotation', (annotation) => {
           console.log('deleteAnnotation', annotation);
         });

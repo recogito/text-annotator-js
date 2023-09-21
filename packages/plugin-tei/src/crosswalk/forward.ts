@@ -112,7 +112,7 @@ export const textToTEITarget = (t: TextAnnotationTarget): TEIAnnotationTarget =>
     selector: {
       ...selector,
       range: t.selector.range,
-      quote: t.selector.quote
+      quote: t.selector.quote.replace(/\s+/g, ' ')
     }
   }
 }
