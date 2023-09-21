@@ -138,10 +138,8 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
 
   const size = () => tree.all().length;
 
-  const recalculate = () => {
-    console.log('Recalculating annotation rects');
+  const recalculate = () =>
     set(store.all().map(a => a.target), true);
-  }
 
   return {
     all,

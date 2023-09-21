@@ -1,5 +1,5 @@
-import type { Origin, Store } from '@annotorious/core';
-import type { TextAnnotation, TextAnnotationTarget } from '../model';
+import type { Store } from '@annotorious/core';
+import type { TextAnnotation } from '../model';
 
 export type TextAnnotationStore = Store<TextAnnotation> & {
 

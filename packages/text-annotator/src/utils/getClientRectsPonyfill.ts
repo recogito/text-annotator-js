@@ -60,7 +60,6 @@ const wrapRange = (range: Range) => {
   // Reverse the wrapping operation, regenerate the range
   const unwrap = () => {
     const root = commonAncestorContainer as Element;
-
     root.replaceChildren(...originalChildren);
 
     const startContainer = getNodeAtIndex(startContainerIndex, root);
@@ -78,8 +77,7 @@ const wrapRange = (range: Range) => {
   };
 
   if (startContainer === endContainer) {
-    // Trivial case
-    return { unwrap, nodes: [surround(range)] };
+    throw 'Not implemented';
   } else {
     // Not-so-trivial case - we need to break the range 
     // apart and create sub-ranges for each segment
@@ -147,13 +145,19 @@ const getTextNodesBetween = (range: Range): Node[] => {
 }
 
 export const getClientRectsPonyfill = (range: Range) => {
-  const { unwrap, nodes } = wrapRange(range);
+  const { startContainer, endContainer } = range;
 
-  const rects = nodes.reduce((rects, node) => {
-    return [...rects, ...node.getClientRects()];
-  }, [] as DOMRect[]);
+  if (startContainer === endContainer) {
+    return Array.from(range.getClientRects());
+  } else {
+    const { unwrap, nodes } = wrapRange(range);
 
-  unwrap();
-  
-  return rects;
+    const rects = nodes.reduce((rects, node) => {
+      return [...rects, ...node.getClientRects()];
+    }, [] as DOMRect[]);
+
+    unwrap();
+    
+    return rects;
+  }
 }

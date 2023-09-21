@@ -44,7 +44,9 @@ export const TEIPlugin = (anno: RecogitoTextAnnotator): RecogitoTEIAnnotator => 
   const _addAnnotation = store.addAnnotation;
   store.addAnnotation = (annotation: TEIAnnotation | TextAnnotation, origin: Origin) => {
     const { selector } = annotation.target;
-    if (!('startSelector' in selector))
+    if ('startSelector' in selector)
+      _addAnnotation(annotation, origin)
+    else
       _addAnnotation(toTEI(annotation), origin);
   }
 
