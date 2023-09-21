@@ -36,7 +36,9 @@ export const CETEIcean = (props: CETEIceanProps) => {
           list: null,
           note: null,
           table: null,
-          teiHeader: (elem: HTMLElement) => elem.hidden = true
+          teiHeader: (elem: HTMLElement) => {
+            elem.hidden = true;
+          }
         }
       });
 
