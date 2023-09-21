@@ -67,6 +67,7 @@ const wrapRange = (range: Range) => {
 
     range.setStart(startContainer, startOffset);
     range.setEnd(endContainer, endOffset);
+    return range;
   }
 
   // Shorthand

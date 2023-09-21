@@ -5,7 +5,7 @@ import { mergeClientRects } from '../utils';
 import { getClientRectsPonyfill } from '../utils/getClientRectsPonyfill';
 import { reviveTarget } from './reviveTarget';
 
-const isFirefox = false; //navigator.userAgent.match(/firefox|fxios/i);
+const isFirefox = navigator.userAgent.match(/firefox|fxios/i);
 
 if (isFirefox) console.warn('Firefox interop enabled');
 
@@ -41,7 +41,9 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
 
     const isValidRange = 
       target.selector.range instanceof Range && 
-      !target.selector.range.collapsed;
+      !target.selector.range.collapsed &&
+      target.selector.range.startContainer.nodeType === Node.TEXT_NODE && 
+      target.selector.range.endContainer.nodeType === Node.TEXT_NODE;
 
     const t = isValidRange ? target : reviveTarget(target, container);
 
