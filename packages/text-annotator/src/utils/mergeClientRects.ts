@@ -32,9 +32,9 @@ const getRelation = (rectA: DOMRect, rectB: DOMRect): Relation | undefined => {
     right: round(rectB.right)
   };
 
-  if (a.top === b.top && a.bottom === b.bottom) {
+  if (Math.abs(a.top - b.top) < 0.5 && Math.abs(a.bottom - b.bottom) < 0.5) {
     // Same height - check for containment and adjacency
-    if (a.left === b.right || a.right === b.left)
+    if (Math.abs(a.left - b.right) < 0.5 || Math.abs(a.right - b.left) < 0.5)
       return 'inline-adjacent';
 
     if (a.left >= b.left && a.right <= b.right)

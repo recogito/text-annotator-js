@@ -55,8 +55,8 @@ export const TextAnnotatorPopup = (props: TextAnnotatorPopupContainerProps) => {
       x = Math.max(x, b.x - left);
       x = Math.min(x, b.right - left);
 
-      y = Math.max(y, b.y - top);
-      y = Math.min(y, b.bottom - top);
+      // y = Math.max(y, b.y - top);
+      // y = Math.min(y, b.bottom - top);
     }
 
     el.current.style.left = `${x}px`;
