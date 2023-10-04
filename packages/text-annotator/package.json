@@ -33,7 +33,7 @@
     "vite-plugin-dts": "^2.3.0"
   },
   "dependencies": {
-    "@annotorious/core": "^3.0.0-pre-alpha-44",
+    "@annotorious/core": "^3.0.0-pre-alpha-49",
     "rbush": "^3.0.1",
     "uuid": "^9.0.0"
   }
