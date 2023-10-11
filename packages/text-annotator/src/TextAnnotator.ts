@@ -1,4 +1,4 @@
-import { Origin, createAnonymousGuest, createLifecyleObserver, parseAll, serializeAll } from '@annotorious/core';
+import { Origin, createAnonymousGuest, createLifecyleObserver, parseAll } from '@annotorious/core';
 import type { Annotator, User, PresenceProvider, Formatter } from '@annotorious/core';
 import { createPainter } from './presence';
 import { createHighlightLayer } from './highlight';
@@ -66,17 +66,16 @@ export const TextAnnotator = <T extends unknown = TextAnnotation>(
         return annotations;
       });
 
-  const setAnnotations = (annotations: T[]): T[] => {
+  const setAnnotations = (annotations: T[]) => {
     if (opts.adapter) {
       const { parsed, failed } = parseAll(opts.adapter)(annotations);
 
       if (failed.length > 0)
         console.warn(`Discarded ${failed.length} invalid annotations`, failed);
 
-      const notRevived = store.bulkAddAnnotation(parsed, true, Origin.REMOTE) as TextAnnotation[];
-      return serializeAll(opts.adapter)(notRevived);
+      store.bulkAddAnnotation(parsed, true, Origin.REMOTE) as TextAnnotation[];
     } else {
-      return store.bulkAddAnnotation(annotations as TextAnnotation[], true, Origin.REMOTE) as T[];
+      store.bulkAddAnnotation(annotations as TextAnnotation[], true, Origin.REMOTE) as T[];
     }
   }
   
