@@ -1,7 +1,7 @@
 import type { Origin, Store } from '@annotorious/core';
 import type { TextAnnotation } from '../model';
 
-export type TextAnnotationStore = Omit<Store<TextAnnotation>, 'bulkAddAnnotation'> & {
+export interface TextAnnotationStore extends Omit<Store<TextAnnotation>, 'bulkAddAnnotation'> {
 
   // Minor change to default Annotorious store - text store returns annotations
   // that failed to render, to support lazy document loading scenarios

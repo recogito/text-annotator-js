@@ -1,9 +1,9 @@
-import { Origin, createAnonymousGuest, createLifecyleObserver, parseAll } from '@annotorious/core';
+import { Origin, createAnonymousGuest, createLifecyleObserver, parseAll, serializeAll } from '@annotorious/core';
 import type { Annotator, User, PresenceProvider, Formatter } from '@annotorious/core';
 import { createPainter } from './presence';
 import { createHighlightLayer } from './highlight';
 import { scrollIntoView } from './api';
-import { TextAnnotatorState, createTextAnnotatorState } from './state';
+import { TextAnnotationStore, TextAnnotatorState, createTextAnnotatorState } from './state';
 import type { TextAnnotation } from './model';
 import type { TextAnnotatorOptions } from './TextAnnotatorOptions';
 import { SelectionHandler } from './SelectionHandler';
@@ -25,7 +25,9 @@ export const TextAnnotator = <T extends unknown = TextAnnotation>(
 
   const state: TextAnnotatorState = createTextAnnotatorState(container, opts.pointerAction);
 
-  const { hover, selection, store, viewport } = state;
+  const { hover, selection, viewport } = state;
+
+  const store: TextAnnotationStore = state.store;
 
   const lifecycle = createLifecyleObserver<TextAnnotation, TextAnnotation | T>(store, selection, hover, viewport);
   
@@ -64,16 +66,17 @@ export const TextAnnotator = <T extends unknown = TextAnnotation>(
         return annotations;
       });
 
-  const setAnnotations = (annotations: T[]) => {
+  const setAnnotations = (annotations: T[]): T[] => {
     if (opts.adapter) {
       const { parsed, failed } = parseAll(opts.adapter)(annotations);
 
       if (failed.length > 0)
         console.warn(`Discarded ${failed.length} invalid annotations`, failed);
 
-      store.bulkAddAnnotation(parsed, true, Origin.REMOTE);
+      const notRevived = store.bulkAddAnnotation(parsed, true, Origin.REMOTE) as TextAnnotation[];
+      return serializeAll(opts.adapter)(notRevived);
     } else {
-      store.bulkAddAnnotation(annotations as TextAnnotation[], true, Origin.REMOTE);
+      return store.bulkAddAnnotation(annotations as TextAnnotation[], true, Origin.REMOTE) as T[];
     }
   }
   
