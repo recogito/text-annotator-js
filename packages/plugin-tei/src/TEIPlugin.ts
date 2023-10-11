@@ -20,6 +20,10 @@ import type {
 
 export type TEIAnnotationStore = Store<TEIAnnotation> & {
 
+  // Minor change to default Annotorious store - text store returns annotations
+  // that failed to render, to support lazy document loading scenarios
+  bulkAddAnnotation(annotations: TextAnnotation[], replace: boolean, origin: Origin): TEIAnnotation[];
+
   getAt(x: number, y: number): TEIAnnotation | undefined;
   
   getIntersecting(minX: number, minY: number, maxX: number, maxY: number): TEIAnnotation[];
@@ -57,7 +61,7 @@ export const TEIPlugin = (anno: RecogitoTextAnnotator): RecogitoTEIAnnotator => 
       return 'startSelector' in selector ? a : toTEI(a);
     });
     
-    _bulkAddAnnotation(teiAnnotations, replace, origin);
+    return _bulkAddAnnotation(teiAnnotations, replace, origin);
   }
 
   const _updateAnnotation = store.updateAnnotation;
