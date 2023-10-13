@@ -1,7 +1,7 @@
 {
   "name": "@recogito/text-annotator-tei",
   "version": "3.0.0-pre-alpha-60",
-  "description": "Experimental rewrite of the Recogito JS text annotation library",
+  "description": "Recogito Text Annotator TEI extension",
   "author": "Rainer Simon",
   "license": "BSD-3-Clause",
   "type": "module",
@@ -31,6 +31,6 @@
     "vite-plugin-dts": "^2.3.0"
   },
   "dependencies": {
-    "@annotorious/core": "^3.0.0-pre-alpha-49"
+    "@annotorious/core": "^3.0.0-pre-alpha-50"
   }
 }
