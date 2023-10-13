@@ -4,11 +4,14 @@ import type { TextAnnotatorState } from './state';
 import type { TextSelector, TextAnnotationTarget } from './model';
 import { trimRange } from './utils';
 
-export const rangeToSelector = (range: Range, container: HTMLElement): TextSelector => {
+export const rangeToSelector = (range: Range, container: HTMLElement, offsetReferenceSelector?: string): TextSelector => {
   const rangeBefore = document.createRange();
 
+  const offsetReference = offsetReferenceSelector ? 
+    (range.startContainer as HTMLElement).closest(offsetReferenceSelector) : container;
+
   // A helper range from the start of the contentNode to the start of the selection
-  rangeBefore.setStart(container, 0);
+  rangeBefore.setStart(offsetReference, 0);
   rangeBefore.setEnd(range.startContainer, range.startOffset);
 
   const quote = range.toString();
@@ -18,7 +21,12 @@ export const rangeToSelector = (range: Range, container: HTMLElement): TextSelec
   return {  quote, start, end, range };
 }
 
-export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorState) => {
+export const SelectionHandler = (
+  container: HTMLElement, 
+  state: TextAnnotatorState,
+  // Experimental
+  offsetReferenceSelector?: string
+) => {
 
   const { store, selection } = state;
 
@@ -74,7 +82,7 @@ export const SelectionHandler = (container: HTMLElement, state: TextAnnotatorSta
       if (hasChanged) {
         currentTarget = {
           ...currentTarget,
-          selector: rangeToSelector(ranges[0], container)
+          selector: rangeToSelector(ranges[0], container, offsetReferenceSelector)
         };
     
         if (store.getAnnotation(currentTarget.annotation)) {

@@ -35,7 +35,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
 
   const highlightLayer = createHighlightLayer(container, state, viewport);
 
-  const selectionHandler = SelectionHandler(container, state);
+  const selectionHandler = SelectionHandler(container, state, opts.offsetReferenceSelector);
 
   selectionHandler.setUser(currentUser);
 

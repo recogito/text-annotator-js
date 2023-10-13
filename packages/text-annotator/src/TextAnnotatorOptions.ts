@@ -11,5 +11,8 @@ export interface TextAnnotatorOptions<T extends unknown = TextAnnotation> {
   pointerAction?: PointerSelectAction | ((annotation: TextAnnotation) => PointerSelectAction);
 
   presence?: PresencePainterOptions;
+
+  // Experimental!
+  offsetReferenceSelector?: string;
     
 }
