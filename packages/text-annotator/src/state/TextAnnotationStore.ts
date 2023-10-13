@@ -1,10 +1,12 @@
 import type { Origin, Store } from '@annotorious/core';
 import type { TextAnnotation } from '../model';
 
-export interface TextAnnotationStore extends Omit<Store<TextAnnotation>, 'bulkAddAnnotation'> {
+export interface TextAnnotationStore extends Omit<Store<TextAnnotation>, 'addAnnotation' | 'bulkAddAnnotation'> {
 
-  // Minor change to default Annotorious store - text store returns annotations
-  // that failed to render, to support lazy document loading scenarios
+  // Minor changes to default Annotorious store - text store returns feedback
+  // on annotations that failed to render, to support lazy document loading scenarios
+  addAnnotation(annotation: TextAnnotation, origin: Origin): boolean;
+
   bulkAddAnnotation(annotations: TextAnnotation[], replace: boolean, origin: Origin): TextAnnotation[];
   
   getAnnotationBounds(id: string, hintX?: number, hintY?: number, buffer?: number): DOMRect[];

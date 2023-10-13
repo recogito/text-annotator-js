@@ -42,11 +42,17 @@ export const createTextAnnotatorState = (
   const viewport = createViewportState();
 
   // Wrap store interface to intercept annotations and revive DOM ranges, if needed
-  const addAnnotation = (annotation: TextAnnotation, origin = Origin.LOCAL) => {
+  const addAnnotation = (annotation: TextAnnotation, origin = Origin.LOCAL): boolean => {
     const revived = annotation.target.selector.range instanceof Range ?
       annotation : { ...annotation, target: reviveTarget(annotation.target, container) };
 
-    store.addAnnotation(revived, origin);
+    const { range } = revived.target.selector;
+    const isValid = range && !range.collapsed;
+
+    if (isValid)
+      store.addAnnotation(revived, origin); 
+
+    return isValid;
   }
 
   const bulkAddAnnotation = (
