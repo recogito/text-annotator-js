@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { AnnotationBody, Annotorious, useAnnotationStore, useAnnotator } from '@annotorious/react';
 import { TextAnnotator, TextAnnotatorPopup, TextAnnotatorPopupProps } from '../src';
-import { TextAnnotation, RecogitoTextAnnotator} from '@recogito/text-annotator';
+import { TextAnnotation, TextAnnotator as RecogitoTextAnnotator} from '@recogito/text-annotator';
 
 const TestPopup = (props: TextAnnotatorPopupProps) => {
 
