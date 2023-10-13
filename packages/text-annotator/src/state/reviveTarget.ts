@@ -7,8 +7,15 @@ import type { TextAnnotationTarget } from '../model';
  * @param container the HTML container of the annotated content
  * @returns the DOM range
  */
-export const reviveTarget = (target: TextAnnotationTarget, container: HTMLElement): TextAnnotationTarget => {
+export const reviveTarget = (
+  target: TextAnnotationTarget, 
+  container: HTMLElement
+): TextAnnotationTarget => {  
   const { quote, start, end } = target.selector;
+
+  const offsetReference = target.selector.offsetReference ? target.selector.offsetReference : container;
+  if (!offsetReference)
+    return target;
 
   const iterator = document.createNodeIterator(container, NodeFilter.SHOW_TEXT);
 
@@ -20,16 +27,22 @@ export const reviveTarget = (target: TextAnnotationTarget, container: HTMLElemen
   if (n === null)
     console.error('Could not revive annotation target. Content missing.');
 
-  // set range start
+  // If there's no offset reference, start immediately
+  let startCounting = !offsetReference;
   while (n !== null) {
     const len = n.textContent.length;
 
-    if (runningOffset + len > start) {
-      range.setStart(n, start - runningOffset);
-      break;
-    }
+    if (!startCounting && offsetReference)
+      startCounting = offsetReference.contains(n);
 
-    runningOffset += len;
+    if (startCounting) {
+      if (runningOffset + len > start) {
+        range.setStart(n, start - runningOffset);
+        break;
+      }
+  
+      runningOffset += len;  
+    }
 
     n = iterator.nextNode();
   }
@@ -50,6 +63,12 @@ export const reviveTarget = (target: TextAnnotationTarget, container: HTMLElemen
 
   return {
     ...target,
-    selector: { quote, start, end, range }
+    selector: { 
+      ...target.selector,
+      quote, 
+      start, 
+      end, 
+      range
+    }
   }
 }

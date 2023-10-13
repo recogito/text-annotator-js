@@ -7,8 +7,8 @@ import { trimRange } from './utils';
 export const rangeToSelector = (range: Range, container: HTMLElement, offsetReferenceSelector?: string): TextSelector => {
   const rangeBefore = document.createRange();
 
-  const offsetReference = offsetReferenceSelector ? 
-    (range.startContainer as HTMLElement).closest(offsetReferenceSelector) : container;
+  const offsetReference: HTMLElement = offsetReferenceSelector ? 
+    (range.startContainer.parentElement as HTMLElement).closest(offsetReferenceSelector) : container;
 
   // A helper range from the start of the contentNode to the start of the selection
   rangeBefore.setStart(offsetReference, 0);
@@ -18,7 +18,9 @@ export const rangeToSelector = (range: Range, container: HTMLElement, offsetRefe
   const start = rangeBefore.toString().length;
   const end = start + quote.length;
 
-  return {  quote, start, end, range };
+  return offsetReferenceSelector ?
+    { quote, start, end, range, offsetReference } :
+    { quote, start, end, range };
 }
 
 export const SelectionHandler = (

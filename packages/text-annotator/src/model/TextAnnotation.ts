@@ -22,4 +22,6 @@ export interface TextSelector {
 
   range: Range;
 
+  offsetReference?: HTMLElement
+
 }

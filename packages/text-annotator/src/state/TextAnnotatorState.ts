@@ -54,7 +54,10 @@ export const createTextAnnotatorState = (
     replace = true, 
     origin = Origin.LOCAL
   ): TextAnnotation[] => {
-    const revived = annotations.map(a => a.target.selector.range instanceof Range ?
+    const isValidRange = (range?: Range) =>
+      range instanceof Range && !range.collapsed;
+
+    const revived = annotations.map(a => isValidRange(a.target.selector.range) ?
       a : { ...a, target: reviveTarget(a.target, container )});
 
     // Initial page load might take some time. Retry for more robustness.
