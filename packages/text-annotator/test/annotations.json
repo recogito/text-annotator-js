@@ -1,0 +1,56 @@
+[
+  {
+    "id": "d9b8b79e-e8bb-47a8-a0c4-8462a1865155",
+    "bodies": [],
+    "target": {
+      "annotation": "d9b8b79e-e8bb-47a8-a0c4-8462a1865155",
+      "selector": {
+        "quote": " world's end, and lie in two halves, the one looking West and the other East. He had gone there to accept a hecatomb of sheep and oxen, and was enjoying himself at his festival; but the other gods met in the house of Olympian Jove, and the sire ",
+        "start": 1326,
+        "end": 1571,
+        "range": {}
+      },
+      "creator": {
+        "isGuest": true,
+        "id": "qn7zdU8XD6ZPDBMXdc7w"
+      },
+      "created": "2023-10-17T12:38:37.390Z"
+    }
+  },
+  {
+    "id": "2a376279-a119-46da-afdf-27eb23eb1fad",
+    "bodies": [],
+    "target": {
+      "annotation": "2a376279-a119-46da-afdf-27eb23eb1fad",
+      "selector": {
+        "quote": "ith Ulysses for having blinded an eye of Polyphemus king of the Cyclopes. Polyphemus is son to Neptune by the nymph Thoosa, daughter to the s",
+        "start": 3540,
+        "end": 3681,
+        "range": {}
+      },
+      "creator": {
+        "isGuest": true,
+        "id": "qn7zdU8XD6ZPDBMXdc7w"
+      },
+      "created": "2023-10-17T12:39:02.290Z"
+    }
+  },
+  {
+    "id": "8e286366-3173-4542-a056-159b1b031a76",
+    "bodies": [],
+    "target": {
+      "annotation": "8e286366-3173-4542-a056-159b1b031a76",
+      "selector": {
+        "quote": "ious with Ulysses for having blinded an eye of Polyphemus king of the Cyclopes. Polyphemus is son to Neptune by the nymph Thoosa, daughter to the sea-king Phorcys; therefore though he will not kill Ulysses outright, he torments him by preventing",
+        "start": 12786,
+        "end": 13031,
+        "range": {}
+      },
+      "creator": {
+        "isGuest": true,
+        "id": "qn7zdU8XD6ZPDBMXdc7w"
+      },
+      "created": "2023-10-17T12:38:07.356Z"
+    }
+  }
+]

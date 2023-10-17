@@ -15,19 +15,27 @@ export const scrollIntoView = (container: HTMLElement, store: TextAnnotationStor
   // Get closest scrollable parent
   const scrollParent: Element = getScrollParent(container);
   if (scrollParent) {
-    const bounds = scrollParent.getBoundingClientRect();
-
     // Get curren version of the annotation from the store
     const current = store.getAnnotation(annotation.id);
 
-    // Get position of the annotation relative to scroll parent
-    const { x, y, width, height } = current.target.selector.range.getBoundingClientRect();
-    const offsetTop = y - bounds.y;
-    const offsetLeft = x - bounds.x;
+    // Parent bounds and client (= visible) height
+    const parentBounds = scrollParent.getBoundingClientRect();
+    const parentHeight = scrollParent.clientHeight;
+    const parentWidth = scrollParent.clientWidth;
 
-    // Set scroll so that annotation is in the middle of the parent
-    const top = offsetTop + height / 2 - scrollParent.clientHeight / 2;
-    const left = offsetLeft + width / 2 - scrollParent.clientWidth / 2;
+    // Position of the annotation relative to viewport
+    const annotationBounds = current.target.selector.range.getBoundingClientRect();
+
+    // Position of the annotation relative to scrollParent
+    const offsetTop = annotationBounds.top - parentBounds.top;
+    const offsetLeft = annotationBounds.left - parentBounds.left;
+
+    const scrollTop = scrollParent.parentElement ? scrollParent.scrollTop : 0;
+    const scrollLeft = scrollParent.parentElement ? scrollParent.scrollLeft : 0;
+
+    // Scroll the annotation to the center of the viewport
+    const top = offsetTop + scrollTop - (parentHeight - annotationBounds.height) / 2;
+    const left = offsetLeft + scrollLeft - (parentWidth - annotationBounds.width) / 2;
 
     scrollParent.scroll({ top, left, behavior: 'smooth' });
   }
