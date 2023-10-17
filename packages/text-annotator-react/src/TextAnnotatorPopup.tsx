@@ -11,7 +11,7 @@ export interface TextAnnotatorPopupProps {
 
 export interface TextAnnotatorPopupContainerProps {
 
-  popup(props: TextAnnotatorPopupProps): ReactNode;
+  popup(props: TextAnnotatorPopupProps): ReactNode | JSX.Element;
 
 }
 

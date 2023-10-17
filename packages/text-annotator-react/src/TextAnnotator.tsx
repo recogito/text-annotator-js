@@ -7,7 +7,7 @@ import '@recogito/text-annotator/dist/text-annotator.css';
 
 export type TextAnnotatorProps<E extends unknown> = TextAnnotatorOptions<E> & {
 
-  children?: ReactNode;
+  children?: ReactNode | JSX.Element; 
 
   formatter?: Formatter;
 
