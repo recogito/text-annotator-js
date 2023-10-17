@@ -5,7 +5,7 @@ import { TextAnnotation, TextAnnotatorOptions, createTextAnnotator } from '@reco
 
 import '@recogito/text-annotator/dist/text-annotator.css';
 
-export type TextAnnotatorProps = TextAnnotatorOptions & {
+export type TextAnnotatorProps<E extends unknown> = TextAnnotatorOptions<E> & {
 
   children?: ReactNode;
 
@@ -13,7 +13,7 @@ export type TextAnnotatorProps = TextAnnotatorOptions & {
 
 }
 
-export const TextAnnotator = (props: TextAnnotatorProps) => {
+export const TextAnnotator = <E extends unknown>(props: TextAnnotatorProps<E>) => {
 
   const el = useRef<HTMLDivElement>(null);
 
