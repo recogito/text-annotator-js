@@ -81,7 +81,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
     setPresenceProvider,
     on: lifecycle.on,
     off: lifecycle.off,
-    scrollIntoView: scrollIntoView(container),
+    scrollIntoView: scrollIntoView(container, store),
     state
   }
 
