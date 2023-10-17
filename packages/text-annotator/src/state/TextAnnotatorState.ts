@@ -26,6 +26,12 @@ export type TextAnnotatorState = AnnotatorState<TextAnnotation> & {
 
 }
 
+// Shorthand
+const hasValidRange = (annotation: TextAnnotation) => {
+  const { range } = annotation.target.selector;
+  return range instanceof Range && !range.collapsed;
+}
+
 export const createTextAnnotatorState = (
   container: HTMLElement,
   defaultPointerAction?: PointerSelectAction | ((annotation: TextAnnotation) => PointerSelectAction)
@@ -60,10 +66,7 @@ export const createTextAnnotatorState = (
     replace = true, 
     origin = Origin.LOCAL
   ): TextAnnotation[] => {
-    const isValidRange = (range?: Range) =>
-      range instanceof Range && !range.collapsed;
-
-    const revived = annotations.map(a => isValidRange(a.target.selector.range) ?
+    const revived = annotations.map(a => hasValidRange(a) ?
       a : { ...a, target: reviveTarget(a.target, container )});
 
     // Initial page load might take some time. Retry for more robustness.
@@ -73,8 +76,10 @@ export const createTextAnnotatorState = (
       console.warn('Could not revive all targets');
       console.warn(couldNotRevive);
 
-      const successful = revived.filter(a => !a.target.selector.range.collapsed);
-      store.bulkAddAnnotation(successful, replace, origin);
+      // Note: we want to keep ALL annotations in the store, even those that
+      // were not revived - even if the highlighter won't be able to render
+      // the un-revived ones to the screen.
+      store.bulkAddAnnotation(revived, replace, origin);
 
       return couldNotRevive;
     } else {
@@ -150,9 +155,11 @@ export const createTextAnnotatorState = (
   const recalculatePositions = () => tree.recalculate();
 
   store.observe(({ changes }) => {
-    const { created, deleted, updated } = changes;
-    
-    if (created?.length > 0)
+    const created = (changes.created || []).filter(hasValidRange);
+    const deleted = (changes.deleted || []).filter(hasValidRange);
+    const updated = (changes.updated || []).filter(u => hasValidRange(u.newValue));
+
+    if (created.length > 0)
       tree.set(created.map(a => a.target), false);
 
     if (deleted?.length > 0)
