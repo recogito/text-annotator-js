@@ -7,7 +7,7 @@ import '@recogito/text-annotator/dist/text-annotator.css';
 
 export type TEIAnnotatorProps = TextAnnotatorOptions & {
 
-  children?: ReactNode;
+  children?: ReactNode | JSX.Element;
 
   formatter?: Formatter;
 
