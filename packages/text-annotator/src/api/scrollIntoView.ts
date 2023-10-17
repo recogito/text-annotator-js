@@ -18,6 +18,11 @@ export const scrollIntoView = (container: HTMLElement, store: TextAnnotationStor
     // Get curren version of the annotation from the store
     const current = store.getAnnotation(annotation.id);
 
+    const { range } = current.target.selector;
+
+    if (!range || range.collapsed)
+      return false;
+
     // Parent bounds and client (= visible) height
     const parentBounds = scrollParent.getBoundingClientRect();
     const parentHeight = scrollParent.clientHeight;
@@ -38,5 +43,7 @@ export const scrollIntoView = (container: HTMLElement, store: TextAnnotationStor
     const left = offsetLeft + scrollLeft - (parentWidth - annotationBounds.width) / 2;
 
     scrollParent.scroll({ top, left, behavior: 'smooth' });
+
+    return true;
   }
 }
