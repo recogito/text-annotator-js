@@ -114,7 +114,7 @@ export const createTextAnnotatorState = (
     return ids.map(id => store.getAnnotation(id)).filter(a => a);
   }
 
-  const getAnnotationBounds = (id: string, x?: number, y?: number, buffer = 5) => {
+  const getAnnotationBounds = (id: string, x?: number, y?: number, buffer = 5): DOMRect => {
     const rects = tree.getDOMRectsForAnnotation(id);
     if (rects.length > 0) {
       if (x && y) {
@@ -123,10 +123,10 @@ export const createTextAnnotatorState = (
 
         if (match)
           // Preferred bounds: the rectangle 
-          return [match];
+          return match;
       }
         
-      return rects;
+      return tree.getBoundsForAnnotation(id);
     }
   }
 

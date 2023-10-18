@@ -31,6 +31,11 @@ export const scrollIntoView = (container: HTMLElement, store: TextAnnotationStor
     // Position of the annotation relative to viewport
     const annotationBounds = current.target.selector.range.getBoundingClientRect();
 
+    // Note: getBoundingClientRect seems to return wrong height! 
+    // (Includes block elements?) We'll therefore use the normalized height
+    // from the spatial index!
+    const { width, height } = store.getAnnotationBounds(annotation.id);
+
     // Position of the annotation relative to scrollParent
     const offsetTop = annotationBounds.top - parentBounds.top;
     const offsetLeft = annotationBounds.left - parentBounds.left;
@@ -39,8 +44,8 @@ export const scrollIntoView = (container: HTMLElement, store: TextAnnotationStor
     const scrollLeft = scrollParent.parentElement ? scrollParent.scrollLeft : 0;
 
     // Scroll the annotation to the center of the viewport
-    const top = offsetTop + scrollTop - (parentHeight - annotationBounds.height) / 2;
-    const left = offsetLeft + scrollLeft - (parentWidth - annotationBounds.width) / 2;
+    const top = offsetTop + scrollTop - (parentHeight - height) / 2;
+    const left = offsetLeft + scrollLeft - (parentWidth - width) / 2;
 
     scrollParent.scroll({ top, left, behavior: 'smooth' });
 

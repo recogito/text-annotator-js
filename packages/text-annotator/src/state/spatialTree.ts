@@ -123,6 +123,29 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
     }
   }
 
+  const getBoundsForAnnotation = (id: string): DOMRect => {
+    const rects = getDOMRectsForAnnotation(id);
+
+    if (rects.length === 0)
+      return undefined;
+
+    let left = rects[0].left;
+    let top = rects[0].top;
+    let right = rects[0].right;
+    let bottom = rects[0].bottom;
+
+    for (let i = 1; i < rects.length; i++) {
+      const rect = rects[i];
+
+      left = Math.min(left, rect.left);
+      top = Math.min(top, rect.top);
+      right = Math.max(right, rect.right);
+      bottom = Math.max(bottom, rect.bottom);
+    }
+
+    return new DOMRect(left, top, right - left, bottom - top);
+  }
+
   const getDOMRectsForAnnotation = (id: string): DOMRect[] => {
     const indexed = index.get(id);
     if (indexed) {
@@ -146,6 +169,7 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
     all,
     clear,
     getAt,
+    getBoundsForAnnotation,
     getDOMRectsForAnnotation,
     getIntersectingRects,
     insert,

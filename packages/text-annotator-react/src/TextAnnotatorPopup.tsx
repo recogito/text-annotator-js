@@ -49,14 +49,9 @@ export const TextAnnotatorPopup = (props: TextAnnotatorPopupContainerProps) => {
     const { offsetX, offsetY } = pointerEvent;
     const bounds = (r.state as TextAnnotatorState).store.getAnnotationBounds(id, offsetX, offsetY);
     
-    if (bounds.length > 0) {
-      const b = bounds[0];
-
-      x = Math.max(x, b.x - left);
-      x = Math.min(x, b.right - left);
-
-      // y = Math.max(y, b.y - top);
-      // y = Math.min(y, b.bottom - top);
+    if (bounds) {
+      x = Math.max(x, bounds.x - left);
+      x = Math.min(x, bounds.right - left);
     }
 
     el.current.style.left = `${x}px`;

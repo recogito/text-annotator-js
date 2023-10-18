@@ -9,7 +9,7 @@ export interface TextAnnotationStore extends Omit<Store<TextAnnotation>, 'addAnn
 
   bulkAddAnnotation(annotations: TextAnnotation[], replace: boolean, origin: Origin): TextAnnotation[];
   
-  getAnnotationBounds(id: string, hintX?: number, hintY?: number, buffer?: number): DOMRect[];
+  getAnnotationBounds(id: string, hintX?: number, hintY?: number, buffer?: number): DOMRect;
 
   getAt(x: number, y: number): TextAnnotation| undefined;
   
