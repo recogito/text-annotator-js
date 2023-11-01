@@ -57,6 +57,9 @@ export const SelectionHandler = (
         creator: currentUser,
         created: new Date()
       };
+    } else {
+      currentTarget = null;
+      lastPointerEvent = undefined;
     }
   });
 
