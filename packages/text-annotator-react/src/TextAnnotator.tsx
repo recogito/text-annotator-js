@@ -21,13 +21,13 @@ export const TextAnnotator = <E extends unknown>(props: TextAnnotatorProps<E>) =
 
   const { anno, setAnno } = useContext(AnnotoriousContext);
   
-  useEffect(() => {    
-    const anno = createTextAnnotator(el.current, opts);
-    anno.style = props.style;
-
-    // @ts-ignore
-    setAnno(anno);
-  }, []);
+  useEffect(() => {  
+    if (setAnno) {
+      const anno = createTextAnnotator(el.current, opts);
+      anno.style = props.style;
+      setAnno(anno);
+    }
+  }, [setAnno]);
 
   useEffect(() => {
     if (!anno)
