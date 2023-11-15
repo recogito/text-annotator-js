@@ -1,9 +1,11 @@
-import type { Formatter, ViewportState } from '@annotorious/core';
+import type { DrawingStyle, ViewportState } from '@annotorious/core';
+import type { TextAnnotation } from '../model';
 import type { TextAnnotatorState } from '../state';
 import { defaultPainter, type HighlightPainter } from './HighlightPainter';
 import { trackViewport } from './trackViewport';
 
 import './highlightLayer.css';
+
 
 const debounce = <T extends (...args: any[]) => void>(func: T, delay: number = 10): T => {
   let timeoutId: number;
@@ -49,7 +51,7 @@ export const createHighlightLayer = (
 
   const { store, selection, hover } = state;
   
-  let currentFormatter: Formatter | undefined;
+  let currentStyle: DrawingStyle | ((annotation: TextAnnotation) => DrawingStyle) | undefined;
 
   let currentPainter: HighlightPainter = defaultPainter;
 
@@ -143,7 +145,7 @@ export const createHighlightLayer = (
       }));
 
       const isSelected = selectedIds.has(annotation.id);
-      currentPainter.paint(annotation, offsetRects, bgContext, fgContext, isSelected, currentFormatter);
+      currentPainter.paint(annotation, offsetRects, bgContext, fgContext, isSelected, currentStyle);
     });
 
     setTimeout(() => onDraw(annotationsInView.map(({ annotation }) => annotation)), 1);
@@ -155,14 +157,14 @@ export const createHighlightLayer = (
   // need need for extra check
   selection.subscribe(() => redraw());
 
-  const setFormatter = (formatter: Formatter) => {
-    currentFormatter = formatter;
+  const setDrawingStyle = (style: DrawingStyle | ((a: TextAnnotation) => DrawingStyle)) => {
+    currentStyle = style;
     redraw();
   }
 
   return {
     redraw,
-    setFormatter,
+    setDrawingStyle,
     setPainter: (painter: HighlightPainter) => currentPainter = painter
   }
 

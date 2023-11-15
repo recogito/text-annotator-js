@@ -1,4 +1,4 @@
-import type { Formatter, PresenceProvider, PresentUser } from '@annotorious/core';
+import type { DrawingStyle, PresenceProvider, PresentUser } from '@annotorious/core';
 import type { HighlightPainter } from '../highlight';
 import type { PresencePainterOptions } from './PresencePainterOptions';
 import type { TextAnnotation } from '../model';
@@ -30,7 +30,7 @@ export const createPainter = (provider: PresenceProvider, opts: PresencePainterO
     bg: CanvasRenderingContext2D, 
     fg: CanvasRenderingContext2D,
     isSelected?: boolean,
-    formatter?: Formatter
+    style?: DrawingStyle | ((annotation: TextAnnotation) => DrawingStyle)
   ) => {
     if (opts.font)
       fg.font = opts.font;
@@ -60,7 +60,7 @@ export const createPainter = (provider: PresenceProvider, opts: PresencePainterO
       bg.globalAlpha = isSelected ? 0.45 : 0.18;
       rects.forEach(({ x, y, width, height }) => bg.fillRect(x, y - 2.5, width, height + 5));
     } else {
-      defaultPainter.paint(annotation, rects, bg, fg, isSelected, formatter);
+      defaultPainter.paint(annotation, rects, bg, fg, isSelected, style);
     }
   }
 

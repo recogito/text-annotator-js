@@ -1,6 +1,6 @@
 import { Children, ReactElement, ReactNode, cloneElement, useContext, useEffect } from 'react';
-import { AnnotoriousContext, Formatter } from '@annotorious/react';
-import { TextAnnotatorOptions, createTextAnnotator } from '@recogito/text-annotator';
+import { AnnotoriousContext, DrawingStyle } from '@annotorious/react';
+import { TextAnnotatorOptions, createTextAnnotator, TextAnnotation } from '@recogito/text-annotator';
 import { RecogitoTEIAnnotator, TEIPlugin } from '@recogito/text-annotator-tei';
 
 import '@recogito/text-annotator/dist/text-annotator.css';
@@ -9,7 +9,7 @@ export type TEIAnnotatorProps = TextAnnotatorOptions & {
 
   children?: ReactNode | JSX.Element;
 
-  formatter?: Formatter;
+  style?: DrawingStyle | ((annotation: TextAnnotation) => DrawingStyle);
 
 }
 
@@ -19,7 +19,7 @@ export const TEIAnnotator = (props: TEIAnnotatorProps) => {
 
   const onLoad = (element: HTMLElement) => {
     const anno = TEIPlugin(createTextAnnotator(element));
-    anno.setFormatter(props.formatter);
+    anno.style = props.style;
 
     // @ts-ignore
     setAnno(anno);
@@ -29,8 +29,8 @@ export const TEIAnnotator = (props: TEIAnnotatorProps) => {
     if (!anno)
       return;
     
-    (anno as unknown as RecogitoTEIAnnotator).setFormatter(props.formatter);
-  }, [props.formatter]);
+    (anno as unknown as RecogitoTEIAnnotator).style = props.style;
+  }, [props.style]);
 
   return props.children ? 
     Children.toArray(props.children).map(child => 

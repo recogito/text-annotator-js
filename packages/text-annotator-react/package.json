@@ -1,6 +1,6 @@
 {
   "name": "@recogito/react-text-annotator",
-  "version": "3.0.0-pre-alpha-67",
+  "version": "3.0.0-pre-alpha-68",
   "description": "Recogito Text Annotator React bindings",
   "author": "Rainer Simon",
   "license": "BSD-3-Clause",
@@ -34,7 +34,7 @@
     "vite-tsconfig-paths": "^4.2.0"
   },
   "peerDependencies": {
-    "@annotorious/react": "^3.0.0-pre-alpha-53",
+    "@annotorious/react": "^3.0.0-pre-alpha-58",
     "react": "16.8.0 || >=17.x || >=18.x",
     "react-dom": "16.8.0 || >=17.x || >=18.x"
   },

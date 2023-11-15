@@ -1,4 +1,4 @@
-import type { Formatter } from '@annotorious/core';
+import type { DrawingStyle } from '@annotorious/core';
 import type { TextAnnotation } from '../model';
 import type { Rect } from '../state';
 
@@ -17,7 +17,7 @@ export type HighlightPainter = {
     bg: CanvasRenderingContext2D,
     fg: CanvasRenderingContext2D,
     isSelected?: boolean,
-    formatter?: Formatter
+    style?: DrawingStyle | ((annotation: TextAnnotation) => DrawingStyle)
   ): void;
 
 }
@@ -27,9 +27,9 @@ export type HighlightPainter = {
  */
 export const defaultPainter: HighlightPainter = {
 
-  paint: (annotation, rects, bg, fg, isSelected, formatter) => {
-    const style: HighlightStyle = formatter ? 
-      formatter(annotation, isSelected) :
+  paint: (annotation, rects, bg, fg, isSelected, drawingStyle) => {
+    const style: HighlightStyle = drawingStyle ? 
+      typeof drawingStyle === 'function' ? drawingStyle(annotation) : drawingStyle :
       isSelected ? DEFAULT_SELECTED_STYLE : 
       DEFAULT_STYLE;
 

@@ -1,5 +1,5 @@
-import { createAnonymousGuest, createLifecyleObserver, createBaseAnnotator } from '@annotorious/core';
-import type { Annotator, User, PresenceProvider, Formatter } from '@annotorious/core';
+import { createAnonymousGuest, createLifecyleObserver, createBaseAnnotator, DrawingStyle } from '@annotorious/core';
+import type { Annotator, User, PresenceProvider } from '@annotorious/core';
 import { createPainter } from './presence';
 import { createHighlightLayer } from './highlight';
 import { scrollIntoView } from './api';
@@ -32,7 +32,9 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
 
   const lifecycle = createLifecyleObserver<TextAnnotation, TextAnnotation | E>(store, selection, hover, viewport);
   
-  let currentUser: User = opts.readOnly ? null : createAnonymousGuest();
+  let currentUser: User = createAnonymousGuest();
+
+  let style = opts.style;
 
   const highlightLayer = createHighlightLayer(container, state, viewport);
 
@@ -47,10 +49,12 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   // Most of the external API functions are covered in the base annotator
   const base = createBaseAnnotator<TextAnnotation, E>(store, opts.adapter);
 
+  const setStyle = (drawingStyle: DrawingStyle | ((annotation: TextAnnotation) => DrawingStyle) | undefined) => {
+    style = drawingStyle;
+    highlightLayer.setDrawingStyle(drawingStyle);
+  }
+
   const getUser = () => currentUser;
-  
-  const setFormatter = (formatter: Formatter) =>
-    highlightLayer.setFormatter(formatter);
 
   const setUser = (user: User) => {
     currentUser = user;
@@ -72,18 +76,24 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
     }
   }
 
+  const destroy = () => {
+    throw 'Not implemented yet';
+  }
+
   return {
     ...base,
+    destroy,
     element: container,
     getUser,
-    setFormatter,
     setUser,
     setSelected,
     setPresenceProvider,
     on: lifecycle.on,
     off: lifecycle.off,
     scrollIntoView: scrollIntoView(container, store),
-    state
+    state,
+    get style() { return style },
+    set style(s: DrawingStyle | ((annotation: TextAnnotation) => DrawingStyle) | undefined) { setStyle(s) }
   }
 
 }

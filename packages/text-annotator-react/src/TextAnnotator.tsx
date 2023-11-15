@@ -1,5 +1,5 @@
 import { ReactNode, useContext, useEffect, useRef } from 'react';
-import { AnnotoriousContext, Formatter } from '@annotorious/react';
+import { AnnotoriousContext, DrawingStyle } from '@annotorious/react';
 import { TextAnnotator as RecogitoTextAnnotator } from '@recogito/text-annotator';
 import { TextAnnotation, TextAnnotatorOptions, createTextAnnotator } from '@recogito/text-annotator';
 
@@ -9,7 +9,7 @@ export type TextAnnotatorProps<E extends unknown> = TextAnnotatorOptions<E> & {
 
   children?: ReactNode | JSX.Element; 
 
-  formatter?: Formatter;
+  style?: DrawingStyle | ((annotation: TextAnnotation) => DrawingStyle);
 
 }
 
@@ -23,7 +23,7 @@ export const TextAnnotator = <E extends unknown>(props: TextAnnotatorProps<E>) =
   
   useEffect(() => {    
     const anno = createTextAnnotator(el.current, opts);
-    anno.setFormatter(props.formatter);
+    anno.style = props.style;
 
     // @ts-ignore
     setAnno(anno);
@@ -33,8 +33,8 @@ export const TextAnnotator = <E extends unknown>(props: TextAnnotatorProps<E>) =
     if (!anno)
       return;
     
-    (anno as unknown as RecogitoTextAnnotator<TextAnnotation>).setFormatter(props.formatter);
-  }, [props.formatter]);
+    (anno as unknown as RecogitoTextAnnotator<TextAnnotation>).style = props.style;
+  }, [props.style]);
 
   return (
     <div ref={el}>
