@@ -20,8 +20,6 @@ export const TEIAnnotator = (props: TEIAnnotatorProps) => {
   const onLoad = (element: HTMLElement) => {
     const anno = TEIPlugin(createTextAnnotator(element));
     anno.style = props.style;
-
-    // @ts-ignore
     setAnno(anno);
   }
 
@@ -29,7 +27,7 @@ export const TEIAnnotator = (props: TEIAnnotatorProps) => {
     if (!anno)
       return;
     
-    (anno as unknown as RecogitoTEIAnnotator).style = props.style;
+    (anno as RecogitoTEIAnnotator).style = props.style;
   }, [props.style]);
 
   return props.children ? 
