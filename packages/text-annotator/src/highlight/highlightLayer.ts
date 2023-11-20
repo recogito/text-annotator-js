@@ -6,7 +6,6 @@ import { trackViewport } from './trackViewport';
 
 import './highlightLayer.css';
 
-
 const debounce = <T extends (...args: any[]) => void>(func: T, delay: number = 10): T => {
   let timeoutId: number;
 
@@ -51,7 +50,7 @@ export const createHighlightLayer = (
 
   const { store, selection, hover } = state;
   
-  let currentStyle: DrawingStyle | ((annotation: TextAnnotation) => DrawingStyle) | undefined;
+  let currentStyle: DrawingStyle | ((annotation: TextAnnotation, selected?: boolean) => DrawingStyle) | undefined;
 
   let currentPainter: HighlightPainter = defaultPainter;
 
@@ -157,7 +156,7 @@ export const createHighlightLayer = (
   // need need for extra check
   selection.subscribe(() => redraw());
 
-  const setDrawingStyle = (style: DrawingStyle | ((a: TextAnnotation) => DrawingStyle)) => {
+  const setDrawingStyle = (style: DrawingStyle | ((a: TextAnnotation, selected?: boolean) => DrawingStyle)) => {
     currentStyle = style;
     redraw();
   }
