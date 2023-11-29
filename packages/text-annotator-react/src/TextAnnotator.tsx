@@ -1,13 +1,15 @@
 import { ReactNode, useContext, useEffect, useRef } from 'react';
 import { AnnotoriousContext, DrawingStyle } from '@annotorious/react';
-import { TextAnnotator as RecogitoTextAnnotator } from '@recogito/text-annotator';
-import { TextAnnotation, TextAnnotatorOptions, createTextAnnotator } from '@recogito/text-annotator';
+import { createTextAnnotator } from '@recogito/text-annotator';
+import type { Filter, TextAnnotation, TextAnnotatorOptions } from '@recogito/text-annotator';
 
 import '@recogito/text-annotator/dist/text-annotator.css';
 
 export type TextAnnotatorProps<E extends unknown> = TextAnnotatorOptions<E> & {
 
   children?: ReactNode | JSX.Element; 
+
+  filter?: Filter;
 
   style?: DrawingStyle | ((annotation: TextAnnotation) => DrawingStyle);
 
@@ -24,7 +26,7 @@ export const TextAnnotator = <E extends unknown>(props: TextAnnotatorProps<E>) =
   useEffect(() => {  
     if (setAnno) {
       const anno = createTextAnnotator(el.current, opts);
-      anno.style = props.style;
+      anno.setStyle(props.style);
       setAnno(anno);
     }
   }, [setAnno]);
@@ -33,8 +35,15 @@ export const TextAnnotator = <E extends unknown>(props: TextAnnotatorProps<E>) =
     if (!anno)
       return;
     
-    (anno as unknown as RecogitoTextAnnotator<TextAnnotation>).style = props.style;
+    anno.setStyle(props.style);
   }, [props.style]);
+
+  useEffect(() => {
+    if (!anno)
+      return;
+    
+    anno.setFilter(props.filter);
+  }, [props.filter]);
 
   return (
     <div ref={el}>

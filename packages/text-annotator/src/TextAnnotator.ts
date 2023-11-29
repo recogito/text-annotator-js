@@ -1,4 +1,4 @@
-import { createAnonymousGuest, createLifecyleObserver, createBaseAnnotator, DrawingStyle } from '@annotorious/core';
+import { createAnonymousGuest, createLifecyleObserver, createBaseAnnotator, DrawingStyle, Filter } from '@annotorious/core';
 import type { Annotator, User, PresenceProvider } from '@annotorious/core';
 import { createPainter } from './presence';
 import { createHighlightLayer } from './highlight';
@@ -34,9 +34,9 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   
   let currentUser: User = createAnonymousGuest();
 
-  let style = opts.style;
-
   const highlightLayer = createHighlightLayer(container, state, viewport);
+  if (opts.style)
+    highlightLayer.setDrawingStyle(opts.style);
 
   const selectionHandler = SelectionHandler(container, state, opts.offsetReferenceSelector);
 
@@ -49,12 +49,14 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   // Most of the external API functions are covered in the base annotator
   const base = createBaseAnnotator<TextAnnotation, E>(store, opts.adapter);
 
-  const setStyle = (drawingStyle: DrawingStyle | ((annotation: TextAnnotation) => DrawingStyle) | undefined) => {
-    style = drawingStyle;
-    highlightLayer.setDrawingStyle(drawingStyle);
+  const getUser = () => currentUser;
+
+  const setFilter = (filter: Filter) => {
+    // TODO
   }
 
-  const getUser = () => currentUser;
+  const setStyle = (drawingStyle: DrawingStyle | ((annotation: TextAnnotation) => DrawingStyle) | undefined) =>
+    highlightLayer.setDrawingStyle(drawingStyle);
 
   const setUser = (user: User) => {
     currentUser = user;
@@ -85,15 +87,15 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
     destroy,
     element: container,
     getUser,
+    setFilter,
+    setStyle,
     setUser,
     setSelected,
     setPresenceProvider,
     on: lifecycle.on,
     off: lifecycle.off,
     scrollIntoView: scrollIntoView(container, store),
-    state,
-    get style() { return style },
-    set style(s: DrawingStyle | ((annotation: TextAnnotation) => DrawingStyle) | undefined) { setStyle(s) }
+    state
   }
 
 }

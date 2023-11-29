@@ -78,9 +78,7 @@ export const TEIPlugin = (anno: TextAnnotator): RecogitoTEIAnnotator => {
       ...anno.state,
       // @ts-ignore
       store
-    },
-    get style() { return anno.style },
-    set style(s: DrawingStyle | ((annotation: TextAnnotation) => DrawingStyle) | undefined) { anno.style = s }
+    }
   }
 
 }
