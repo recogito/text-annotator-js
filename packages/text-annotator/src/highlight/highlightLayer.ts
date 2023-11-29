@@ -1,4 +1,4 @@
-import type { DrawingStyle, ViewportState } from '@annotorious/core';
+import type { DrawingStyle, Filter, ViewportState } from '@annotorious/core';
 import type { TextAnnotation } from '../model';
 import type { TextAnnotatorState } from '../state';
 import { defaultPainter, type HighlightPainter } from './HighlightPainter';
@@ -52,6 +52,8 @@ export const createHighlightLayer = (
   
   let currentStyle: DrawingStyle | ((annotation: TextAnnotation, selected?: boolean) => DrawingStyle) | undefined;
 
+  let currentFilter: Filter | undefined;
+
   let currentPainter: HighlightPainter = defaultPainter;
 
   const onDraw = trackViewport(viewport);
@@ -69,11 +71,14 @@ export const createHighlightLayer = (
 
   container.addEventListener('pointermove', (event: PointerEvent) => {
     const {x, y} = container.getBoundingClientRect();
-    const hovered = store.getAt(event.clientX - x, event.clientY - y);
-    if (hovered) {
-      if (hover.current !== hovered.id) {
+
+    const hit = store.getAt(event.clientX - x, event.clientY - y);
+    const isVisibleHit = hit && (!currentFilter || currentFilter(hit));
+
+    if (isVisibleHit) {
+      if (hover.current !== hit.id) {
         container.classList.add('hovered');
-        hover.set(hovered.id);
+        hover.set(hit.id);
       }
     } else {
       if (hover.current) {
@@ -123,8 +128,10 @@ export const createHighlightLayer = (
   const redraw = () => requestAnimationFrame(() => {
     const { top, left, minX, minY, maxX, maxY } = getViewport();   
     
-    const annotationsInView = store.getIntersectingRects(minX, minY, maxX, maxY);
-    
+    const annotationsInView = currentFilter
+      ? store.getIntersectingRects(minX, minY, maxX, maxY).filter(({ annotation }) => currentFilter(annotation))
+      : store.getIntersectingRects(minX, minY, maxX, maxY);
+
     const { width, height } = fgCanvas;
 
     // Get current selection
@@ -161,9 +168,15 @@ export const createHighlightLayer = (
     redraw();
   }
 
+  const setFilter = (filter?: Filter) => {
+    currentFilter = filter;
+    redraw();
+  } 
+
   return {
     redraw,
     setDrawingStyle,
+    setFilter,
     setPainter: (painter: HighlightPainter) => currentPainter = painter
   }
 
