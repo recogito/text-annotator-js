@@ -5,10 +5,6 @@ import type { TextSelector, TextAnnotationTarget, TextSelectorQuote } from './mo
 import { trimRange } from './utils';
 
 const rangeToQuote = (range: Range): TextSelectorQuote => {
-  /**
-   * Captures the prefix and suffix snippets of the selection to match the `Text Quote Selector` spec
-   * @see https://www.w3.org/TR/annotation-model/#text-quote-selector
-   */
   const snippetLength = 10;
 
   const rangePrefix = document.createRange();
