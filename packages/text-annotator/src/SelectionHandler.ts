@@ -5,18 +5,37 @@ import type { TextSelector, TextAnnotationTarget } from './model';
 import { trimRange } from './utils';
 
 export const rangeToSelector = (range: Range, container: HTMLElement, offsetReferenceSelector?: string): TextSelector => {
-  const rangeBefore = document.createRange();
-
   const offsetReference: HTMLElement = offsetReferenceSelector ? 
     (range.startContainer.parentElement as HTMLElement).closest(offsetReferenceSelector) : container;
 
-  // A helper range from the start of the contentNode to the start of the selection
+  // Helper range from the start of the contentNode to the start of the selection
+  const rangeBefore = document.createRange();
   rangeBefore.setStart(offsetReference, 0);
   rangeBefore.setEnd(range.startContainer, range.startOffset);
 
-  const quote = range.toString();
+  /**
+   * Capture the prefix and suffix of the selection to match the `Text Quote Selector` spec from the W3C Annotation Data Model
+   * @see https://www.w3.org/TR/annotation-model/#text-quote-selector
+   */
+  const snippetLength = 10;
+
+  const rangePrefix = document.createRange();
+  const rangePrefixStartOffset = range.startOffset < snippetLength ? 0 : range.startOffset - snippetLength;
+  rangePrefix.setStart(range.startContainer, rangePrefixStartOffset);
+  rangePrefix.setEnd(range.startContainer, range.startOffset);
+
+  const rangeSuffix = document.createRange();
+  const rangeSuffixEndOffset = range.endOffset + snippetLength > range.endContainer.textContent.length ? range.endContainer.textContent.length : range.endOffset + snippetLength;
+  rangeSuffix.setStart(range.endContainer, range.endOffset);
+  rangeSuffix.setEnd(range.endContainer, rangeSuffixEndOffset);
+
+  const quote = {
+    exact: range.toString(),
+    prefix: rangePrefix.toString(),
+    suffix: rangeSuffix.toString()
+  }
   const start = rangeBefore.toString().length;
-  const end = start + quote.length;
+  const end = start + quote.exact.length;
 
   return offsetReferenceSelector ?
     { quote, start, end, range, offsetReference } :
