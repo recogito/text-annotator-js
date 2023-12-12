@@ -14,15 +14,7 @@ export interface TextAnnotationTarget extends AnnotationTarget {
 
 export interface TextSelector {
 
-  /**
-   * Matches the `Text Quote Selector` spec from the W3C Annotation Data Model
-   * @see https://www.w3.org/TR/annotation-model/#text-quote-selector
-   */
-  quote: {
-    exact: string;
-    prefix: string;
-    suffix: string;
-  }
+  quote: TextSelectorQuote
   
   start: number;
 
@@ -31,5 +23,19 @@ export interface TextSelector {
   range: Range;
 
   offsetReference?: HTMLElement
+
+}
+
+/**
+ * Matches the `Text Quote Selector` spec from the W3C Annotation Data Model
+ * @see https://www.w3.org/TR/annotation-model/#text-quote-selector
+ */
+export interface TextSelectorQuote {
+
+  exact: string;
+
+  prefix: string;
+
+  suffix: string;
 
 }

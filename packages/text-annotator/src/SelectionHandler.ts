@@ -1,39 +1,42 @@
 import { Origin, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotatorState } from './state';
-import type { TextSelector, TextAnnotationTarget } from './model';
+import type { TextSelector, TextAnnotationTarget, TextSelectorQuote } from './model';
 import { trimRange } from './utils';
 
+const rangeToQuote = (range: Range): TextSelectorQuote => {
+  /**
+   * Captures the prefix and suffix snippets of the selection to match the `Text Quote Selector` spec
+   * @see https://www.w3.org/TR/annotation-model/#text-quote-selector
+   */
+  const snippetLength = 10;
+
+  const rangePrefix = document.createRange();
+  rangePrefix.setStart(range.startContainer, Math.max(range.startOffset - snippetLength, 0));
+  rangePrefix.setEnd(range.startContainer, range.startOffset);
+
+  const rangeSuffix = document.createRange();
+  rangeSuffix.setStart(range.endContainer, range.endOffset);
+  rangeSuffix.setEnd(range.endContainer, Math.min(range.endOffset + snippetLength, range.endContainer.textContent.length));
+
+  return {
+    exact: range.toString(),
+    prefix: rangePrefix.toString(),
+    suffix: rangeSuffix.toString()
+  }
+}
+
 export const rangeToSelector = (range: Range, container: HTMLElement, offsetReferenceSelector?: string): TextSelector => {
-  const offsetReference: HTMLElement = offsetReferenceSelector ? 
-    (range.startContainer.parentElement as HTMLElement).closest(offsetReferenceSelector) : container;
+  const offsetReference: HTMLElement = offsetReferenceSelector
+      ? (range.startContainer.parentElement as HTMLElement).closest(offsetReferenceSelector)
+      : container;
 
   // Helper range from the start of the contentNode to the start of the selection
   const rangeBefore = document.createRange();
   rangeBefore.setStart(offsetReference, 0);
   rangeBefore.setEnd(range.startContainer, range.startOffset);
 
-  /**
-   * Capture the prefix and suffix of the selection to match the `Text Quote Selector` spec from the W3C Annotation Data Model
-   * @see https://www.w3.org/TR/annotation-model/#text-quote-selector
-   */
-  const snippetLength = 10;
-
-  const rangePrefix = document.createRange();
-  const rangePrefixStartOffset = range.startOffset < snippetLength ? 0 : range.startOffset - snippetLength;
-  rangePrefix.setStart(range.startContainer, rangePrefixStartOffset);
-  rangePrefix.setEnd(range.startContainer, range.startOffset);
-
-  const rangeSuffix = document.createRange();
-  const rangeSuffixEndOffset = range.endOffset + snippetLength > range.endContainer.textContent.length ? range.endContainer.textContent.length : range.endOffset + snippetLength;
-  rangeSuffix.setStart(range.endContainer, range.endOffset);
-  rangeSuffix.setEnd(range.endContainer, rangeSuffixEndOffset);
-
-  const quote = {
-    exact: range.toString(),
-    prefix: rangePrefix.toString(),
-    suffix: rangeSuffix.toString()
-  }
+  const quote = rangeToQuote(range);
   const start = rangeBefore.toString().length;
   const end = start + quote.exact.length;
 
@@ -43,7 +46,7 @@ export const rangeToSelector = (range: Range, container: HTMLElement, offsetRefe
 }
 
 export const SelectionHandler = (
-  container: HTMLElement, 
+  container: HTMLElement,
   state: TextAnnotatorState,
   // Experimental
   offsetReferenceSelector?: string
@@ -66,7 +69,7 @@ export const SelectionHandler = (
       return;
 
     // Make sure we don't listen to selection changes that
-    // were not started on the container, or which are not supposed to 
+    // were not started on the container, or which are not supposed to
     // be annotatable (like the popup)
     const annotatable = !(evt.target as Node).parentElement.closest('.not-annotatable');
     if (annotatable) {
@@ -91,7 +94,7 @@ export const SelectionHandler = (
     debounceTimer = setTimeout(() => onSelectionChange(), 50);
   });
 
-  const onSelectionChange = () => { 
+  const onSelectionChange = () => {
     const sel = document.getSelection();
 
     if (!sel.isCollapsed && isLeftClick && currentTarget) {
@@ -108,7 +111,7 @@ export const SelectionHandler = (
           ...currentTarget,
           selector: rangeToSelector(ranges[0], container, offsetReferenceSelector)
         };
-    
+
         if (store.getAnnotation(currentTarget.annotation)) {
           store.updateTarget(currentTarget, Origin.LOCAL);
         } else {
@@ -148,13 +151,13 @@ export const SelectionHandler = (
 
         currentTarget = null;
         lastPointerEvent = undefined;
-      } else {            
+      } else {
         const { x, y } = container.getBoundingClientRect();
-        
+
         const hovered = store.getAt(evt.clientX - x, evt.clientY - y);
         if (hovered) {
           const { selected } = selection;
-          
+
           if (selected.length !== 1 || selected[0].id !== hovered.id) {
             selection.clickSelect(hovered.id, evt);
             lastPointerEvent = undefined;
