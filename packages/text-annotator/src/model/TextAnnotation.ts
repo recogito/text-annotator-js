@@ -14,7 +14,15 @@ export interface TextAnnotationTarget extends AnnotationTarget {
 
 export interface TextSelector {
 
-  quote: string;
+  /**
+   * Matches the `Text Quote Selector` spec from the W3C Annotation Data Model
+   * @see https://www.w3.org/TR/annotation-model/#text-quote-selector
+   */
+  quote: {
+    exact: string;
+    prefix: string;
+    suffix: string;
+  }
   
   start: number;
 
