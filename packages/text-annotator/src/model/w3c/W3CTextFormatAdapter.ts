@@ -57,17 +57,9 @@ export const parseW3CTextAnnotation = (annotation: W3CTextAnnotation, container:
     if (!incompleteSelector.start) missingTypes.push('TextPositionSelector');
     if (!incompleteSelector.quote) missingTypes.push('TextQuoteSelector');
 
-    let errorMessage = 'Missing selector types';
-    switch (missingTypes.length) {
-      case 1:
-        errorMessage = `Missing selector type: ${missingTypes[0]}`;
-        break;
-      case 2:
-        errorMessage = `Missing selector types: ${missingTypes.join(' and ')}`;
-        break;
-      default:
-        break;
-    }
+    let errorMessage = missingTypes.length === 1
+      ? `Missing selector type: ${missingTypes[0]}`
+      : `Missing selector types: ${missingTypes.join(' and ')}`;
     return Error(errorMessage);
   }
 };
