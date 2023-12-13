@@ -10,51 +10,51 @@ import type { TextAnnotationTarget } from '../model';
  * @returns the DOM range
  */
 export const reviveTargetRange = (start: number, end: number, offsetReference: HTMLElement): Range => {
-    const iterator = document.createNodeIterator(offsetReference, NodeFilter.SHOW_TEXT);
+  const iterator = document.createNodeIterator(offsetReference, NodeFilter.SHOW_TEXT);
 
-    let runningOffset = 0;
+  let runningOffset = 0;
 
-    let range = document.createRange();
+  let range = document.createRange();
 
-    let n = iterator.nextNode();
-    if (n === null)
-        console.error('Could not revive annotation target. Content missing.');
+  let n = iterator.nextNode();
+  if (n === null)
+    console.error('Could not revive annotation target. Content missing.');
 
-    // If there's no offset reference, start immediately
-    let startCounting = !offsetReference;
-    while (n !== null) {
-        const len = n.textContent.length;
+  // If there's no offset reference, start immediately
+  let startCounting = !offsetReference;
+  while (n !== null) {
+    const len = n.textContent.length;
 
-        if (!startCounting && offsetReference)
-            startCounting = offsetReference.contains(n);
+    if (!startCounting && offsetReference)
+      startCounting = offsetReference.contains(n);
 
-        if (startCounting) {
-            if (runningOffset + len > start) {
-                range.setStart(n, start - runningOffset);
-                break;
-            }
+    if (startCounting) {
+      if (runningOffset + len > start) {
+        range.setStart(n, start - runningOffset);
+        break;
+      }
 
-            runningOffset += len;
-        }
-
-        n = iterator.nextNode();
+      runningOffset += len;
     }
 
-    // set range end
-    while (n !== null) {
-        const len = n.textContent.length;
+    n = iterator.nextNode();
+  }
 
-        if (runningOffset + len > end) {
-            range.setEnd(n, end - runningOffset);
-            break;
-        }
+  // set range end
+  while (n !== null) {
+    const len = n.textContent.length;
 
-        runningOffset += len;
-
-        n = iterator.nextNode();
+    if (runningOffset + len > end) {
+      range.setEnd(n, end - runningOffset);
+      break;
     }
 
-    return range;
+    runningOffset += len;
+
+    n = iterator.nextNode();
+  }
+
+  return range;
 };
 
 /**
@@ -66,19 +66,19 @@ export const reviveTargetRange = (start: number, end: number, offsetReference: H
  * @returns the new text annotation target
  */
 export const reviveTarget = (
-    target: TextAnnotationTarget,
-    container: HTMLElement
+  target: TextAnnotationTarget,
+  container: HTMLElement
 ): TextAnnotationTarget => {
-    const { start, end } = target.selector;
+  const { start, end } = target.selector;
 
-    const offsetReference = target.selector.offsetReference ? target.selector.offsetReference : container;
-    return offsetReference ? {
-        ...target,
-        selector: {
-            ...target.selector,
-            range: reviveTargetRange(start, end, offsetReference)
-        }
-    } : target;
+  const offsetReference = target.selector.offsetReference ? target.selector.offsetReference : container;
+  return offsetReference ? {
+    ...target,
+    selector: {
+      ...target.selector,
+      range: reviveTargetRange(start, end, offsetReference)
+    }
+  } : target;
 
 };
 

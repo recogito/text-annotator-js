@@ -2,35 +2,35 @@ import type { W3CAnnotation, W3CAnnotationTarget } from '@annotorious/core';
 
 export interface W3CTextAnnotation extends Omit<W3CAnnotation, 'target'> {
 
-    target: W3CTextAnnotationTarget | W3CTextAnnotationTarget[];
+  target: W3CTextAnnotationTarget | W3CTextAnnotationTarget[];
 
 }
 
 export interface W3CTextAnnotationTarget extends Omit<W3CAnnotationTarget, 'selector'> {
 
-    selector?: W3CTextAnnotationSelector | W3CTextAnnotationSelector[];
+  selector?: W3CTextAnnotationSelector | W3CTextAnnotationSelector[];
 
 }
 
 export interface W3CTextQuoteSelector {
 
-    type: 'TextQuoteSelector';
+  type: 'TextQuoteSelector';
 
-    exact: string;
+  exact: string;
 
-    prefix?: string;
+  prefix?: string;
 
-    suffix?: string;
+  suffix?: string;
 
 }
 
 export interface W3CTextPositionSelector {
 
-    type: 'TextPositionSelector';
+  type: 'TextPositionSelector';
 
-    start: number;
+  start: number;
 
-    end: number;
+  end: number;
 
 }
 

@@ -38,7 +38,7 @@ export interface TextPositionSelector {
 
   range: Range;
 
-  offsetReference?: HTMLElement
+  offsetReference?: HTMLElement;
 
 }
 
