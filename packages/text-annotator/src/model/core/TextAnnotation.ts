@@ -44,3 +44,5 @@ export interface TextPositionSelector {
 
 export type TextSelector = TextQuoteSelector & TextPositionSelector;
 
+export const isCompleteTextSelector = (partialTextSelector: Partial<TextSelector>): partialTextSelector is TextSelector =>
+  partialTextSelector.range !== undefined && partialTextSelector.quote !== undefined;
