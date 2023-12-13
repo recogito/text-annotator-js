@@ -11,7 +11,7 @@ export const reviveTarget = (
   target: TextAnnotationTarget, 
   container: HTMLElement
 ): TextAnnotationTarget => {  
-  const { quote, start, end } = target.selector;
+  const { start, end } = target.selector;
 
   const offsetReference = target.selector.offsetReference ? target.selector.offsetReference : container;
   if (!offsetReference)
@@ -65,7 +65,6 @@ export const reviveTarget = (
     ...target,
     selector: { 
       ...target.selector,
-      quote, 
       start, 
       end, 
       range
