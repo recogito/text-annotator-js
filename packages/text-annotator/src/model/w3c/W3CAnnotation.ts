@@ -1,4 +1,4 @@
-import type { AnnotationTarget, W3CAnnotation, W3CAnnotationTarget, W3CSelector } from '@annotorious/core';
+import type { W3CAnnotation, W3CAnnotationTarget } from '@annotorious/core';
 
 export interface W3CTextAnnotation extends Omit<W3CAnnotation, 'target'> {
 
@@ -11,7 +11,6 @@ export interface W3CTextAnnotationTarget extends Omit<W3CAnnotationTarget, 'sele
     selector?: W3CTextAnnotationSelector | W3CTextAnnotationSelector[];
 
 }
-
 
 export interface W3CTextQuoteSelector {
 
