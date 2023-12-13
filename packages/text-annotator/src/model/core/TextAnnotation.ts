@@ -20,9 +20,9 @@ export interface TextQuoteSelector {
 
   quote: string;
 
-  quotePrefix: string;
+  quotePrefix?: string;
 
-  quoteSuffix: string;
+  quoteSuffix?: string;
 
 }
 
