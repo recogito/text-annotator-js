@@ -65,8 +65,6 @@ export const reviveTarget = (
     ...target,
     selector: { 
       ...target.selector,
-      start, 
-      end, 
       range
     }
   }
