@@ -1,24 +1,26 @@
 import { Origin, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotatorState } from './state';
-import type { TextSelector, TextAnnotationTarget, TextSelectorQuote } from './model';
+import type { TextSelector, TextAnnotationTarget, TextQuoteSelector } from './model';
 import { trimRange } from './utils';
 
-const rangeToQuote = (range: Range): TextSelectorQuote => {
+const rangeToQuoteSelector = (range: Range): TextQuoteSelector => {
+  const { startContainer, startOffset, endContainer, endOffset } = range;
+
   const snippetLength = 10;
 
   const rangePrefix = document.createRange();
-  rangePrefix.setStart(range.startContainer, Math.max(range.startOffset - snippetLength, 0));
-  rangePrefix.setEnd(range.startContainer, range.startOffset);
+  rangePrefix.setStart(startContainer, Math.max(startOffset - snippetLength, 0));
+  rangePrefix.setEnd(startContainer, startOffset);
 
   const rangeSuffix = document.createRange();
-  rangeSuffix.setStart(range.endContainer, range.endOffset);
-  rangeSuffix.setEnd(range.endContainer, Math.min(range.endOffset + snippetLength, range.endContainer.textContent.length));
+  rangeSuffix.setStart(endContainer, endOffset);
+  rangeSuffix.setEnd(endContainer, Math.min(endOffset + snippetLength, endContainer.textContent.length));
 
   return {
-    exact: range.toString(),
-    prefix: rangePrefix.toString(),
-    suffix: rangeSuffix.toString()
+    quote: range.toString(),
+    quotePrefix: rangePrefix.toString(),
+    quoteSuffix: rangeSuffix.toString()
   }
 }
 
@@ -32,13 +34,13 @@ export const rangeToSelector = (range: Range, container: HTMLElement, offsetRefe
   rangeBefore.setStart(offsetReference, 0);
   rangeBefore.setEnd(range.startContainer, range.startOffset);
 
-  const quote = rangeToQuote(range);
+  const quoteSelector = rangeToQuoteSelector(range);
   const start = rangeBefore.toString().length;
-  const end = start + quote.exact.length;
+  const end = start + quoteSelector.quote.length;
 
   return offsetReferenceSelector ?
-    { quote, start, end, range, offsetReference } :
-    { quote, start, end, range };
+    { ...quoteSelector, start, end, range, offsetReference } :
+    { ...quoteSelector, start, end, range };
 }
 
 export const SelectionHandler = (
