@@ -12,10 +12,26 @@ export interface TextAnnotationTarget extends AnnotationTarget {
 
 }
 
-export interface TextSelector {
+/**
+ * Matches the `Text Quote Selector` spec
+ * @see https://www.w3.org/TR/annotation-model/#text-quote-selector
+ */
+export interface TextQuoteSelector {
 
-  quote: TextSelectorQuote
-  
+  quote: string;
+
+  quotePrefix: string;
+
+  quoteSuffix: string;
+
+}
+
+/**
+ * Matches the `Text Position Selector` spec
+ * @see https://www.w3.org/TR/annotation-model/#text-position-selector
+ */
+export interface TextPositionSelector {
+
   start: number;
 
   end: number;
@@ -26,16 +42,5 @@ export interface TextSelector {
 
 }
 
-/**
- * Matches the `Text Quote Selector` spec from the W3C Annotation Data Model
- * @see https://www.w3.org/TR/annotation-model/#text-quote-selector
- */
-export interface TextSelectorQuote {
+export type TextSelector = TextQuoteSelector & TextPositionSelector;
 
-  exact: string;
-
-  prefix: string;
-
-  suffix: string;
-
-}
