@@ -82,14 +82,13 @@ export const serializeW3CTextAnnotation = (annotation: TextAnnotation, source: s
     }
   ];
 
+  const w3cTarget = serializeW3CTarget<TextAnnotationTarget, W3CTextAnnotationTarget>(target, source, selector);
+
   return {
     ...serializableAnnotation,
     '@context': 'http://www.w3.org/ns/anno.jsonld',
     type: 'Annotation',
     body: serializeW3CBodies(bodies),
-    target: {
-      source,
-      selector
-    }
+    target: w3cTarget
   };
 };
