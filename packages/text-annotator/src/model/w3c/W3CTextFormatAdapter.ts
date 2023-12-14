@@ -1,10 +1,11 @@
 import { v4 as uuidv4 } from 'uuid';
 import {
-  parseLifecycleInfo,
   ParseResult,
   parseW3CBodies,
+  parseW3CLifecycleInfo,
   parseW3CTarget,
   serializeW3CBodies,
+  serializeW3CLifecycleInfo,
   serializeW3CTarget
 } from '@annotorious/core';
 import {
@@ -56,7 +57,7 @@ export const parseW3CTextAnnotation = (annotation: W3CTextAnnotation, container:
   const target = parseW3CTarget<TextAnnotationTarget, W3CTextAnnotationTarget>(
     w3cTarget,
     annotationId,
-    parseLifecycleInfo(annotation),
+    parseW3CLifecycleInfo(annotation),
     selector
   );
 
@@ -82,7 +83,7 @@ export const parseW3CTextAnnotation = (annotation: W3CTextAnnotation, container:
 };
 
 export const serializeW3CTextAnnotation = (annotation: TextAnnotation, source: string): W3CTextAnnotation => {
-  const { bodies, target, ...serializableAnnotation } = annotation;
+  const { bodies, target, ...serializableRest } = annotation;
   const { quote, quotePrefix, quoteSuffix, start, end } = target.selector;
 
   const selector: W3CTextAnnotationSelector[] = [
@@ -102,7 +103,8 @@ export const serializeW3CTextAnnotation = (annotation: TextAnnotation, source: s
   const w3cTarget = serializeW3CTarget<TextAnnotationTarget, W3CTextAnnotationTarget>(target, source, selector);
 
   return {
-    ...serializableAnnotation,
+    ...serializableRest,
+    ...serializeW3CLifecycleInfo(target),
     '@context': 'http://www.w3.org/ns/anno.jsonld',
     type: 'Annotation',
     body: serializeW3CBodies(bodies),
