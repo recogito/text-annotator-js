@@ -40,13 +40,13 @@ export const parseW3CTextAnnotation = (annotation: W3CTextAnnotation, container:
 
   return isCompleteTextSelector(selector) ? {
     parsed: {
+      ...rest,
       id: annotationId,
       bodies,
       target: {
         annotation: annotationId,
         selector
-      },
-      properties: rest
+      }
     }
   } : {
     error: getParsingError(selector)
@@ -65,9 +65,8 @@ export const parseW3CTextAnnotation = (annotation: W3CTextAnnotation, container:
 };
 
 export const serializeW3CTextAnnotation = (annotation: TextAnnotation, source: string): W3CTextAnnotation => {
-  const { properties } = annotation;
-
-  const { quote, quotePrefix, quoteSuffix, start, end } = annotation.target.selector;
+  const { bodies, target, ...serializableAnnotation } = annotation;
+  const { quote, quotePrefix, quoteSuffix, start, end } = target.selector;
 
   const selector: W3CTextAnnotationSelector[] = [
     {
@@ -84,11 +83,10 @@ export const serializeW3CTextAnnotation = (annotation: TextAnnotation, source: s
   ];
 
   return {
-    ...properties,
+    ...serializableAnnotation,
     '@context': 'http://www.w3.org/ns/anno.jsonld',
-    id: annotation.id,
     type: 'Annotation',
-    body: serializeW3CBodies(annotation.bodies),
+    body: serializeW3CBodies(bodies),
     target: {
       source,
       selector
