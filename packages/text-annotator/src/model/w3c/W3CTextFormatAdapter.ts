@@ -1,7 +1,20 @@
 import { v4 as uuidv4 } from 'uuid';
-import { ParseResult, parseW3CBodies, serializeW3CBodies } from '@annotorious/core';
-import { isCompleteTextSelector, type TextAnnotation, type TextFormatAdapter, type TextSelector } from '../core';
-import type { W3CTextAnnotation, W3CTextAnnotationSelector } from './W3CAnnotation';
+import {
+  parseLifecycleInfo,
+  ParseResult,
+  parseW3CBodies,
+  parseW3CTarget,
+  serializeW3CBodies,
+  serializeW3CTarget
+} from '@annotorious/core';
+import {
+  isCompleteTextSelector,
+  type TextAnnotation,
+  type TextAnnotationTarget,
+  type TextFormatAdapter,
+  type TextSelector
+} from '../core';
+import type { W3CTextAnnotation, W3CTextAnnotationSelector, W3CTextAnnotationTarget } from './W3CAnnotation';
 import { reviveTargetRange } from '../../state';
 
 export type W3CTextFormatAdapter = TextFormatAdapter<TextAnnotation, W3CTextAnnotation>;
@@ -18,9 +31,8 @@ export const parseW3CTextAnnotation = (annotation: W3CTextAnnotation, container:
 
   const bodies = parseW3CBodies(body, annotationId);
 
-  const target = Array.isArray(annotation.target) ? annotation.target[0] : annotation.target;
-
-  const w3cSelectors = Array.isArray(target.selector) ? target.selector : [target.selector];
+  const w3cTarget = Array.isArray(annotation.target) ? annotation.target[0] : annotation.target;
+  const w3cSelectors = Array.isArray(w3cTarget.selector) ? w3cTarget.selector : [w3cTarget.selector];
 
   const selector = w3cSelectors.reduce<Partial<TextSelector>>((s, w3cSelector) => {
     if (w3cSelector.type === 'TextQuoteSelector') {
@@ -33,23 +45,28 @@ export const parseW3CTextAnnotation = (annotation: W3CTextAnnotation, container:
     }
     return s;
   }, {});
-
   if (selector.start !== undefined && selector.end !== undefined) {
     selector.range = reviveTargetRange(selector.start, selector.end, container);
   }
 
-  return isCompleteTextSelector(selector) ? {
+  if (!isCompleteTextSelector(selector)) {
+    return { error: getParsingError(selector) };
+  }
+
+  const target = parseW3CTarget<TextAnnotationTarget, W3CTextAnnotationTarget>(
+    w3cTarget,
+    annotationId,
+    parseLifecycleInfo(annotation),
+    selector
+  );
+
+  return {
     parsed: {
       ...rest,
       id: annotationId,
       bodies,
-      target: {
-        annotation: annotationId,
-        selector
-      }
+      target
     }
-  } : {
-    error: getParsingError(selector)
   };
 
   function getParsingError(incompleteSelector: Partial<TextSelector>): Error {
