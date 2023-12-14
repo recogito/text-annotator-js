@@ -6,11 +6,7 @@ export interface W3CTextAnnotation extends Omit<W3CAnnotation, 'target'> {
 
 }
 
-export interface W3CTextAnnotationTarget extends Omit<W3CAnnotationTarget, 'selector'> {
-
-  selector?: W3CTextAnnotationSelector | W3CTextAnnotationSelector[];
-
-}
+export type W3CTextAnnotationTarget = W3CAnnotationTarget<W3CTextAnnotationSelector>;
 
 export interface W3CTextQuoteSelector {
 
