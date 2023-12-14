@@ -34,5 +34,3 @@ export const incompleteTextAnnotation: W3CTextAnnotation = {
     selector: textAnnotation.target.selector[0] // Only the `Text Quote Selector`
   }
 };
-
-export const textAnnotations: W3CTextAnnotation[] = [textAnnotation, incompleteTextAnnotation];

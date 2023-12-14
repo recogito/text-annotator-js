@@ -2,7 +2,11 @@ import { describe, it, beforeEach, afterEach, expect } from 'vitest';
 import { JSDOM } from 'jsdom';
 import type { W3CAnnotationBody } from '@annotorious/core/src/model/W3CAnnotation';
 import { textAnnotation, incompleteTextAnnotation } from './fixtures';
-import { parseW3CTextAnnotation, type W3CTextAnnotationTarget } from '../../../src/model/w3c';
+import {
+  parseW3CTextAnnotation,
+  serializeW3CTextAnnotation,
+  type W3CTextAnnotationTarget
+} from '../../../src/model/w3c';
 
 
 beforeEach(async () => {
@@ -39,5 +43,21 @@ describe('parseW3CTextAnnotation', () => {
     expect(parseResults.parsed).toBeUndefined();
     expect(parseResults.error).toBeDefined();
     expect(parseResults.error.message).toContain('Missing selector');
-  })
+  });
+
+  it('should serialize the sample annotation correctly', () => {
+    const parseResults = parseW3CTextAnnotation(textAnnotation, global.contentContainer);
+    expect(parseResults.error).toBeUndefined();
+
+    // @ts-ignore
+    const serialized = serializeW3CTextAnnotation(parseResults.parsed, textAnnotation.target.source);
+
+    const w3cBodies = Array.isArray(textAnnotation.body) ? textAnnotation.body : [textAnnotation.body];
+    expect(serialized.body).toEqual(w3cBodies);
+
+    const target = Array.isArray(textAnnotation.target) ? textAnnotation.target[0] : textAnnotation.target;
+    const w3cSelectors = Array.isArray(target.selector) ? target.selector : [target.selector];
+    // @ts-ignore
+    expect(serialized.target.selector).toEqual(w3cSelectors);
+  });
 });
