@@ -1,8 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
-import { FormatAdapter, ParseResult, parseW3CBodies, W3CAnnotation } from '@annotorious/core';
+import { ParseResult, parseW3CBodies, serializeW3CBodies } from '@annotorious/core';
 import { isCompleteTextSelector, type TextAnnotation, type TextFormatAdapter, type TextSelector } from '../core';
-import type { W3CTextAnnotation } from './W3CAnnotation';
-import { reviveTarget, reviveTargetRange } from '../../state';
+import type { W3CTextAnnotation, W3CTextAnnotationSelector } from './W3CAnnotation';
+import { reviveTargetRange } from '../../state';
 
 export type W3CTextFormatAdapter = TextFormatAdapter<TextAnnotation, W3CTextAnnotation>;
 
@@ -40,13 +40,13 @@ export const parseW3CTextAnnotation = (annotation: W3CTextAnnotation, container:
 
   return isCompleteTextSelector(selector) ? {
     parsed: {
-      ...rest,
       id: annotationId,
       bodies,
       target: {
         annotation: annotationId,
         selector
-      }
+      },
+      properties: rest
     }
   } : {
     error: getParsingError(selector)
