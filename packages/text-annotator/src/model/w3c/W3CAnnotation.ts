@@ -1,6 +1,6 @@
 import type { W3CAnnotation, W3CAnnotationTarget } from '@annotorious/core';
 
-export interface W3CTextAnnotation extends Omit<W3CAnnotation, 'target'> {
+export interface W3CTextAnnotation extends W3CAnnotation<W3CTextAnnotationSelector> {
 
   target: W3CTextAnnotationTarget | W3CTextAnnotationTarget[];
 
