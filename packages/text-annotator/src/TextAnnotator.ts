@@ -1,4 +1,11 @@
-import { createAnonymousGuest, createLifecyleObserver, createBaseAnnotator, DrawingStyle, Filter } from '@annotorious/core';
+import {
+  createAnonymousGuest,
+  createLifecyleObserver,
+  createBaseAnnotator,
+  DrawingStyle,
+  Filter,
+  createUndoStack
+} from '@annotorious/core';
 import type { Annotator, User, PresenceProvider } from '@annotorious/core';
 import { createPainter } from './presence';
 import { createHighlightLayer } from './highlight';
@@ -20,7 +27,7 @@ export interface TextAnnotator<T extends unknown = TextAnnotation> extends Annot
 }
 
 export const createTextAnnotator = <E extends unknown = TextAnnotation>(
-  container: HTMLElement, 
+  container: HTMLElement,
   opts: TextAnnotatorOptions<E> = {}
 ): TextAnnotator<E> => {
 
@@ -31,7 +38,9 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   const store: TextAnnotationStore = state.store;
 
   const lifecycle = createLifecyleObserver<TextAnnotation, TextAnnotation | E>(store, selection, hover, viewport);
-  
+
+  const undoStack = createUndoStack(store);
+
   let currentUser: User = createAnonymousGuest();
 
   const highlightLayer = createHighlightLayer(container, state, viewport);
@@ -46,8 +55,8 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   /*      External API     */
   /******++++++*************/
 
-  // Most of the external API functions are covered in the base annotator
-  const base = createBaseAnnotator<TextAnnotation, E>(store, opts.adapter);
+    // Most of the external API functions are covered in the base annotator
+  const base = createBaseAnnotator<TextAnnotation, E>(store, undoStack, opts.adapter);
 
   const getUser = () => currentUser;
 
@@ -60,14 +69,14 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   const setUser = (user: User) => {
     currentUser = user;
     selectionHandler.setUser(user);
-  }
+  };
 
   const setPresenceProvider = (provider: PresenceProvider) => {
     if (provider) {
       highlightLayer.setPainter(createPainter(provider, opts.presence));
       provider.on('selectionChange', () => highlightLayer.redraw());
     }
-  }
+  };
 
   const setSelected = (arg?: string | string[]) => {
     if (arg) {
@@ -75,11 +84,11 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
     } else {
       selection.clear();
     }
-  }
+  };
 
   const destroy = () => {
     throw 'Not implemented yet';
-  }
+  };
 
   return {
     ...base,
@@ -95,6 +104,6 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
     off: lifecycle.off,
     scrollIntoView: scrollIntoView(container, store),
     state
-  }
+  };
 
-}
+};
