@@ -7,11 +7,11 @@ import { trackViewport } from './trackViewport';
 import './highlightLayer.css';
 
 const debounce = <T extends (...args: any[]) => void>(func: T, delay: number = 10): T => {
-  let timeoutId: number;
+  let debounceTimer: ReturnType<typeof setTimeout> = undefined;
 
   return ((...args: any[]) => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => func.apply(this, args), delay);
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => func.apply(this, args), delay);
   }) as T;
 }
 
