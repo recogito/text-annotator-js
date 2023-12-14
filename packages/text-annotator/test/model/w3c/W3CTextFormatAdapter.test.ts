@@ -55,8 +55,8 @@ describe('parseW3CTextAnnotation', () => {
     const w3cBodies = Array.isArray(textAnnotation.body) ? textAnnotation.body : [textAnnotation.body];
     expect(serialized.body).toEqual(w3cBodies);
 
-    const target = Array.isArray(textAnnotation.target) ? textAnnotation.target[0] : textAnnotation.target;
-    const w3cSelectors = Array.isArray(target.selector) ? target.selector : [target.selector];
+    // @ts-ignore
+    const w3cSelectors = Array.isArray(textAnnotation.target.selector) ? textAnnotation.target.selector : [textAnnotation.target.selector];
     // @ts-ignore
     expect(serialized.target.selector).toEqual(w3cSelectors);
   });
