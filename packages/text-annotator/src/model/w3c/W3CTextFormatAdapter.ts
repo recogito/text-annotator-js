@@ -65,22 +65,33 @@ export const parseW3CTextAnnotation = (annotation: W3CTextAnnotation, container:
 };
 
 export const serializeW3CTextAnnotation = (annotation: TextAnnotation, source: string): W3CTextAnnotation => {
-  // TODO Replace with real function
-  return {
-    id: '1',
-    type: 'Annotation',
-    body: {
-      type: 'TextualBody',
-      value: '1',
-      format: 'text/plain'
+  const { properties } = annotation;
+
+  const { quote, quotePrefix, quoteSuffix, start, end } = annotation.target.selector;
+
+  const selector: W3CTextAnnotationSelector[] = [
+    {
+      type: 'TextQuoteSelector',
+      exact: quote,
+      prefix: quotePrefix,
+      suffix: quoteSuffix
     },
+    {
+      type: 'TextPositionSelector',
+      start,
+      end
+    }
+  ];
+
+  return {
+    ...properties,
+    '@context': 'http://www.w3.org/ns/anno.jsonld',
+    id: annotation.id,
+    type: 'Annotation',
+    body: serializeW3CBodies(annotation.bodies),
     target: {
-      source: source,
-      selector: {
-        type: 'TextPositionSelector',
-        start: 0,
-        end: 0
-      }
+      source,
+      selector
     }
   };
 };
