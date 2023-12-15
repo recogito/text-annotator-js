@@ -1,4 +1,4 @@
-import type { W3CTextAnnotation } from '../../../src/model/w3c';
+import type { W3CTextAnnotation } from '../../../src';
 
 export const textAnnotation: W3CTextAnnotation = {
   '@context': 'http://www.w3.org/ns/anno.jsonld',
