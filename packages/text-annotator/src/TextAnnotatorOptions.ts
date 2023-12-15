@@ -6,6 +6,8 @@ export interface TextAnnotatorOptions<T extends unknown = TextAnnotation> {
 
   adapter?: FormatAdapter<TextAnnotation, T> | null;
 
+  autoSave?: boolean;
+
   offsetReferenceSelector?: string;
 
   pointerAction?: PointerSelectAction | ((annotation: TextAnnotation) => PointerSelectAction);
