@@ -37,7 +37,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
 
   const store: TextAnnotationStore = state.store;
 
-  const lifecycle = createLifecyleObserver<TextAnnotation, TextAnnotation | E>(store, selection, hover, viewport);
+  const lifecycle = createLifecyleObserver<TextAnnotation, TextAnnotation | E>(store, selection, hover, viewport, opts.adapter);
 
   const undoStack = createUndoStack(store);
 
