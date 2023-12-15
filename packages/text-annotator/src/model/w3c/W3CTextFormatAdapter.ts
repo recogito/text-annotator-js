@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import {
+  type FormatAdapter,
   ParseResult,
   parseW3CBodies,
   parseW3CLifecycleInfo,
@@ -12,16 +13,20 @@ import {
   isCompleteTextSelector,
   type TextAnnotation,
   type TextAnnotationTarget,
-  type TextFormatAdapter,
   type TextSelector
 } from '../core';
 import type { W3CTextAnnotation, W3CTextAnnotationSelector, W3CTextAnnotationTarget } from './W3CAnnotation';
 import { reviveTargetRange } from '../../state';
 
-export type W3CTextFormatAdapter = TextFormatAdapter<TextAnnotation, W3CTextAnnotation>;
+export type W3CTextFormatAdapter = FormatAdapter<TextAnnotation, W3CTextAnnotation>;
 
-export const W3CTextFormat = (source: string): W3CTextFormatAdapter => ({
-  parse: (serialized, container) => parseW3CTextAnnotation(serialized, container),
+/**
+ * @param source - the IRI of the annotated content
+ * @param container - the HTML container of the annotated content,
+ *                    Required to locate the content's `range` within the DOM
+ */
+export const W3CTextFormat = (source: string, container: HTMLElement): W3CTextFormatAdapter => ({
+  parse: (serialized) => parseW3CTextAnnotation(serialized, container),
   serialize: (annotation) => serializeW3CTextAnnotation(annotation, source)
 });
 
