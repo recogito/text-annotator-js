@@ -6,7 +6,7 @@ import {
   parseW3CTextAnnotation,
   serializeW3CTextAnnotation,
   type W3CTextAnnotationTarget
-} from '../../../src/model/w3c';
+} from '../../../src';
 
 
 beforeEach(async () => {
