@@ -1,0 +1,80 @@
+[
+  {
+    "@context": "http://www.w3.org/ns/anno.jsonld",
+    "type": "Annotation",
+    "id": "d9b8b79e-e8bb-47a8-a0c4-8462a1865155",
+    "created": "2023-10-17T12:38:37.390Z",
+    "creator": {
+      "isGuest": true,
+      "id": "qn7zdU8XD6ZPDBMXdc7w"
+    },
+    "body": [],
+    "target": {
+      "annotation": "d9b8b79e-e8bb-47a8-a0c4-8462a1865155",
+      "selector": [
+        {
+          "type": "TextQuoteSelector",
+          "exact": " world's end, and lie in two halves, the one looking West and the other East. He had gone there to accept a hecatomb of sheep and oxen, and was enjoying himself at his festival; but the other gods met in the house of Olympian Jove, and the sire "
+        },
+        {
+          "type": "TextPositionSelector",
+          "start": 1326,
+          "end": 1571
+        }
+      ],
+      "source": "https://www.gutenberg.org/files/1727/1727-h/1727-h.htm"
+    }
+  },
+  {
+    "@context": "http://www.w3.org/ns/anno.jsonld",
+    "type": "Annotation",
+    "id": "2a376279-a119-46da-afdf-27eb23eb1fad",
+    "created": "2023-10-17T12:39:02.290Z",
+    "creator": {
+      "isGuest": true,
+      "id": "qn7zdU8XD6ZPDBMXdc7w"
+    },
+    "body": [],
+    "target": {
+      "annotation": "2a376279-a119-46da-afdf-27eb23eb1fad",
+      "selector": [
+        {
+          "type": "TextQuoteSelector",
+          "exact": "ith Ulysses for having blinded an eye of Polyphemus king of the Cyclopes. Polyphemus is son to Neptune by the nymph Thoosa, daughter to the s"
+        },
+        {
+          "type": "TextPositionSelector",
+          "start": 3540,
+          "end": 3681
+        }
+      ],
+      "source": "https://www.gutenberg.org/files/1727/1727-h/1727-h.htm"
+    }
+  },
+  {
+    "@context": "http://www.w3.org/ns/anno.jsonld",
+    "type": "Annotation",
+    "id": "8e286366-3173-4542-a056-159b1b031a76",
+    "created": "2023-10-17T12:38:07.356Z",
+    "creator": {
+      "isGuest": true,
+      "id": "qn7zdU8XD6ZPDBMXdc7w"
+    },
+    "body": [],
+    "target": {
+      "annotation": "8e286366-3173-4542-a056-159b1b031a76",
+      "selector": [
+        {
+          "type": "TextQuoteSelector",
+          "exact": "ious with Ulysses for having blinded an eye of Polyphemus king of the Cyclopes. Polyphemus is son to Neptune by the nymph Thoosa, daughter to the sea-king Phorcys; therefore though he will not kill Ulysses outright, he torments him by preventing"
+        },
+        {
+          "type": "TextPositionSelector",
+          "start": 12786,
+          "end": 13031
+        }
+      ],
+      "source": "https://www.gutenberg.org/files/1727/1727-h/1727-h.htm"
+    }
+  }
+]
