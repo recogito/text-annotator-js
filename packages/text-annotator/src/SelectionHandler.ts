@@ -24,9 +24,8 @@ export const rangeToSelector = (range: Range, container: HTMLElement, offsetRefe
 }
 
 export const SelectionHandler = (
-  container: HTMLElement, 
+  container: HTMLElement,
   state: TextAnnotatorState,
-  // Experimental
   offsetReferenceSelector?: string
 ) => {
 
@@ -47,7 +46,7 @@ export const SelectionHandler = (
       return;
 
     // Make sure we don't listen to selection changes that
-    // were not started on the container, or which are not supposed to 
+    // were not started on the container, or which are not supposed to
     // be annotatable (like the popup)
     const annotatable = !(evt.target as Node).parentElement.closest('.not-annotatable');
     if (annotatable) {
@@ -72,7 +71,7 @@ export const SelectionHandler = (
     debounceTimer = setTimeout(() => onSelectionChange(), 50);
   });
 
-  const onSelectionChange = () => { 
+  const onSelectionChange = () => {
     const sel = document.getSelection();
 
     if (!sel.isCollapsed && isLeftClick && currentTarget) {
@@ -89,7 +88,7 @@ export const SelectionHandler = (
           ...currentTarget,
           selector: rangeToSelector(ranges[0], container, offsetReferenceSelector)
         };
-    
+
         if (store.getAnnotation(currentTarget.annotation)) {
           store.updateTarget(currentTarget, Origin.LOCAL);
         } else {
@@ -129,13 +128,13 @@ export const SelectionHandler = (
 
         currentTarget = null;
         lastPointerEvent = undefined;
-      } else {            
+      } else {
         const { x, y } = container.getBoundingClientRect();
-        
+
         const hovered = store.getAt(evt.clientX - x, evt.clientY - y);
         if (hovered) {
           const { selected } = selection;
-          
+
           if (selected.length !== 1 || selected[0].id !== hovered.id) {
             selection.clickSelect(hovered.id, evt);
             lastPointerEvent = undefined;
