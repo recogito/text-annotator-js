@@ -1,52 +1,31 @@
 import { Origin, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotatorState } from './state';
-import type { TextSelector, TextAnnotationTarget, TextQuoteSelector } from './model';
+import type { TextSelector, TextAnnotationTarget } from './model';
 import { trimRange } from './utils';
 
-const rangeToQuoteSelector = (range: Range): TextQuoteSelector => {
-  const { startContainer, startOffset, endContainer, endOffset } = range;
-
-  const snippetLength = 10;
-
-  const rangePrefix = document.createRange();
-  rangePrefix.setStart(startContainer, Math.max(startOffset - snippetLength, 0));
-  rangePrefix.setEnd(startContainer, startOffset);
-
-  const rangeSuffix = document.createRange();
-  rangeSuffix.setStart(endContainer, endOffset);
-  rangeSuffix.setEnd(endContainer, Math.min(endOffset + snippetLength, endContainer.textContent.length));
-
-  return {
-    quote: range.toString(),
-    quotePrefix: rangePrefix.toString(),
-    quoteSuffix: rangeSuffix.toString()
-  }
-}
-
 export const rangeToSelector = (range: Range, container: HTMLElement, offsetReferenceSelector?: string): TextSelector => {
-  const offsetReference: HTMLElement = offsetReferenceSelector
-      ? (range.startContainer.parentElement as HTMLElement).closest(offsetReferenceSelector)
-      : container;
-
-  // Helper range from the start of the contentNode to the start of the selection
   const rangeBefore = document.createRange();
+
+  const offsetReference: HTMLElement = offsetReferenceSelector ? 
+    (range.startContainer.parentElement as HTMLElement).closest(offsetReferenceSelector) : container;
+
+  // A helper range from the start of the contentNode to the start of the selection
   rangeBefore.setStart(offsetReference, 0);
   rangeBefore.setEnd(range.startContainer, range.startOffset);
 
-  const quoteSelector = rangeToQuoteSelector(range);
+  const quote = range.toString();
   const start = rangeBefore.toString().length;
-  const end = start + quoteSelector.quote.length;
+  const end = start + quote.length;
 
   return offsetReferenceSelector ?
-    { ...quoteSelector, start, end, range, offsetReference } :
-    { ...quoteSelector, start, end, range };
+    { quote, start, end, range, offsetReference } :
+    { quote, start, end, range };
 }
 
 export const SelectionHandler = (
   container: HTMLElement,
   state: TextAnnotatorState,
-  // Experimental
   offsetReferenceSelector?: string
 ) => {
 
