@@ -1,8 +1,8 @@
 import { Children, ReactElement, ReactNode, cloneElement, useContext, useEffect } from 'react';
-import { AnnotoriousContext, DrawingStyle } from '@annotorious/react';
+import { AnnotoriousContext, DrawingStyle, Filter } from '@annotorious/react';
 import { TEIPlugin } from '@recogito/text-annotator-tei';
 import { createTextAnnotator } from '@recogito/text-annotator';
-import type { Filter, TextAnnotatorOptions, TextAnnotation } from '@recogito/text-annotator';
+import type { TextAnnotatorOptions, TextAnnotation } from '@recogito/text-annotator';
 
 import '@recogito/text-annotator/dist/text-annotator.css';
 

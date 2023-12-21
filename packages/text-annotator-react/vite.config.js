@@ -25,7 +25,9 @@ export default defineConfig(({ command, mode }) => ({
       fileName: (format) => `react-text-annotator.${format}.js`
     },
     rollupOptions: {
-      external: [...Object.keys(packageJson.peerDependencies)],
+      external: [
+        ...Object.keys(packageJson.peerDependencies)
+      ],
       output: {
         preserveModules: true,
         assetFileNames: 'react-text-annotator.[ext]',

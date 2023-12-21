@@ -31,6 +31,6 @@
     "vite-plugin-dts": "^2.3.0"
   },
   "dependencies": {
-    "@annotorious/core": "^3.0.0-rc.4"
+    "@annotorious/core": "^3.0.0-rc.8"
   }
 }
