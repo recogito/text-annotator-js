@@ -1,4 +1,4 @@
-import { createAnonymousGuest, createLifecyleObserver, createBaseAnnotator, DrawingStyle, Filter } from '@annotorious/core';
+import { createAnonymousGuest, createLifecyleObserver, createBaseAnnotator, DrawingStyle, Filter, createUndoStack } from '@annotorious/core';
 import type { Annotator, User, PresenceProvider } from '@annotorious/core';
 import { createPainter } from './presence';
 import { createHighlightLayer } from './highlight';
@@ -26,11 +26,15 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
 
   const state: TextAnnotatorState = createTextAnnotatorState(container, opts.pointerAction);
 
-  const { hover, selection, viewport } = state;
+  const { selection, viewport } = state;
 
   const store: TextAnnotationStore = state.store;
 
-  const lifecycle = createLifecyleObserver<TextAnnotation, TextAnnotation | E>(store, selection, hover, viewport);
+  const undoStack = createUndoStack(store);
+
+  const lifecycle = createLifecyleObserver<TextAnnotation, TextAnnotation | E>(
+    state, undoStack, opts.adapter
+  );
   
   let currentUser: User = createAnonymousGuest();
 
@@ -47,7 +51,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   /******++++++*************/
 
   // Most of the external API functions are covered in the base annotator
-  const base = createBaseAnnotator<TextAnnotation, E>(store, opts.adapter);
+  const base = createBaseAnnotator<TextAnnotation, E>(state, undoStack, opts.adapter);
 
   const getUser = () => currentUser;
 
