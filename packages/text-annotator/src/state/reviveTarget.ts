@@ -1,23 +1,16 @@
 import type { TextAnnotationTarget } from '../model';
 
 /**
- * Recalculates the DOM range from the given text annotation target.
+ * Recalculates the DOM range from the given text annotation position
  *
- * @param annotation the text annotation
- * @param container the HTML container of the annotated content
+ * @param start start of the annotated content
+ * @param end end of the annotated content
+ * @param offsetReference the HTML container of the annotated content
+ *
  * @returns the DOM range
  */
-export const reviveTarget = (
-  target: TextAnnotationTarget,
-  container: HTMLElement
-): TextAnnotationTarget => {
-  const { start, end } = target.selector;
-
-  const offsetReference = target.selector.offsetReference ? target.selector.offsetReference : container;
-  if (!offsetReference)
-    return target;
-
-  const iterator = document.createNodeIterator(container, NodeFilter.SHOW_TEXT);
+export const reviveTargetRange = (start: number, end: number, offsetReference: HTMLElement): Range => {
+  const iterator = document.createNodeIterator(offsetReference, NodeFilter.SHOW_TEXT);
 
   let runningOffset = 0;
 
@@ -61,11 +54,30 @@ export const reviveTarget = (
     n = iterator.nextNode();
   }
 
-  return {
+  return range;
+};
+
+/**
+ * Constructs a new target with the recalculated DOM range from the given text annotation target
+ *
+ * @param target the text annotation target
+ * @param container the HTML container of the annotated content
+ *
+ * @returns text annotation target
+ */
+export const reviveTarget = (
+  target: TextAnnotationTarget,
+  container: HTMLElement
+): TextAnnotationTarget => {
+  const { start, end } = target.selector;
+
+  const offsetReference = target.selector.offsetReference ? target.selector.offsetReference : container;
+  return offsetReference ? {
     ...target,
     selector: {
       ...target.selector,
-      range
+      range: reviveTargetRange(start, end, offsetReference)
     }
-  };
+  } : target;
+
 };
