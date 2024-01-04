@@ -1,4 +1,11 @@
-import { createAnonymousGuest, createLifecyleObserver, createBaseAnnotator, DrawingStyle, Filter, createUndoStack } from '@annotorious/core';
+import {
+  createAnonymousGuest,
+  createLifecyleObserver,
+  createBaseAnnotator,
+  DrawingStyle,
+  Filter,
+  createUndoStack
+} from '@annotorious/core';
 import type { Annotator, User, PresenceProvider } from '@annotorious/core';
 import { createPainter } from './presence';
 import { createHighlightLayer } from './highlight';
@@ -20,7 +27,7 @@ export interface TextAnnotator<T extends unknown = TextAnnotation> extends Annot
 }
 
 export const createTextAnnotator = <E extends unknown = TextAnnotation>(
-  container: HTMLElement, 
+  container: HTMLElement,
   opts: TextAnnotatorOptions<E> = {}
 ): TextAnnotator<E> => {
 
@@ -35,7 +42,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   const lifecycle = createLifecyleObserver<TextAnnotation, TextAnnotation | E>(
     state, undoStack, opts.adapter
   );
-  
+
   let currentUser: User = createAnonymousGuest();
 
   const highlightLayer = createHighlightLayer(container, state, viewport);
@@ -64,14 +71,14 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   const setUser = (user: User) => {
     currentUser = user;
     selectionHandler.setUser(user);
-  }
+  };
 
   const setPresenceProvider = (provider: PresenceProvider) => {
     if (provider) {
       highlightLayer.setPainter(createPainter(provider, opts.presence));
       provider.on('selectionChange', () => highlightLayer.redraw());
     }
-  }
+  };
 
   const setSelected = (arg?: string | string[]) => {
     if (arg) {
@@ -79,11 +86,11 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
     } else {
       selection.clear();
     }
-  }
+  };
 
   const destroy = () => {
     throw 'Not implemented yet';
-  }
+  };
 
   return {
     ...base,
@@ -99,6 +106,6 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
     off: lifecycle.off,
     scrollIntoView: scrollIntoView(container, store),
     state
-  }
+  };
 
-}
+};

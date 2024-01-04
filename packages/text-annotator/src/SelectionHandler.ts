@@ -7,7 +7,7 @@ import { trimRange } from './utils';
 export const rangeToSelector = (range: Range, container: HTMLElement, offsetReferenceSelector?: string): TextSelector => {
   const rangeBefore = document.createRange();
 
-  const offsetReference: HTMLElement = offsetReferenceSelector ? 
+  const offsetReference: HTMLElement = offsetReferenceSelector ?
     (range.startContainer.parentElement as HTMLElement).closest(offsetReferenceSelector) : container;
 
   // A helper range from the start of the contentNode to the start of the selection
@@ -21,7 +21,7 @@ export const rangeToSelector = (range: Range, container: HTMLElement, offsetRefe
   return offsetReferenceSelector ?
     { quote, start, end, range, offsetReference } :
     { quote, start, end, range };
-}
+};
 
 export const SelectionHandler = (
   container: HTMLElement,
@@ -103,7 +103,7 @@ export const SelectionHandler = (
         }
       }
     }
-  }
+  };
 
   // Select events don't carry information about the mouse button
   // Therefore, to prevent right-click selection, we need to listen
@@ -148,6 +148,6 @@ export const SelectionHandler = (
 
   return {
     setUser
-  }
+  };
 
-}
+};
