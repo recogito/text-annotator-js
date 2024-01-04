@@ -40,7 +40,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   const undoStack = createUndoStack(store);
 
   const lifecycle = createLifecyleObserver<TextAnnotation, TextAnnotation | E>(
-    state, undoStack, opts.adapter
+    state, undoStack, opts.adapter, opts.autoSave
   );
 
   let currentUser: User = createAnonymousGuest();
