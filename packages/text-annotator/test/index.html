@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <title>RecogitoJS 3</title>
@@ -170,7 +170,7 @@
 
             filterActive = false;
           } else {
-            r.setFilter(annotation => {
+            r.setFilter(_annotation => {
               // Dummy filter - just filter randomly
               return  Math.random() < 0.5;
             });
