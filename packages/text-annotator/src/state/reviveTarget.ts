@@ -2,15 +2,15 @@ import type { TextAnnotationTarget } from '../model';
 
 /**
  * Recalculates the DOM range from the given text annotation target.
- * 
+ *
  * @param annotation the text annotation
  * @param container the HTML container of the annotated content
  * @returns the DOM range
  */
 export const reviveTarget = (
-  target: TextAnnotationTarget, 
+  target: TextAnnotationTarget,
   container: HTMLElement
-): TextAnnotationTarget => {  
+): TextAnnotationTarget => {
   const { start, end } = target.selector;
 
   const offsetReference = target.selector.offsetReference ? target.selector.offsetReference : container;
@@ -40,8 +40,8 @@ export const reviveTarget = (
         range.setStart(n, start - runningOffset);
         break;
       }
-  
-      runningOffset += len;  
+
+      runningOffset += len;
     }
 
     n = iterator.nextNode();
@@ -63,9 +63,9 @@ export const reviveTarget = (
 
   return {
     ...target,
-    selector: { 
+    selector: {
       ...target.selector,
       range
     }
-  }
-}
+  };
+};
