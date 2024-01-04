@@ -3,7 +3,7 @@ const findIndex = (node: Node, root: Node) => {
   const ni = document.createNodeIterator(root);
 
   let index = 0;
-  
+
   let n = ni.nextNode();
 
   while (n !== null) {
@@ -14,10 +14,10 @@ const findIndex = (node: Node, root: Node) => {
 
     n = ni.nextNode();
   }
-}
+};
 
-/** 
- * Returns the node that has the given index in the node 
+/**
+ * Returns the node that has the given index in the node
  * iterator of the given root node.
  */
 const getNodeAtIndex = (index: number, root: Node) => {
@@ -25,17 +25,17 @@ const getNodeAtIndex = (index: number, root: Node) => {
 
   let node: Node;
 
-  for (let i=0; i<index + 1; i++) {
+  for (let i = 0; i < index + 1; i++) {
     node = ni.nextNode();
   }
 
   return node;
-}
+};
 
 /**
  * Wraps a DOM range CLEVERLY! If the range spans multiple
  * elements, it's broken apart appropriately, and each segment
- * is wrapped 
+ * is wrapped
  */
 const wrapRange = (range: Range) => {
   const {
@@ -47,7 +47,7 @@ const wrapRange = (range: Range) => {
   } = range;
 
   // Clone the original children, so we can re-generate the original DOM
-  const originalChildren = 
+  const originalChildren =
     Array.from(commonAncestorContainer.childNodes).map(n => {
       const cloned = n.cloneNode(true);
       return n.nodeName === 'CANVAS' ? n : cloned;
@@ -68,7 +68,7 @@ const wrapRange = (range: Range) => {
     range.setStart(startContainer, startOffset);
     range.setEnd(endContainer, endOffset);
     return range;
-  }
+  };
 
   // Shorthand
   const surround = (range: Range) => {
@@ -107,18 +107,18 @@ const wrapRange = (range: Range) => {
     return { unwrap, nodes: [startNode, ...innerNodes, endNode] };
   }
 
-}
+};
 
 /**
  * Returns a list of all text nodes between the start
- * and end node of the range. Start and end node themselves 
+ * and end node of the range. Start and end node themselves
  * are NOT INCLUDED!
  */
 const getTextNodesBetween = (range: Range): Node[] => {
-  const { 
-    commonAncestorContainer, 
-    startContainer, 
-    endContainer 
+  const {
+    commonAncestorContainer,
+    startContainer,
+    endContainer
   } = range;
 
   const ni = document.createNodeIterator(commonAncestorContainer, NodeFilter.SHOW_TEXT);
@@ -126,7 +126,7 @@ const getTextNodesBetween = (range: Range): Node[] => {
   let n = ni.nextNode();
 
   let take = false;
-  
+
   const nodesBetween: Node[] = [];
 
   while (n != null) {
@@ -139,11 +139,11 @@ const getTextNodesBetween = (range: Range): Node[] => {
     if (n === startContainer)
       take = true;
 
-    n = ni.nextNode()
+    n = ni.nextNode();
   }
 
   return nodesBetween;
-}
+};
 
 export const getClientRectsPonyfill = (range: Range) => {
   const { startContainer, endContainer } = range;
@@ -158,7 +158,7 @@ export const getClientRectsPonyfill = (range: Range) => {
     }, [] as DOMRect[]);
 
     unwrap();
-    
+
     return rects;
   }
-}
+};

@@ -1,6 +1,6 @@
 export const getContext = (
-  range: Range, 
-  container: HTMLElement, 
+  range: Range,
+  container: HTMLElement,
   length = 10,
   offsetReferenceSelector?: string
 ) => {
@@ -13,7 +13,7 @@ export const getContext = (
   rangeBefore.setEnd(range.startContainer, range.startOffset);
 
   const before = rangeBefore.toString();
-  
+
   const rangeAfter = document.createRange();
   rangeAfter.setStart(range.endContainer, range.endOffset);
 
@@ -27,5 +27,5 @@ export const getContext = (
   return {
     prefix: before.substring(before.length - length),
     suffix: after.substring(0, length)
-  }
-}
+  };
+};

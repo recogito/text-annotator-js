@@ -1,8 +1,7 @@
 import RBush from 'rbush';
 import type { Store } from '@annotorious/core';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
-import { mergeClientRects } from '../utils';
-import { getClientRectsPonyfill } from '../utils/getClientRectsPonyfill';
+import { mergeClientRects, getClientRectsPonyfill } from '../utils';
 import { reviveTarget } from './reviveTarget';
 
 const isFirefox = false; // navigator.userAgent.match(/firefox|fxios/i);

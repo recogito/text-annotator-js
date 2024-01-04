@@ -1,5 +1,5 @@
 // The three topological relations we need to check for
-type Relation = 
+type Relation =
   // Inline elements, same height, directly adjacent
   'inline-adjacent' |
   // Inline elements, A fully contains B
@@ -15,7 +15,7 @@ type Relation =
 // few shortcuts to test ONLY the situations we'll encounter
 // with text selections.
 const getRelation = (rectA: DOMRect, rectB: DOMRect): Relation | undefined => {
-  const round = (num: number ) => Math.round(num * 10) / 10;
+  const round = (num: number) => Math.round(num * 10) / 10;
 
   // Some browsers have fractional pixel differences (looking at you FF!)
   const a = {
@@ -46,7 +46,7 @@ const getRelation = (rectA: DOMRect, rectB: DOMRect): Relation | undefined => {
     // Different heights - check for containment
     if (a.top <= b.top && a.bottom >= b.bottom) {
       if (a.left <= b.left && a.right >= b.right) {
-        return 'block-contains'
+        return 'block-contains';
       }
     } else if (a.top >= b.top && a.bottom <= b.bottom) {
       if (a.left >= b.left && a.right <= b.right) {
@@ -54,7 +54,7 @@ const getRelation = (rectA: DOMRect, rectB: DOMRect): Relation | undefined => {
       }
     }
   }
-}
+};
 
 const union = (a: DOMRect, b: DOMRect): DOMRect => {
   const left = Math.min(a.left, b.left);
@@ -63,7 +63,7 @@ const union = (a: DOMRect, b: DOMRect): DOMRect => {
   const bottom = Math.max(a.bottom, b.bottom);
 
   return new DOMRect(left, top, right - left, bottom - top);
-}
+};
 
 export const mergeClientRects = (rects: DOMRect[]) => rects.reduce((merged, rectA) => {
   // Some browser report empty rects - discard
@@ -76,7 +76,7 @@ export const mergeClientRects = (rects: DOMRect[]) => rects.reduce((merged, rect
 
   for (const rectB of merged) {
     const relation = getRelation(rectA, rectB);
-    
+
     if (relation === 'inline-adjacent') {
       // A and B are adjacent - remove B and keep union
       next = next.map(r => r === rectB ? union(rectA, rectB) : r);
@@ -101,5 +101,5 @@ export const mergeClientRects = (rects: DOMRect[]) => rects.reduce((merged, rect
     }
   }
 
-  return wasMerged ? next : [ ...next, rectA ];
+  return wasMerged ? next : [...next, rectA];
 }, [] as DOMRect[]);
