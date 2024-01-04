@@ -3,11 +3,13 @@ import {
   type FormatAdapter,
   ParseResult,
   parseW3CBodies,
-  parseW3CUser
+  parseW3CUser,
+  serializeW3CBodies
 } from '@annotorious/core';
 import type { TextAnnotation, TextSelector } from '../core';
-import type { W3CTextAnnotation } from '../w3c';
+import type { W3CTextAnnotation, W3CTextSelector } from '../w3c';
 import { reviveTargetRange } from '../../state';
+import { getQuoteContext } from '../../utils/getQuoteContext';
 
 export type W3CTextFormatAdapter = FormatAdapter<TextAnnotation, W3CTextAnnotation>;
 
@@ -18,7 +20,7 @@ export type W3CTextFormatAdapter = FormatAdapter<TextAnnotation, W3CTextAnnotati
  */
 export const W3CTextFormat = (source: string, container: HTMLElement): W3CTextFormatAdapter => ({
   parse: (serialized) => parseW3CTextAnnotation(serialized, container),
-  serialize: (annotation) => serializeW3CTextAnnotation(annotation, source)
+  serialize: (annotation) => serializeW3CTextAnnotation(annotation, source, container)
 });
 
 export const parseW3CTextAnnotation = (annotation: W3CTextAnnotation, container: HTMLElement): ParseResult<TextAnnotation> => {
@@ -27,8 +29,7 @@ export const parseW3CTextAnnotation = (annotation: W3CTextAnnotation, container:
   const {
     creator,
     created,
-    updatedBy,
-    updated,
+    modified,
     body,
     ...rest
   } = annotation;
@@ -63,6 +64,7 @@ export const parseW3CTextAnnotation = (annotation: W3CTextAnnotation, container:
       target: {
         created: created ? new Date(created) : undefined,
         creator: parseW3CUser(creator),
+        updated: modified ? new Date(modified) : undefined,
         ...rest.target,
         annotation: annotationId,
         selector
@@ -84,6 +86,45 @@ export const parseW3CTextAnnotation = (annotation: W3CTextAnnotation, container:
 };
 
 
-export const serializeW3CTextAnnotation = (annotation: TextAnnotation, source: string): W3CTextAnnotation => {
-  return {} as any;
+export const serializeW3CTextAnnotation = (annotation: TextAnnotation, source: string, container: HTMLElement): W3CTextAnnotation => {
+  const { bodies, target, ...rest } = annotation;
+  const {
+    selector,
+    creator,
+    created,
+    updated,
+    ...targetRest
+  } = target;
+  const { quote, start, end, range } = selector;
+  const { prefix, suffix } = getQuoteContext(range, container);
+
+  const w3cSelector: W3CTextSelector[] = [
+    {
+      type: 'TextQuoteSelector',
+      exact: quote,
+      prefix,
+      suffix
+    },
+    {
+      type: 'TextPositionSelector',
+      start,
+      end
+    }
+  ];
+
+  return {
+    ...rest,
+    '@context': 'http://www.w3.org/ns/anno.jsonld',
+    id: annotation.id,
+    type: 'Annotation',
+    body: serializeW3CBodies(annotation.bodies),
+    creator,
+    created: created?.toISOString(),
+    modified: updated?.toISOString(),
+    target: {
+      ...targetRest,
+      source,
+      selector: w3cSelector
+    }
+  };
 };
