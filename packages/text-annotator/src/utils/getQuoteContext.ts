@@ -1,4 +1,4 @@
-export const getContext = (
+export const getQuoteContext = (
   range: Range,
   container: HTMLElement,
   length = 10,
