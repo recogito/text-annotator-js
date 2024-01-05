@@ -265,12 +265,16 @@
 </div>
 
 <script type="module">
-    import { createTextAnnotator } from '../src/index.ts';
+    import { createTextAnnotator, W3CTextFormat } from '../src/index.ts';
 
     window.onload = async function () {
-        const r = createTextAnnotator(document.getElementById('content'));
+        const contentContainer = document.getElementById('content');
 
-        void r.loadAnnotations('annotations.json');
+        const r = createTextAnnotator(contentContainer, {
+            adapter: W3CTextFormat('https://www.gutenberg.org/files/1727/1727-h/1727-h.htm', contentContainer)
+        });
+
+        await r.loadAnnotations('annotations.w3c.json');
 
         r.on('createAnnotation', annotation => {
             console.log('createAnnotation', annotation);
