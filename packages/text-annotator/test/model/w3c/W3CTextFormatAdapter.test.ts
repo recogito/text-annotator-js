@@ -1,6 +1,5 @@
 import { describe, it, beforeEach, afterEach, expect } from 'vitest';
 import { JSDOM } from 'jsdom';
-import type { W3CAnnotationBody } from '@annotorious/core/src/model/W3CAnnotation';
 import { textAnnotation, incompleteTextAnnotation } from './fixtures';
 import {
   parseW3CTextAnnotation,
@@ -27,7 +26,7 @@ describe('parseW3CTextAnnotation', () => {
 
     const fixtureBody = textAnnotation.body[0];
     const fixtureTarget = textAnnotation.target as W3CTextAnnotationTarget;
-    
+
     expect(parsed.bodies).toHaveLength(1);
     expect(parsed.bodies[0].value).toBe(fixtureBody.value);
 
