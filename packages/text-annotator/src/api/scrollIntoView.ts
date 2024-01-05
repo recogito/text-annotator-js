@@ -1,5 +1,5 @@
 import type { TextAnnotationStore } from 'src/state';
-import type { TextAnnotation } from '../model/TextAnnotation';
+import type { TextAnnotation } from 'src/model';
 
 const getScrollParent = (el: Element) => {
   if (el === null)
