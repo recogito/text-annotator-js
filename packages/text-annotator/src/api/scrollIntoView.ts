@@ -1,5 +1,5 @@
 import { reviveTarget, type TextAnnotationStore } from '../state';
-import type { TextAnnotation, TextAnnotationTarget } from '../model/TextAnnotation';
+import type { TextAnnotation, TextAnnotationTarget } from 'src/model';
 
 const getScrollParent = (el: Element) => {
   if (el === null)
@@ -45,7 +45,7 @@ export const scrollIntoView = (container: HTMLElement, store: TextAnnotationStor
 
     scrollParent.scroll({ top, left, behavior: 'smooth' });
   }
-  
+
   // Get closest scrollable parent
   const scrollParent: Element = getScrollParent(container);
   if (scrollParent) {
