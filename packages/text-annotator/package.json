@@ -9,7 +9,7 @@
     "start": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "echo 'Skipping tests in @recogito/text-annotator package'"
+    "test": "vitest"
   },
   "main": "./dist/text-annotator.umd.js",
   "module": "./dist/text-annotator.es.js",
@@ -25,12 +25,16 @@
     "./dist/text-annotator.css": "./dist/text-annotator.css"
   },
   "devDependencies": {
+    "@types/jsdom": "^21.1.6",
     "@types/rbush": "^3.0.0",
     "@types/uuid": "^9.0.1",
+    "canvas": "^2.11.2",
+    "jsdom": "^23.0.1",
     "svelte": "^4.0.0",
     "typescript": "^4.9.5",
     "vite": "^4.2.1",
-    "vite-plugin-dts": "^2.3.0"
+    "vite-plugin-dts": "^2.3.0",
+    "vitest": "^1.1.3"
   },
   "dependencies": {
     "@annotorious/core": "^3.0.0-rc.9",
