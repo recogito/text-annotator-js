@@ -3,9 +3,13 @@ import type { TextAnnotation } from '../model/TextAnnotation';
 
 const getScrollParent = (el: Element) => {
   if (el === null)
-    return null;
+    return document.scrollingElement;
 
-  if (el.scrollHeight > el.clientHeight)
+  const { overflowY } = window.getComputedStyle(el);
+  const isScrollable = overflowY !== 'visible' && overflowY !== 'hidden';
+
+  // Cf. discussion https://stackoverflow.com/questions/35939886/find-first-scrollable-parent
+  if (isScrollable && el.scrollHeight > el.clientHeight)
     return el;
   else
     return getScrollParent(el.parentElement);

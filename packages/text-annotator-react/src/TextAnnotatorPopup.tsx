@@ -61,7 +61,7 @@ export const TextAnnotatorPopup = (props: TextAnnotatorPopupContainerProps) => {
   const onPointerUp = (evt: React.PointerEvent<HTMLDivElement>) =>
     evt.stopPropagation();
   
-  return (open && selected.length > 0) && createPortal(
+  return (open && selected.length > 0) ? createPortal(
     <div 
       ref={el}
       className="a9s-popup r6o-popup not-annotatable"
@@ -71,6 +71,6 @@ export const TextAnnotatorPopup = (props: TextAnnotatorPopupContainerProps) => {
       {props.popup({ selected })}
       
     </div>, r.element
-  );
+  ) : null;
 
 }
