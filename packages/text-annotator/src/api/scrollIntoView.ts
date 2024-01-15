@@ -60,7 +60,6 @@ export const scrollIntoView = (container: HTMLElement, store: TextAnnotationStor
       // Try reviving to account for lazy rendering
       const revived = reviveTarget(current.target, container);
       if (revived.selector.range && !revived.selector.range.collapsed) {
-        console.log('scrolling revived');
         scroll(revived);
         return true;
       }
