@@ -5,6 +5,11 @@ export * from './presence/PresencePainterOptions';
 export * from './TextAnnotator';
 export * from './TextAnnotatorOptions';
 
+// Essential re-exports from @annotorious/core
+export type {
+  Filter
+} from '@annotorious/core';
+
 import {
   Origin as _Origin,
 } from '@annotorious/core';
