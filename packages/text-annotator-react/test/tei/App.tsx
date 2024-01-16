@@ -12,7 +12,7 @@ const TestPopup = (props: TextAnnotatorPopupProps) => {
 
   const body: AnnotationBody = {
     id: `${Math.random()}`,
-    annotation: props.selected[0].id,
+    annotation: props.selected[0].annotation.id,
     purpose: 'commenting',
     value: 'A Dummy Comment'
   }
