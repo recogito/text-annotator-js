@@ -40,8 +40,11 @@ export const TEIAnnotator = (props: TEIAnnotatorProps) => {
     anno.setFilter(props.filter);
   }, [props.filter]);
 
-  return props.children ? 
-    Children.toArray(props.children).map(child => 
-      cloneElement(child as ReactElement, { onLoad })) : null;
+  return props.children ? (
+    <>
+      {Children.toArray(props.children).map(child => 
+        cloneElement(child as ReactElement, { onLoad }))}
+    </>
+  ) : null;
 
 }
