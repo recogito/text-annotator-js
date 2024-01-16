@@ -6,7 +6,6 @@ import type {
 } from '@recogito/text-annotator';
 import type { 
   Annotator,
-  DrawingStyle,
   Origin,  
   Store,  
 } from '@annotorious/core';

@@ -1,35 +1,31 @@
-import type { TextAnnotationStore } from 'src/state';
-import type { TextAnnotation } from 'src/model';
+import { reviveTarget, type TextAnnotationStore } from '../state';
+import type { TextAnnotation, TextAnnotationTarget } from 'src/model';
 
 const getScrollParent = (el: Element) => {
   if (el === null)
-    return null;
+    return document.scrollingElement;
 
-  if (el.scrollHeight > el.clientHeight)
+  const { overflowY } = window.getComputedStyle(el);
+  const isScrollable = overflowY !== 'visible' && overflowY !== 'hidden';
+
+  // Cf. discussion https://stackoverflow.com/questions/35939886/find-first-scrollable-parent
+  if (isScrollable && el.scrollHeight > el.clientHeight)
     return el;
   else
     return getScrollParent(el.parentElement);
 }
 
 export const scrollIntoView = (container: HTMLElement, store: TextAnnotationStore) => (annotation: TextAnnotation) => {
-  // Get closest scrollable parent
-  const scrollParent: Element = getScrollParent(container);
-  if (scrollParent) {
-    // Get curren version of the annotation from the store
-    const current = store.getAnnotation(annotation.id);
 
-    const { range } = current.target.selector;
-
-    if (!range || range.collapsed)
-      return false;
-
+  // Executes scroll on an annotation with a valid DOM range selector
+  const scroll = (target: TextAnnotationTarget) => {
     // Parent bounds and client (= visible) height
     const parentBounds = scrollParent.getBoundingClientRect();
     const parentHeight = scrollParent.clientHeight;
     const parentWidth = scrollParent.clientWidth;
 
     // Position of the annotation relative to viewport
-    const annotationBounds = current.target.selector.range.getBoundingClientRect();
+    const annotationBounds = target.selector.range.getBoundingClientRect();
 
     // Note: getBoundingClientRect seems to return wrong height! 
     // (Includes block elements?) We'll therefore use the normalized height
@@ -48,7 +44,27 @@ export const scrollIntoView = (container: HTMLElement, store: TextAnnotationStor
     const left = offsetLeft + scrollLeft - (parentWidth - width) / 2;
 
     scrollParent.scroll({ top, left, behavior: 'smooth' });
-
-    return true;
   }
+
+  // Get closest scrollable parent
+  const scrollParent: Element = getScrollParent(container);
+  if (scrollParent) {
+    // Get curren version of the annotation from the store
+    const current = store.getAnnotation(annotation.id);
+    const { range } = current.target.selector;
+
+    if (range && !range.collapsed) {
+      scroll(current.target);
+      return true;
+    } else {
+      // Try reviving to account for lazy rendering
+      const revived = reviveTarget(current.target, container);
+      if (revived.selector.range && !revived.selector.range.collapsed) {
+        scroll(revived);
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
