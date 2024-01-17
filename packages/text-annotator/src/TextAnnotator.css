@@ -1,3 +1,29 @@
+html, body {
+  overscroll-behavior-y: none;
+}
+
+/* https://stackoverflow.com/questions/42507623/blue-highlight-on-onclick-on-buttons-in-chrome-mobile */
+.r6o-annotatable {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.r6o-annotatable, .r6o-annotatable * {
+  position: relative;
+}
+
+.r6o-annotatable.hovered {
+  cursor: pointer;
+}
+
+.r6o-highlight-layer {
+  height: 100vh;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  pointer-events: none;
+}
+
 *::selection, ::selection {
   background: rgba(0, 128, 255, 0.18);
 }
@@ -5,4 +31,3 @@
 ::-moz-selection, ::-moz-selection{
   background: rgba(0, 128, 255, 0.18);
 }
-

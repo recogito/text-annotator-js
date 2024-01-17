@@ -33,21 +33,20 @@ export const SelectionHandler = (
 
   let currentUser: User;
 
-  let currentTarget: TextAnnotationTarget = null;
+  let currentTarget: TextAnnotationTarget | undefined;
 
   const setUser = (user: User) => currentUser = user;
 
   let isLeftClick = false;
 
-  let lastPointerEvent: PointerEvent;
+  let lastPointerDown: PointerEvent | undefined;
 
-  container.addEventListener('selectstart', (evt: PointerEvent) => {
-    if (!isLeftClick)
-      return;
+  container.addEventListener('selectstart', (evt: PointerEvent) => { 
+    if (!isLeftClick) return;
 
-    // Make sure we don't listen to selection changes that
-    // were not started on the container, or which are not supposed to
-    // be annotatable (like the popup)
+    // Make sure we don't listen to selection changes that were
+    // not started on the container, or which are not supposed to
+    // be annotatable (like a component popup)
     const annotatable = !(evt.target as Node).parentElement.closest('.not-annotatable');
     if (annotatable) {
       currentTarget = {
@@ -57,19 +56,11 @@ export const SelectionHandler = (
         created: new Date()
       };
     } else {
-      currentTarget = null;
-      lastPointerEvent = undefined;
+      currentTarget = undefined;
     }
   });
 
   let debounceTimer: ReturnType<typeof setTimeout> = undefined;
-
-  document.addEventListener('selectionchange', (evt: PointerEvent) => {
-    if (debounceTimer)
-      clearTimeout(debounceTimer);
-
-    debounceTimer = setTimeout(() => onSelectionChange(), 50);
-  });
 
   const onSelectionChange = () => {
     const sel = document.getSelection();
@@ -99,51 +90,57 @@ export const SelectionHandler = (
           });
 
           // Reminder: select events don't have offsetX/offsetY - reuse last up/down
-          selection.clickSelect(currentTarget.annotation, lastPointerEvent);
+          selection.clickSelect(currentTarget.annotation, lastPointerDown);
         }
       }
     }
   }
 
+  document.addEventListener('selectionchange', () => {
+    if (debounceTimer)
+      clearTimeout(debounceTimer);
+
+    debounceTimer = setTimeout(() => onSelectionChange(), 10);
+  });
+
   // Select events don't carry information about the mouse button
   // Therefore, to prevent right-click selection, we need to listen
   // to the initial pointerdown event and remember the button
   container.addEventListener('pointerdown', (evt: PointerEvent) => {
-    lastPointerEvent = evt;
+    // Note that the event itself can be ephemeral!
+    const { timeStamp, offsetX, offsetY } = evt;
+    lastPointerDown = { ...evt, timeStamp, offsetX, offsetY };
+    
     isLeftClick = evt.button === 0;
   });
 
   document.addEventListener('pointerup', (evt: PointerEvent) => {
-    lastPointerEvent = evt;
-
     const annotatable = !(evt.target as Node).parentElement?.closest('.not-annotatable');
     if (!annotatable || !isLeftClick)
       return;
 
-    setTimeout(() => {
-      if (currentTarget?.selector) {
-        store.updateTarget(currentTarget, Origin.LOCAL);
+    // Logic for selecting an existing annotation by clicking it
+    const clickSelect = () => {
+      const { x, y } = container.getBoundingClientRect();
 
-        selection.clickSelect(currentTarget.annotation, evt);
+      const hovered = store.getAt(evt.clientX - x, evt.clientY - y);
+      if (hovered) {
+        const { selected } = selection;
 
-        currentTarget = null;
-        lastPointerEvent = undefined;
-      } else {
-        const { x, y } = container.getBoundingClientRect();
-
-        const hovered = store.getAt(evt.clientX - x, evt.clientY - y);
-        if (hovered) {
-          const { selected } = selection;
-
-          if (selected.length !== 1 || selected[0].id !== hovered.id) {
-            selection.clickSelect(hovered.id, evt);
-            lastPointerEvent = undefined;
-          }
-        } else if (!selection.isEmpty()) {
-          selection.clear();
-        }
+        if (selected.length !== 1 || selected[0].id !== hovered.id)
+          selection.clickSelect(hovered.id, evt);
+      } else if (!selection.isEmpty()) {
+        selection.clear();
       }
-    }, 50);
+    }
+
+    const timeDifference = evt.timeStamp - lastPointerDown.timeStamp;
+
+    // Just a click, not a selection
+    if (document.getSelection().isCollapsed && timeDifference < 300) {
+      currentTarget = undefined;
+      clickSelect();
+    }
   });
 
   return {
