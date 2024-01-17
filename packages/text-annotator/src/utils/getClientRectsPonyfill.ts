@@ -23,13 +23,13 @@ const findIndex = (node: Node, root: Node) => {
 const getNodeAtIndex = (index: number, root: Node) => {
   const ni = document.createNodeIterator(root);
 
-  let node: Node;
+  let node: Node | null = null;
 
   for (let i=0; i<index + 1; i++) {
     node = ni.nextNode();
   }
 
-  return node;
+  return node!;
 }
 
 /**
@@ -54,8 +54,8 @@ const wrapRange = (range: Range) => {
     });
 
   // Rember range start/end indices, so we can re-generate the range in the clone
-  const startContainerIndex = findIndex(startContainer, commonAncestorContainer);
-  const endContainerIndex = findIndex(endContainer, commonAncestorContainer);
+  const startContainerIndex = findIndex(startContainer, commonAncestorContainer)!;
+  const endContainerIndex = findIndex(endContainer, commonAncestorContainer)!;
 
   // Reverse the wrapping operation, regenerate the range
   const unwrap = () => {
@@ -99,7 +99,7 @@ const wrapRange = (range: Range) => {
 
     const innerNodes = textNodesBetween.reverse().map(node => {
       const wrapper = document.createElement('SPAN');
-      node.parentNode.insertBefore(wrapper, node);
+      node.parentNode?.insertBefore(wrapper, node);
       wrapper.appendChild(node);
       return wrapper;
     });
