@@ -6,7 +6,7 @@
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
-    "start": "vite --host",
+    "start": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "test": "echo 'Skipping tests in @recogito/text-annotator package'"

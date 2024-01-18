@@ -108,8 +108,8 @@ export const SelectionHandler = (
   // to the initial pointerdown event and remember the button
   container.addEventListener('pointerdown', (evt: PointerEvent) => {
     // Note that the event itself can be ephemeral!
-    const { timeStamp, offsetX, offsetY } = evt;
-    lastPointerDown = { ...evt, timeStamp, offsetX, offsetY };
+    const { timeStamp, offsetX, offsetY, type } = evt;
+    lastPointerDown = { ...evt, timeStamp, offsetX, offsetY, type };
     
     isLeftClick = evt.button === 0;
   });
@@ -140,6 +140,8 @@ export const SelectionHandler = (
     if (document.getSelection().isCollapsed && timeDifference < 300) {
       currentTarget = undefined;
       clickSelect();
+    } else {
+      selection.clickSelect(currentTarget.annotation, evt);
     }
   });
 
