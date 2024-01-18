@@ -1,12 +1,12 @@
 {
   "name": "@recogito/react-text-annotator",
-  "version": "3.0.0-rc.9",
+  "version": "3.0.0-rc.10",
   "description": "Recogito Text Annotator React bindings",
   "author": "Rainer Simon",
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
-    "start": "vite",
+    "start": "vite --host",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "echo 'Skipping tests in @recogito/text-annotator-react package'"

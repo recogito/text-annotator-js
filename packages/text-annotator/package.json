@@ -1,12 +1,12 @@
 {
   "name": "@recogito/text-annotator",
-  "version": "3.0.0-rc.9",
+  "version": "3.0.0-rc.10",
   "description": "A JavaScript text annotation library",
   "author": "Rainer Simon",
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
-    "start": "vite",
+    "start": "vite --host",
     "build": "vite build",
     "preview": "vite preview",
     "test": "echo 'Skipping tests in @recogito/text-annotator package'"
