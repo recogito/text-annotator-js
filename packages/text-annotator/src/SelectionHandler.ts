@@ -70,7 +70,7 @@ export const SelectionHandler = (
 
     // Chrome/iOS does not reliably fire the 'selectstart' event!
     if (evt.timeStamp - lastPointerDown.timeStamp < 1000 && !currentTarget)
-      onSelectStart(evt);
+      onSelectStart(lastPointerDown);
 
     if (!sel.isCollapsed && isLeftClick && currentTarget) {
       const ranges = Array.from(Array(sel.rangeCount).keys())
@@ -115,8 +115,8 @@ export const SelectionHandler = (
   // to the initial pointerdown event and remember the button
   container.addEventListener('pointerdown', (evt: PointerEvent) => {
     // Note that the event itself can be ephemeral!
-    const { timeStamp, offsetX, offsetY, type } = evt;
-    lastPointerDown = { ...evt, timeStamp, offsetX, offsetY, type };
+    const { target, timeStamp, offsetX, offsetY, type } = evt;
+    lastPointerDown = { ...evt, target, timeStamp, offsetX, offsetY, type };
     
     isLeftClick = evt.button === 0;
   });
