@@ -16,10 +16,10 @@ html, body {
 }
 
 .r6o-highlight-layer {
-  height: 100vh;
   left: 0;
   position: fixed;
   top: 0;
+  bottom: 0;
   width: 100vw;
   pointer-events: none;
 }
