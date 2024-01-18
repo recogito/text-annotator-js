@@ -41,13 +41,14 @@ export const SelectionHandler = (
 
   let lastPointerDown: PointerEvent | undefined;
 
-  container.addEventListener('selectstart', (evt: PointerEvent) => { 
+  const onSelectStart = (evt: PointerEvent) => {
     if (!isLeftClick) return;
 
     // Make sure we don't listen to selection changes that were
     // not started on the container, or which are not supposed to
-    // be annotatable (like a component popup)
-    const annotatable = !(evt.target as Node).parentElement.closest('.not-annotatable');
+    // be annotatable (like a component popup).
+    // Note that Chrome/iOS will sometimes return the root doc as target!
+    const annotatable = !(evt.target as Node).parentElement?.closest('.not-annotatable');
     if (annotatable) {
       currentTarget = {
         annotation: uuidv4(),
@@ -58,12 +59,18 @@ export const SelectionHandler = (
     } else {
       currentTarget = undefined;
     }
-  });
+  }
+
+  container.addEventListener('selectstart', onSelectStart);
 
   let debounceTimer: ReturnType<typeof setTimeout> = undefined;
 
-  const onSelectionChange = () => {
+  const onSelectionChange = (evt: PointerEvent) => {
     const sel = document.getSelection();
+
+    // Chrome/iOS does not reliably fire the 'selectstart' event!
+    if (evt.timeStamp - lastPointerDown.timeStamp < 1000 && !currentTarget)
+      onSelectStart(evt);
 
     if (!sel.isCollapsed && isLeftClick && currentTarget) {
       const ranges = Array.from(Array(sel.rangeCount).keys())
@@ -72,7 +79,7 @@ export const SelectionHandler = (
       const trimmed = trimRange(ranges[0]);
 
       const hasChanged =
-        trimmed.toString() !== currentTarget.selector?.range?.toString();
+        trimmed.toString() !== currentTarget.selector?.quote;
 
       if (hasChanged) {
         currentTarget = {
@@ -96,11 +103,11 @@ export const SelectionHandler = (
     }
   }
 
-  document.addEventListener('selectionchange', () => {
+  document.addEventListener('selectionchange', (evt: PointerEvent) => {
     if (debounceTimer)
       clearTimeout(debounceTimer);
 
-    debounceTimer = setTimeout(() => onSelectionChange(), 10);
+    debounceTimer = setTimeout(() => onSelectionChange(evt), 10);
   });
 
   // Select events don't carry information about the mouse button
