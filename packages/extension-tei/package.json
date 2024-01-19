@@ -19,6 +19,7 @@
   ],
   "exports": {
     ".": {
+      "types": "./dist/src/index.d.ts",
       "import": "./dist/text-annotator-tei.es.js",
       "require": "./dist/text-annotator-tei.umd.js"
     },
