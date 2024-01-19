@@ -1,12 +1,11 @@
-import { describe, it, beforeEach, afterEach, expect } from 'vitest';
 import { JSDOM } from 'jsdom';
+import { describe, it, beforeEach, afterEach, expect } from 'vitest';
 import { textAnnotation, incompleteTextAnnotation } from './fixtures';
 import {
   parseW3CTextAnnotation,
   serializeW3CTextAnnotation,
   type W3CTextAnnotationTarget
 } from '../../../src';
-
 
 beforeEach(async () => {
   const dom = await JSDOM.fromFile(`${process.cwd()}/test/index.html`);

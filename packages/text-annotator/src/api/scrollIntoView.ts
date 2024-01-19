@@ -1,5 +1,5 @@
 import { reviveTarget, type TextAnnotationStore } from '../state';
-import type { TextAnnotation, TextAnnotationTarget } from 'src/model';
+import type { TextAnnotation, TextAnnotationTarget } from '../model';
 
 const getScrollParent = (el: Element) => {
   if (el === null)
