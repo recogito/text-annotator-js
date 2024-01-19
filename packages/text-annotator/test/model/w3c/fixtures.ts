@@ -25,8 +25,8 @@ export const textAnnotation: W3CTextAnnotation = {
       },
       {
         type: 'TextPositionSelector',
-        start: 922,
-        end: 934
+        start: 945,
+        end: 957
       },
     ]
   }
