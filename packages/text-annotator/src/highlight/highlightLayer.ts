@@ -4,8 +4,6 @@ import type { TextAnnotatorState } from '../state';
 import { defaultPainter, type HighlightPainter } from './HighlightPainter';
 import { trackViewport } from './trackViewport';
 
-import './highlightLayer.css';
-
 const debounce = <T extends (...args: any[]) => void>(func: T, delay: number = 10): T => {
   let timeoutId: number;
 
@@ -153,7 +151,7 @@ export const createHighlightLayer = (
       const isSelected = selectedIds.has(annotation.id);
       currentPainter.paint(annotation, offsetRects, bgContext, fgContext, isSelected, currentStyle);
     });
-
+    
     setTimeout(() => onDraw(annotationsInView.map(({ annotation }) => annotation)), 1);
   });
 

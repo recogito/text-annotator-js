@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>RecogitoJS 3</title>
     <style>
         html, body {
@@ -38,6 +39,21 @@
             left: 10px;
             z-index: 1;
         }
+
+      #debug {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        text-align: right;
+        background-color: rgba(0, 0, 0, 0.75);
+      }
+      #debug p {
+        padding: 0;
+        margin: 0;
+        font-size: 0.8em;
+        color: #fff;
+      }
     </style>
 </head>
 
@@ -47,7 +63,10 @@
 </div>
 
 <div id="content">
-    <h1>Homer: The Odyssey</h1>
+    <div id="debug">
+
+      </div>
+      <h1>Homer: The Odyssey</h1>
 
     <p>
         Tell me, O muse, of that ingenious hero who travelled far and wide after he had sacked the famous town of Troy.
