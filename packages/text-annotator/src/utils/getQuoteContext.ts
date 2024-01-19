@@ -1,11 +1,11 @@
-export const getContext = (
+export const getQuoteContext = (
   range: Range, 
   container: HTMLElement, 
   length = 10,
   offsetReferenceSelector?: string
 ) => {
   const offsetReference: HTMLElement = offsetReferenceSelector
-    ? (range.startContainer.parentElement as HTMLElement).closest(offsetReferenceSelector)
+    ? (range.startContainer.parentElement as HTMLElement).closest(offsetReferenceSelector)!
     : container;
 
   const rangeBefore = document.createRange();
