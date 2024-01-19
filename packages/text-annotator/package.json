@@ -19,6 +19,7 @@
   ],
   "exports": {
     ".": {
+      "types": "./dist/src/index.d.ts",
       "import": "./dist/text-annotator.es.js",
       "require": "./dist/text-annotator.umd.js"
     },
