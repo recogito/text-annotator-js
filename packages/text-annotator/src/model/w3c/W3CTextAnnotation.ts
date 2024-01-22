@@ -4,11 +4,15 @@ export interface W3CTextAnnotation extends W3CAnnotation {
 
   target: W3CTextAnnotationTarget | W3CTextAnnotationTarget[];
 
+  stylesheet?: W3CAnnotationStylesheet;
+
 }
 
 export interface W3CTextAnnotationTarget extends W3CAnnotationTarget {
 
   selector: W3CTextSelector | W3CTextSelector[];
+
+  styleClass?: string;
 
 }
 
@@ -43,3 +47,8 @@ export interface W3CTextPositionSelector {
 }
 
 export type W3CTextSelector = W3CTextQuoteSelector | W3CTextPositionSelector;
+
+export type W3CAnnotationStylesheet = string | {
+  type: 'CssStylesheet',
+  value: string
+}
