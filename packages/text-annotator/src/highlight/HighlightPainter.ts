@@ -1,10 +1,10 @@
-import type { DrawingStyle } from '@annotorious/core';
+import type { Color } from '@annotorious/core';
 import type { TextAnnotation } from '../model';
 import type { Rect } from '../state';
 
-const DEFAULT_STYLE = { fill: 'rgb(0, 128, 255', fillOpacity: 0.18 };
+const DEFAULT_STYLE = { fill: 'rgb(0, 128, 255)', fillOpacity: 0.18 } as const;
 
-const DEFAULT_SELECTED_STYLE = { fill: 'rgb(0, 128, 255)', fillOpacity: 0.45 };
+const DEFAULT_SELECTED_STYLE = { fill: 'rgb(0, 128, 255)', fillOpacity: 0.45 } as const;
 
 /** 
  * A painter implements the actual CANVAS highlight drawing logic.
@@ -45,11 +45,11 @@ export const defaultPainter: HighlightPainter = {
 
 export interface HighlightStyle {
 
-  fill?: string;
+  fill?: Color;
 
   fillOpacity?: number;
 
-  underline?: string;
+  underline?: Color;
 
   underlineOpacity?: number;
 
