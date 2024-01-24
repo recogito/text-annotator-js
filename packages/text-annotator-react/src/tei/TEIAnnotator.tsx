@@ -12,7 +12,7 @@ export type TEIAnnotatorProps = TextAnnotatorOptions & {
 
   filter?: Filter;
 
-  style?: HighlightPainterStyle
+  style?: HighlightPainterStyle;
 
 }
 
