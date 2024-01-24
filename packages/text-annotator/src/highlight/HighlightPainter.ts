@@ -22,7 +22,7 @@ export type HighlightPainter = {
 
 }
 
-export type HighlightPainterStyle = DrawingStyle | ((annotation: TextAnnotation, selected?: boolean) => DrawingStyle);
+export type HighlightPainterStyle = HighlightStyle | ((annotation: TextAnnotation, selected?: boolean) => HighlightStyle);
 
 /**
  * The default painter.
