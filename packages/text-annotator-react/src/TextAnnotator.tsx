@@ -11,7 +11,7 @@ export type TextAnnotatorProps<E extends unknown> = TextAnnotatorOptions<E> & {
 
   filter?: Filter;
 
-  style?: DrawingStyle | ((annotation: TextAnnotation) => DrawingStyle);
+  style?: DrawingStyle | ((annotation: TextAnnotation, selected?: boolean) => DrawingStyle)
 
 }
 

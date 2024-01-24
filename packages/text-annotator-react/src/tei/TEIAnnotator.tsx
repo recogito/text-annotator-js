@@ -12,7 +12,7 @@ export type TEIAnnotatorProps = TextAnnotatorOptions & {
 
   filter?: Filter;
 
-  style?: DrawingStyle | ((annotation: TextAnnotation) => DrawingStyle);
+  style?: DrawingStyle | ((annotation: TextAnnotation, selected?: boolean) => DrawingStyle)
 
 }
 

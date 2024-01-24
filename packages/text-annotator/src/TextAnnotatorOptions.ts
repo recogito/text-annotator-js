@@ -12,6 +12,6 @@ export interface TextAnnotatorOptions<T extends unknown = TextAnnotation> {
 
   presence?: PresencePainterOptions;
 
-  style?: DrawingStyle | ((annotation: TextAnnotation) => DrawingStyle);
+  style?: DrawingStyle | ((annotation: TextAnnotation, selected?: boolean) => DrawingStyle);
     
 }

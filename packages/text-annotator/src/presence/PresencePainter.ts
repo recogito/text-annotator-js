@@ -30,7 +30,7 @@ export const createPainter = (provider: PresenceProvider, opts: PresencePainterO
     bg: CanvasRenderingContext2D, 
     fg: CanvasRenderingContext2D,
     isSelected?: boolean,
-    style?: DrawingStyle | ((annotation: TextAnnotation) => DrawingStyle)
+    style?:  DrawingStyle | ((annotation: TextAnnotation, selected?: boolean) => DrawingStyle)
   ) => {
     if (opts.font)
       fg.font = opts.font;
