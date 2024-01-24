@@ -1,7 +1,7 @@
 import { createAnonymousGuest, createLifecyleObserver, createBaseAnnotator, DrawingStyle, Filter, createUndoStack } from '@annotorious/core';
 import type { Annotator, User, PresenceProvider } from '@annotorious/core';
 import { createPainter } from './presence';
-import { createHighlightLayer } from './highlight';
+import { createHighlightLayer, type HighlightPainterStyle } from './highlight';
 import { scrollIntoView } from './api';
 import { TextAnnotationStore, TextAnnotatorState, createTextAnnotatorState } from './state';
 import type { TextAnnotation } from './model';
@@ -60,8 +60,8 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   const setFilter = (filter?: Filter) =>
     highlightLayer.setFilter(filter);
 
-  const setStyle = (drawingStyle?: DrawingStyle | ((a: TextAnnotation, selected?: boolean) => DrawingStyle)) =>
-    highlightLayer.setDrawingStyle(drawingStyle);
+  const setStyle = (style?: HighlightPainterStyle) =>
+    highlightLayer.setDrawingStyle(style);
 
   const setUser = (user: User) => {
     currentUser = user;

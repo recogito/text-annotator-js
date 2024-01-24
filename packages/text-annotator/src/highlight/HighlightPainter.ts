@@ -17,10 +17,12 @@ export type HighlightPainter = {
     bg: CanvasRenderingContext2D,
     fg: CanvasRenderingContext2D,
     isSelected?: boolean,
-    style?: DrawingStyle | ((annotation: TextAnnotation, selected?: boolean) => DrawingStyle)
+    style?: HighlightPainterStyle
   ): void;
 
 }
+
+export type HighlightPainterStyle = DrawingStyle | ((annotation: TextAnnotation, selected?: boolean) => DrawingStyle);
 
 /**
  * The default painter.

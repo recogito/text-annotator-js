@@ -1,8 +1,8 @@
 import { Children, ReactElement, ReactNode, cloneElement, useContext, useEffect } from 'react';
-import { AnnotoriousContext, DrawingStyle, Filter } from '@annotorious/react';
+import { AnnotoriousContext, Filter } from '@annotorious/react';
 import { TEIPlugin } from '@recogito/text-annotator-tei';
-import { createTextAnnotator } from '@recogito/text-annotator';
-import type { TextAnnotatorOptions, TextAnnotation } from '@recogito/text-annotator';
+import { createTextAnnotator, type HighlightPainterStyle } from '@recogito/text-annotator';
+import type { TextAnnotatorOptions } from '@recogito/text-annotator';
 
 import '@recogito/text-annotator/dist/text-annotator.css';
 
@@ -12,7 +12,7 @@ export type TEIAnnotatorProps = TextAnnotatorOptions & {
 
   filter?: Filter;
 
-  style?: DrawingStyle | ((annotation: TextAnnotation, selected?: boolean) => DrawingStyle)
+  style?: HighlightPainterStyle
 
 }
 

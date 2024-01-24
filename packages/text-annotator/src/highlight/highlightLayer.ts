@@ -1,7 +1,7 @@
 import type { DrawingStyle, Filter, ViewportState } from '@annotorious/core';
 import type { TextAnnotation } from '../model';
 import type { TextAnnotatorState } from '../state';
-import { defaultPainter, type HighlightPainter } from './HighlightPainter';
+import { defaultPainter, type HighlightPainter, type HighlightPainterStyle } from './HighlightPainter';
 import { trackViewport } from './trackViewport';
 
 const debounce = <T extends (...args: any[]) => void>(func: T, delay: number = 10): T => {
@@ -48,7 +48,7 @@ export const createHighlightLayer = (
 
   const { store, selection, hover } = state;
   
-  let currentStyle: DrawingStyle | ((annotation: TextAnnotation, selected?: boolean) => DrawingStyle) | undefined;
+  let currentStyle: HighlightPainterStyle | undefined;
 
   let currentFilter: Filter | undefined;
 
@@ -161,7 +161,7 @@ export const createHighlightLayer = (
   // need need for extra check
   selection.subscribe(() => redraw());
 
-  const setDrawingStyle = (style: DrawingStyle | ((a: TextAnnotation, selected?: boolean) => DrawingStyle)) => {
+  const setDrawingStyle = (style: HighlightPainterStyle) => {
     currentStyle = style;
     redraw();
   }
