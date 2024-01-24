@@ -17,6 +17,8 @@ export interface TextAnnotator<T extends unknown = TextAnnotation> extends Annot
   // Returns true if successful (or false if the annotation is not currently rendered)
   scrollIntoView(annotation: TextAnnotation): boolean;
 
+  setStyle(style?: HighlightPainterStyle): void;
+
 }
 
 export const createTextAnnotator = <E extends unknown = TextAnnotation>(
