@@ -1,4 +1,4 @@
-import type { Color } from '@annotorious/core';
+import type { Color, DrawingStyle } from '@annotorious/core';
 import type { TextAnnotation } from '../model';
 import type { Rect } from '../state';
 
@@ -43,11 +43,7 @@ export const defaultPainter: HighlightPainter = {
 
 }
 
-export interface HighlightStyle {
-
-  fill?: Color;
-
-  fillOpacity?: number;
+export interface HighlightStyle extends Pick<DrawingStyle, 'fill' | 'fillOpacity'>{
 
   underline?: Color;
 
