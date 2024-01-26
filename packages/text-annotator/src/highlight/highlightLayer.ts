@@ -160,6 +160,8 @@ export const createHighlightLayer = (
   // probably no ideal solution, but one straightforward way
   // would be to just set a flag in 
   const onResize = debounce(() => {
+    console.log('onresize!');
+
     resetCanvas(bgCanvas);
     resetCanvas(fgCanvas, true);
 
@@ -172,6 +174,16 @@ export const createHighlightLayer = (
 
   const resizeObserver = new ResizeObserver(onResize);
   resizeObserver.observe(container);
+
+  // Redraw on DOM mutation
+  // Options for the observer (which mutations to observe)
+  const config = { attributes: true, childList: true, subtree: true };
+
+  // This is an extra precaution. The position of the container
+  // might shift (without resizing) due to layout changes higher-up
+  // in the DOM. (This happens in Recogito+ for example)
+  const mutationObserver = new MutationObserver(onResize);
+  mutationObserver.observe(document.body, config);
 
   const destroy = () => {
     container.removeEventListener('pointermove', onPointerMove);
@@ -187,6 +199,8 @@ export const createHighlightLayer = (
 
     window.removeEventListener('resize', onResize);
     resizeObserver.disconnect();
+
+    mutationObserver.disconnect();
   }
 
   return {
