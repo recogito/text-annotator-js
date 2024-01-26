@@ -3,15 +3,7 @@ import type { TextAnnotation } from '../model';
 import type { TextAnnotatorState } from '../state';
 import { defaultPainter, type HighlightPainter } from './HighlightPainter';
 import { trackViewport } from './trackViewport';
-
-const debounce = <T extends (...args: any[]) => void>(func: T, delay: number = 10): T => {
-  let timeoutId: ReturnType<typeof setTimeout>;
-
-  return ((...args: any[]) => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => func.apply(this, args), delay);
-  }) as T;
-}
+import { debounce } from '../utils';
 
 const createCanvas = (className: string, highres?: boolean) => {
   const canvas = document.createElement('canvas');
@@ -177,7 +169,7 @@ export const createHighlightLayer = (
 
   // Redraw on DOM mutation
   // Options for the observer (which mutations to observe)
-  const config = { attributes: true, childList: true, subtree: true };
+  const config = { childList: true, subtree: true };
 
   // This is an extra precaution. The position of the container
   // might shift (without resizing) due to layout changes higher-up
