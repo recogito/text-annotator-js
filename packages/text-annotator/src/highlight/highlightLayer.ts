@@ -3,15 +3,7 @@ import type { TextAnnotation } from '../model';
 import type { TextAnnotatorState } from '../state';
 import { defaultPainter, type HighlightPainter, type HighlightPainterStyle } from './HighlightPainter';
 import { trackViewport } from './trackViewport';
-
-const debounce = <T extends (...args: any[]) => void>(func: T, delay: number = 10): T => {
-  let timeoutId: number;
-
-  return ((...args: any[]) => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => func.apply(this, args), delay);
-  }) as T;
-}
+import { debounce } from '../utils';
 
 const createCanvas = (className: string, highres?: boolean) => {
   const canvas = document.createElement('canvas');
@@ -45,7 +37,6 @@ export const createHighlightLayer = (
   state: TextAnnotatorState,
   viewport: ViewportState
 ) => {
-
   const { store, selection, hover } = state;
   
   let currentStyle: HighlightPainterStyle | undefined;
@@ -67,7 +58,7 @@ export const createHighlightLayer = (
   container.insertBefore(bgCanvas, container.firstChild);
   container.appendChild(fgCanvas);
 
-  container.addEventListener('pointermove', (event: PointerEvent) => {
+  const onPointerMove = (event: PointerEvent) => {
     const {x, y} = container.getBoundingClientRect();
 
     const hit = store.getAt(event.clientX - x, event.clientY - y);
@@ -84,7 +75,9 @@ export const createHighlightLayer = (
         hover.set(null);
       }
     }
-  });
+  }
+
+  container.addEventListener('pointermove', onPointerMove);
 
   const getViewport = () => {
     const { top, left } = container.getBoundingClientRect();
@@ -98,30 +91,6 @@ export const createHighlightLayer = (
 
     return { top, left, minX, minY, maxX, maxY };
   }
-
-  const onScroll = () => redraw();
-
-  document.addEventListener('scroll', onScroll, { capture: true, passive: true });
-
-  const onResize = debounce(() => {
-    resetCanvas(bgCanvas);
-    resetCanvas(fgCanvas, true);
-
-    store.recalculatePositions();
-
-    redraw();
-  });
-
-  // Note that in cases where the element resized due to a 
-  // window resize, onResize will be triggered twice. This is
-  // probably not a huge issue. But definitely an area for
-  // future optimization. In terms of how to do this: there's 
-  // probably no ideal solution, but one straightforward way
-  // would be to just set a flag in 
-  window.addEventListener('resize', onResize);
-
-  const resizeObserver = new ResizeObserver(onResize);
-  resizeObserver.observe(container);
 
   const redraw = () => requestAnimationFrame(() => {
     const { top, left, minX, minY, maxX, maxY } = getViewport();   
@@ -153,13 +122,7 @@ export const createHighlightLayer = (
     });
     
     setTimeout(() => onDraw(annotationsInView.map(({ annotation }) => annotation)), 1);
-  });
-
-  store.observe(() => redraw());
-
-  // Selection should only ever affect visible annotations,
-  // need need for extra check
-  selection.subscribe(() => redraw());
+  });  
 
   const setDrawingStyle = (style: HighlightPainterStyle) => {
     currentStyle = style;
@@ -171,7 +134,69 @@ export const createHighlightLayer = (
     redraw();
   } 
 
+  // Redraw on store change
+  const onStoreChange = () => redraw();
+  store.observe(onStoreChange);
+
+  // Redraw on selection change
+  const unsubscribeSelection = selection.subscribe(() => redraw());
+
+  // Redraw on scroll
+  const onScroll = () => redraw();
+  document.addEventListener('scroll', onScroll, { capture: true, passive: true });
+
+  // Redraw on resize. Note that in cases where the element resized 
+  // due to a window resize, onResize will be triggered twice. This 
+  // is probably not a huge issue. But definitely an area for
+  // future optimization. In terms of how to do this: there's 
+  // probably no ideal solution, but one straightforward way
+  // would be to just set a flag in 
+  const onResize = debounce(() => {
+    console.log('onresize!');
+
+    resetCanvas(bgCanvas);
+    resetCanvas(fgCanvas, true);
+
+    store.recalculatePositions();
+
+    redraw();
+  });
+
+  window.addEventListener('resize', onResize);
+
+  const resizeObserver = new ResizeObserver(onResize);
+  resizeObserver.observe(container);
+
+  // Redraw on DOM mutation
+  // Options for the observer (which mutations to observe)
+  const config: MutationObserverInit = { attributes: true, childList: true, subtree: true };
+
+  // This is an extra precaution. The position of the container
+  // might shift (without resizing) due to layout changes higher-up
+  // in the DOM. (This happens in Recogito+ for example)
+  const mutationObserver = new MutationObserver(onResize);
+  mutationObserver.observe(document.body, config);
+
+  const destroy = () => {
+    container.removeEventListener('pointermove', onPointerMove);
+
+    container.removeChild(fgCanvas);
+    container.appendChild(bgCanvas);
+
+    store.unobserve(onStoreChange);
+
+    unsubscribeSelection();
+
+    document.removeEventListener('scroll', onScroll);
+
+    window.removeEventListener('resize', onResize);
+    resizeObserver.disconnect();
+
+    mutationObserver.disconnect();
+  }
+
   return {
+    destroy,
     redraw,
     setDrawingStyle,
     setFilter,

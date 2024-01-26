@@ -35,22 +35,25 @@ const MockStorage = () => {
   const anno = useAnnotator<RecogitoTextAnnotator>();
 
   useEffect(() => {
-    if (anno) {
-      anno.on('createAnnotation', (annotation: TextAnnotation) => {
-        console.log('create', annotation);
-      });
+    if (!anno) return;
 
-      anno.on('deleteAnnotation', (annotation: TextAnnotation) => {
-        console.log('delete', annotation);
-      });
-    
-      anno.on('selectionChanged', (annotations: TextAnnotation[]) => {
-        console.log('selection changed', annotations);
-      });
-    
-      anno.on('updateAnnotation', (annotation: TextAnnotation, previous: TextAnnotation) => {
-        console.log('update', annotation, previous);
-      });
+    const handleCreateAnnotation = (annotation: TextAnnotation) => console.log('create', annotation);
+    anno.on('createAnnotation', handleCreateAnnotation);
+
+    const handleDeleteAnnotation = (annotation: TextAnnotation) => console.log('delete', annotation);
+    anno.on('deleteAnnotation', handleDeleteAnnotation);
+
+    const handleSelectionChanged = (annotations: TextAnnotation[]) => console.log('selection changed', annotations);
+    anno.on('selectionChanged', handleSelectionChanged);
+
+    const handleUpdateAnnotation = (annotation: TextAnnotation, previous: TextAnnotation) => console.log('update', annotation, previous);
+    anno.on('updateAnnotation', handleUpdateAnnotation);
+
+    return () => {
+      anno.off('createAnnotation', handleCreateAnnotation);
+      anno.off('deleteAnnotation', handleDeleteAnnotation);
+      anno.off('selectionChanged', handleSelectionChanged);
+      anno.off('updateAnnotation', handleUpdateAnnotation);
     }
   }, [anno]);
 
