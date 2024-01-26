@@ -2,7 +2,7 @@ import { Origin, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotatorState } from './state';
 import type { TextSelector, TextAnnotationTarget } from './model';
-import { trimRange } from './utils';
+import { debounce, trimRange } from './utils';
 
 export const rangeToSelector = (range: Range, container: HTMLElement, offsetReferenceSelector?: string): TextSelector => {
   const rangeBefore = document.createRange();
@@ -63,9 +63,7 @@ export const SelectionHandler = (
 
   container.addEventListener('selectstart', onSelectStart);
 
-  let debounceTimer: ReturnType<typeof setTimeout> = undefined;
-
-  const onSelectionChange = (evt: PointerEvent) => {
+  const onSelectionChange = debounce( (evt: PointerEvent) => {
     const sel = document.getSelection();
 
     // Chrome/iOS does not reliably fire the 'selectstart' event!
@@ -101,27 +99,24 @@ export const SelectionHandler = (
         }
       }
     }
-  }
+  })
 
-  document.addEventListener('selectionchange', (evt: PointerEvent) => {
-    if (debounceTimer)
-      clearTimeout(debounceTimer);
-
-    debounceTimer = setTimeout(() => onSelectionChange(evt), 10);
-  });
+  document.addEventListener('selectionchange', onSelectionChange);
 
   // Select events don't carry information about the mouse button
   // Therefore, to prevent right-click selection, we need to listen
   // to the initial pointerdown event and remember the button
-  container.addEventListener('pointerdown', (evt: PointerEvent) => {
+  const onPointerDown = (evt: PointerEvent) => {
     // Note that the event itself can be ephemeral!
     const { target, timeStamp, offsetX, offsetY, type } = evt;
     lastPointerDown = { ...evt, target, timeStamp, offsetX, offsetY, type };
-    
-    isLeftClick = evt.button === 0;
-  });
 
-  document.addEventListener('pointerup', (evt: PointerEvent) => {
+    isLeftClick = evt.button === 0;
+  }
+
+  container.addEventListener('pointerdown', onPointerDown);
+
+  const onPointerUp = (evt: PointerEvent) => {
     const annotatable = !(evt.target as Node).parentElement?.closest('.not-annotatable');
     if (!annotatable || !isLeftClick)
       return;
@@ -150,9 +145,19 @@ export const SelectionHandler = (
     } else {
       selection.clickSelect(currentTarget.annotation, evt);
     }
-  });
+  }
+
+  document.addEventListener('pointerup', onPointerUp);
+
+  const destroy = () => {
+    container.removeEventListener('selectstart', onSelectStart);
+    document.removeEventListener('selectionchange', onSelectionChange);
+    container.removeEventListener('pointerdown', onPointerDown);
+    document.removeEventListener('pointerup', onPointerUp);
+  }
 
   return {
+    destroy,
     setUser
   }
 

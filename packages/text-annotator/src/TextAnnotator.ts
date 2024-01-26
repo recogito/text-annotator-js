@@ -84,7 +84,11 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   }
 
   const destroy = () => {
-    throw 'Not implemented yet';
+    highlightLayer.destroy();
+    selectionHandler.destroy();
+
+    // Other cleanup actions
+    undoStack.destroy();
   }
 
   return {
