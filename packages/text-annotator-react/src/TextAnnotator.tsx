@@ -1,10 +1,9 @@
 import { ReactNode, useContext, useEffect, useRef } from 'react';
 import { AnnotoriousContext, DrawingStyle, Filter } from '@annotorious/react';
-import { createTextAnnotator } from '@recogito/text-annotator';
 import type { TextAnnotation, TextAnnotatorOptions } from '@recogito/text-annotator';
+import { createTextAnnotator } from '@recogito/text-annotator';
 
 import '@recogito/text-annotator/dist/text-annotator.css';
-import { textAnnotation } from '@recogito/text-annotator/dist/test/model/w3c/fixtures';
 
 export type TextAnnotatorProps<E extends unknown> = TextAnnotatorOptions<E> & {
 
