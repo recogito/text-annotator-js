@@ -5,7 +5,7 @@ import { defaultPainter, type HighlightPainter } from './HighlightPainter';
 import { trackViewport } from './trackViewport';
 
 const debounce = <T extends (...args: any[]) => void>(func: T, delay: number = 10): T => {
-  let timeoutId: number;
+  let timeoutId: ReturnType<typeof setTimeout>;
 
   return ((...args: any[]) => {
     clearTimeout(timeoutId);
@@ -45,7 +45,6 @@ export const createHighlightLayer = (
   state: TextAnnotatorState,
   viewport: ViewportState
 ) => {
-
   const { store, selection, hover } = state;
   
   let currentStyle: DrawingStyle | ((annotation: TextAnnotation, selected?: boolean) => DrawingStyle) | undefined;
@@ -67,7 +66,7 @@ export const createHighlightLayer = (
   container.insertBefore(bgCanvas, container.firstChild);
   container.appendChild(fgCanvas);
 
-  container.addEventListener('pointermove', (event: PointerEvent) => {
+  const onPointerMove = (event: PointerEvent) => {
     const {x, y} = container.getBoundingClientRect();
 
     const hit = store.getAt(event.clientX - x, event.clientY - y);
@@ -84,7 +83,9 @@ export const createHighlightLayer = (
         hover.set(null);
       }
     }
-  });
+  }
+
+  container.addEventListener('pointermove', onPointerMove);
 
   const getViewport = () => {
     const { top, left } = container.getBoundingClientRect();
@@ -98,30 +99,6 @@ export const createHighlightLayer = (
 
     return { top, left, minX, minY, maxX, maxY };
   }
-
-  const onScroll = () => redraw();
-
-  document.addEventListener('scroll', onScroll, { capture: true, passive: true });
-
-  const onResize = debounce(() => {
-    resetCanvas(bgCanvas);
-    resetCanvas(fgCanvas, true);
-
-    store.recalculatePositions();
-
-    redraw();
-  });
-
-  // Note that in cases where the element resized due to a 
-  // window resize, onResize will be triggered twice. This is
-  // probably not a huge issue. But definitely an area for
-  // future optimization. In terms of how to do this: there's 
-  // probably no ideal solution, but one straightforward way
-  // would be to just set a flag in 
-  window.addEventListener('resize', onResize);
-
-  const resizeObserver = new ResizeObserver(onResize);
-  resizeObserver.observe(container);
 
   const redraw = () => requestAnimationFrame(() => {
     const { top, left, minX, minY, maxX, maxY } = getViewport();   
@@ -153,13 +130,7 @@ export const createHighlightLayer = (
     });
     
     setTimeout(() => onDraw(annotationsInView.map(({ annotation }) => annotation)), 1);
-  });
-
-  store.observe(() => redraw());
-
-  // Selection should only ever affect visible annotations,
-  // need need for extra check
-  selection.subscribe(() => redraw());
+  });  
 
   const setDrawingStyle = (style: DrawingStyle | ((a: TextAnnotation, selected?: boolean) => DrawingStyle)) => {
     currentStyle = style;
@@ -171,7 +142,55 @@ export const createHighlightLayer = (
     redraw();
   } 
 
+  // Redraw on store change
+  const onStoreChange = () => redraw();
+  store.observe(onStoreChange);
+
+  // Redraw on selection change
+  const unsubscribeSelection = selection.subscribe(() => redraw());
+
+  // Redraw on scroll
+  const onScroll = () => redraw();
+  document.addEventListener('scroll', onScroll, { capture: true, passive: true });
+
+  // Redraw on resize. Note that in cases where the element resized 
+  // due to a window resize, onResize will be triggered twice. This 
+  // is probably not a huge issue. But definitely an area for
+  // future optimization. In terms of how to do this: there's 
+  // probably no ideal solution, but one straightforward way
+  // would be to just set a flag in 
+  const onResize = debounce(() => {
+    resetCanvas(bgCanvas);
+    resetCanvas(fgCanvas, true);
+
+    store.recalculatePositions();
+
+    redraw();
+  });
+
+  window.addEventListener('resize', onResize);
+
+  const resizeObserver = new ResizeObserver(onResize);
+  resizeObserver.observe(container);
+
+  const destroy = () => {
+    container.removeEventListener('pointermove', onPointerMove);
+
+    container.removeChild(fgCanvas);
+    container.appendChild(bgCanvas);
+
+    store.unobserve(onStoreChange);
+
+    unsubscribeSelection();
+
+    document.removeEventListener('scroll', onScroll);
+
+    window.removeEventListener('resize', onResize);
+    resizeObserver.disconnect();
+  }
+
   return {
+    destroy,
     redraw,
     setDrawingStyle,
     setFilter,
