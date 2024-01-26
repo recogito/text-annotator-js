@@ -85,7 +85,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
 
   const destroy = () => {
     highlightLayer.destroy();
-    // selectionHandler.destroy();
+    selectionHandler.destroy();
 
     // Other cleanup actions
     undoStack.destroy();
