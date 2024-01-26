@@ -169,7 +169,7 @@ export const createHighlightLayer = (
 
   // Redraw on DOM mutation
   // Options for the observer (which mutations to observe)
-  const config = { childList: true, subtree: true };
+  const config: MutationObserverInit = { attributes: true, childList: true, subtree: true };
 
   // This is an extra precaution. The position of the container
   // might shift (without resizing) due to layout changes higher-up
