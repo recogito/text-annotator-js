@@ -156,10 +156,10 @@
     <script type="module">
       import { createTextAnnotator } from '../src/index.ts';
 
-      window.onload = async function() {
-        var r = createTextAnnotator(document.getElementById('content'));
+      window.onload = async () => {
+        const r = createTextAnnotator(document.getElementById('content'));
 
-        r.loadAnnotations('annotations.json');
+        void r.loadAnnotations('annotations.w3c.json');
 
         r.on('createAnnotation', annotation => {
           console.log('createAnnotation', annotation);
