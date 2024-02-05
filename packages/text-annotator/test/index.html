@@ -181,22 +181,19 @@
           console.log('viewport', annotations);
         });
 
-        var filterActive = false;
-
-        document.getElementById('filter').addEventListener('click', () => {
+        let filterActive = false;
+        document.getElementById('filter').onclick = () => {
           if (filterActive) {
-            r.setFilter();
+            r.setFilter(undefined);
 
             filterActive = false;
           } else {
-            r.setFilter(annotation => {
-              // Dummy filter - just filter randomly
-              return  Math.random() < 0.5;
-            });
+            // Dummy filter - just filter randomly
+            r.setFilter(_annotation => Math.random() < 0.5);
 
             filterActive = true;
           }
-        });
+        }
       }
     </script>
   </body>
