@@ -186,16 +186,21 @@
         });
 
         let filterActive = false;
-        document.getElementById('filter').onclick = () => {
+        const toggleButton = document.getElementById('filter');
+        const toggleButtonLabel = toggleButton.innerText;
+
+        toggleButton.onclick = () => {
           if (filterActive) {
             r.setFilter(undefined);
 
             filterActive = false;
+            toggleButton.innerText = `${toggleButtonLabel} on`;
           } else {
             // Dummy filter - just filter randomly
             r.setFilter(_annotation => Math.random() < 0.5);
 
             filterActive = true;
+            toggleButton.innerText = `${toggleButtonLabel} off`;
           }
         };
       };
