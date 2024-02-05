@@ -67,37 +67,34 @@ export const SelectionHandler = (
     const sel = document.getSelection();
 
     // Chrome/iOS does not reliably fire the 'selectstart' event!
-    if (evt.timeStamp - lastPointerDown.timeStamp < 1000 && !currentTarget)
+    if (evt.timeStamp - lastPointerDown.timeStamp < 1000 && !currentTarget) {
       onSelectStart(lastPointerDown);
+    }
 
-    if (!sel.isCollapsed && isLeftClick && currentTarget) {
-      const ranges = Array.from(Array(sel.rangeCount).keys())
-        .map(idx => sel.getRangeAt(idx));
+    if (sel.isCollapsed || !isLeftClick || !currentTarget) return;
 
-      const trimmed = trimRange(ranges[0].cloneRange());
+    const selRange = sel.getRangeAt(0);
+    const trimmed = trimRange(selRange.cloneRange());
 
-      const hasChanged =
-        trimmed.toString() !== currentTarget.selector?.quote;
+    const hasChanged = trimmed.toString() !== currentTarget.selector?.quote;
+    if (!hasChanged) return;
 
-      if (hasChanged) {
-        currentTarget = {
-          ...currentTarget,
-          selector: rangeToSelector(ranges[0], container, offsetReferenceSelector)
-        };
+    currentTarget = {
+      ...currentTarget,
+      selector: rangeToSelector(selRange, container, offsetReferenceSelector)
+    };
 
-        if (store.getAnnotation(currentTarget.annotation)) {
-          store.updateTarget(currentTarget, Origin.LOCAL);
-        } else {
-          store.addAnnotation({
-            id: currentTarget.annotation,
-            bodies: [],
-            target: currentTarget
-          });
+    if (store.getAnnotation(currentTarget.annotation)) {
+      store.updateTarget(currentTarget, Origin.LOCAL);
+    } else {
+      store.addAnnotation({
+        id: currentTarget.annotation,
+        bodies: [],
+        target: currentTarget
+      });
 
-          // Reminder: select events don't have offsetX/offsetY - reuse last up/down
-          selection.clickSelect(currentTarget.annotation, lastPointerDown);
-        }
-      }
+      // Reminder: select events don't have offsetX/offsetY - reuse last up/down
+      selection.clickSelect(currentTarget.annotation, lastPointerDown);
     }
   })
 
