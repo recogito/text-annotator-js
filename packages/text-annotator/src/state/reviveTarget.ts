@@ -51,7 +51,7 @@ export const reviveTarget = (
   while (n !== null) {
     const len = n.textContent.length;
 
-    if (runningOffset + len > end) {
+    if (runningOffset + len >= end) {
       range.setEnd(n, end - runningOffset);
       break;
     }
