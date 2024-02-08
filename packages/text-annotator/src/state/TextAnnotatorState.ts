@@ -1,11 +1,12 @@
 import type { PointerSelectAction, Store, ViewportState } from '@annotorious/core';
-import { 
-  createHoverState, 
-  createSelectionState, 
-  createStore, 
-  AnnotatorState, 
-  SelectionState, 
-  HoverState, 
+import {
+  createHoverState,
+  createSelectionState,
+  createStore,
+  AnnotatorState,
+  SelectionState,
+  HoverState,
+  AnnotationLinkedEntityIdentifier,
   Origin,
   createViewportState
 } from '@annotorious/core';
@@ -27,10 +28,13 @@ export type TextAnnotatorState = AnnotatorState<TextAnnotation> & {
 }
 
 // Shorthand
-const hasValidRange = (annotation: TextAnnotation) => {
-  const { range } = annotation.target.selector;
-  return range instanceof Range && !range.collapsed;
-}
+const isValidRange = (range: unknown) => range instanceof Range && !range.collapsed;
+const hasAllValidRanges = (annotation: TextAnnotation) => annotation.targets.map(t => t.selector.range).every(isValidRange)
+
+const reviveAnnotation = (annotation: TextAnnotation, container: HTMLElement): TextAnnotation => ({
+  ...annotation,
+  targets: annotation.targets.map(t => isValidRange(t.selector.range) ? t : reviveTarget(t, container))
+})
 
 export const createTextAnnotatorState = (
   container: HTMLElement,
@@ -49,32 +53,27 @@ export const createTextAnnotatorState = (
 
   // Wrap store interface to intercept annotations and revive DOM ranges, if needed
   const addAnnotation = (annotation: TextAnnotation, origin = Origin.LOCAL): boolean => {
-    const revived = annotation.target.selector.range instanceof Range ?
-      annotation : { ...annotation, target: reviveTarget(annotation.target, container) };
+    const revived = reviveAnnotation(annotation, container);
 
-    const { range } = revived.target.selector;
-    const isValid = range && !range.collapsed;
-
-    if (isValid)
-      store.addAnnotation(revived, origin); 
+    const isValid = hasAllValidRanges(revived);
+    if (isValid) {
+      store.addAnnotation(revived, origin);
+    }
 
     return isValid;
-  }
+  };
 
   const bulkAddAnnotation = (
     annotations: TextAnnotation[], 
     replace = true, 
     origin = Origin.LOCAL
   ): TextAnnotation[] => {
-    const revived = annotations.map(a => hasValidRange(a) ?
-      a : { ...a, target: reviveTarget(a.target, container )});
+    const revived = annotations.map(a => reviveAnnotation(a, container));
 
     // Initial page load might take some time. Retry for more robustness.
-    const hasCollapsedRanges = revived.some(a => a.target.selector.range.collapsed);
-    if (hasCollapsedRanges) {
-      const couldNotRevive = revived.filter(a => a.target.selector.range.collapsed);
-      console.warn('Could not revive all targets');
-      console.warn(couldNotRevive);
+    const couldNotRevive = revived.filter(a => !hasAllValidRanges(a));
+    if (couldNotRevive.length > 0) {
+      console.warn('Could not revive all targets for these annotations:', couldNotRevive);
 
       // Note: we want to keep ALL annotations in the store, even those that
       // were not revived - even if the highlighter won't be able to render
@@ -88,11 +87,9 @@ export const createTextAnnotatorState = (
     }
   }
 
-  const updateTarget = (target: TextAnnotationTarget, origin = Origin.LOCAL) => {
-    const revived = target.selector.range instanceof Range ?
-      target : reviveTarget(target, container);
-
-    store.updateTarget(revived, origin);
+  const updateTarget = (oldTargetId: AnnotationLinkedEntityIdentifier, newTarget: TextAnnotationTarget, origin = Origin.LOCAL) => {
+    const revived = newTarget.selector.range instanceof Range ? newTarget : reviveTarget(newTarget, container);
+    store.updateTarget(oldTargetId, revived, origin);
   }
 
   const bulkUpdateTargets = (targets: TextAnnotationTarget[], origin = Origin.LOCAL) => {
@@ -155,19 +152,19 @@ export const createTextAnnotatorState = (
   const recalculatePositions = () => tree.recalculate();
 
   store.observe(({ changes }) => {
-    const created = (changes.created || []).filter(hasValidRange);
-    const deleted = (changes.deleted || []).filter(hasValidRange);
-    const updated = (changes.updated || []).filter(u => hasValidRange(u.newValue));
+    const created = (changes.created || []).filter(hasAllValidRanges);
+    const deleted = (changes.deleted || []).filter(hasAllValidRanges);
+    const updated = (changes.updated || []).filter(u => hasAllValidRanges(u.newValue));
 
     if (created.length > 0)
-      tree.set(created.map(a => a.target), false);
+      tree.set(created.map(a => a.targets), false);
 
     if (deleted?.length > 0)
-      deleted.forEach(a => tree.remove(a.target));
+      deleted.forEach(a => tree.remove(a.targets));
 
     if (updated?.length > 0)
       updated.forEach(({ newValue }) =>
-        tree.update(newValue.target));
+        tree.update(newValue.targets));
   });
 
   return {
