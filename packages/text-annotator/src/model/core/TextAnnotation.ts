@@ -2,7 +2,7 @@ import type { Annotation, AnnotationTarget } from '@annotorious/core';
 
 export interface TextAnnotation extends Annotation {
 
-  target: TextAnnotationTarget;
+  targets: TextAnnotationTarget[];
 
 }
 
