@@ -7,7 +7,6 @@ const getAnnotableRangeContents = (range: Range): DocumentFragment => {
 	return contents;
 };
 
-
 export const rangeToSelector = (
 	range: Range,
 	container: HTMLElement,
