@@ -18,10 +18,7 @@ export type W3CTextFormatAdapter = FormatAdapter<TextAnnotation, W3CTextAnnotati
  * @param container - the HTML container of the annotated content,
  *                    Required to locate the content's `range` within the DOM
  */
-export const W3CTextFormat = (
-  source: string, 
-  container: HTMLElement
-): W3CTextFormatAdapter => ({
+export const W3CTextFormat = (source: string, container: HTMLElement): W3CTextFormatAdapter => ({
   parse: (serialized) => parseW3CTextAnnotation(serialized, container),
   serialize: (annotation) => serializeW3CTextAnnotation(annotation, source, container)
 });
@@ -29,7 +26,7 @@ export const W3CTextFormat = (
 const isTextSelector = (selector: Partial<TextSelector>): selector is TextSelector =>
   selector.quote !== undefined && selector.start !== undefined && selector.end !== undefined;
 
-const parseW3CTextTargets = (annotation: W3CTextAnnotation,  container: HTMLElement) => {
+const parseW3CTextTargets = (annotation: W3CTextAnnotation, container: HTMLElement) => {
   const {
     id: annotationId,
     creator,
@@ -38,13 +35,13 @@ const parseW3CTextTargets = (annotation: W3CTextAnnotation,  container: HTMLElem
     target
   } = annotation;
 
-  const w3cTargets = Array.isArray(target) ? target : [ target ];
+  const w3cTargets = Array.isArray(target) ? target : [target];
 
   const parsed = [];
 
-  for(const w3cTarget of w3cTargets) {
+  for (const w3cTarget of w3cTargets) {
     const w3cSelectors = Array.isArray(w3cTarget.selector)
-      ? w3cTarget.selector : [ w3cTarget.selector ];
+      ? w3cTarget.selector : [w3cTarget.selector];
 
     const selector = w3cSelectors.reduce<Partial<TextSelector>>((s, w3cSelector) => {
       switch (w3cSelector.type) {
@@ -71,7 +68,7 @@ const parseW3CTextTargets = (annotation: W3CTextAnnotation,  container: HTMLElem
           annotation: annotationId,
           selector
         }, container)
-      )
+      );
     } else {
       const missingTypes = [
         !selector.start ? 'TextPositionSelector' : undefined,
@@ -80,15 +77,15 @@ const parseW3CTextTargets = (annotation: W3CTextAnnotation,  container: HTMLElem
 
       return {
         error: Error(`Missing selector types: ${missingTypes.join(' and ')}`)
-      }
+      };
     }
   }
 
   return { parsed };
-}
+};
 
 export const parseW3CTextAnnotation = (
-  annotation: W3CTextAnnotation, 
+  annotation: W3CTextAnnotation,
   container: HTMLElement
 ): ParseResult<TextAnnotation> => {
   const annotationId = annotation.id || uuidv4();
@@ -111,38 +108,46 @@ export const parseW3CTextAnnotation = (
       bodies,
       targets: targets.parsed
     }
-  }
-}
+  };
+};
 
 export const serializeW3CTextAnnotation = (
-  annotation: TextAnnotation, 
-  source: string, 
+  annotation: TextAnnotation,
+  source: string,
   container: HTMLElement
 ): W3CTextAnnotation => {
-  const { bodies, target, ...rest } = annotation;
+  const { bodies, targets, ...rest } = annotation;
 
-  const {
-    selector,
-    creator,
-    created,
-    updated,
-    ...targetRest
-  } = target;
+  const w3cTargets = targets.map(target => {
+    const {
+      selector,
+      creator,
+      created,
+      updated,
+      ...targetRest
+    } = target;
 
-  const { quote, start, end, range } = selector;
+    const { quote, start, end, range } = selector;
 
-  const { prefix, suffix } = getQuoteContext(range, container);
+    const { prefix, suffix } = getQuoteContext(range, container);
 
-  const w3cSelector: W3CTextSelector[] = [{
-    type: 'TextQuoteSelector',
-    exact: quote,
-    prefix,
-    suffix
-  },{
-    type: 'TextPositionSelector',
-    start,
-    end
-  }];
+    const w3cSelector: W3CTextSelector[] = [{
+      type: 'TextQuoteSelector',
+      exact: quote,
+      prefix,
+      suffix
+    }, {
+      type: 'TextPositionSelector',
+      start,
+      end
+    }];
+
+    return {
+      ...targetRest,
+      source,
+      selector: w3cSelector
+    };
+  });
 
   return {
     ...rest,
@@ -150,14 +155,10 @@ export const serializeW3CTextAnnotation = (
     id: annotation.id,
     type: 'Annotation',
     body: serializeW3CBodies(annotation.bodies),
-    creator,
-    created: created?.toISOString(),
-    modified: updated?.toISOString(),
-    target: {
-      ...targetRest,
-      source,
-      selector: w3cSelector
-    }
-  }
+    creator: targets[0].creator,
+    created: targets[0].created?.toISOString(),
+    modified: targets[0].updated?.toISOString(),
+    target: w3cTargets
+  };
 
-}
+};
