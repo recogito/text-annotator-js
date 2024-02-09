@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -154,12 +154,16 @@
     </div>
 
     <script type="module">
-      import { createTextAnnotator } from '../src/index.ts';
+      import { createTextAnnotator, W3CTextFormat } from '../src/index.ts';
 
-      window.onload = async function() {
-        var r = createTextAnnotator(document.getElementById('content'));
+      window.onload = async () => {
+        const contentContainer = document.getElementById('content');
 
-        r.loadAnnotations('annotations.json');
+        const r = createTextAnnotator(contentContainer, {
+          adapter: W3CTextFormat('https://www.gutenberg.org', contentContainer)
+        });
+
+        void r.loadAnnotations('annotations.w3c.json');
 
         r.on('createAnnotation', annotation => {
           console.log('createAnnotation', annotation);
@@ -181,23 +185,25 @@
           console.log('viewport', annotations);
         });
 
-        var filterActive = false;
+        let filterActive = false;
+        const toggleButton = document.getElementById('filter');
+        const toggleButtonLabel = toggleButton.innerText;
 
-        document.getElementById('filter').addEventListener('click', () => {
+        toggleButton.onclick = () => {
           if (filterActive) {
-            r.setFilter();
+            r.setFilter(undefined);
 
             filterActive = false;
+            toggleButton.innerText = `${toggleButtonLabel} on`;
           } else {
-            r.setFilter(annotation => {
-              // Dummy filter - just filter randomly
-              return  Math.random() < 0.5;
-            });
+            // Dummy filter - just filter randomly
+            r.setFilter(_annotation => Math.random() < 0.5);
 
             filterActive = true;
+            toggleButton.innerText = `${toggleButtonLabel} off`;
           }
-        });
-      }
+        };
+      };
     </script>
   </body>
 </html>
