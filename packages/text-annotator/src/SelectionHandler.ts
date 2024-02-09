@@ -1,7 +1,7 @@
 import { Origin, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotatorState } from './state';
-import type { TextAnnotationTarget } from './model';
+import type { TextAnnotation, TextAnnotationTarget } from './model';
 import { debounce, getAnnotableRanges, rangeToSelector, trimRange } from './utils';
 
 // Shortcut
@@ -34,8 +34,7 @@ export const SelectionHandler = (
 
   let currentUser: User;
 
-  let currentAnnotationId: string | undefined;
-  let currentTargets: TextAnnotationTarget[] | undefined;
+  let currentAnnotation: TextAnnotation | undefined;
 
   const setUser = (user: User) => currentUser = user;
 
@@ -52,8 +51,11 @@ export const SelectionHandler = (
     // Note that Chrome/iOS will sometimes return the root doc as target!
     const annotatable = !(evt.target as Node).parentElement?.closest('.not-annotatable');
 
-    currentAnnotationId = annotatable ? uuidv4() : undefined;
-    currentTargets = annotatable ? [] : undefined;
+    currentAnnotation = annotatable ? {
+      id: uuidv4(),
+      targets: [],
+      bodies: []
+    } : undefined;
   }
 
   container.addEventListener('selectstart', onSelectStart);
@@ -62,35 +64,35 @@ export const SelectionHandler = (
     const sel = document.getSelection();
 
     // Chrome/iOS does not reliably fire the 'selectstart' event!
-    if (evt.timeStamp - lastPointerDown.timeStamp < 1000 && !currentTargets) {
+    if (evt.timeStamp - lastPointerDown.timeStamp < 1000 && !currentAnnotation) {
       onSelectStart(lastPointerDown);
     }
 
-    if (sel.isCollapsed || !isLeftClick || !currentTargets) return;
+    if (sel.isCollapsed || !isLeftClick || !currentAnnotation) return;
 
     const selRange = sel.getRangeAt(0);
     const trimmedRange = trimRange(selRange.cloneRange());
     const annotableRanges = getAnnotableRanges(trimmedRange);
 
     const hasChanged =
-      annotableRanges.length !== currentTargets.length ||
-      annotableRanges.some((r, i) => r.toString() !== currentTargets[i].selector?.quote);
+      annotableRanges.length !== currentAnnotation.targets.length ||
+      annotableRanges.some((r, i) => r.toString() !== currentAnnotation.targets[i].selector?.quote);
     if (!hasChanged) return;
 
     // Discards any targets that don't have a corresponding annotable range
-    const targetsToDiscard = currentTargets.slice(annotableRanges.length);
+    const targetsToDiscard = currentAnnotation.targets.slice(annotableRanges.length);
     targetsToDiscard.forEach(target => store.deleteTarget(target, Origin.LOCAL));
 
     annotableRanges.forEach((range, i) => {
-      const target = currentTargets[i];
+      const target = currentAnnotation.targets[i];
       if (target) {
-        currentTargets[i] = {
+        currentAnnotation.targets[i] = {
           ...target,
           selector: rangeToSelector(range, container, offsetReferenceSelector)
         };
       } else {
-        currentTargets[i] = createTarget({
-          annotationId: currentAnnotationId!,
+        currentAnnotation.targets[i] = createTarget({
+          annotationId: currentAnnotation.id,
           creator: currentUser,
           range,
           container,
@@ -99,18 +101,14 @@ export const SelectionHandler = (
       }
     });
 
-    const annotation = store.getAnnotation(currentAnnotationId!);
+    const annotation = store.getAnnotation(currentAnnotation.id);
     if (annotation) {
-      store.updateAnnotation({ ...annotation, targets: currentTargets });
+      store.updateAnnotation(annotation);
     } else {
-      store.addAnnotation({
-        id: currentAnnotationId,
-        bodies: [],
-        targets: currentTargets
-      });
+      store.addAnnotation(annotation);
 
       // Reminder: select events don't have offsetX/offsetY - reuse last up/down
-      selection.clickSelect(currentAnnotationId, lastPointerDown);
+      selection.clickSelect(annotation.id, lastPointerDown);
     }
   })
 
@@ -153,11 +151,10 @@ export const SelectionHandler = (
 
     // Just a click, not a selection
     if (document.getSelection().isCollapsed && timeDifference < 300) {
-      currentAnnotationId = undefined;
-      currentTargets = undefined;
+      currentAnnotation = undefined;
       clickSelect();
     } else {
-      selection.clickSelect(currentAnnotationId, evt);
+      selection.clickSelect(currentAnnotation.id, evt);
     }
   }
 
