@@ -1,12 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
 import {
-  type FormatAdapter, hashCode,
+  type FormatAdapter,
+  hashCode,
   ParseResult,
   parseW3CBodies,
   parseW3CUser,
   serializeW3CBodies
 } from '@annotorious/core';
-import type { TextAnnotation, TextAnnotationTarget, TextSelector } from '../core';
+import type { TextAnnotation, TextSelector } from '../core';
 import type { W3CTextAnnotation, W3CTextSelector } from '../w3c';
 import { reviveTarget } from '../../state';
 import { getQuoteContext } from '../../utils';
