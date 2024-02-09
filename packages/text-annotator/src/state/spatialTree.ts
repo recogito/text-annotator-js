@@ -5,11 +5,15 @@ import { mergeClientRects } from '../utils';
 import { getClientRectsPonyfill } from '../utils/getClientRectsPonyfill';
 import { reviveTarget } from './reviveTarget';
 
+// TODO Removed unused imports of ponyfill
 const isFirefox = false; // navigator.userAgent.match(/firefox|fxios/i);
-
 if (isFirefox) console.warn('Firefox interop enabled');
 
-export interface IndexedHighlightRect {
+/**
+ * Stores rects captured by the annotation's target range
+ * Those ranges can be non-contiguous
+ */
+export interface IndexedHighlightRects {
 
   minX: number;
 
@@ -19,35 +23,40 @@ export interface IndexedHighlightRect {
 
   maxY: number;
 
-  annotation: {
-    
+  target: {
+
     id: string;
+
+    annotation: string;
 
     rects: DOMRect[];
 
-  }
+  };
 
 }
 
 export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLElement) => {
 
-  const tree = new RBush<IndexedHighlightRect>();
+  const tree = new RBush<IndexedHighlightRects>();
 
-  const index = new Map<string, IndexedHighlightRect[]>();
+  /**
+   * Binds annotation to the targets' rects (possibly non-contiguous)
+   */
+  const index = new Map<string, { [targetId: string]: IndexedHighlightRects[] }>();
 
   // Helper: converts a single text annotation target to a list of hightlight rects
-  const toItems = (target: TextAnnotationTarget): IndexedHighlightRect[] => {
+  const toItems = (target: TextAnnotationTarget): IndexedHighlightRects[] => {
     const offset = container.getBoundingClientRect();
 
-    const isValidRange = 
-      target.selector.range instanceof Range && 
+    const isValidRange =
+      target.selector.range instanceof Range &&
       !target.selector.range.collapsed &&
-      target.selector.range.startContainer.nodeType === Node.TEXT_NODE && 
+      target.selector.range.startContainer.nodeType === Node.TEXT_NODE &&
       target.selector.range.endContainer.nodeType === Node.TEXT_NODE;
 
     const t = isValidRange ? target : reviveTarget(target, container);
 
-    const rects = isFirefox ? 
+    const rects = isFirefox ?
       getClientRectsPonyfill(t.selector.range) :
       Array.from(t.selector.range.getClientRects());
 
@@ -61,13 +70,14 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
         minY: y - offset.y,
         maxX: x - offset.x + width,
         maxY: y - offset.y + height,
-        annotation: {
-          id: target.annotation,
+        target: {
+          id: target.id,
+          annotation: target.annotation,
           rects: merged
         }
-      }
+      };
     });
-  }
+  };
 
   const all = () => [...index.values()];
 
@@ -77,16 +87,26 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
   }
 
   const insert = (target: TextAnnotationTarget) => {
-    const rects = toItems(target);
-    rects.forEach(rect => tree.insert(rect));
-    index.set(target.annotation, rects);
+    const targetRects = toItems(target);
+    targetRects.forEach(rect => tree.insert(rect));
+
+    const annoRects = index.get(target.annotation) || {};
+    annoRects[target.id] = targetRects;
+
+    index.set(target.annotation, annoRects);
   }
 
   const remove = (target: TextAnnotationTarget) => {
-    const rects = index.get(target.annotation);
-    rects.forEach(rect => tree.remove(rect));
-    index.delete(target.annotation);
-  }
+    const annoRects = index.get(target.annotation);
+
+    const targetRects = annoRects[target.id];
+    targetRects.forEach(rect => tree.remove(rect));
+
+    delete annoRects[target.id]; // Mutates the object within the index
+    if (Object.keys(annoRects).length === 0) {
+      index.delete(target.annotation);
+    }
+  };
 
   const update = (target: TextAnnotationTarget) => {
     remove(target);
@@ -98,11 +118,19 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
       clear();
 
     const rectsByTarget = targets.map(target => ({ target, rects: toItems(target) }));
-    rectsByTarget.forEach(({ target, rects }) => index.set(target.annotation, rects));
+    rectsByTarget.forEach(({ target, rects }) => {
+      const annoRects = index.get(target.annotation) || {};
+      annoRects[target.id] = rects;
+      index.set(target.annotation, annoRects);
+    });
 
-    const allRects = rectsByTarget.reduce((all, { rects }) => [...all, ...rects], []);
+    /**
+     * Bulk insertion is usually ~2-3 times faster than inserting items one by one.
+     * After bulk loading (bulk insertion into an empty tree), subsequent query performance is also ~20-30% better.
+     */
+    const allRects = rectsByTarget.flatMap(({ rects }) => rects);
     tree.load(allRects);
-  }
+  };
 
   const getAt = (x: number, y: number): string | undefined => {
     const hits = tree.search({
@@ -112,14 +140,14 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
       maxY: y
     });
 
-    const area = (rect: IndexedHighlightRect) =>
-      rect.annotation.rects.reduce((area, r) =>
+    const area = (rect: IndexedHighlightRects) =>
+      rect.target.rects.reduce((area, r) =>
         area + r.width * r.height, 0);
     
     // Get smallest rect
     if (hits.length > 0) {
       hits.sort((a, b) => area(a) - area(b));
-      return hits[0].annotation.id;
+      return hits[0].target.annotation;
     }
   }
 
@@ -147,15 +175,13 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
   }
 
   const getDOMRectsForAnnotation = (id: string): DOMRect[] => {
-    const indexed = index.get(id);
-    if (indexed) {
-      // Reminder: *each* IndexedHighlightRect stores *all*
-      // DOMRects for the annotation for convenience
-      return indexed[0].annotation.rects;
-    } else {
-      return [];
-    }
-  }
+    const annoRects = index.get(id);
+
+    return annoRects ? Object.values(annoRects).flatMap(
+        // Reminder: *each* IndexedHighlightRect stores *all* DOMRects for the target for convenience
+        targetRects => targetRects[0].target.rects
+      ) : [];
+  };
 
   const getIntersectingRects = (minX: number, minY: number, maxX: number, maxY: number) =>
     tree.search({ minX, minY, maxX, maxY });
@@ -163,7 +189,7 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
   const size = () => tree.all().length;
 
   const recalculate = () =>
-    set(store.all().map(a => a.target), true);
+    set(store.all().flatMap(a => a.targets), true);
 
   return {
     all,
