@@ -98,8 +98,14 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
 
   const remove = (target: TextAnnotationTarget) => {
     const annoRects = index.get(target.annotation);
-
     const targetRects = annoRects[target.id];
+
+    /**
+     * `targetRects` can be `undefined` when the `update` function ran prior
+     */
+    if (!targetRects)
+      return;
+
     targetRects.forEach(rect => tree.remove(rect));
 
     delete annoRects[target.id]; // Mutates the object within the index

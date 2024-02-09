@@ -103,7 +103,7 @@ export const SelectionHandler = (
 
     const annotation = store.getAnnotation(currentAnnotation.id);
     if (annotation) {
-      store.updateAnnotation(annotation);
+      store.updateAnnotation(currentAnnotation);
     } else {
       store.addAnnotation(currentAnnotation);
 
