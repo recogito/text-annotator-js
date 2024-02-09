@@ -1,27 +1,28 @@
 import { Origin, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotatorState } from './state';
-import type { TextSelector, TextAnnotationTarget } from './model';
-import { debounce, trimRange } from './utils';
+import type { TextAnnotationTarget } from './model';
+import { debounce, getAnnotableRanges, rangeToSelector, trimRange } from './utils';
 
-export const rangeToSelector = (range: Range, container: HTMLElement, offsetReferenceSelector?: string): TextSelector => {
-  const rangeBefore = document.createRange();
+// Shortcut
+const createTarget = (args: {
+  annotationId: string,
+  creator: User,
+  range: Range,
+  container: HTMLElement,
+  offsetReferenceSelector?: string
+}): TextAnnotationTarget => {
+  const { annotationId, creator, range, container, offsetReferenceSelector } = args
 
-  const offsetReference: HTMLElement = offsetReferenceSelector ? 
-    (range.startContainer.parentElement as HTMLElement).closest(offsetReferenceSelector) : container;
-
-  // A helper range from the start of the contentNode to the start of the selection
-  rangeBefore.setStart(offsetReference, 0);
-  rangeBefore.setEnd(range.startContainer, range.startOffset);
-
-  const quote = range.toString();
-  const start = rangeBefore.toString().length;
-  const end = start + quote.length;
-
-  return offsetReferenceSelector ?
-    { quote, start, end, range, offsetReference } :
-    { quote, start, end, range };
-}
+  const selector = rangeToSelector(range, container, offsetReferenceSelector);
+  return {
+    id: uuidv4(),
+    annotation: annotationId,
+    selector,
+    creator,
+    created: new Date()
+  };
+};
 
 export const SelectionHandler = (
   container: HTMLElement,
@@ -33,7 +34,8 @@ export const SelectionHandler = (
 
   let currentUser: User;
 
-  let currentTarget: TextAnnotationTarget | undefined;
+  let currentAnnotationId: string | undefined;
+  let currentTargets: TextAnnotationTarget[] | undefined;
 
   const setUser = (user: User) => currentUser = user;
 
@@ -49,16 +51,9 @@ export const SelectionHandler = (
     // be annotatable (like a component popup).
     // Note that Chrome/iOS will sometimes return the root doc as target!
     const annotatable = !(evt.target as Node).parentElement?.closest('.not-annotatable');
-    if (annotatable) {
-      currentTarget = {
-        annotation: uuidv4(),
-        selector: undefined,
-        creator: currentUser,
-        created: new Date()
-      };
-    } else {
-      currentTarget = undefined;
-    }
+
+    currentAnnotationId = annotatable ? uuidv4() : undefined;
+    currentTargets = annotatable ? [] : undefined;
   }
 
   container.addEventListener('selectstart', onSelectStart);
@@ -67,34 +62,55 @@ export const SelectionHandler = (
     const sel = document.getSelection();
 
     // Chrome/iOS does not reliably fire the 'selectstart' event!
-    if (evt.timeStamp - lastPointerDown.timeStamp < 1000 && !currentTarget) {
+    if (evt.timeStamp - lastPointerDown.timeStamp < 1000 && !currentTargets) {
       onSelectStart(lastPointerDown);
     }
 
-    if (sel.isCollapsed || !isLeftClick || !currentTarget) return;
+    if (sel.isCollapsed || !isLeftClick || !currentTargets) return;
 
     const selRange = sel.getRangeAt(0);
-    const trimmed = trimRange(selRange.cloneRange());
+    const trimmedRange = trimRange(selRange.cloneRange());
+    const annotableRanges = getAnnotableRanges(trimmedRange);
 
-    const hasChanged = trimmed.toString() !== currentTarget.selector?.quote;
+    const hasChanged =
+      annotableRanges.length !== currentTargets.length ||
+      annotableRanges.some((r, i) => r.toString() !== currentTargets[i].selector?.quote);
     if (!hasChanged) return;
 
-    currentTarget = {
-      ...currentTarget,
-      selector: rangeToSelector(selRange, container, offsetReferenceSelector)
-    };
+    // Discards any targets that don't have a corresponding annotable range
+    const targetsToDiscard = currentTargets.slice(annotableRanges.length);
+    targetsToDiscard.forEach(target => store.deleteTarget(target, Origin.LOCAL));
 
-    if (store.getAnnotation(currentTarget.annotation)) {
-      store.updateTarget(currentTarget, Origin.LOCAL);
+    annotableRanges.forEach((range, i) => {
+      const target = currentTargets[i];
+      if (target) {
+        currentTargets[i] = {
+          ...target,
+          selector: rangeToSelector(range, container, offsetReferenceSelector)
+        };
+      } else {
+        currentTargets[i] = createTarget({
+          annotationId: currentAnnotationId!,
+          creator: currentUser,
+          range,
+          container,
+          offsetReferenceSelector
+        });
+      }
+    });
+
+    const annotation = store.getAnnotation(currentAnnotationId!);
+    if (annotation) {
+      store.updateAnnotation({ ...annotation, targets: currentTargets });
     } else {
       store.addAnnotation({
-        id: currentTarget.annotation,
+        id: currentAnnotationId,
         bodies: [],
-        target: currentTarget
+        targets: currentTargets
       });
 
       // Reminder: select events don't have offsetX/offsetY - reuse last up/down
-      selection.clickSelect(currentTarget.annotation, lastPointerDown);
+      selection.clickSelect(currentAnnotationId, lastPointerDown);
     }
   })
 
@@ -137,10 +153,11 @@ export const SelectionHandler = (
 
     // Just a click, not a selection
     if (document.getSelection().isCollapsed && timeDifference < 300) {
-      currentTarget = undefined;
+      currentAnnotationId = undefined;
+      currentTargets = undefined;
       clickSelect();
     } else {
-      selection.clickSelect(currentTarget.annotation, evt);
+      selection.clickSelect(currentAnnotationId, evt);
     }
   }
 
