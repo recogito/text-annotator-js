@@ -51,14 +51,17 @@ export const scrollIntoView = (container: HTMLElement, store: TextAnnotationStor
   if (scrollParent) {
     // Get curren version of the annotation from the store
     const current = store.getAnnotation(annotation.id);
-    const { range } = current.target.selector;
+
+    // The 1st target is the topmost one as well
+    const target = current.targets[0];
+    const { range } = target.selector;
 
     if (range && !range.collapsed) {
-      scroll(current.target);
+      scroll(target);
       return true;
     } else {
       // Try reviving to account for lazy rendering
-      const revived = reviveTarget(current.target, container);
+      const revived = reviveTarget(target, container);
       if (revived.selector.range && !revived.selector.range.collapsed) {
         scroll(revived);
         return true;
