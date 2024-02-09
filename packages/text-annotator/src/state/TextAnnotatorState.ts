@@ -10,7 +10,7 @@ import {
   Origin,
   createViewportState
 } from '@annotorious/core';
-import { IndexedHighlightRect, createSpatialTree } from './spatialTree';
+import { IndexedHighlightRects, createSpatialTree } from './spatialTree';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
 import type { AnnotationRects, TextAnnotationStore } from './TextAnnotationStore';
 import { reviveTarget } from './reviveTarget';
@@ -104,11 +104,11 @@ export const createTextAnnotatorState = (
 
   const getIntersecting = (minX: number, minY: number, maxX: number, maxY: number) => {
     const rects = tree.getIntersectingRects(minX, minY, maxX, maxY);
-    const ids = Array.from(new Set(rects.map(item => item.annotation.id)));
+    const ids = Array.from(new Set(rects.map(item => item.target.annotation)));
 
-    // Note that the tree could be slightly out of sync (because it updates
-    // by listening to changes, just like anyone else)
-    return ids.map(id => store.getAnnotation(id)).filter(a => a);
+    // Note that the tree could be slightly out of sync
+    // (because it updates by listening to changes, just like anyone else)
+    return ids.map(id => store.getAnnotation(id)).filter(Boolean);
   }
 
   const getAnnotationBounds = (id: string, x?: number, y?: number, buffer = 5): DOMRect => {
@@ -136,8 +136,8 @@ export const createTextAnnotatorState = (
     const rects = tree.getIntersectingRects(minX, minY, maxX, maxY);
 
     // Group by annotation ID
-    const groupedByAnnotationId: { [key:string]: IndexedHighlightRect[] } = rects.reduce((grouped, rect) => {
-      (grouped[rect.annotation.id] = grouped[rect.annotation.id] || []).push(rect);
+    const groupedByAnnotationId: { [key:string]: IndexedHighlightRects[] } = rects.reduce((grouped, rect) => {
+      (grouped[rect.target.annotation] = grouped[rect.target.annotation] || []).push(rect);
       return grouped;
     }, {});
 
@@ -157,14 +157,13 @@ export const createTextAnnotatorState = (
     const updated = (changes.updated || []).filter(u => hasAllValidRanges(u.newValue));
 
     if (created.length > 0)
-      tree.set(created.map(a => a.targets), false);
+      tree.set(created.flatMap(a => a.targets), false);
 
     if (deleted?.length > 0)
-      deleted.forEach(a => tree.remove(a.targets));
+      deleted.forEach(a => a.targets.map(t => tree.remove(t)));
 
     if (updated?.length > 0)
-      updated.forEach(({ newValue }) =>
-        tree.update(newValue.targets));
+      updated.forEach(({ newValue }) => newValue.targets.map(t => tree.update(t)));
   });
 
   return {
