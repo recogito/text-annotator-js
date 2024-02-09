@@ -105,10 +105,10 @@ export const SelectionHandler = (
     if (annotation) {
       store.updateAnnotation(annotation);
     } else {
-      store.addAnnotation(annotation);
+      store.addAnnotation(currentAnnotation);
 
       // Reminder: select events don't have offsetX/offsetY - reuse last up/down
-      selection.clickSelect(annotation.id, lastPointerDown);
+      selection.clickSelect(currentAnnotation.id, lastPointerDown);
     }
   })
 
