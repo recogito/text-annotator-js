@@ -28,7 +28,7 @@ export type TextAnnotatorState = AnnotatorState<TextAnnotation> & {
 }
 
 // Shorthand
-const isValidRange = (range: unknown) => range instanceof Range && !range.collapsed;
+const isValidRange = (range: unknown): range is Range => range instanceof Range && !range.collapsed;
 const hasAllValidRanges = (annotation: TextAnnotation) => annotation.targets.map(t => t.selector.range).every(isValidRange)
 
 const reviveAnnotation = (annotation: TextAnnotation, container: HTMLElement): TextAnnotation => ({

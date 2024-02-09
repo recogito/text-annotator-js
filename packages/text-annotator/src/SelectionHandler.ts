@@ -4,7 +4,7 @@ import type { TextAnnotatorState } from './state';
 import type { TextAnnotation, TextAnnotationTarget } from './model';
 import { debounce, getAnnotableRanges, rangeToSelector, trimRange } from './utils';
 
-// Shortcut
+// Shorthand
 const createTarget = (args: {
   annotationId: string,
   creator: User,
