@@ -29,7 +29,14 @@ export type TextAnnotatorState = AnnotatorState<TextAnnotation> & {
 
 // Shorthand
 const isValidRange = (range: unknown): range is Range => range instanceof Range && !range.collapsed;
-const hasAllValidRanges = (annotation: TextAnnotation) => annotation.targets.map(t => t.selector.range).every(isValidRange)
+const hasAllValidTargets = (annotation: TextAnnotation) => {
+  const { targets } = annotation
+
+  return (
+    targets.length !== 0 && // Annotation must have at least one target
+    annotation.targets.map(t => t.selector.range).every(isValidRange)
+  )
+}
 
 const reviveAnnotation = (annotation: TextAnnotation, container: HTMLElement): TextAnnotation => ({
   ...annotation,
@@ -55,7 +62,7 @@ export const createTextAnnotatorState = (
   const addAnnotation = (annotation: TextAnnotation, origin = Origin.LOCAL): boolean => {
     const revived = reviveAnnotation(annotation, container);
 
-    const isValid = hasAllValidRanges(revived);
+    const isValid = hasAllValidTargets(revived);
     if (isValid) {
       store.addAnnotation(revived, origin);
     }
@@ -71,7 +78,7 @@ export const createTextAnnotatorState = (
     const revived = annotations.map(a => reviveAnnotation(a, container));
 
     // Initial page load might take some time. Retry for more robustness.
-    const couldNotRevive = revived.filter(a => !hasAllValidRanges(a));
+    const couldNotRevive = revived.filter(a => !hasAllValidTargets(a));
     if (couldNotRevive.length > 0) {
       console.warn('Could not revive all targets for these annotations:', couldNotRevive);
 
@@ -152,9 +159,9 @@ export const createTextAnnotatorState = (
   const recalculatePositions = () => tree.recalculate();
 
   store.observe(({ changes }) => {
-    const created = (changes.created || []).filter(hasAllValidRanges);
-    const deleted = (changes.deleted || []).filter(hasAllValidRanges);
-    const updated = (changes.updated || []).filter(u => hasAllValidRanges(u.newValue));
+    const created = (changes.created || []).filter(hasAllValidTargets);
+    const deleted = (changes.deleted || []).filter(hasAllValidTargets);
+    const updated = (changes.updated || []).filter(u => hasAllValidTargets(u.newValue));
 
     if (created.length > 0)
       tree.set(created.flatMap(a => a.targets), false);
