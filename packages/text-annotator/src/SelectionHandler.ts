@@ -2,26 +2,7 @@ import { Origin, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotatorState } from './state';
 import type { TextSelector, TextAnnotationTarget } from './model';
-import { debounce, trimRange } from './utils';
-
-export const rangeToSelector = (range: Range, container: HTMLElement, offsetReferenceSelector?: string): TextSelector => {
-  const rangeBefore = document.createRange();
-
-  const offsetReference: HTMLElement = offsetReferenceSelector ? 
-    (range.startContainer.parentElement as HTMLElement).closest(offsetReferenceSelector) : container;
-
-  // A helper range from the start of the contentNode to the start of the selection
-  rangeBefore.setStart(offsetReference, 0);
-  rangeBefore.setEnd(range.startContainer, range.startOffset);
-
-  const quote = range.toString();
-  const start = rangeBefore.toString().length;
-  const end = start + quote.length;
-
-  return offsetReferenceSelector ?
-    { quote, start, end, range, offsetReference } :
-    { quote, start, end, range };
-}
+import { debounce, getAnnotableRanges, rangeToSelector, trimRange } from './utils';
 
 export const SelectionHandler = (
   container: HTMLElement,
@@ -70,34 +51,37 @@ export const SelectionHandler = (
     if (evt.timeStamp - lastPointerDown.timeStamp < 1000 && !currentTarget)
       onSelectStart(lastPointerDown);
 
-    if (!sel.isCollapsed && isLeftClick && currentTarget) {
-      const ranges = Array.from(Array(sel.rangeCount).keys())
-        .map(idx => sel.getRangeAt(idx));
+    if (sel.isCollapsed || !isLeftClick || !currentTarget) return;
 
-      const trimmed = trimRange(ranges[0].cloneRange());
+    const selectionRange = sel.getRangeAt(0);
+    const trimmedRange = trimRange(selectionRange.cloneRange())
+    const annotableRanges = getAnnotableRanges(trimmedRange);
 
-      const hasChanged =
-        trimmed.toString() !== currentTarget.selector?.quote;
+    // const hasChanged =
+    //   trimmedRange.toString() !== currentTarget.selector?.quote;
 
-      if (hasChanged) {
-        currentTarget = {
-          ...currentTarget,
-          selector: rangeToSelector(ranges[0], container, offsetReferenceSelector)
-        };
+    const hasChanged =
+      annotableRanges.length !== currentTarget.selector.length ||
+      annotableRanges.some((r, i) => r.toString() !== currentTarget.selector[i]?.quote);
+    if (!hasChanged) return;
 
-        if (store.getAnnotation(currentTarget.annotation)) {
-          store.updateTarget(currentTarget, Origin.LOCAL);
-        } else {
-          store.addAnnotation({
-            id: currentTarget.annotation,
-            bodies: [],
-            target: currentTarget
-          });
 
-          // Reminder: select events don't have offsetX/offsetY - reuse last up/down
-          selection.clickSelect(currentTarget.annotation, lastPointerDown);
-        }
-      }
+    currentTarget = {
+      ...currentTarget,
+      selector: annotableRanges.map(r => rangeToSelector(r, container, offsetReferenceSelector))
+    };
+
+    if (store.getAnnotation(currentTarget.annotation)) {
+      store.updateTarget(currentTarget, Origin.LOCAL);
+    } else {
+      store.addAnnotation({
+        id: currentTarget.annotation,
+        bodies: [],
+        target: currentTarget
+      });
+
+      // Reminder: select events don't have offsetX/offsetY - reuse last up/down
+      selection.clickSelect(currentTarget.annotation, lastPointerDown);
     }
   })
 
