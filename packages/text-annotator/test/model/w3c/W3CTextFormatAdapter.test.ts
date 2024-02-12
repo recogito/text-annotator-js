@@ -46,8 +46,6 @@ describe('parseW3CTextAnnotation', () => {
   });
 
   it('should serialize the sample annotation correctly', () => {
-    debugger;
-
     const { parsed, error } = parseW3CTextAnnotation(textAnnotation, global.contentContainer);
     expect(error).toBeUndefined();
 
