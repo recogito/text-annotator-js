@@ -3,7 +3,7 @@
   "bodies": [],
   "target": {
     "annotation": "5430edac-706b-4943-9b87-fd6e8f281b39",
-    "selector": {
+    "selector": [{
       "start": 3436,
       "startSelector": {
         "type": "XPathSelector",
@@ -16,7 +16,7 @@
       },
       "quote": "Three Witches, the Weïrd Sisters Duncan king of Scotland Malcolm his elder son Donalbain Duncan’s younger son Macbeth thane of Glamis Lady Macbeth Seyton attendant to Macbeth Three Murderers in Macbeth’s service both attending upon Lady Macbeth A Doctor A Gentlewoman A Porter Banquo commander, with Macbeth, of Duncan’s army Fleance his son Macduff a Scottish noble Lady Macduff Their son Scottish Nobles Lennox Ross",
       "range": {}
-    },
+    }],
     "creator": {
       "isGuest": true,
       "id": "DwQPXeG3uLHfsSLnvTV8"
@@ -28,7 +28,7 @@
   "bodies": [],
   "target": {
     "annotation": "fa049492-020b-4eaf-ba93-3d595e9d624f",
-    "selector": {
+    "selector": [{
       "start": 6464,
       "startSelector": {
         "type": "XPathSelector",
@@ -41,7 +41,7 @@
       },
       "quote": "ACT 1 Scene 1 Thunder and Lightning . Enter three Witches .",
       "range": {}
-    },
+    }],
     "creator": {
       "isGuest": true,
       "id": "jzgy0s50ZDZBGakEHfTU"
@@ -53,7 +53,7 @@
   "bodies": [],
   "target": {
     "annotation": "091078e1-4073-4efc-a82a-bee79774dbf0",
-    "selector": {
+    "selector": [{
       "start": 3671,
       "startSelector": {
         "type": "XPathSelector",
@@ -66,7 +66,7 @@
       },
       "quote": "olm his elder son Donalbain Duncan’s younger son Macbeth thane of Glamis Lady Macbeth Seyton attendant to Macbeth Three Murderers in Macbeth’s service both attending upon Lady Macbeth A Doctor A Gentlewoman A Porter Banquo commander, with Macbeth, of Duncan’s ar",
       "range": {}
-    },
+    }],
     "creator": {
       "isGuest": true,
       "id": "2G7YULxo_qVPC2wCYxfW"
