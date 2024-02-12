@@ -2,12 +2,7 @@ import RBush from 'rbush';
 import type { Store } from '@annotorious/core';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
 import { mergeClientRects } from '../utils';
-import { getClientRectsPonyfill } from '../utils/getClientRectsPonyfill';
 import { reviveTarget } from './reviveTarget';
-
-const isFirefox = false; // navigator.userAgent.match(/firefox|fxios/i);
-
-if (isFirefox) console.warn('Firefox interop enabled');
 
 export interface IndexedHighlightRect {
 
@@ -47,10 +42,7 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
 
     const t = isValidRange ? target : reviveTarget(target, container);
 
-    const rects = isFirefox ? 
-      getClientRectsPonyfill(t.selector.range) :
-      Array.from(t.selector.range.getClientRects());
-
+    const rects = Array.from(t.selector.range.getClientRects());
     const merged = mergeClientRects(rects);
 
     return merged.map(rect => {
