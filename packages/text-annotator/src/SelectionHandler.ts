@@ -1,7 +1,7 @@
 import { Origin, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotatorState } from './state';
-import type { TextSelector, TextAnnotationTarget } from './model';
+import type { TextAnnotationTarget } from './model';
 import { debounce, getAnnotableRanges, rangeToSelector, trimRange } from './utils';
 
 export const SelectionHandler = (
