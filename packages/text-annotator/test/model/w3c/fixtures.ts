@@ -10,33 +10,38 @@ export const textAnnotation: W3CTextAnnotation = {
     id: 'qn7zdU8XD6ZPDBMXdc7w',
     name: 'Oleksandr'
   },
-  body: [{
-    type: 'TextualBody',
-    value: 'A comment about a content'
-  }],
-  target: {
-    source: 'http://www.example.com/source/1',
-    selector: [
-      {
-        type: 'TextQuoteSelector',
-        exact: 'But as years',
-        prefix: 'arry him. ',
-        suffix: ' went by, '
-      },
-      {
-        type: 'TextPositionSelector',
-        start: 945,
-        end: 957
-      },
-    ]
-  }
+  body: [
+    {
+      type: 'TextualBody',
+      value: 'A comment about a content'
+    }
+  ],
+  target: [
+    {
+      source: 'http://www.example.com/source/1',
+      selector: [
+        {
+          type: 'TextQuoteSelector',
+          exact: 'But as years',
+          prefix: 'arry him. ',
+          suffix: ' went by, '
+        },
+        {
+          type: 'TextPositionSelector',
+          start: 945,
+          end: 957
+        },
+      ]
+    }
+  ]
 };
 
 export const incompleteTextAnnotation: W3CTextAnnotation = {
   ...textAnnotation,
-  target: {
-    ...textAnnotation.target,
-    // @ts-ignore
-    selector: textAnnotation.target.selector[0] // Only the `Text Quote Selector`
-  }
+  target: [
+    {
+      ...textAnnotation.target[0],
+      selector: textAnnotation.target[0].selector[0] // Only the `Text Quote Selector`
+    }
+  ]
 };

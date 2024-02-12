@@ -8,7 +8,7 @@ import {
 } from '@annotorious/core';
 import type { TextAnnotation, TextAnnotationTarget, TextSelector } from '../core';
 import type { W3CTextAnnotation, W3CTextSelector } from '../w3c';
-import { getQuoteContext, reviveSelector, reviveTarget } from '../../utils';
+import { getQuoteContext, reviveSelector } from '../../utils';
 
 export type W3CTextFormatAdapter = FormatAdapter<TextAnnotation, W3CTextAnnotation>;
 
@@ -105,6 +105,7 @@ export const parseW3CTextAnnotation = (
         target: target.parsed
       }
     };
+
 };
 
 export const serializeW3CTextAnnotation = (
@@ -122,20 +123,29 @@ export const serializeW3CTextAnnotation = (
     ...targetRest
   } = target;
 
-  const { quote, start, end, range } = selector;
+  const w3cTargets = selector.map((s) => {
+    const { quote, start, end, range } = s;
 
-  const { prefix, suffix } = getQuoteContext(range, container);
+    const { prefix, suffix } = getQuoteContext(range, container);
 
-  const w3cSelector: W3CTextSelector[] = [{
-    type: 'TextQuoteSelector',
-    exact: quote,
-    prefix,
-    suffix
-  }, {
-    type: 'TextPositionSelector',
-    start,
-    end
-  }];
+    const w3cSelectors: W3CTextSelector[] = [{
+      type: 'TextQuoteSelector',
+      exact: quote,
+      prefix,
+      suffix
+    }, {
+      type: 'TextPositionSelector',
+      start,
+      end
+    }];
+
+    return {
+      ...targetRest,
+      source,
+      selector: w3cSelectors
+    };
+  });
+
 
   return {
     ...rest,
@@ -146,11 +156,7 @@ export const serializeW3CTextAnnotation = (
     creator,
     created: created?.toISOString(),
     modified: updated?.toISOString(),
-    target: {
-      ...targetRest,
-      source,
-      selector: w3cSelector
-    }
+    target: w3cTargets
   };
 
 };
