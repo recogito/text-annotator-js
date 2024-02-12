@@ -1,5 +1,5 @@
 import { notAnnotableSelector } from './getAnnotableRanges';
-import type { TextSelector } from '../model';
+import type { TextAnnotation, TextAnnotationTarget, TextSelector } from '../model';
 
 /**
  * Retrieves the DOM range from the given text annotation position
@@ -62,14 +62,6 @@ const reviveRange = (start: number, end: number, offsetReference: HTMLElement): 
   return range;
 };
 
-/**
- * Constructs a new selector with the recalculated DOM range from the given text annotation selector
- *
- * @param selector the text annotation target selector
- * @param container the HTML container of the annotated content
- *
- * @returns the new text annotation target
- */
 export const reviveSelector = (selector: TextSelector, container: HTMLElement): TextSelector => {
   const { start, end, offsetReference: selectorReference } = selector;
 
@@ -79,3 +71,21 @@ export const reviveSelector = (selector: TextSelector, container: HTMLElement): 
     range: reviveRange(start, end, offsetReference)
   } : selector;
 };
+
+export const reviveTarget = (target: TextAnnotationTarget, container: HTMLElement): TextAnnotationTarget => ({
+  ...target,
+  selector: target.selector.map(s => s.range instanceof Range ? s : reviveSelector(s, container))
+})
+
+export const hasAllValidRanges = (annotation: TextAnnotation) => {
+  const { target: { selector } } = annotation;
+  return (
+    selector.length !== 0 && // Annotation must have at least one target selector
+    selector.every(s => s.range instanceof Range && !s.range.collapsed)
+  );
+};
+
+export const reviveAnnotation = (annotation: TextAnnotation, container: HTMLElement): TextAnnotation =>
+  hasAllValidRanges(annotation)
+    ? annotation
+    : ({ ...annotation, target: reviveTarget(annotation.target, container) });
