@@ -33,7 +33,7 @@ export const SelectionHandler = (
     if (annotatable) {
       currentTarget = {
         annotation: uuidv4(),
-        selector: undefined,
+        selector: [],
         creator: currentUser,
         created: new Date()
       };
