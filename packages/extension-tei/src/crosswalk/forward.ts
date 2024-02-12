@@ -105,24 +105,16 @@ export const rangeToTEIRangeSelector = (selector: TextSelector): TEIRangeSelecto
       type: 'XPathSelector',
       value: end
     },
-    quote: selector.quote,
+    quote: selector.quote.replace(/\s+/g, ' '),
     range
   };
 }
 
 export const textToTEITarget =  (container: HTMLElement) => (t: TextAnnotationTarget): TEIAnnotationTarget => {
-  const isValidRange = t.selector.range instanceof Range && !t.selector.range.collapsed;
-
-  const target = isValidRange ? t : reviveTarget(t, container);
-  const selector = rangeToTEIRangeSelector(target.selector);
-
+  const target = reviveTarget(t, container);
   return {
     ...t,
-    selector: {
-      ...selector,
-      range: t.selector.range,
-      quote: t.selector.quote.replace(/\s+/g, ' ')
-    }
+    selector: target.selector.map(rangeToTEIRangeSelector)
   }
 }
 
