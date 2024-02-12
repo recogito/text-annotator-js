@@ -20,8 +20,8 @@
         },
         {
           "type": "TextPositionSelector",
-          "start": 725,
-          "end": 756
+          "start": 716,
+          "end": 747
         }
       ]
     }
@@ -47,8 +47,8 @@
         },
         {
           "type": "TextPositionSelector",
-          "start": 966,
-          "end": 1014
+          "start": 941,
+          "end": 989
         }
       ]
     }
@@ -68,14 +68,14 @@
       "selector": [
         {
           "type": "TextQuoteSelector",
-          "exact": "Now Neptune had gone off to the Ethiopians, who are at the world's end, and lie in two halves, the one looking\n        West and the other East. He had gone there to accept a",
+          "exact": "Now Neptune had gone off to the Ethiopians, who are at the world's end, and lie in two halves, the one looking West and the other East. He had gone there to accept a",
           "prefix": " \n        ",
           "suffix": " hecatomb "
         },
         {
           "type": "TextPositionSelector",
-          "start": 1336,
-          "end": 1509
+          "start": 1291,
+          "end": 1456
         }
       ]
     }
