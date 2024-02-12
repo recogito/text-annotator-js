@@ -67,3 +67,8 @@ export const getAnnotableRanges = (range: Range): Range[] => {
 
   return annotableRanges.length > 0 ? annotableRanges : [range];
 };
+export const getRangeAnnotableContents = (range: Range): DocumentFragment => {
+  const contents = range.cloneContents();
+  contents.querySelectorAll(notAnnotableSelector).forEach((el) => el.remove());
+  return contents;
+};

@@ -1,3 +1,5 @@
+import { getRangeAnnotableContents } from './getAnnotableRanges';
+
 export const getQuoteContext = (
   range: Range, 
   container: HTMLElement, 
@@ -12,7 +14,7 @@ export const getQuoteContext = (
   rangeBefore.setStart(offsetReference, 0);
   rangeBefore.setEnd(range.startContainer, range.startOffset);
 
-  const before = rangeBefore.toString();
+  const before = getRangeAnnotableContents(rangeBefore).textContent;
   
   const rangeAfter = document.createRange();
   rangeAfter.setStart(range.endContainer, range.endOffset);
@@ -22,7 +24,7 @@ export const getQuoteContext = (
   else
     rangeAfter.setEndAfter(offsetReference);
 
-  const after = rangeAfter.toString();
+  const after = getRangeAnnotableContents(rangeAfter).textContent;
 
   return {
     prefix: before.substring(before.length - length),

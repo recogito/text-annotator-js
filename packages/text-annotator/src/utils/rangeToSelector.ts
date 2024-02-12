@@ -1,11 +1,5 @@
-import { notAnnotableSelector } from './getAnnotableRanges';
+import { getRangeAnnotableContents } from './getAnnotableRanges';
 import type { TextSelector } from '../model';
-
-const getAnnotableRangeContents = (range: Range): DocumentFragment => {
-  const contents = range.cloneContents();
-  contents.querySelectorAll(notAnnotableSelector).forEach((el) => el.remove());
-  return contents;
-};
 
 export const rangeToSelector = (
   range: Range,
@@ -23,10 +17,10 @@ export const rangeToSelector = (
   rangeBefore.setEnd(range.startContainer, range.startOffset);
 
   // A content range before content w/o not annotable elements
-  const rangeBeforeAnnotableContents = getAnnotableRangeContents(rangeBefore);
+  const before = getRangeAnnotableContents(rangeBefore).textContent;
 
   const quote = range.toString();
-  const start = rangeBeforeAnnotableContents.textContent?.length || 0;
+  const start = before.length || 0;
   const end = start + quote.length;
 
   return offsetReferenceSelector
