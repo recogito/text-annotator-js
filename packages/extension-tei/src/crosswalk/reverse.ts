@@ -77,17 +77,13 @@ export const teiToTextAnnotation = (container: HTMLElement) => (a: TEIAnnotation
   target: teiToTextTarget(container)(a.target)
 })
 
-export const teiToTextTarget = (container: HTMLElement) => (t: TEIAnnotationTarget): TextAnnotationTarget => {
-  const range = teiRangeSelectorToRange(t.selector, container);
-
-  return {
-    ...t,
-    selector: {
-      start: t.selector.start,
-      end: t.selector.end,
-      quote: t.selector.quote,
-      range
-    }
-  }
-}
+export const teiToTextTarget = (container: HTMLElement) => (t: TEIAnnotationTarget): TextAnnotationTarget => ({
+  ...t,
+  selector: t.selector.map(s => ({
+    start: s.start,
+    end: s.end,
+    quote: s.quote,
+    range: teiRangeSelectorToRange(s, container)
+  }))
+});
 
