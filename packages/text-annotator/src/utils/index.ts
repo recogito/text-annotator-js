@@ -4,4 +4,5 @@ export * from './mergeClientRects';
 export * from './trimRange';
 export * from './getAnnotableRanges';
 export * from './rangeToSelector';
+export * from './reviveSelector';
 export * from './debounce';
