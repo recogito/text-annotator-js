@@ -74,7 +74,7 @@ export const SelectionHandler = (
       const ranges = Array.from(Array(sel.rangeCount).keys())
         .map(idx => sel.getRangeAt(idx));
 
-      const trimmed = trimRange(ranges[0]);
+      const trimmed = trimRange(ranges[0].cloneRange());
 
       const hasChanged =
         trimmed.toString() !== currentTarget.selector?.quote;
