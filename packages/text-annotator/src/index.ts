@@ -1,6 +1,7 @@
 export * from './highlight';
 export * from './model';
 export * from './state';
+export * from './utils/reviveAnnotation';
 export * from './presence/PresencePainterOptions';
 export * from './TextAnnotator';
 export * from './TextAnnotatorOptions';
