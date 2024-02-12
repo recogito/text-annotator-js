@@ -62,6 +62,12 @@ const reviveRange = (start: number, end: number, offsetReference: HTMLElement): 
   return range;
 };
 
+export const hasAllValidRanges = (selector: TextAnnotationTarget['selector']) =>
+  (
+    selector.length !== 0 && // Annotation must have at least one target selector
+    selector.every(s => s.range instanceof Range && !s.range.collapsed)
+  );
+
 export const reviveSelector = (selector: TextSelector, container: HTMLElement): TextSelector => {
   const { start, end, offsetReference: selectorReference } = selector;
 
@@ -72,20 +78,15 @@ export const reviveSelector = (selector: TextSelector, container: HTMLElement): 
   } : selector;
 };
 
-export const reviveTarget = (target: TextAnnotationTarget, container: HTMLElement): TextAnnotationTarget => ({
-  ...target,
-  selector: target.selector.map(s => s.range instanceof Range ? s : reviveSelector(s, container))
-})
-
-export const hasAllValidRanges = (annotation: TextAnnotation) => {
-  const { target: { selector } } = annotation;
-  return (
-    selector.length !== 0 && // Annotation must have at least one target selector
-    selector.every(s => s.range instanceof Range && !s.range.collapsed)
-  );
-};
+export const reviveTarget = (target: TextAnnotationTarget, container: HTMLElement): TextAnnotationTarget =>
+  hasAllValidRanges(target.selector)
+    ? target
+    : ({
+      ...target,
+      selector: target.selector.map(s => s.range instanceof Range ? s : reviveSelector(s, container))
+    });
 
 export const reviveAnnotation = (annotation: TextAnnotation, container: HTMLElement): TextAnnotation =>
-  hasAllValidRanges(annotation)
+  hasAllValidRanges(annotation.target.selector)
     ? annotation
     : ({ ...annotation, target: reviveTarget(annotation.target, container) });
