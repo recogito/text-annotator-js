@@ -1,4 +1,4 @@
-export const notAnnotableSelector = '[data-not-annotable]';
+export const notAnnotableSelector = '[data-not-annotable="true"]';
 
 const isRangeNotAnnotable = (range: Range): boolean => {
   const ancestor = range.commonAncestorContainer;
