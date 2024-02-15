@@ -1,11 +1,12 @@
 import type { TextAnnotationTarget } from '../model';
 
 /**
- * Recalculates the DOM range from the given text annotation target.
- * 
- * @param annotation the text annotation
+ * Constructs a new target with the recalculated DOM range from the given text annotation target
+ *
+ * @param target the text annotation target
  * @param container the HTML container of the annotated content
- * @returns the DOM range
+ *
+ * @returns text annotation target
  */
 export const reviveTarget = (
   target: TextAnnotationTarget, 
