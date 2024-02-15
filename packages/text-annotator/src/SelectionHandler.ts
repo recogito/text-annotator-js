@@ -82,7 +82,7 @@ export const SelectionHandler = (
       if (hasChanged) {
         currentTarget = {
           ...currentTarget,
-          selector: rangeToSelector(ranges[0], container, offsetReferenceSelector)
+          selector: rangeToSelector(trimmed, container, offsetReferenceSelector)
         };
 
         if (store.getAnnotation(currentTarget.annotation)) {
