@@ -1,7 +1,8 @@
 import { createAnonymousGuest, createLifecyleObserver, createBaseAnnotator, DrawingStyle, Filter, createUndoStack } from '@annotorious/core';
 import type { Annotator, User, PresenceProvider } from '@annotorious/core';
 import { createPainter } from './presence';
-import { createHighlightLayer } from './highlight';
+// import { createHighlightLayer } from './highlight';
+import { createHighlightLayer } from './highlight/nativeHighlightLayer';
 import { scrollIntoView } from './api';
 import { TextAnnotationStore, TextAnnotatorState, createTextAnnotatorState } from './state';
 import type { TextAnnotation } from './model';
