@@ -157,13 +157,13 @@
       import { createTextAnnotator, W3CTextFormat } from '../src/index.ts';
 
       window.onload = async () => {
-        const contentContainer = document.getElementById('content');
+        var contentContainer = document.getElementById('content');
 
-        const r = createTextAnnotator(contentContainer, {
+        var r = createTextAnnotator(contentContainer, {
           adapter: W3CTextFormat('https://www.gutenberg.org', contentContainer)
         });
 
-        void r.loadAnnotations('annotations.w3c.json');
+        r.loadAnnotations('annotations.w3c.json');
 
         r.on('createAnnotation', annotation => {
           console.log('createAnnotation', annotation);
@@ -185,11 +185,12 @@
           console.log('viewport', annotations);
         });
 
-        let filterActive = false;
-        const toggleButton = document.getElementById('filter');
-        const toggleButtonLabel = toggleButton.innerText;
+        var filterActive = false;
 
-        toggleButton.onclick = () => {
+        var toggleButton = document.getElementById('filter');
+        var toggleButtonLabel = toggleButton.innerText;
+
+        toggleButton.addEventListener('click', function() {
           if (filterActive) {
             r.setFilter(undefined);
 
@@ -202,8 +203,8 @@
             filterActive = true;
             toggleButton.innerText = `${toggleButtonLabel} off`;
           }
-        };
-      };
+        });
+      }
     </script>
   </body>
 </html>
