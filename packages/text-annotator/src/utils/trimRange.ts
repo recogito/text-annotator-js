@@ -14,7 +14,7 @@ export const trimRange = (range: Range): Range => {
     // Get first text child in next container
     const nextText = nextContainer?.nodeType === Node.TEXT_NODE ?
       nextContainer :
-      Array.from(nextContainer!.childNodes).filter(n => n.nodeType === Node.TEXT_NODE).shift();   
+      Array.from(nextContainer!.childNodes).filter(n => n.nodeType === Node.TEXT_NODE).shift();
 
     range.setEnd(nextText!, 0);
   }
@@ -25,7 +25,7 @@ export const trimRange = (range: Range): Range => {
     // Get last text child in previous container
     const prevText = prevContainer?.nodeType === Node.TEXT_NODE ?
       prevContainer :
-      Array.from(prevContainer!.childNodes).filter(n => n.nodeType === Node.TEXT_NODE).pop();   
+      Array.from(prevContainer!.childNodes).filter(n => n.nodeType === Node.TEXT_NODE).pop();
 
     range.setEnd(prevText!, prevText?.textContent?.length || 0);
   }
