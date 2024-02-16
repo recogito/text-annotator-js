@@ -10,6 +10,7 @@ import type { TextAnnotatorOptions } from './TextAnnotatorOptions';
 import { SelectionHandler } from './SelectionHandler';
 
 import './TextAnnotator.css';
+import { createPresenceLayer } from './presence/dedicatedPresenceLayer';
 
 export interface TextAnnotator<T extends unknown = TextAnnotation> extends Annotator<TextAnnotation, T> {
 
@@ -71,7 +72,8 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
 
   const setPresenceProvider = (provider: PresenceProvider) => {
     if (provider) {
-      highlightLayer.setPainter(createPainter(provider, opts.presence));
+      const p = createPresenceLayer(container, provider, opts.presence);
+      // highlightLayer.setPainter(createPainter(provider, opts.presence));
       provider.on('selectionChange', () => highlightLayer.redraw());
     }
   }

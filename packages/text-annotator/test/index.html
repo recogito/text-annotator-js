@@ -60,6 +60,7 @@
   <body>
     <div id="buttons">
       <button id="filter">Toggle Filter</button>
+      <button id="fake-presence">Fake Presence</button>
     </div>
     
     <div id="content">
@@ -167,7 +168,9 @@
           }
         });
 
-        r.loadAnnotations('annotations.w3c.json');
+        var annotations; 
+
+        r.loadAnnotations('annotations.w3c.json').then(a => annotations = a);
 
         r.on('createAnnotation', annotation => {
           console.log('createAnnotation', annotation);
@@ -206,6 +209,42 @@
 
             filterActive = true;
             toggleButton.innerText = `${toggleButtonLabel} off`;
+          }
+        });
+
+        var remoteSelection; 
+
+        var handlers = [];
+        var presenceProvider = {
+          on: function(event, callback) {
+            console.log('registering:', event);
+            handlers.push(callback);
+          }
+        }
+
+        r.setPresenceProvider(presenceProvider);
+
+        const fakeCollaborator = {
+          presenceKey: '1',
+          appearance: {
+            label: 'Rainer',
+            color: '#00cc00'
+          }
+        };
+
+        var presenceButton = document.getElementById('fake-presence'); 
+        presenceButton.addEventListener('click', function() {
+          if (remoteSelection) {
+            remoteSelection = undefined;
+            handlers.forEach(callback => {
+               callback(fakeCollaborator, []);
+            })
+          } else {
+            const randomIdx = Math.floor(Math.random() * annotations.length);
+            remoteSelection = annotations[randomIdx];
+            handlers.forEach(callback => {
+               callback(fakeCollaborator, [remoteSelection]);
+            })
           }
         });
       }
