@@ -2,7 +2,7 @@ import type { DrawingStyle } from '@annotorious/core';
 import type { TextAnnotation } from '../model';
 import type { Rect } from '../state';
 
-const DEFAULT_STYLE = { fill: 'rgb(0, 128, 255', fillOpacity: 0.18 };
+const DEFAULT_STYLE = { fill: 'rgb(0, 128, 255)', fillOpacity: 0.18 };
 
 const DEFAULT_SELECTED_STYLE = { fill: 'rgb(0, 128, 255)', fillOpacity: 0.45 };
 

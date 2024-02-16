@@ -2,6 +2,7 @@ import type { DrawingStyle, Filter, StoreChangeEvent, ViewportState } from '@ann
 import type { TextAnnotatorState } from '../state';
 import type { TextAnnotation } from 'src/model';
 import type { HighlightPainter } from './HighlightPainter';
+import { createStylesheet } from './nativeHighlightStylesheet';
 
 export const createHighlightLayer = (
   container: HTMLElement, 
@@ -14,8 +15,7 @@ export const createHighlightLayer = (
 
   let currentFilter: Filter | undefined;
 
-  const stylesheet = document.createElement('style');
-  document.getElementsByTagName('head')[0].appendChild(stylesheet);
+  const stylesheet = createStylesheet();
 
   const onPointerMove = (event: PointerEvent) => {
     const {x, y} = container.getBoundingClientRect();
@@ -36,41 +36,53 @@ export const createHighlightLayer = (
     }
   }
 
+  container.addEventListener('pointermove', onPointerMove);
+
+  const getViewport = () => {
+    const { top, left } = container.getBoundingClientRect();
+
+    const { innerWidth, innerHeight } = window;
+
+    const minX = - left;
+    const minY = - top;
+    const maxX = innerWidth - left;
+    const maxY = innerHeight - top;
+
+    return { top, left, minX, minY, maxX, maxY };
+  }
+
   const redraw = () => {
-    // TODO
+    const { top, left, minX, minY, maxX, maxY } = getViewport();   
+    
+    const annotationsInView = currentFilter
+      ? store.getIntersectingRects(minX, minY, maxX, maxY).filter(({ annotation }) => currentFilter(annotation))
+      : store.getIntersectingRects(minX, minY, maxX, maxY);
+
+    // Get current selection
+    const selectedIds = selection.selected.map(({ id }) => id);
+
+    stylesheet.refresh(annotationsInView.map(r => r.annotation), selectedIds, currentStyle);
+
+    // setTimeout(() => onDraw(annotationsInView.map(({ annotation }) => annotation)), 1);
   }
 
   const setDrawingStyle = (style: DrawingStyle | ((a: TextAnnotation, selected?: boolean) => DrawingStyle)) => {
-    // TODO
+    currentStyle = style;
+    redraw();
   }
 
   const setFilter = (filter?: Filter) => {
-    // TODO
+    currentFilter = filter;
+    redraw();
   } 
 
-  const onStoreChange = (event: StoreChangeEvent<TextAnnotation>) =>  {
-    const { created, updated } = event.changes;
+  // Redraw on store change
+  const onStoreChange = () => redraw();
+  store.observe(onStoreChange);
 
-    created.forEach(annotation => {
-      // Just a hack - create highlights for all Created text ranges
-      // @ts-ignore
-      const highlight = new Highlight(annotation.target.selector.range);
+  // Redraw on selection change
+  const unsubscribeSelection = selection.subscribe(() => redraw());
 
-      stylesheet.innerHTML += `::highlight(_${annotation.id}) { background-color: red; }\n`;
-
-      // @ts-ignore
-      CSS.highlights.set(`_${annotation.id}`, highlight);
-    });
-
-    updated.forEach(({ newValue }) => {
-      // @ts-ignore
-      const highlight = new Highlight(newValue.target.selector.range);
-
-      // @ts-ignore
-      CSS.highlights.set(`_${newValue.id}`, highlight);
-    });
-
-  };
 
   store.observe(onStoreChange);
 

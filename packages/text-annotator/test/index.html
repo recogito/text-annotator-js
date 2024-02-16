@@ -160,7 +160,11 @@
         var contentContainer = document.getElementById('content');
 
         var r = createTextAnnotator(contentContainer, {
-          adapter: W3CTextFormat('https://www.gutenberg.org', contentContainer)
+          adapter: W3CTextFormat('https://www.gutenberg.org', contentContainer),
+          style: {
+            fill: '#ff0000',
+            fillOpacity: 0.25
+          }
         });
 
         r.loadAnnotations('annotations.w3c.json');
