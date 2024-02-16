@@ -83,14 +83,15 @@ export const createHighlightLayer = (
   // Redraw on selection change
   const unsubscribeSelection = selection.subscribe(() => redraw());
 
-
   store.observe(onStoreChange);
+
+  // Redraw on scroll
+  const onScroll = () => redraw();
+  document.addEventListener('scroll', onScroll, { capture: true, passive: true });
 
   const destroy = () => {
     // TODO
   }
-
-
 
   return {
     destroy,

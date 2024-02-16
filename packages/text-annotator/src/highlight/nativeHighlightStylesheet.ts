@@ -39,7 +39,7 @@ export const createStylesheet = () => {
 
     // Remove rendered
     // @ts-ignore
-    Array.from(rendered).forEach(id => CSS.highlights.delete(`_${id}`));
+    // Array.from(rendered).forEach(id => CSS.highlights.delete(`_${id}`));
 
     annotations.forEach(annotation => {
       // Just a hack - create highlights for all Created text ranges
