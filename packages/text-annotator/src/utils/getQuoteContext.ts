@@ -1,4 +1,4 @@
-import { getRangeAnnotableContents } from './getAnnotatableRanges';
+import { getRangeAnnotatableContents } from './getAnnotatableRanges';
 
 export const getQuoteContext = (
   range: Range, 
@@ -14,7 +14,7 @@ export const getQuoteContext = (
   rangeBefore.setStart(offsetReference, 0);
   rangeBefore.setEnd(range.startContainer, range.startOffset);
 
-  const before = getRangeAnnotableContents(rangeBefore).textContent;
+  const before = getRangeAnnotatableContents(rangeBefore).textContent;
   
   const rangeAfter = document.createRange();
   rangeAfter.setStart(range.endContainer, range.endOffset);
@@ -24,7 +24,7 @@ export const getQuoteContext = (
   else
     rangeAfter.setEndAfter(offsetReference);
 
-  const after = getRangeAnnotableContents(rangeAfter).textContent;
+  const after = getRangeAnnotatableContents(rangeAfter).textContent;
 
   return {
     prefix: before.substring(before.length - length),

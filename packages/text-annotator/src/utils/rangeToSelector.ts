@@ -1,4 +1,4 @@
-import { getRangeAnnotableContents } from './getAnnotatableRanges';
+import { getRangeAnnotatableContents } from './getAnnotatableRanges';
 import type { TextSelector } from '../model';
 
 export const rangeToSelector = (
@@ -17,7 +17,7 @@ export const rangeToSelector = (
   rangeBefore.setEnd(range.startContainer, range.startOffset);
 
   // A content range before content w/o not annotable elements
-  const before = getRangeAnnotableContents(rangeBefore).textContent;
+  const before = getRangeAnnotatableContents(rangeBefore).textContent;
 
   const quote = range.toString();
   const start = before.length || 0;
