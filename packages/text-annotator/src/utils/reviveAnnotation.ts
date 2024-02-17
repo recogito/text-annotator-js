@@ -3,7 +3,7 @@ import type { TextAnnotation, TextAnnotationTarget, TextSelector } from '../mode
 
 /**
  * Retrieves the DOM range from the given text annotation position
- * Only the annotable elements are processed and counted towards the range
+ * Only the annotatable elements are processed and counted towards the range
  *
  * @param start start of the annotated content
  * @param end end of the annotated content
@@ -18,7 +18,7 @@ const reviveRange = (start: number, end: number, offsetReference: HTMLElement): 
       : NodeFilter.FILTER_ACCEPT
   );
 
-  // Position that contains the length of the preceding annotable text nodes
+  // Position that contains the length of the preceding annotatable text nodes
   let runningOffset = 0;
 
   const range = document.createRange();

@@ -55,20 +55,20 @@ export const SelectionHandler = (
 
     const selectionRange = sel.getRangeAt(0);
     const trimmedRange = trimRange(selectionRange.cloneRange())
-    const annotableRanges = getAnnotatableRanges(trimmedRange);
+    const annotatableRanges = getAnnotatableRanges(trimmedRange);
 
     // const hasChanged =
     //   trimmedRange.toString() !== currentTarget.selector?.quote;
 
     const hasChanged =
-      annotableRanges.length !== currentTarget.selector.length ||
-      annotableRanges.some((r, i) => r.toString() !== currentTarget.selector[i]?.quote);
+      annotatableRanges.length !== currentTarget.selector.length ||
+      annotatableRanges.some((r, i) => r.toString() !== currentTarget.selector[i]?.quote);
     if (!hasChanged) return;
 
 
     currentTarget = {
       ...currentTarget,
-      selector: annotableRanges.map(r => rangeToSelector(r, container, offsetReferenceSelector))
+      selector: annotatableRanges.map(r => rangeToSelector(r, container, offsetReferenceSelector))
     };
 
     if (store.getAnnotation(currentTarget.annotation)) {

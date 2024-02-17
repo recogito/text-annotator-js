@@ -16,7 +16,7 @@ export const rangeToSelector = (
   rangeBefore.setStart(offsetReference, 0);
   rangeBefore.setEnd(range.startContainer, range.startOffset);
 
-  // A content range before content w/o not annotable elements
+  // A content range before content w/o not annotatable elements
   const before = getRangeAnnotatableContents(rangeBefore).textContent;
 
   const quote = range.toString();

@@ -1,15 +1,15 @@
 const notAnnotatableToken = 'not-annotatable';
 export const notAnnotatableSelector = `.${notAnnotatableToken}`;
 
-const isRangeNotAnnotable = (range: Range): boolean => {
+const isRangeNotAnnotatable = (range: Range): boolean => {
   const ancestor = range.commonAncestorContainer;
   return ancestor instanceof HTMLElement
     ? !!ancestor.closest(notAnnotatableSelector)
     : !!ancestor.parentElement?.closest(notAnnotatableSelector);
 };
 
-const iterateRangeNotAnnotableElements = function*(range: Range): Generator<HTMLElement> {
-  const notAnnotableIterator = document.createNodeIterator(
+const iterateRangeNotAnnotatableElements = function*(range: Range): Generator<HTMLElement> {
+  const notAnnotatableIterator = document.createNodeIterator(
     range.commonAncestorContainer,
     NodeFilter.SHOW_ELEMENT,
     (node) =>
@@ -18,55 +18,55 @@ const iterateRangeNotAnnotableElements = function*(range: Range): Generator<HTML
         : NodeFilter.FILTER_SKIP
   );
 
-  let notAnnotableNode: Node | null;
-  while ((notAnnotableNode = notAnnotableIterator.nextNode())) {
-    if (notAnnotableNode instanceof HTMLElement) {
-      yield notAnnotableNode;
+  let notAnnotatableNode: Node | null;
+  while ((notAnnotatableNode = notAnnotatableIterator.nextNode())) {
+    if (notAnnotatableNode instanceof HTMLElement) {
+      yield notAnnotatableNode;
     }
   }
 };
 
 
 export const getAnnotatableRanges = (range: Range): Range[] => {
-  // Nothing to annotate within a not annotable element 🤷🏻
-  if (isRangeNotAnnotable(range)) return [];
+  // Nothing to annotate within a not annotatable element 🤷🏻
+  if (isRangeNotAnnotatable(range)) return [];
 
-  const annotableRanges: Range[] = [];
+  const annotatableRanges: Range[] = [];
 
-  let prevNotAnnotable: HTMLElement | null = null;
-  for (const notAnnotable of iterateRangeNotAnnotableElements(range)) {
+  let prevNotAnnotatable: HTMLElement | null = null;
+  for (const notAnnotatable of iterateRangeNotAnnotatableElements(range)) {
     let subRange: Range;
 
     /*
-     From the start of the range to the not annotable element
-     When the selection starts on the `notAnnotable` element - a collapsed range will be created and ignored
+     From the start of the range to the not annotatable element
+     When the selection starts on the `notAnnotatable` element - a collapsed range will be created and ignored
     */
-    if (!prevNotAnnotable) {
+    if (!prevNotAnnotatable) {
       subRange = range.cloneRange();
-      subRange.setEndBefore(notAnnotable);
+      subRange.setEndBefore(notAnnotatable);
     } else {
-      // From the previous not annotable element to the current not annotable element
+      // From the previous not annotatable element to the current not annotatable element
       subRange = document.createRange();
-      subRange.setStartAfter(prevNotAnnotable);
-      subRange.setEndBefore(notAnnotable);
+      subRange.setStartAfter(prevNotAnnotatable);
+      subRange.setEndBefore(notAnnotatable);
     }
 
     if (!subRange.collapsed) {
-      annotableRanges.push(subRange);
+      annotatableRanges.push(subRange);
     }
-    prevNotAnnotable = notAnnotable;
+    prevNotAnnotatable = notAnnotatable;
   }
 
-  // From the last not annotable element to the end of the parent range
-  if (prevNotAnnotable) {
+  // From the last not annotatable element to the end of the parent range
+  if (prevNotAnnotatable) {
     const lastRange = range.cloneRange();
-    lastRange.setStartAfter(prevNotAnnotable);
+    lastRange.setStartAfter(prevNotAnnotatable);
     if (!lastRange.collapsed) {
-      annotableRanges.push(lastRange);
+      annotatableRanges.push(lastRange);
     }
   }
 
-  return annotableRanges.length > 0 ? annotableRanges : [range];
+  return annotatableRanges.length > 0 ? annotatableRanges : [range];
 };
 export const getRangeAnnotatableContents = (range: Range): DocumentFragment => {
   const contents = range.cloneContents();
