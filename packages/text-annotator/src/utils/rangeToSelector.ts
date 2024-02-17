@@ -1,4 +1,4 @@
-import { getRangeAnnotableContents } from './getAnnotableRanges';
+import { getRangeAnnotableContents } from './getAnnotatableRanges';
 import type { TextSelector } from '../model';
 
 export const rangeToSelector = (

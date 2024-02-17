@@ -26,7 +26,7 @@ const iterateRangeNotAnnotableElements = function*(range: Range): Generator<HTML
 };
 
 
-export const getAnnotableRanges = (range: Range): Range[] => {
+export const getAnnotatableRanges = (range: Range): Range[] => {
   // Nothing to annotate within a not annotable element 🤷🏻
   if (isRangeNotAnnotable(range)) return [];
 

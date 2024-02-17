@@ -1,4 +1,4 @@
-import { notAnnotatableSelector } from './getAnnotableRanges';
+import { notAnnotatableSelector } from './getAnnotatableRanges';
 import type { TextAnnotation, TextAnnotationTarget, TextSelector } from '../model';
 
 /**
