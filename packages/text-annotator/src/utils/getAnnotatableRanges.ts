@@ -1,4 +1,5 @@
-export const notAnnotatableSelector = '.not-annotatable';
+const notAnnotatableToken = 'not-annotatable';
+export const notAnnotatableSelector = `.${notAnnotatableToken}`;
 
 const isRangeNotAnnotable = (range: Range): boolean => {
   const ancestor = range.commonAncestorContainer;
@@ -12,7 +13,7 @@ const iterateRangeNotAnnotableElements = function*(range: Range): Generator<HTML
     range.commonAncestorContainer,
     NodeFilter.SHOW_ELEMENT,
     (node) =>
-      node instanceof HTMLElement && node.dataset.notAnnotable && range.intersectsNode(node)
+      node instanceof HTMLElement && node.classList.contains(notAnnotatableToken) && range.intersectsNode(node)
         ? NodeFilter.FILTER_ACCEPT
         : NodeFilter.FILTER_SKIP
   );
