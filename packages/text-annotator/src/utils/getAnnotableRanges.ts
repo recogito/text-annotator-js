@@ -1,10 +1,10 @@
-export const notAnnotableSelector = '[data-not-annotable="true"]';
+export const notAnnotatableSelector = '.not-annotatable';
 
 const isRangeNotAnnotable = (range: Range): boolean => {
   const ancestor = range.commonAncestorContainer;
   return ancestor instanceof HTMLElement
-    ? !!ancestor.closest(notAnnotableSelector)
-    : !!ancestor.parentElement?.closest(notAnnotableSelector);
+    ? !!ancestor.closest(notAnnotatableSelector)
+    : !!ancestor.parentElement?.closest(notAnnotatableSelector);
 };
 
 const iterateRangeNotAnnotableElements = function*(range: Range): Generator<HTMLElement> {
@@ -69,6 +69,6 @@ export const getAnnotableRanges = (range: Range): Range[] => {
 };
 export const getRangeAnnotableContents = (range: Range): DocumentFragment => {
   const contents = range.cloneContents();
-  contents.querySelectorAll(notAnnotableSelector).forEach((el) => el.remove());
+  contents.querySelectorAll(notAnnotatableSelector).forEach((el) => el.remove());
   return contents;
 };

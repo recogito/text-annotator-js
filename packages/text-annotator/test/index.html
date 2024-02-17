@@ -21,6 +21,10 @@
             border-style: solid;
             border-color: #cfcfcf;
             border-width: 0 1px;
+
+            .not-annotatable {
+                background-color: wheat;
+            }
         }
 
         h1 {
@@ -31,10 +35,6 @@
         p {
             font-size: 17px;
             line-height: 160%;
-        }
-
-        [data-not-annotable] {
-            background-color: wheat;
         }
 
         #buttons {
@@ -84,7 +84,7 @@
         Jove, from whatsoever source you may know them.
     </p>
 
-    <h5 data-not-annotable="true">
+    <h5 class="not-annotatable">
         Parent not annotable!
         <span>And its sub-element</span>
     </h5>
@@ -100,7 +100,7 @@
 
     <h5>
         Parent annotable!
-        <span data-not-annotable="true">But its sub-element is not!</span>
+        <span class="not-annotatable">But its sub-element is not!</span>
     </h5>
 
     <p>

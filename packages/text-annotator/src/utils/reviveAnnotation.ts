@@ -1,4 +1,4 @@
-import { notAnnotableSelector } from './getAnnotableRanges';
+import { notAnnotatableSelector } from './getAnnotableRanges';
 import type { TextAnnotation, TextAnnotationTarget, TextSelector } from '../model';
 
 /**
@@ -13,7 +13,7 @@ import type { TextAnnotation, TextAnnotationTarget, TextSelector } from '../mode
  */
 const reviveRange = (start: number, end: number, offsetReference: HTMLElement): Range => {
   const iterator = document.createNodeIterator(offsetReference, NodeFilter.SHOW_TEXT, (node) =>
-    node.parentElement?.closest(notAnnotableSelector)
+    node.parentElement?.closest(notAnnotatableSelector)
       ? NodeFilter.FILTER_SKIP
       : NodeFilter.FILTER_ACCEPT
   );
