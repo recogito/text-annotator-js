@@ -12,7 +12,7 @@ import {
 import { IndexedHighlightRect, createSpatialTree } from './spatialTree';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
 import type { AnnotationRects, TextAnnotationStore } from './TextAnnotationStore';
-import { reviveTarget } from './reviveTarget';
+import { hasAllValidRanges, reviveAnnotation, reviveTarget } from '../utils';
 
 export type TextAnnotatorState = AnnotatorState<TextAnnotation> & {
 
@@ -24,12 +24,6 @@ export type TextAnnotatorState = AnnotatorState<TextAnnotation> & {
 
   viewport: ViewportState;
 
-}
-
-// Shorthand
-const hasValidRange = (annotation: TextAnnotation) => {
-  const { range } = annotation.target.selector;
-  return range instanceof Range && !range.collapsed;
 }
 
 export const createTextAnnotatorState = (
@@ -49,12 +43,9 @@ export const createTextAnnotatorState = (
 
   // Wrap store interface to intercept annotations and revive DOM ranges, if needed
   const addAnnotation = (annotation: TextAnnotation, origin = Origin.LOCAL): boolean => {
-    const revived = annotation.target.selector.range instanceof Range ?
-      annotation : { ...annotation, target: reviveTarget(annotation.target, container) };
+    const revived = reviveAnnotation(annotation, container);
 
-    const { range } = revived.target.selector;
-    const isValid = range && !range.collapsed;
-
+    const isValid = hasAllValidRanges(revived.target.selector);
     if (isValid)
       store.addAnnotation(revived, origin); 
 
@@ -66,15 +57,12 @@ export const createTextAnnotatorState = (
     replace = true, 
     origin = Origin.LOCAL
   ): TextAnnotation[] => {
-    const revived = annotations.map(a => hasValidRange(a) ?
-      a : { ...a, target: reviveTarget(a.target, container )});
+    const revived = annotations.map(a => reviveAnnotation(a, container));
 
     // Initial page load might take some time. Retry for more robustness.
-    const hasCollapsedRanges = revived.some(a => a.target.selector.range.collapsed);
-    if (hasCollapsedRanges) {
-      const couldNotRevive = revived.filter(a => a.target.selector.range.collapsed);
-      console.warn('Could not revive all targets');
-      console.warn(couldNotRevive);
+    const couldNotRevive = revived.filter(a => !hasAllValidRanges(a.target.selector));
+    if (couldNotRevive.length > 0) {
+      console.warn('Could not revive all targets for these annotations:', couldNotRevive);
 
       // Note: we want to keep ALL annotations in the store, even those that
       // were not revived - even if the highlighter won't be able to render
@@ -89,14 +77,12 @@ export const createTextAnnotatorState = (
   }
 
   const updateTarget = (target: TextAnnotationTarget, origin = Origin.LOCAL) => {
-    const revived = target.selector.range instanceof Range ?
-      target : reviveTarget(target, container);
-
+    const revived = reviveTarget(target, container);
     store.updateTarget(revived, origin);
   }
 
   const bulkUpdateTargets = (targets: TextAnnotationTarget[], origin = Origin.LOCAL) => {
-    const revived = targets.map(t => t.selector.range instanceof Range ? t : reviveTarget(t, container));
+    const revived = targets.map(t => reviveTarget(t, container));
     store.bulkUpdateTargets(revived, origin);
   }
 
@@ -111,23 +97,22 @@ export const createTextAnnotatorState = (
 
     // Note that the tree could be slightly out of sync (because it updates
     // by listening to changes, just like anyone else)
-    return ids.map(id => store.getAnnotation(id)).filter(a => a);
+    return ids.map(id => store.getAnnotation(id)).filter(Boolean);
   }
 
   const getAnnotationBounds = (id: string, x?: number, y?: number, buffer = 5): DOMRect => {
     const rects = tree.getDOMRectsForAnnotation(id);
-    if (rects.length > 0) {
-      if (x && y) {
-        const match = rects.find(({ top, right, bottom, left }) =>
-          x >= left - buffer && x <= right + buffer && y >= top - buffer && y <= bottom + buffer);
+    if (rects.length === 0) return;
 
-        if (match)
-          // Preferred bounds: the rectangle 
-          return match;
-      }
-        
-      return tree.getBoundsForAnnotation(id);
+    if (x && y) {
+      const match = rects.find(({ top, right, bottom, left }) =>
+        x >= left - buffer && x <= right + buffer && y >= top - buffer && y <= bottom + buffer);
+
+      // Preferred bounds: the rectangle
+      if (match) return match;
     }
+
+    return tree.getBoundsForAnnotation(id);
   }
 
   const getIntersectingRects = (
@@ -155,9 +140,9 @@ export const createTextAnnotatorState = (
   const recalculatePositions = () => tree.recalculate();
 
   store.observe(({ changes }) => {
-    const created = (changes.created || []).filter(hasValidRange);
-    const deleted = (changes.deleted || []).filter(hasValidRange);
-    const updated = (changes.updated || []).filter(u => hasValidRange(u.newValue));
+    const created = (changes.created || []).filter(a => hasAllValidRanges(a.target.selector));
+    const deleted = (changes.deleted || []).filter(a => hasAllValidRanges(a.target.selector));
+    const updated = (changes.updated || []).filter(u => hasAllValidRanges(u.newValue.target.selector));
 
     if (created.length > 0)
       tree.set(created.map(a => a.target), false);
@@ -166,8 +151,7 @@ export const createTextAnnotatorState = (
       deleted.forEach(a => tree.remove(a.target));
 
     if (updated?.length > 0)
-      updated.forEach(({ newValue }) =>
-        tree.update(newValue.target));
+      updated.forEach(({ newValue }) => tree.update(newValue.target));
   });
 
   return {

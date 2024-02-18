@@ -3,7 +3,7 @@ import type { Store } from '@annotorious/core';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
 import { mergeClientRects } from '../utils';
 import { getClientRectsPonyfill } from '../utils/getClientRectsPonyfill';
-import { reviveTarget } from './reviveTarget';
+import { reviveSelector } from '../utils/reviveAnnotation';
 
 const isFirefox = false; // navigator.userAgent.match(/firefox|fxios/i);
 
@@ -39,17 +39,19 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
   const toItems = (target: TextAnnotationTarget): IndexedHighlightRect[] => {
     const offset = container.getBoundingClientRect();
 
-    const isValidRange = 
-      target.selector.range instanceof Range && 
-      !target.selector.range.collapsed &&
-      target.selector.range.startContainer.nodeType === Node.TEXT_NODE && 
-      target.selector.range.endContainer.nodeType === Node.TEXT_NODE;
+    const rects = target.selector.flatMap(s => {
 
-    const t = isValidRange ? target : reviveTarget(target, container);
+      const isValidRange =
+        s.range instanceof Range &&
+        !s.range.collapsed &&
+        s.range.startContainer.nodeType === Node.TEXT_NODE &&
+        s.range.endContainer.nodeType === Node.TEXT_NODE;
 
-    const rects = isFirefox ? 
-      getClientRectsPonyfill(t.selector.range) :
-      Array.from(t.selector.range.getClientRects());
+      const revivedRange = isValidRange ? s.range : reviveSelector(s, container).range;
+      return isFirefox ?
+        getClientRectsPonyfill(revivedRange) :
+        Array.from(revivedRange.getClientRects());
+    });
 
     const merged = mergeClientRects(rects);
 
