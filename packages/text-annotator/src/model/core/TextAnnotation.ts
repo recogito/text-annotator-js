@@ -8,7 +8,7 @@ export interface TextAnnotation extends Annotation {
 
 export interface TextAnnotationTarget extends AnnotationTarget {
 
-  selector: TextSelector;
+  selector: TextSelector[];
 
 }
 
