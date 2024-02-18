@@ -1,46 +1,48 @@
-const notAnnotatableToken = 'not-annotatable';
-export const notAnnotatableSelector = `.${notAnnotatableToken}`;
+const NOT_ANNTOTATABLE_CLASS = 'not-annotatable';
 
-const isRangeNotAnnotatable = (range: Range): boolean => {
+export const NOT_ANNTOTATABLE_SELECTOR = `.${NOT_ANNTOTATABLE_CLASS}`;
+
+const isRangeAnnotatable = (range: Range): boolean => {
   const ancestor = range.commonAncestorContainer;
   return ancestor instanceof HTMLElement
-    ? !!ancestor.closest(notAnnotatableSelector)
-    : !!ancestor.parentElement?.closest(notAnnotatableSelector);
-};
+    ? !ancestor.closest(NOT_ANNTOTATABLE_SELECTOR)
+    : !ancestor.parentElement?.closest(NOT_ANNTOTATABLE_SELECTOR);
+}
 
-const iterateRangeNotAnnotatableElements = function*(range: Range): Generator<HTMLElement> {
+const iterateNotAnnotatableElements = function*(range: Range): Generator<HTMLElement> {
   const notAnnotatableIterator = document.createNodeIterator(
     range.commonAncestorContainer,
     NodeFilter.SHOW_ELEMENT,
     (node) =>
-      node instanceof HTMLElement && node.classList.contains(notAnnotatableToken) && range.intersectsNode(node)
+      node instanceof HTMLElement && node.classList.contains(NOT_ANNTOTATABLE_CLASS) && range.intersectsNode(node)
         ? NodeFilter.FILTER_ACCEPT
         : NodeFilter.FILTER_SKIP
   );
 
   let notAnnotatableNode: Node | null;
+
   while ((notAnnotatableNode = notAnnotatableIterator.nextNode())) {
     if (notAnnotatableNode instanceof HTMLElement) {
       yield notAnnotatableNode;
     }
   }
-};
+}
 
-
-export const getAnnotatableRanges = (range: Range): Range[] => {
-  // Nothing to annotate within a not annotatable element 🤷🏻
-  if (isRangeNotAnnotatable(range)) return [];
+/**
+ * Splits a DOM Range into one or more ranges that span annotatable content only.
+ */
+export const splitAnnotatableRanges = (range: Range): Range[] => {
+  if (!isRangeAnnotatable(range)) return [];
 
   const annotatableRanges: Range[] = [];
 
   let prevNotAnnotatable: HTMLElement | null = null;
-  for (const notAnnotatable of iterateRangeNotAnnotatableElements(range)) {
+
+  for (const notAnnotatable of iterateNotAnnotatableElements(range)) {
     let subRange: Range;
 
-    /*
-     From the start of the range to the not annotatable element
-     When the selection starts on the `notAnnotatable` element - a collapsed range will be created and ignored
-    */
+    // From the start of the range to the not annotatable element.
+    // If selection starts on the non-annotatable element, a collapsed range will be created and ignored.
     if (!prevNotAnnotatable) {
       subRange = range.cloneRange();
       subRange.setEndBefore(notAnnotatable);
@@ -51,9 +53,9 @@ export const getAnnotatableRanges = (range: Range): Range[] => {
       subRange.setEndBefore(notAnnotatable);
     }
 
-    if (!subRange.collapsed) {
+    if (!subRange.collapsed)
       annotatableRanges.push(subRange);
-    }
+
     prevNotAnnotatable = notAnnotatable;
   }
 
@@ -67,9 +69,10 @@ export const getAnnotatableRanges = (range: Range): Range[] => {
   }
 
   return annotatableRanges.length > 0 ? annotatableRanges : [range];
-};
+}
+
 export const getRangeAnnotatableContents = (range: Range): DocumentFragment => {
   const contents = range.cloneContents();
-  contents.querySelectorAll(notAnnotatableSelector).forEach((el) => el.remove());
+  contents.querySelectorAll(NOT_ANNTOTATABLE_SELECTOR).forEach((el) => el.remove());
   return contents;
-};
+}

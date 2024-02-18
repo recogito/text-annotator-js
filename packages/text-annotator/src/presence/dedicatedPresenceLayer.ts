@@ -1,5 +1,5 @@
 import type { PresenceProvider, PresentUser, ViewportState } from '@annotorious/core';
-import type { Rect, TextAnnotatorState } from '../state';
+import type { Rect } from '../state';
 import type { TextAnnotation } from '../model';
 import type { PresencePainterOptions } from './PresencePainterOptions';
 

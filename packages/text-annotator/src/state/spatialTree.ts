@@ -3,7 +3,7 @@ import type { Store } from '@annotorious/core';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
 import { mergeClientRects } from '../utils';
 import { getClientRectsPonyfill } from '../utils/getClientRectsPonyfill';
-import { reviveSelector } from '../utils/reviveAnnotation';
+import { reviveSelector } from '../utils';
 
 const isFirefox = false; // navigator.userAgent.match(/firefox|fxios/i);
 

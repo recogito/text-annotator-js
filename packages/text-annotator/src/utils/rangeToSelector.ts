@@ -1,4 +1,4 @@
-import { getRangeAnnotatableContents } from './getAnnotatableRanges';
+import { getRangeAnnotatableContents } from './splitAnnotatableRanges';
 import type { TextSelector } from '../model';
 
 export const rangeToSelector = (
@@ -26,4 +26,4 @@ export const rangeToSelector = (
   return offsetReferenceSelector
     ? { quote, start, end, range, offsetReference }
     : { quote, start, end, range };
-};
+}
