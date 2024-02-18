@@ -1,8 +1,8 @@
 export const trimRange = (range: Range): Range => {
   const { startContainer, endContainer } = range;
 
-  const isTextRange = 
-    startContainer.nodeType === Node.TEXT_NODE && 
+  const isTextRange =
+    startContainer.nodeType === Node.TEXT_NODE &&
     endContainer.nodeType === Node.TEXT_NODE;
 
   if (isTextRange)
@@ -10,7 +10,7 @@ export const trimRange = (range: Range): Range => {
 
   if (startContainer.nodeType !== Node.TEXT_NODE) {
     const nextContainer = startContainer.nextSibling || startContainer.parentNode;
-          
+
     // Get first text child in next container
     const nextText = nextContainer?.nodeType === Node.TEXT_NODE ?
       nextContainer :
@@ -21,7 +21,7 @@ export const trimRange = (range: Range): Range => {
 
   if (endContainer.nodeType !== Node.TEXT_NODE) {
     const prevContainer = endContainer.previousSibling || endContainer.parentNode;
-         
+
     // Get last text child in previous container
     const prevText = prevContainer?.nodeType === Node.TEXT_NODE ?
       prevContainer :
@@ -32,3 +32,4 @@ export const trimRange = (range: Range): Range => {
 
   return range;
 }
+;

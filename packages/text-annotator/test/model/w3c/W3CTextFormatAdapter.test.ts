@@ -4,7 +4,6 @@ import { textAnnotation, incompleteTextAnnotation } from './fixtures';
 import {
   parseW3CTextAnnotation,
   serializeW3CTextAnnotation,
-  type W3CTextAnnotationTarget
 } from '../../../src';
 
 beforeEach(async () => {
@@ -24,12 +23,14 @@ describe('parseW3CTextAnnotation', () => {
     expect(error).toBeUndefined();
 
     const fixtureBody = textAnnotation.body[0];
-    const fixtureTarget = textAnnotation.target as W3CTextAnnotationTarget;
+    const fixtureTarget = textAnnotation.target[0];
 
     expect(parsed.bodies).toHaveLength(1);
     expect(parsed.bodies[0].value).toBe(fixtureBody.value);
 
-    const { selector: { quote, start, range }, created, creator } = parsed.target;
+    const { selector, created, creator } = parsed.target;
+    const { quote, start, range } = selector[0];
+
     expect(quote).toStrictEqual(fixtureTarget.selector[0].exact);
     expect(start).toStrictEqual(fixtureTarget.selector[1].start);
     expect(created.getTime()).toEqual(new Date(textAnnotation.created).getTime());
@@ -48,11 +49,9 @@ describe('parseW3CTextAnnotation', () => {
     const { parsed, error } = parseW3CTextAnnotation(textAnnotation, global.contentContainer);
     expect(error).toBeUndefined();
 
-    // @ts-expect-error
-    const serialized = serializeW3CTextAnnotation(parsed, textAnnotation.target.source, global.contentContainer);
+    const serialized = serializeW3CTextAnnotation(parsed, textAnnotation.target[0].source, global.contentContainer);
     expect(serialized.body).toEqual(textAnnotation.body);
 
-    // @ts-expect-error
-    expect(serialized.target.selector).toEqual(textAnnotation.target.selector);
+    expect(serialized.target[0].selector).toEqual(textAnnotation.target[0].selector);
   });
 });
