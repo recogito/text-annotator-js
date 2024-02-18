@@ -86,4 +86,3 @@ export const teiToTextTarget = (container: HTMLElement) => (t: TEIAnnotationTarg
     range: teiRangeSelectorToRange(s, container)
   }))
 });
-

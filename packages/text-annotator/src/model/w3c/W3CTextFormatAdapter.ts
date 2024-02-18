@@ -8,7 +8,7 @@ import {
 } from '@annotorious/core';
 import type { TextAnnotation, TextAnnotationTarget, TextSelector } from '../core';
 import type { W3CTextAnnotation, W3CTextSelector } from '../w3c';
-import { getQuoteContext, reviveSelector } from '../../utils';
+import { getQuoteContext } from '../../utils';
 
 export type W3CTextFormatAdapter = FormatAdapter<TextAnnotation, W3CTextAnnotation>;
 
@@ -64,7 +64,7 @@ const parseW3CTextTargets = (annotation: W3CTextAnnotation, container: HTMLEleme
     }, {});
 
     if (isTextSelector(selector)) {
-      parsed.selector.push(reviveSelector(selector, container));
+      parsed.selector.push(selector);
     } else {
       const missingTypes = [
         !selector.start ? 'TextPositionSelector' : undefined,

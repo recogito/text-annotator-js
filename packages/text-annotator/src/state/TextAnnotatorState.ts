@@ -12,7 +12,7 @@ import {
 import { IndexedHighlightRect, createSpatialTree } from './spatialTree';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
 import type { AnnotationRects, TextAnnotationStore } from './TextAnnotationStore';
-import { hasAllValidRanges, reviveAnnotation, reviveTarget } from '../utils';
+import { isRevived, reviveAnnotation, reviveTarget } from '../utils';
 
 export type TextAnnotatorState = AnnotatorState<TextAnnotation> & {
 
@@ -45,7 +45,7 @@ export const createTextAnnotatorState = (
   const addAnnotation = (annotation: TextAnnotation, origin = Origin.LOCAL): boolean => {
     const revived = reviveAnnotation(annotation, container);
 
-    const isValid = hasAllValidRanges(revived.target.selector);
+    const isValid = isRevived(revived.target.selector);
     if (isValid)
       store.addAnnotation(revived, origin); 
 
@@ -60,7 +60,7 @@ export const createTextAnnotatorState = (
     const revived = annotations.map(a => reviveAnnotation(a, container));
 
     // Initial page load might take some time. Retry for more robustness.
-    const couldNotRevive = revived.filter(a => !hasAllValidRanges(a.target.selector));
+    const couldNotRevive = revived.filter(a => !isRevived(a.target.selector));
     if (couldNotRevive.length > 0) {
       console.warn('Could not revive all targets for these annotations:', couldNotRevive);
 
@@ -140,9 +140,9 @@ export const createTextAnnotatorState = (
   const recalculatePositions = () => tree.recalculate();
 
   store.observe(({ changes }) => {
-    const created = (changes.created || []).filter(a => hasAllValidRanges(a.target.selector));
-    const deleted = (changes.deleted || []).filter(a => hasAllValidRanges(a.target.selector));
-    const updated = (changes.updated || []).filter(u => hasAllValidRanges(u.newValue.target.selector));
+    const created = (changes.created || []).filter(a => isRevived(a.target.selector));
+    const deleted = (changes.deleted || []).filter(a => isRevived(a.target.selector));
+    const updated = (changes.updated || []).filter(u => isRevived(u.newValue.target.selector));
 
     if (created.length > 0)
       tree.set(created.map(a => a.target), false);

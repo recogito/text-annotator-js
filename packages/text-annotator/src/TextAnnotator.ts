@@ -2,6 +2,7 @@ import { createAnonymousGuest, createLifecyleObserver, createBaseAnnotator, Draw
 import type { Annotator, User, PresenceProvider } from '@annotorious/core';
 import { createPainter } from './presence';
 import { createHighlightLayer } from './highlight';
+// import { createHighlightLayer } from './highlight/nativeHighlightLayer';
 import { scrollIntoView } from './api';
 import { TextAnnotationStore, TextAnnotatorState, createTextAnnotatorState } from './state';
 import type { TextAnnotation } from './model';
@@ -9,6 +10,7 @@ import type { TextAnnotatorOptions } from './TextAnnotatorOptions';
 import { SelectionHandler } from './SelectionHandler';
 
 import './TextAnnotator.css';
+import { createPresenceLayer } from './presence/dedicatedPresenceLayer';
 
 export interface TextAnnotator<T extends unknown = TextAnnotation> extends Annotator<TextAnnotation, T> {
 
@@ -70,6 +72,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
 
   const setPresenceProvider = (provider: PresenceProvider) => {
     if (provider) {
+      const p = createPresenceLayer(container, provider, opts.presence);
       highlightLayer.setPainter(createPainter(provider, opts.presence));
       provider.on('selectionChange', () => highlightLayer.redraw());
     }

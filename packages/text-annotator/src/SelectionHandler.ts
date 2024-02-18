@@ -2,7 +2,7 @@ import { Origin, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotationTarget } from './model';
-import { debounce, getAnnotatableRanges, rangeToSelector, trimRange } from './utils';
+import { debounce, splitAnnotatableRanges, rangeToSelector, trimRange } from './utils';
 
 export const SelectionHandler = (
   container: HTMLElement,
@@ -55,7 +55,7 @@ export const SelectionHandler = (
 
     const selectionRange = sel.getRangeAt(0);
     const trimmedRange = trimRange(selectionRange.cloneRange())
-    const annotatableRanges = getAnnotatableRanges(trimmedRange);
+    const annotatableRanges = splitAnnotatableRanges(trimmedRange);
 
     // const hasChanged =
     //   trimmedRange.toString() !== currentTarget.selector?.quote;

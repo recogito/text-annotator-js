@@ -1,4 +1,4 @@
-import { reviveTarget } from '@recogito/text-annotator';
+import { isRevived, reviveTarget } from '@recogito/text-annotator';
 import type { 
   TextAnnotation, 
   TextAnnotationTarget, 

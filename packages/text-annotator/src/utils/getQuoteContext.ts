@@ -1,4 +1,4 @@
-import { getRangeAnnotatableContents } from './getAnnotatableRanges';
+import { getRangeAnnotatableContents } from './splitAnnotatableRanges';
 
 export const getQuoteContext = (
   range: Range, 

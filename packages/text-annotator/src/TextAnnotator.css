@@ -11,7 +11,7 @@ html, body {
   position: relative;
 }
 
-.r6o-annotatable.hovered {
+.hovered * {
   cursor: pointer;
 }
 

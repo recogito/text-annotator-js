@@ -26,7 +26,8 @@ export const scrollIntoView = (container: HTMLElement, store: TextAnnotationStor
     const parentWidth = scrollParent.clientWidth;
 
     // Position of the annotation relative to viewport
-    const topAnnotationBounds = target.selector[0].range.getBoundingClientRect();
+    // Note: first selector is not necessarily top one...
+    const annotationBounds = target.selector[0].range.getBoundingClientRect();
 
     // Note: getBoundingClientRect seems to return wrong height! 
     // (Includes block elements?) We'll therefore use the normalized height
@@ -34,8 +35,8 @@ export const scrollIntoView = (container: HTMLElement, store: TextAnnotationStor
     const { width, height } = store.getAnnotationBounds(annotation.id);
 
     // Position of the annotation relative to scrollParent
-    const offsetTop = topAnnotationBounds.top - parentBounds.top;
-    const offsetLeft = topAnnotationBounds.left - parentBounds.left;
+    const offsetTop = annotationBounds.top - parentBounds.top;
+    const offsetLeft = annotationBounds.left - parentBounds.left;
 
     const scrollTop = scrollParent.parentElement ? scrollParent.scrollTop : 0;
     const scrollLeft = scrollParent.parentElement ? scrollParent.scrollLeft : 0;
