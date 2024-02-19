@@ -22,8 +22,6 @@ export const createHighlights = () => {
 
   let currentRendered = new Set<string>();
 
-  let currentSelected = new Set<string>();
-
   const refresh = (
     highlights: AnnotationRects[], 
     viewportBounds: ViewportBounds,
@@ -78,7 +76,6 @@ export const createHighlights = () => {
     });
 
     currentRendered = nextRendered;
-    currentSelected = nextSelected;
   }
 
   const setPainter = (painter: HighlightPainter) => customPainter = painter;

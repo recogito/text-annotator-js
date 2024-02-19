@@ -13,6 +13,8 @@ export const createCSSHighlightRenderer = (
 ) => {
   const { store, selection, hover } = state;
 
+  let customPainter: HighlightPainter;
+
   let currentStyle: DrawingStyle | ((annotation: TextAnnotation, selected?: boolean) => DrawingStyle) | undefined;
 
   let currentFilter: Filter | undefined;
@@ -59,7 +61,10 @@ export const createCSSHighlightRenderer = (
     setTimeout(() => onDraw(annotationsInView.map(({ annotation }) => annotation)), 1);
   }
 
-  const setPainter = (painter: HighlightPainter) => highlights.setPainter(painter);
+  const setPainter = (painter: HighlightPainter) => {
+    customPainter = painter;
+    highlights.setPainter(painter);
+  }
 
   // Refresh when style changes
   const setDrawingStyle = (style: DrawingStyle | ((a: TextAnnotation, selected?: boolean) => DrawingStyle)) => {
@@ -86,6 +91,10 @@ export const createCSSHighlightRenderer = (
   // Refresh on resize
   const onResize = debounce(() => {
     store.recalculatePositions();
+
+    if (customPainter)
+      customPainter.reset();
+
     refresh();
   });
 
