@@ -2,14 +2,13 @@ import type { TextSelector } from '../model';
 import { NOT_ANNTOTATABLE_SELECTOR } from './splitAnnotatableRanges';
 
 /**
- * Retrieves the DOM range from the given text annotation position
+ * Creates a new selector object with the revived DOM range from the given text annotation position
  * Only the annotatable elements are processed and counted towards the range
  *
- * @param start start of the annotated content
- * @param end end of the annotated content
- * @param offsetReference the HTML container of the annotated content
+ * @param selector annotation selector with start and end positions
+ * @param container the HTML container of the annotated content
  *
- * @returns the DOM range
+ * @returns the revived selector
  */
 export const reviveSelector = (selector: TextSelector, container: HTMLElement): TextSelector => {
 
