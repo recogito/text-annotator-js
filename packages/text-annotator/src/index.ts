@@ -1,6 +1,7 @@
 export * from './highlight/canvas';
 export * from './model';
 export * from './state';
+export * from './utils';
 export * from './presence/PresencePainterOptions';
 export * from './TextAnnotator';
 export * from './TextAnnotatorOptions';
