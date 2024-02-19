@@ -1,2 +1,1 @@
-export * from './highlightRenderer';
-export * from '../../presence/presencePainter';
+export * from './highlightRenderer'
