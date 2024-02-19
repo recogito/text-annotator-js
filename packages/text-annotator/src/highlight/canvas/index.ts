@@ -1,2 +1,1 @@
-export * from './highlightLayer';
-export * from './HighlightPainter';
+export * from './highlightRenderer';

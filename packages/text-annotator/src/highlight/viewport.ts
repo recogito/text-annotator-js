@@ -1,7 +1,23 @@
 import type { ViewportState } from '@annotorious/core';
 import type { TextAnnotation } from '../model';
 
-export const getViewport = (container: HTMLElement) => {
+export interface ViewportBounds {
+
+  top: number;
+
+  left: number;
+
+  minX: number;
+
+  minY: number;
+  
+  maxX: number;
+  
+  maxY: number;
+
+}
+
+export const getViewportBounds = (container: HTMLElement): ViewportBounds => {
   const { top, left } = container.getBoundingClientRect();
 
   const { innerWidth, innerHeight } = window;

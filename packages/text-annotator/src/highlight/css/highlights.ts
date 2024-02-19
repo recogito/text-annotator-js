@@ -1,57 +1,59 @@
 import type { DrawingStyle } from '@annotorious/core';
 import { colord } from 'colord';
 import type { TextAnnotation } from '../../model';
-import { DEFAULT_SELECTED_STYLE, DEFAULT_STYLE } from '../defaultStyles';
+import type { HighlightPainter } from '../HighlightPainter';
+import type { AnnotationRects } from 'src/state';
+import type { ViewportBounds } from '../viewport';
+import { DEFAULT_SELECTED_STYLE, DEFAULT_STYLE } from '../HighlightStyle';
 
 const toCSS = (s: DrawingStyle) => {
   const backgroundColor = colord(s.fill || DEFAULT_STYLE.fill).alpha(s.fillOpacity || DEFAULT_STYLE.fillOpacity).toHex();
   return `background-color: ${backgroundColor};`
 }
 
-const setsEqual = (set1: Set<any>, set2: Set<any>) =>
-  set1.size === set2.size && [...set1].every(value => set2.has(value));
+// const setsEqual = (set1: Set<any>, set2: Set<any>) =>
+//   set1.size === set2.size && [...set1].every(value => set2.has(value));
 
 export const createHighlights = () => {
   const elem = document.createElement('style');
   document.getElementsByTagName('head')[0].appendChild(elem);
+
+  let customPainter: HighlightPainter;
 
   let currentRendered = new Set<string>();
 
   let currentSelected = new Set<string>();
 
   const refresh = (
-    annotations: TextAnnotation[], 
+    highlights: AnnotationRects[], 
+    viewportBounds: ViewportBounds,
     selected: string[], 
     currentStyle: DrawingStyle | ((annotation: TextAnnotation, selected: boolean) => DrawingStyle)
   ) => {
-    // New set of rendered annotation IDs
-    const nextRendered = new Set(annotations.map(a => a.id));
+    if (customPainter)
+      customPainter.clear();
 
+    // Next set of rendered annotation IDs and selections
+    const nextRendered = new Set(highlights.map(h => h.annotation.id));
     const nextSelected = new Set(selected);
 
-    // New annotations that are not yet in this stylesheet
-    const toAdd = annotations.filter(a => !currentRendered.has(a.id));
-
-    // Annotations currently in this stylesheet that should no longer be rendered
+    // Annotations currently in this stylesheet that no longer need rendering
     const toRemove = Array.from(currentRendered).filter(id => !nextRendered.has(id));
 
-    const selectionChanged = !setsEqual(currentSelected, nextSelected);
+    // For simplicity, re-generate the whole stylesheet
+    const updatedCSS = highlights.map(h => {
+      const isSelected = nextSelected.has(h.annotation.id);
 
-    // if (toAdd.length + toRemove.length === 0 && !selectionChanged)
-    //   return; // No change in rendered annotations
-
-    // Change! For simplicity, re-generate the whole stylesheet. It's the
-    // DOM insert op that's likely the bottleneck, not the string computation.
-    const updatedCSS = annotations.map(annotation => {
-      const isSelected = nextSelected.has(annotation.id);
-
-      const style = currentStyle 
+      const base = currentStyle 
         ? typeof currentStyle === 'function' 
-          ? currentStyle(annotation, isSelected) 
+          ? currentStyle(h.annotation, isSelected) 
           : currentStyle 
         : isSelected ? DEFAULT_SELECTED_STYLE : DEFAULT_STYLE;
 
-      return `::highlight(_${annotation.id}) { ${toCSS(style)} }`;
+      // Trigger the custom painter (if any) as a side-effect
+      const style = customPainter ? customPainter.paint(h, viewportBounds, isSelected) || base : base;
+
+      return `::highlight(_${h.annotation.id}) { ${toCSS(style)} }`;
     });
 
     elem.innerHTML = updatedCSS.join('\n');
@@ -65,7 +67,7 @@ export const createHighlights = () => {
 
     // Could be improved further by (re-)setting only annotations that
     // have changes.
-    annotations.forEach(annotation => { 
+    highlights.forEach(({ annotation }) => { 
       const ranges = annotation.target.selector.map(s => s.range);
 
       // @ts-ignore
@@ -79,6 +81,8 @@ export const createHighlights = () => {
     currentSelected = nextSelected;
   }
 
+  const setPainter = (painter: HighlightPainter) => customPainter = painter;
+
   const destroy = () => {
     // Clear all highlights from the Highlight Registry
     // @ts-ignore
@@ -90,7 +94,8 @@ export const createHighlights = () => {
 
   return {
     destroy,
-    refresh
+    refresh,
+    setPainter
   }
 
 }

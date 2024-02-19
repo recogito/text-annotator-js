@@ -1,22 +1,16 @@
 import type { DrawingStyle, Filter, ViewportState } from '@annotorious/core';
 import type { TextAnnotation } from '../../model';
 import type { TextAnnotatorState } from '../../state';
-import { defaultPainter, type HighlightPainter } from './HighlightPainter';
 import { trackViewport } from '../viewport';
 import { debounce } from '../../utils';
+import { DEFAULT_SELECTED_STYLE, DEFAULT_STYLE, type HighlightStyle } from '../HighlightStyle';
+import type { HighlightPainter } from '../HighlightPainter';
 
-const createCanvas = (className: string, highres?: boolean) => {
+const createCanvas = () => {
   const canvas = document.createElement('canvas');
-  canvas.width = highres ? 2 * window.innerWidth : window.innerWidth;
-  canvas.height = highres ? 2 * window.innerHeight : window.innerHeight;
-  canvas.className = className;
-
-  if (highres) {
-    const context = canvas.getContext('2d');
-    context.scale(2, 2);
-    context.translate(0.5, 0.5);
-  }
-
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  canvas.className = 'r6o-highlight-layer bg';
   return canvas;
 }
 
@@ -32,7 +26,7 @@ const resetCanvas = (canvas: HTMLCanvasElement, highres?: boolean) => {
   }
 }
 
-export const createHighlightLayer = (
+export const createCanvasHighlightRenderer = (
   container: HTMLElement, 
   state: TextAnnotatorState,
   viewport: ViewportState
@@ -43,20 +37,16 @@ export const createHighlightLayer = (
 
   let currentFilter: Filter | undefined;
 
-  let currentPainter: HighlightPainter = defaultPainter;
+  let currentPainter: HighlightPainter;
 
   const onDraw = trackViewport(viewport);
 
   container.classList.add('r6o-annotatable');
 
-  const bgCanvas = createCanvas('r6o-highlight-layer bg');
-  const fgCanvas = createCanvas('r6o-highlight-layer fg', true);
+  const canvas = createCanvas();
+  const ctx = canvas.getContext('2d');
 
-  const bgContext = bgCanvas.getContext('2d');
-  const fgContext = fgCanvas.getContext('2d');
-
-  container.insertBefore(bgCanvas, container.firstChild);
-  container.appendChild(fgCanvas);
+  container.insertBefore(canvas, container.firstChild);
 
   const onPointerMove = (event: PointerEvent) => {
     const {x, y} = container.getBoundingClientRect();
@@ -92,21 +82,20 @@ export const createHighlightLayer = (
     return { top, left, minX, minY, maxX, maxY };
   }
 
-  const redraw = () => requestAnimationFrame(() => {
+  const refresh = () => requestAnimationFrame(() => {
     const { top, left, minX, minY, maxX, maxY } = getViewport();   
     
     const annotationsInView = currentFilter
       ? store.getIntersectingRects(minX, minY, maxX, maxY).filter(({ annotation }) => currentFilter(annotation))
       : store.getIntersectingRects(minX, minY, maxX, maxY);
 
-    const { width, height } = fgCanvas;
+    const { width, height } = canvas;
 
     // Get current selection
     const selectedIds = new Set(selection.selected.map(({ id }) => id));
 
     // New render loop - clear canvases
-    fgContext.clearRect(-0.5, -0.5, width + 1, height + 1);
-    bgContext.clearRect(-0.5, -0.5, width + 1, height + 1);
+    ctx.clearRect(-0.5, -0.5, width + 1, height + 1);
     
     annotationsInView.forEach(({ annotation, rects }) => {
       // Offset annotation rects by current scroll position
@@ -118,7 +107,19 @@ export const createHighlightLayer = (
       }));
 
       const isSelected = selectedIds.has(annotation.id);
-      currentPainter.paint(annotation, offsetRects, bgContext, fgContext, isSelected, currentStyle);
+
+      const style: HighlightStyle = currentStyle 
+        ? typeof currentStyle === 'function' 
+          ? currentStyle(annotation, isSelected) 
+          : currentStyle 
+        : isSelected 
+          ? DEFAULT_SELECTED_STYLE 
+          : DEFAULT_STYLE;
+
+      ctx.fillStyle = style.fill;
+      ctx.globalAlpha = style.fillOpacity || 1;
+      
+      offsetRects.forEach(({ x, y, width, height }) => ctx.fillRect(x, y - 2.5, width, height + 5));
     });
     
     setTimeout(() => onDraw(annotationsInView.map(({ annotation }) => annotation)), 1);
@@ -126,23 +127,23 @@ export const createHighlightLayer = (
 
   const setDrawingStyle = (style: DrawingStyle | ((a: TextAnnotation, selected?: boolean) => DrawingStyle)) => {
     currentStyle = style;
-    redraw();
+    refresh();
   }
 
   const setFilter = (filter?: Filter) => {
     currentFilter = filter;
-    redraw();
+    refresh();
   } 
 
   // Redraw on store change
-  const onStoreChange = () => redraw();
+  const onStoreChange = () => refresh();
   store.observe(onStoreChange);
 
   // Redraw on selection change
-  const unsubscribeSelection = selection.subscribe(() => redraw());
+  const unsubscribeSelection = selection.subscribe(() => refresh());
 
   // Redraw on scroll
-  const onScroll = () => redraw();
+  const onScroll = () => refresh();
   document.addEventListener('scroll', onScroll, { capture: true, passive: true });
 
   // Redraw on resize. Note that in cases where the element resized 
@@ -152,12 +153,11 @@ export const createHighlightLayer = (
   // probably no ideal solution, but one straightforward way
   // would be to just set a flag in 
   const onResize = debounce(() => {
-    resetCanvas(bgCanvas);
-    resetCanvas(fgCanvas, true);
+    resetCanvas(canvas);
 
     store.recalculatePositions();
 
-    redraw();
+    refresh();
   });
 
   window.addEventListener('resize', onResize);
@@ -170,14 +170,13 @@ export const createHighlightLayer = (
   // This is an extra precaution. The position of the container
   // might shift (without resizing) due to layout changes higher-up
   // in the DOM. (This happens in Recogito+ for example)
-  const mutationObserver = new MutationObserver(redraw);
+  const mutationObserver = new MutationObserver(refresh);
   mutationObserver.observe(document.body, config);
 
   const destroy = () => {
     container.removeEventListener('pointermove', onPointerMove);
 
-    container.removeChild(fgCanvas);
-    container.appendChild(bgCanvas);
+    container.removeChild(canvas);
 
     store.unobserve(onStoreChange);
 
@@ -193,7 +192,7 @@ export const createHighlightLayer = (
 
   return {
     destroy,
-    redraw,
+    refresh,
     setDrawingStyle,
     setFilter,
     setPainter: (painter: HighlightPainter) => currentPainter = painter

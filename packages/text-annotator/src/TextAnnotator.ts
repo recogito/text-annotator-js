@@ -1,8 +1,6 @@
 import { createAnonymousGuest, createLifecyleObserver, createBaseAnnotator, DrawingStyle, Filter, createUndoStack } from '@annotorious/core';
 import type { Annotator, User, PresenceProvider } from '@annotorious/core';
-import { createPainter } from './presence';
-// import { createHighlightLayer } from './highlight/canvas';
-import { createHighlightRenderer } from './highlight/cssCustomHighlight';
+import { createCanvasHighlightRenderer, createCSSHighlightRenderer, createPresencePainter } from './highlight';
 import { scrollIntoView } from './api';
 import { TextAnnotationStore, TextAnnotatorState, createTextAnnotatorState } from './state';
 import type { TextAnnotation } from './model';
@@ -41,7 +39,18 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   
   let currentUser: User = createAnonymousGuest();
 
-  const highlightRenderer = createHighlightRenderer(container, state, viewport);
+  // Switch on CSS Custom Highlight rendering, if requested in the init 
+  // opts and API is available in this browser
+  // @ts-ignore
+  const useExperimentalCSSRenderer = opts.experimentalCSSRenderer && Boolean(CSS.highlights);
+
+  if (useExperimentalCSSRenderer)
+    console.log('Using experimental CSS Custom Highlight API renderer');
+
+  const highlightRenderer = useExperimentalCSSRenderer
+      ? createCSSHighlightRenderer(container, state, viewport)
+      : createCanvasHighlightRenderer(container, state, viewport);
+
   if (opts.style)
     highlightRenderer.setDrawingStyle(opts.style);
 
@@ -71,9 +80,8 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
 
   const setPresenceProvider = (provider: PresenceProvider) => {
     if (provider) {
-      // const p = createPresenceLayer(container, provider, opts.presence);
-      // highlightLayer.setPainter(createPainter(provider, opts.presence));
-      // provider.on('selectionChange', () => highlightLayer.redraw());
+      highlightRenderer.setPainter(createPresencePainter(container, provider, opts.presence));
+      provider.on('selectionChange', () => highlightRenderer.refresh());
     }
   }
 

@@ -2,11 +2,11 @@ import type { DrawingStyle, Filter, ViewportState } from '@annotorious/core';
 import type { TextAnnotatorState } from '../../state';
 import type { TextAnnotation } from '../../model';
 import { debounce } from '../../utils';
-import type { HighlightPainter } from '../canvas/HighlightPainter';
-import { getViewport, trackViewport } from '../viewport';
+import { getViewportBounds, trackViewport } from '../viewport';
+import type { HighlightPainter } from '../HighlightPainter';
 import { createHighlights } from './highlights';
 
-export const createHighlightRenderer = (
+export const createCSSHighlightRenderer = (
   container: HTMLElement, 
   state: TextAnnotatorState,
   viewport: ViewportState
@@ -43,7 +43,9 @@ export const createHighlightRenderer = (
   container.addEventListener('pointermove', onPointerMove);
 
   const refresh = () => {
-    const { minX, minY, maxX, maxY } = getViewport(container);   
+    const bounds = getViewportBounds(container);   
+
+    const { minX, minY, maxX, maxY } = bounds;
     
     const annotationsInView = currentFilter
       ? store.getIntersectingRects(minX, minY, maxX, maxY).filter(({ annotation }) => currentFilter(annotation))
@@ -52,10 +54,12 @@ export const createHighlightRenderer = (
     // Get current selection
     const selectedIds = selection.selected.map(({ id }) => id);
 
-    highlights.refresh(annotationsInView.map(r => r.annotation), selectedIds, currentStyle);
+    highlights.refresh(annotationsInView, bounds, selectedIds, currentStyle);
 
     setTimeout(() => onDraw(annotationsInView.map(({ annotation }) => annotation)), 1);
   }
+
+  const setPainter = (painter: HighlightPainter) => highlights.setPainter(painter);
 
   // Refresh when style changes
   const setDrawingStyle = (style: DrawingStyle | ((a: TextAnnotation, selected?: boolean) => DrawingStyle)) => {
@@ -77,8 +81,7 @@ export const createHighlightRenderer = (
   const unsubscribeSelection = selection.subscribe(() => refresh());
 
   // Refresh on scroll
-  const onScroll = () => refresh();
-  document.addEventListener('scroll', onScroll, { capture: true, passive: true });
+  document.addEventListener('scroll', refresh, { capture: true, passive: true });
 
   // Refresh on resize
   const onResize = debounce(() => {
@@ -108,7 +111,7 @@ export const createHighlightRenderer = (
 
     unsubscribeSelection();
 
-    document.removeEventListener('scroll', onScroll);
+    document.removeEventListener('scroll', refresh);
 
     window.removeEventListener('resize', onResize);
     resizeObserver.disconnect();
@@ -121,6 +124,7 @@ export const createHighlightRenderer = (
     refresh,
     setDrawingStyle,
     setFilter,
-    setPainter: (painter: HighlightPainter) => console.log(painter)
+    setPainter
   }
+
 }

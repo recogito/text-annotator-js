@@ -1,11 +1,36 @@
-import type { DrawingStyle, PresenceProvider, PresentUser } from '@annotorious/core';
-import type { HighlightPainter } from '../highlight/canvas';
-import type { PresencePainterOptions } from './PresencePainterOptions';
-import type { TextAnnotation } from '../model';
-import type { Rect } from '../state';
-import { defaultPainter } from '../highlight/canvas';
+import type { Color, PresenceProvider, PresentUser } from '@annotorious/core';
+import type { AnnotationRects } from '../state';
+import type { HighlightStyle } from '../highlight/HighlightStyle';
+import type { HighlightPainter } from '../highlight/HighlightPainter';
+import type { PresencePainterOptions } from 'src/presence';
+import type { ViewportBounds } from '../highlight/viewport';
 
-export const createPainter = (provider: PresenceProvider, opts: PresencePainterOptions = {}): HighlightPainter => {
+const createCanvas = () => {
+  const canvas = document.createElement('canvas');
+
+  // Retina resolution for crisp font rendering
+  canvas.width = 2 * window.innerWidth;
+  canvas.height = 2 * window.innerHeight;
+  canvas.className = 'r6o-highlight-layer presence';
+
+  const context = canvas.getContext('2d');
+  context.scale(2, 2);
+  context.translate(0.5, 0.5);
+
+  return canvas;
+}
+
+export const createPresencePainter = (
+  container: HTMLElement, 
+  provider: PresenceProvider, 
+  opts: PresencePainterOptions = {}
+): HighlightPainter => {
+
+  const canvas = createCanvas();
+
+  const ctx = canvas.getContext('2d');
+
+  container.appendChild(canvas);
 
   const trackedAnnotations = new Map<string, PresentUser>();
 
@@ -24,46 +49,70 @@ export const createPainter = (provider: PresenceProvider, opts: PresencePainterO
       selection.forEach(id => trackedAnnotations.set(id, p));
   });  
 
-  const paint = (
-    annotation: TextAnnotation,
-    rects: Rect[], 
-    bg: CanvasRenderingContext2D, 
-    fg: CanvasRenderingContext2D,
-    isSelected?: boolean,
-    style?: DrawingStyle | ((annotation: TextAnnotation) => DrawingStyle)
-  ) => {
-    if (opts.font)
-      fg.font = opts.font;
+  const clear = () => {
+    const { width, height } = canvas;
+    ctx.clearRect(-0.5, -0.5, width + 1, height + 1);
+  }
 
-    const user = trackedAnnotations.get(annotation.id);
+  const paint = (
+    highlight: AnnotationRects, 
+    viewportBounds: ViewportBounds,
+    isSelected?: boolean
+  ): HighlightStyle | undefined => {
+    if (opts.font)
+      ctx.font = opts.font;
+
+    const user = trackedAnnotations.get(highlight.annotation.id);
     if (user) {
-      const { x, y, height } = rects[0];
+      // Draw cursor + label to the presence canvas
+      const { height } = highlight.rects[0];
+      const x = highlight.rects[0].x + viewportBounds.left;
+      const y = highlight.rects[0].y + viewportBounds.top;
 
       // Draw presence indicator
-      fg.fillStyle = user.appearance.color;
-      fg.fillRect(x - 2, y - 2.5, 2, height + 5);
+      ctx.fillStyle = user.appearance.color;
+      ctx.fillRect(x - 2, y - 2.5, 2, height + 5);
 
       // Draw name label
-      const metrics = fg.measureText(user.appearance.label);
+      const metrics = ctx.measureText(user.appearance.label);
       const labelWidth = metrics.width + 6;
       const labelHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent + 8;
       
       // Sigh... different between FF and Chrome
       const paddingBottom = metrics.fontBoundingBoxAscent ? 8 : 6.5;
 
-      fg.fillRect(x - 2, y - 2.5 - labelHeight, labelWidth, labelHeight);
+      ctx.fillRect(x - 2, y - 2.5 - labelHeight, labelWidth, labelHeight);
       
-      fg.fillStyle = '#fff';
-      fg.fillText(user.appearance.label, x + 1, y - paddingBottom);
+      ctx.fillStyle = '#fff';
+      ctx.fillText(user.appearance.label, x + 1, y - paddingBottom);
 
-      bg.fillStyle = user.appearance.color;
-      bg.globalAlpha = isSelected ? 0.45 : 0.18;
-      rects.forEach(({ x, y, width, height }) => bg.fillRect(x, y - 2.5, width, height + 5));
-    } else {
-      defaultPainter.paint(annotation, rects, bg, fg, isSelected, style);
+      // Return modfied style for the renderer
+      return { 
+        fill: user.appearance.color as Color,
+        fillOpacity: isSelected ? 0.45 : 0.18
+      }
     }
   }
+  
+  const reset = () => {
+    canvas.width = 2 * window.innerWidth;
+    canvas.height = 2 * window.innerHeight;
 
-  return { paint };
+    // Note that resizing the canvas resets the context
+    const context = canvas.getContext('2d');
+    context.scale(2, 2);
+    context.translate(0.5, 0.5);
+  }
+
+  const destroy = () => {
+    canvas.remove();
+  }
+
+  return {
+    clear,
+    destroy,
+    paint,
+    reset
+  }
   
 }
