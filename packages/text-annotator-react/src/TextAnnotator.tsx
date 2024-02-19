@@ -1,4 +1,5 @@
-import { ReactNode, useContext, useEffect, useRef } from 'react';
+import { ForwardedRef, forwardRef, ReactNode, useContext, useEffect, useRef } from 'react';
+import { mergeRefs } from 'react-merge-refs';
 import { AnnotoriousContext, DrawingStyle, Filter } from '@annotorious/react';
 import type { TextAnnotation, TextAnnotatorOptions } from '@recogito/text-annotator';
 import { createTextAnnotator } from '@recogito/text-annotator';
@@ -7,7 +8,7 @@ import '@recogito/text-annotator/dist/text-annotator.css';
 
 export type TextAnnotatorProps<E extends unknown> = TextAnnotatorOptions<E> & {
 
-  children?: ReactNode | JSX.Element; 
+  children?: ReactNode | JSX.Element;
 
   filter?: Filter;
 
@@ -15,18 +16,19 @@ export type TextAnnotatorProps<E extends unknown> = TextAnnotatorOptions<E> & {
 
 }
 
-export const TextAnnotator = <E extends unknown>(props: TextAnnotatorProps<E>) => {
+export const TextAnnotator = forwardRef(<E extends unknown>(props: TextAnnotatorProps<E>, ref: ForwardedRef<HTMLDivElement>) => {
 
-  const el = useRef<HTMLDivElement>(null);
+  const containerElRef = useRef<HTMLDivElement | null>(null);
 
   const { children, ...opts } = props;
 
   const { anno, setAnno } = useContext(AnnotoriousContext);
 
   useEffect(() => {
-    if (!setAnno) return;
+    const { current: containerEl } = containerElRef;
+    if (!containerEl || !setAnno) return;
 
-    const anno = createTextAnnotator(el.current, opts);
+    const anno = createTextAnnotator(containerEl, opts);
     anno.setStyle(props.style);
     setAnno(anno);
 
@@ -46,9 +48,9 @@ export const TextAnnotator = <E extends unknown>(props: TextAnnotatorProps<E>) =
   }, [anno, props.filter]);
 
   return (
-    <div ref={el}>
+    <div ref={mergeRefs([containerElRef, ref])}>
       {children}
     </div>
   )
 
-}
+});
