@@ -1,9 +1,9 @@
 import type { DrawingStyle, PresenceProvider, PresentUser } from '@annotorious/core';
-import type { HighlightPainter } from '../highlight';
+import type { HighlightPainter } from '../highlight/canvas';
 import type { PresencePainterOptions } from './PresencePainterOptions';
 import type { TextAnnotation } from '../model';
 import type { Rect } from '../state';
-import { defaultPainter } from '../highlight';
+import { defaultPainter } from '../highlight/canvas';
 
 export const createPainter = (provider: PresenceProvider, opts: PresencePainterOptions = {}): HighlightPainter => {
 

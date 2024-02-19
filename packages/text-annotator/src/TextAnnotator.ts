@@ -1,8 +1,8 @@
 import { createAnonymousGuest, createLifecyleObserver, createBaseAnnotator, DrawingStyle, Filter, createUndoStack } from '@annotorious/core';
 import type { Annotator, User, PresenceProvider } from '@annotorious/core';
 import { createPainter } from './presence';
-import { createHighlightLayer } from './highlight';
-// import { createHighlightLayer } from './highlight/nativeHighlightLayer';
+// import { createHighlightLayer } from './highlight/canvas';
+import { createHighlightRenderer } from './highlight/cssCustomHighlight';
 import { scrollIntoView } from './api';
 import { TextAnnotationStore, TextAnnotatorState, createTextAnnotatorState } from './state';
 import type { TextAnnotation } from './model';
@@ -10,7 +10,6 @@ import type { TextAnnotatorOptions } from './TextAnnotatorOptions';
 import { SelectionHandler } from './SelectionHandler';
 
 import './TextAnnotator.css';
-import { createPresenceLayer } from './presence/dedicatedPresenceLayer';
 
 export interface TextAnnotator<T extends unknown = TextAnnotation> extends Annotator<TextAnnotation, T> {
 
@@ -42,9 +41,9 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   
   let currentUser: User = createAnonymousGuest();
 
-  const highlightLayer = createHighlightLayer(container, state, viewport);
+  const highlightRenderer = createHighlightRenderer(container, state, viewport);
   if (opts.style)
-    highlightLayer.setDrawingStyle(opts.style);
+    highlightRenderer.setDrawingStyle(opts.style);
 
   const selectionHandler = SelectionHandler(container, state, opts.offsetReferenceSelector);
 
@@ -60,10 +59,10 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   const getUser = () => currentUser;
 
   const setFilter = (filter?: Filter) =>
-    highlightLayer.setFilter(filter);
+    highlightRenderer.setFilter(filter);
 
   const setStyle = (drawingStyle: DrawingStyle | ((annotation: TextAnnotation) => DrawingStyle) | undefined) =>
-    highlightLayer.setDrawingStyle(drawingStyle);
+    highlightRenderer.setDrawingStyle(drawingStyle);
 
   const setUser = (user: User) => {
     currentUser = user;
@@ -72,9 +71,9 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
 
   const setPresenceProvider = (provider: PresenceProvider) => {
     if (provider) {
-      const p = createPresenceLayer(container, provider, opts.presence);
-      highlightLayer.setPainter(createPainter(provider, opts.presence));
-      provider.on('selectionChange', () => highlightLayer.redraw());
+      // const p = createPresenceLayer(container, provider, opts.presence);
+      // highlightLayer.setPainter(createPainter(provider, opts.presence));
+      // provider.on('selectionChange', () => highlightLayer.redraw());
     }
   }
 
@@ -87,7 +86,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   }
 
   const destroy = () => {
-    highlightLayer.destroy();
+    highlightRenderer.destroy();
     selectionHandler.destroy();
 
     // Other cleanup actions

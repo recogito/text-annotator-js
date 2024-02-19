@@ -1,9 +1,9 @@
 import type { DrawingStyle, Filter, ViewportState } from '@annotorious/core';
-import type { TextAnnotation } from '../model';
-import type { TextAnnotatorState } from '../state';
+import type { TextAnnotation } from '../../model';
+import type { TextAnnotatorState } from '../../state';
 import { defaultPainter, type HighlightPainter } from './HighlightPainter';
-import { trackViewport } from './trackViewport';
-import { debounce } from '../utils';
+import { trackViewport } from '../viewport';
+import { debounce } from '../../utils';
 
 const createCanvas = (className: string, highres?: boolean) => {
   const canvas = document.createElement('canvas');

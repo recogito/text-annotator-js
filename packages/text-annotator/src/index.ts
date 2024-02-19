@@ -1,4 +1,4 @@
-export * from './highlight';
+export * from './highlight/canvas';
 export * from './model';
 export * from './state';
 export * from './presence/PresencePainterOptions';

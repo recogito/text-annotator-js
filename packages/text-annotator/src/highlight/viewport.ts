@@ -1,6 +1,19 @@
 import type { ViewportState } from '@annotorious/core';
 import type { TextAnnotation } from '../model';
 
+export const getViewport = (container: HTMLElement) => {
+  const { top, left } = container.getBoundingClientRect();
+
+  const { innerWidth, innerHeight } = window;
+
+  const minX = - left;
+  const minY = - top;
+  const maxX = innerWidth - left;
+  const maxY = innerHeight - top;
+
+  return { top, left, minX, minY, maxX, maxY };
+}
+
 export const trackViewport = (viewport: ViewportState) => {
   let visible = new Set<string>();
 
