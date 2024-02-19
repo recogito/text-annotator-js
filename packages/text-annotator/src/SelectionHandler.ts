@@ -48,7 +48,7 @@ export const SelectionHandler = (
     const sel = document.getSelection();
 
     // Chrome/iOS does not reliably fire the 'selectstart' event!
-    if (evt.timeStamp - lastPointerDown.timeStamp < 1000 && !currentTarget)
+    if (evt.timeStamp - (lastPointerDown?.timeStamp || evt.timeStamp) < 1000 && !currentTarget)
       onSelectStart(lastPointerDown);
 
     if (sel.isCollapsed || !isLeftClick || !currentTarget) return;

@@ -11,8 +11,13 @@ import { NOT_ANNTOTATABLE_SELECTOR } from './splitAnnotatableRanges';
  *
  * @returns the DOM range
  */
-const reviveRange = (start: number, end: number, offsetReference: HTMLElement): Range => {
-  const iterator = document.createNodeIterator(offsetReference, NodeFilter.SHOW_TEXT, (node) =>
+export const reviveSelector = (selector: TextSelector, container: HTMLElement): TextSelector => {
+
+  const { start, end } = selector;
+
+  const offsetReference = selector.offsetReference || container;
+
+  const iterator = document.createNodeIterator(container, NodeFilter.SHOW_TEXT, (node) =>
     node.parentElement?.closest(NOT_ANNTOTATABLE_SELECTOR)
       ? NodeFilter.FILTER_SKIP
       : NodeFilter.FILTER_ACCEPT
@@ -58,17 +63,10 @@ const reviveRange = (start: number, end: number, offsetReference: HTMLElement): 
 
     n = iterator.nextNode();
   }
-
-  return range;
-}
-
-export const reviveSelector = (selector: TextSelector, container: HTMLElement): TextSelector => {
-  const { start, end, offsetReference: selectorReference } = selector;
-
-  const offsetReference = selectorReference || container;
-  return offsetReference ? {
+  
+  return {
     ...selector,
-    range: reviveRange(start, end, offsetReference)
-  } : selector;
-}
+    range
+  }
 
+}
