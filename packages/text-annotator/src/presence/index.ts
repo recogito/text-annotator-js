@@ -1,2 +1,2 @@
-export * from './PresencePainter';
+export * from './presencePainter';
 export * from './PresencePainterOptions';
