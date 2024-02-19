@@ -7,7 +7,7 @@ export const reviveTarget = (target: TextAnnotationTarget, container: HTMLElemen
     ? target
     : ({
       ...target,
-      selector: target.selector.map(s => s.range instanceof Range ? s : reviveSelector(s, container))
+      selector: target.selector.map(s => s.range instanceof Range && !s.range.collapsed ? s : reviveSelector(s, container))
     });
 
 
