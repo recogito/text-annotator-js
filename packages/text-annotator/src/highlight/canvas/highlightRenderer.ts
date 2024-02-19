@@ -98,14 +98,14 @@ export const createCanvasHighlightRenderer = (
 
       const base: HighlightDrawingStyle = currentStyle
         ? typeof currentStyle === 'function' 
-          ? currentStyle(h.annotation, isSelected) 
+          ? currentStyle(h.annotation, { selected: isSelected })
           : currentStyle 
         : isSelected 
           ? DEFAULT_SELECTED_STYLE 
           : DEFAULT_STYLE;
 
       // Trigger the custom painter (if any) as a side-effect
-      const style = customPainter ? customPainter.paint(h, bounds, isSelected) || base : base;
+      const style = customPainter ? customPainter.paint(h, bounds, { selected: isSelected }) || base : base;
 
       // Offset annotation rects by current scroll position
       const offsetRects = h.rects.map(({ x, y, width, height }) => ({ 

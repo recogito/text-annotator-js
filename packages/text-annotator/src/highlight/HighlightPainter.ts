@@ -11,9 +11,13 @@ export interface HighlightPainter {
   paint(  
     annotation: AnnotationRects,
     viewportBounds: ViewportBounds,
-    isSelected?: boolean
+    state?: HighlightState
   ): HighlightDrawingStyle;
 
   reset(): void;
 
+}
+
+export interface HighlightState {
+  selected: boolean;
 }

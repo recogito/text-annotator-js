@@ -47,12 +47,14 @@ export const createHighlights = () => {
 
       const base = currentStyle 
         ? typeof currentStyle === 'function' 
-          ? currentStyle(h.annotation, isSelected) 
+          ? currentStyle(h.annotation, { selected: isSelected })
           : currentStyle 
         : isSelected ? DEFAULT_SELECTED_STYLE : DEFAULT_STYLE;
 
       // Trigger the custom painter (if any) as a side-effect
-      const style = customPainter ? customPainter.paint(h, viewportBounds, isSelected) || base : base;
+      const style = customPainter
+        ? customPainter.paint(h, viewportBounds, { selected: isSelected }) || base
+        : base;
 
       return `::highlight(_${h.annotation.id}) { ${toCSS(style)} }`;
     });

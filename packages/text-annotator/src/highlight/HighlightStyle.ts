@@ -25,5 +25,5 @@ export interface HighlightDrawingStyle extends Pick<DrawingStyle, 'fill' | 'fill
 
 export type HighlightStyle =
   | HighlightDrawingStyle
-  | ((annotation: TextAnnotation, isSelected?: boolean) => HighlightDrawingStyle)
+  | ((annotation: TextAnnotation, state?: { selected: boolean }) => HighlightDrawingStyle)
   | undefined;
