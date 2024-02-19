@@ -1,4 +1,5 @@
 import type { DrawingStyle } from '@annotorious/core';
+import type { TextAnnotation } from '../model';
 
 export const DEFAULT_STYLE: DrawingStyle = { 
   fill: 'rgb(0, 128, 255)', 
@@ -21,3 +22,7 @@ export interface HighlightStyle extends Pick<DrawingStyle, 'fill' | 'fillOpacity
   underlineThickness?: number;
   
 }
+
+export type HighlightStyleOption =
+  HighlightStyle |
+  ((annotation: TextAnnotation, isSelected?: boolean) => HighlightStyle) | undefined;
