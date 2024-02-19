@@ -57,14 +57,10 @@ export const SelectionHandler = (
     const trimmedRange = trimRange(selectionRange.cloneRange())
     const annotatableRanges = splitAnnotatableRanges(trimmedRange);
 
-    // const hasChanged =
-    //   trimmedRange.toString() !== currentTarget.selector?.quote;
-
     const hasChanged =
       annotatableRanges.length !== currentTarget.selector.length ||
       annotatableRanges.some((r, i) => r.toString() !== currentTarget.selector[i]?.quote);
     if (!hasChanged) return;
-
 
     currentTarget = {
       ...currentTarget,
@@ -126,7 +122,7 @@ export const SelectionHandler = (
     if (document.getSelection().isCollapsed && timeDifference < 300) {
       currentTarget = undefined;
       clickSelect();
-    } else {
+    } else if (currentTarget) {
       selection.clickSelect(currentTarget.annotation, evt);
     }
   }
