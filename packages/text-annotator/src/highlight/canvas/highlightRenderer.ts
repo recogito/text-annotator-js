@@ -1,9 +1,13 @@
-import type { DrawingStyle, Filter, ViewportState } from '@annotorious/core';
-import type { TextAnnotation } from '../../model';
+import type { Filter, ViewportState } from '@annotorious/core';
 import type { TextAnnotatorState } from '../../state';
 import { getViewportBounds, trackViewport } from '../viewport';
 import { debounce } from '../../utils';
-import { DEFAULT_SELECTED_STYLE, DEFAULT_STYLE, type HighlightStyle } from '../HighlightStyle';
+import {
+  DEFAULT_SELECTED_STYLE,
+  DEFAULT_STYLE,
+  type HighlightDrawingStyle,
+  type HighlightStyle
+} from '../HighlightStyle';
 import type { HighlightPainter } from '../HighlightPainter';
 
 const createCanvas = () => {
@@ -33,7 +37,7 @@ export const createCanvasHighlightRenderer = (
 ) => {
   const { store, selection, hover } = state;
   
-  let currentStyle: DrawingStyle | ((annotation: TextAnnotation, selected?: boolean) => DrawingStyle) | undefined;
+  let currentStyle: HighlightStyle;
 
   let currentFilter: Filter | undefined;
 
@@ -92,7 +96,7 @@ export const createCanvasHighlightRenderer = (
     annotationsInView.forEach(h => {
       const isSelected = selectedIds.has(h.annotation.id);
 
-      const base: HighlightStyle = currentStyle 
+      const base: HighlightDrawingStyle = currentStyle
         ? typeof currentStyle === 'function' 
           ? currentStyle(h.annotation, isSelected) 
           : currentStyle 
@@ -120,7 +124,7 @@ export const createCanvasHighlightRenderer = (
     setTimeout(() => onDraw(annotationsInView.map(({ annotation }) => annotation)), 1);
   });  
 
-  const setDrawingStyle = (style: DrawingStyle | ((a: TextAnnotation, selected?: boolean) => DrawingStyle)) => {
+  const setHighlightStyle = (style: HighlightStyle) => {
     currentStyle = style;
     refresh();
   }
@@ -191,7 +195,7 @@ export const createCanvasHighlightRenderer = (
   return {
     destroy,
     refresh,
-    setDrawingStyle,
+    setHighlightStyle,
     setFilter,
     setPainter: (painter: HighlightPainter) => customPainter = painter
   }

@@ -285,7 +285,10 @@
 
         var r = createTextAnnotator(contentContainer, {
           adapter: W3CTextFormat('https://www.gutenberg.org', contentContainer),
-          experimentalCSSRenderer: true
+          experimentalCSSRenderer: true,
+          style: (anno) => {
+
+          }
         });
 
         var annotations;

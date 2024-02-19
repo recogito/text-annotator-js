@@ -1,7 +1,7 @@
 import type { FormatAdapter, PointerSelectAction } from '@annotorious/core';
 import type { PresencePainterOptions } from './presence';
 import type { TextAnnotation } from './model';
-import type { HighlightStyleOption } from './highlight/HighlightStyle';
+import type { HighlightStyle } from './highlight';
 
 export interface TextAnnotatorOptions<T extends unknown = TextAnnotation> {
 
@@ -15,6 +15,6 @@ export interface TextAnnotatorOptions<T extends unknown = TextAnnotation> {
 
   presence?: PresencePainterOptions;
 
-  style?: HighlightStyleOption;
+  style?: HighlightStyle;
 
 }

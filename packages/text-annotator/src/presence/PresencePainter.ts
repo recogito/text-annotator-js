@@ -1,7 +1,6 @@
 import type { Color, PresenceProvider, PresentUser } from '@annotorious/core';
 import type { AnnotationRects } from '../state';
-import type { HighlightStyle } from '../highlight/HighlightStyle';
-import type { HighlightPainter } from '../highlight/HighlightPainter';
+import type { HighlightDrawingStyle, HighlightPainter } from '../highlight';
 import type { PresencePainterOptions } from 'src/presence';
 import type { ViewportBounds } from '../highlight/viewport';
 
@@ -58,7 +57,7 @@ export const createPresencePainter = (
     highlight: AnnotationRects, 
     viewportBounds: ViewportBounds,
     isSelected?: boolean
-  ): HighlightStyle | undefined => {
+  ): HighlightDrawingStyle | undefined => {
     if (opts.font)
       ctx.font = opts.font;
 

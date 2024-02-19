@@ -1,10 +1,10 @@
-import type { DrawingStyle, Filter, ViewportState } from '@annotorious/core';
+import type {  Filter, ViewportState } from '@annotorious/core';
 import type { TextAnnotatorState } from '../../state';
-import type { TextAnnotation } from '../../model';
 import { debounce } from '../../utils';
 import { getViewportBounds, trackViewport } from '../viewport';
 import type { HighlightPainter } from '../HighlightPainter';
 import { createHighlights } from './highlights';
+import type { HighlightStyle } from '../HighlightStyle';
 
 export const createCSSHighlightRenderer = (
   container: HTMLElement, 
@@ -15,7 +15,7 @@ export const createCSSHighlightRenderer = (
 
   let customPainter: HighlightPainter;
 
-  let currentStyle: DrawingStyle | ((annotation: TextAnnotation, selected?: boolean) => DrawingStyle) | undefined;
+  let currentStyle: HighlightStyle;
 
   let currentFilter: Filter | undefined;
 
@@ -67,7 +67,7 @@ export const createCSSHighlightRenderer = (
   }
 
   // Refresh when style changes
-  const setDrawingStyle = (style: DrawingStyle | ((a: TextAnnotation, selected?: boolean) => DrawingStyle)) => {
+  const setHighlightStyle = (style: HighlightStyle) => {
     currentStyle = style;
     refresh();
   }
@@ -131,7 +131,7 @@ export const createCSSHighlightRenderer = (
   return {
     destroy,
     refresh,
-    setDrawingStyle,
+    setHighlightStyle,
     setFilter,
     setPainter
   }
