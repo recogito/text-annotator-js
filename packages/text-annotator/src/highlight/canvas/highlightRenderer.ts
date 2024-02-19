@@ -1,7 +1,7 @@
 import type { DrawingStyle, Filter, ViewportState } from '@annotorious/core';
 import type { TextAnnotation } from '../../model';
 import type { TextAnnotatorState } from '../../state';
-import { trackViewport } from '../viewport';
+import { getViewportBounds, trackViewport } from '../viewport';
 import { debounce } from '../../utils';
 import { DEFAULT_SELECTED_STYLE, DEFAULT_STYLE, type HighlightStyle } from '../HighlightStyle';
 import type { HighlightPainter } from '../HighlightPainter';
@@ -37,7 +37,7 @@ export const createCanvasHighlightRenderer = (
 
   let currentFilter: Filter | undefined;
 
-  let currentPainter: HighlightPainter;
+  let customPainter: HighlightPainter;
 
   const onDraw = trackViewport(viewport);
 
@@ -69,21 +69,10 @@ export const createCanvasHighlightRenderer = (
 
   container.addEventListener('pointermove', onPointerMove);
 
-  const getViewport = () => {
-    const { top, left } = container.getBoundingClientRect();
-
-    const { innerWidth, innerHeight } = window;
-
-    const minX = - left;
-    const minY = - top;
-    const maxX = innerWidth - left;
-    const maxY = innerHeight - top;
-
-    return { top, left, minX, minY, maxX, maxY };
-  }
-
   const refresh = () => requestAnimationFrame(() => {
-    const { top, left, minX, minY, maxX, maxY } = getViewport();   
+    const bounds = getViewportBounds(container);   
+
+    const { top, left, minX, minY, maxX, maxY } = bounds;
     
     const annotationsInView = currentFilter
       ? store.getIntersectingRects(minX, minY, maxX, maxY).filter(({ annotation }) => currentFilter(annotation))
@@ -96,25 +85,31 @@ export const createCanvasHighlightRenderer = (
 
     // New render loop - clear canvases
     ctx.clearRect(-0.5, -0.5, width + 1, height + 1);
+
+    if (customPainter)
+      customPainter.clear();
     
-    annotationsInView.forEach(({ annotation, rects }) => {
+    annotationsInView.forEach(h => {
+      const isSelected = selectedIds.has(h.annotation.id);
+
+      const base: HighlightStyle = currentStyle 
+        ? typeof currentStyle === 'function' 
+          ? currentStyle(h.annotation, isSelected) 
+          : currentStyle 
+        : isSelected 
+          ? DEFAULT_SELECTED_STYLE 
+          : DEFAULT_STYLE;
+
+      // Trigger the custom painter (if any) as a side-effect
+      const style = customPainter ? customPainter.paint(h, bounds, isSelected) || base : base;
+
       // Offset annotation rects by current scroll position
-      const offsetRects = rects.map(({ x, y, width, height }) => ({ 
+      const offsetRects = h.rects.map(({ x, y, width, height }) => ({ 
         x: x + left, 
         y: y + top, 
         width, 
         height 
       }));
-
-      const isSelected = selectedIds.has(annotation.id);
-
-      const style: HighlightStyle = currentStyle 
-        ? typeof currentStyle === 'function' 
-          ? currentStyle(annotation, isSelected) 
-          : currentStyle 
-        : isSelected 
-          ? DEFAULT_SELECTED_STYLE 
-          : DEFAULT_STYLE;
 
       ctx.fillStyle = style.fill;
       ctx.globalAlpha = style.fillOpacity || 1;
@@ -157,6 +152,9 @@ export const createCanvasHighlightRenderer = (
 
     store.recalculatePositions();
 
+    if (customPainter)
+      customPainter.reset();
+
     refresh();
   });
 
@@ -195,7 +193,7 @@ export const createCanvasHighlightRenderer = (
     refresh,
     setDrawingStyle,
     setFilter,
-    setPainter: (painter: HighlightPainter) => currentPainter = painter
+    setPainter: (painter: HighlightPainter) => customPainter = painter
   }
 
 }
