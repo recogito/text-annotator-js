@@ -2,17 +2,21 @@ import type { TextSelector } from '../model';
 import { NOT_ANNTOTATABLE_SELECTOR } from './splitAnnotatableRanges';
 
 /**
- * Retrieves the DOM range from the given text annotation position
+ * Creates a new selector object with the revived DOM range from the given text annotation position
  * Only the annotatable elements are processed and counted towards the range
  *
- * @param start start of the annotated content
- * @param end end of the annotated content
- * @param offsetReference the HTML container of the annotated content
+ * @param selector annotation selector with start and end positions
+ * @param container the HTML container of the annotated content
  *
- * @returns the DOM range
+ * @returns the revived selector
  */
-const reviveRange = (start: number, end: number, offsetReference: HTMLElement): Range => {
-  const iterator = document.createNodeIterator(offsetReference, NodeFilter.SHOW_TEXT, (node) =>
+export const reviveSelector = (selector: TextSelector, container: HTMLElement): TextSelector => {
+
+  const { start, end } = selector;
+
+  const offsetReference = selector.offsetReference || container;
+
+  const iterator = document.createNodeIterator(container, NodeFilter.SHOW_TEXT, (node) =>
     node.parentElement?.closest(NOT_ANNTOTATABLE_SELECTOR)
       ? NodeFilter.FILTER_SKIP
       : NodeFilter.FILTER_ACCEPT
@@ -58,17 +62,10 @@ const reviveRange = (start: number, end: number, offsetReference: HTMLElement): 
 
     n = iterator.nextNode();
   }
-
-  return range;
-}
-
-export const reviveSelector = (selector: TextSelector, container: HTMLElement): TextSelector => {
-  const { start, end, offsetReference: selectorReference } = selector;
-
-  const offsetReference = selectorReference || container;
-  return offsetReference ? {
+  
+  return {
     ...selector,
-    range: reviveRange(start, end, offsetReference)
-  } : selector;
-}
+    range
+  }
 
+}

@@ -48,7 +48,7 @@ export const SelectionHandler = (
     const sel = document.getSelection();
 
     // Chrome/iOS does not reliably fire the 'selectstart' event!
-    if (evt.timeStamp - lastPointerDown.timeStamp < 1000 && !currentTarget)
+    if (evt.timeStamp - (lastPointerDown?.timeStamp || evt.timeStamp) < 1000 && !currentTarget)
       onSelectStart(lastPointerDown);
 
     if (sel.isCollapsed || !isLeftClick || !currentTarget) return;
@@ -57,14 +57,10 @@ export const SelectionHandler = (
     const trimmedRange = trimRange(selectionRange.cloneRange())
     const annotatableRanges = splitAnnotatableRanges(trimmedRange);
 
-    // const hasChanged =
-    //   trimmedRange.toString() !== currentTarget.selector?.quote;
-
     const hasChanged =
       annotatableRanges.length !== currentTarget.selector.length ||
       annotatableRanges.some((r, i) => r.toString() !== currentTarget.selector[i]?.quote);
     if (!hasChanged) return;
-
 
     currentTarget = {
       ...currentTarget,
@@ -126,7 +122,7 @@ export const SelectionHandler = (
     if (document.getSelection().isCollapsed && timeDifference < 300) {
       currentTarget = undefined;
       clickSelect();
-    } else {
+    } else if (currentTarget) {
       selection.clickSelect(currentTarget.annotation, evt);
     }
   }

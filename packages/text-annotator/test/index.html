@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>RecogitoJS 3</title>
     <style>
-      html,
-      body {
+      html, body {
         background: #e2e2e2;
         padding: 0;
         margin: 0;
@@ -62,8 +61,6 @@
       }
     </style>
   </head>
-
-  <!--  -->
 
   <body>
     <div id="buttons">
@@ -287,10 +284,13 @@
         var contentContainer = document.getElementById('content');
 
         var r = createTextAnnotator(contentContainer, {
-          adapter: W3CTextFormat('https://www.gutenberg.org', contentContainer)
+          adapter: W3CTextFormat('https://www.gutenberg.org', contentContainer),
+          experimentalCSSRenderer: true
         });
 
-        r.loadAnnotations('annotations.w3c.json');
+        var annotations;
+
+        r.loadAnnotations('annotations.w3c.json').then(a => annotations = a);
 
         r.on('createAnnotation', annotation => {
           console.log('createAnnotation', annotation);
@@ -314,7 +314,6 @@
 
         var filterActive = false;
 
-
         var toggleButton = document.getElementById('filter');
         var toggleButtonLabel = toggleButton.innerText;
 
@@ -333,12 +332,13 @@
           }
         });
 
+        // Just a hack for testing...
         var remoteSelection;
 
         var handlers = [];
+
         var presenceProvider = {
           on: function (event, callback) {
-            console.log('registering:', event);
             handlers.push(callback);
           }
         }
@@ -354,15 +354,18 @@
         };
 
         var presenceButton = document.getElementById('fake-presence');
+        
         presenceButton.addEventListener('click', function () {
           if (remoteSelection) {
             remoteSelection = undefined;
+
             handlers.forEach(callback => {
               callback(fakeCollaborator, []);
             })
           } else {
             const randomIdx = Math.floor(Math.random() * annotations.length);
-            remoteSelection = annotations[randomIdx];
+            remoteSelection = annotations[randomIdx].id;
+
             handlers.forEach(callback => {
               callback(fakeCollaborator, [remoteSelection]);
             })
