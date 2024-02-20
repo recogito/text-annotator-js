@@ -16,11 +16,12 @@ export type TEIAnnotatorProps = TextAnnotatorOptions & {
 
 export const TEIAnnotator = (props: TEIAnnotatorProps) => {
 
+  const { children, ...opts } = props;
+
   const { anno, setAnno } = useContext(AnnotoriousContext);
 
   const onLoad = (element: HTMLElement) => {
-    const anno = TEIPlugin(createTextAnnotator(element));
-    anno.setStyle(props.style);
+    const anno = TEIPlugin(createTextAnnotator(element, opts));
     setAnno(anno);
   }
 

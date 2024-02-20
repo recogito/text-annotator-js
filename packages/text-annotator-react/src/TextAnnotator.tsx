@@ -31,7 +31,6 @@ export const TextAnnotator = <E extends unknown>(props: TextAnnotatorProps<E>) =
     const adapter = typeof opts.adapter === 'function' ? opts.adapter(el.current) : opts.adapter;
 
     const anno = createTextAnnotator(el.current, { ...opts, adapter });
-    anno.setStyle(props.style);
     setAnno(anno);
 
     return () => anno.destroy();
