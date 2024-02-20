@@ -29,7 +29,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   opts: TextAnnotatorOptions<E> = {}
 ): TextAnnotator<E> => {
   // Prevent mobile browsers from triggering word selection on single click.
-  container.addEventListener('click', evt => (evt.target as Element).nodeName !== 'A' && evt.preventDefault());
+  container.addEventListener('click', evt => !(evt.target as Element).closest('a') && evt.preventDefault());
 
   const state: TextAnnotatorState = createTextAnnotatorState(container, opts.pointerAction);
 
