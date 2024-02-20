@@ -2,10 +2,11 @@ import { createAnonymousGuest, createLifecyleObserver, createBaseAnnotator, Filt
 import type { Annotator, User, PresenceProvider } from '@annotorious/core';
 import {
   createCanvasHighlightRenderer,
-  createCSSHighlightRenderer} from './highlight';
+  createCSSHighlightRenderer,
+  type HighlightStyle
+} from './highlight';
 import {
   createPresencePainter,
-  type HighlightStyle
 } from './presence';
 import { scrollIntoView } from './api';
 import { TextAnnotationStore, TextAnnotatorState, createTextAnnotatorState } from './state';
