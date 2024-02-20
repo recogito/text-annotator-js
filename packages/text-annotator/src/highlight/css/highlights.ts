@@ -1,12 +1,15 @@
-import type { DrawingStyle } from '@annotorious/core';
 import { colord } from 'colord';
-import type { TextAnnotation } from '../../model';
 import type { HighlightPainter } from '../HighlightPainter';
 import type { AnnotationRects } from 'src/state';
 import type { ViewportBounds } from '../viewport';
-import { DEFAULT_SELECTED_STYLE, DEFAULT_STYLE } from '../HighlightStyle';
+import {
+  DEFAULT_SELECTED_STYLE,
+  DEFAULT_STYLE,
+  type HighlightDrawingStyle,
+  type HighlightStyle
+} from '../HighlightStyle';
 
-const toCSS = (s: DrawingStyle) => {
+const toCSS = (s: HighlightDrawingStyle) => {
   const backgroundColor = colord(s.fill || DEFAULT_STYLE.fill).alpha(s.fillOpacity || DEFAULT_STYLE.fillOpacity).toHex();
   return `background-color: ${backgroundColor};`
 }
@@ -26,7 +29,7 @@ export const createHighlights = () => {
     highlights: AnnotationRects[], 
     viewportBounds: ViewportBounds,
     selected: string[], 
-    currentStyle: DrawingStyle | ((annotation: TextAnnotation, selected: boolean) => DrawingStyle)
+    currentStyle: HighlightStyle
   ) => {
     if (customPainter)
       customPainter.clear();

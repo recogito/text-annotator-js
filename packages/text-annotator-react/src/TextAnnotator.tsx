@@ -1,7 +1,6 @@
 import { ReactNode, useContext, useEffect, useRef } from 'react';
-import { AnnotoriousContext, DrawingStyle, Filter } from '@annotorious/react';
-import type { FormatAdapter } from '@annotorious/core';
-import type { TextAnnotation, TextAnnotatorOptions } from '@recogito/text-annotator';
+import { AnnotoriousContext, Filter } from '@annotorious/react';
+import type { HighlightStyle, TextAnnotatorOptions } from '@recogito/text-annotator';
 import { createTextAnnotator } from '@recogito/text-annotator';
 
 import '@recogito/text-annotator/dist/text-annotator.css';
@@ -14,7 +13,7 @@ export interface TextAnnotatorProps<E extends unknown> extends Omit<TextAnnotato
 
   filter?: Filter;
 
-  style?: DrawingStyle | ((annotation: TextAnnotation) => DrawingStyle);
+  style?: HighlightStyle;
 
 }
 

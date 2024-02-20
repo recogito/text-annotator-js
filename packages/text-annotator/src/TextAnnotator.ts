@@ -1,7 +1,12 @@
-import { createAnonymousGuest, createLifecyleObserver, createBaseAnnotator, DrawingStyle, Filter, createUndoStack } from '@annotorious/core';
+import { createAnonymousGuest, createLifecyleObserver, createBaseAnnotator, Filter, createUndoStack } from '@annotorious/core';
 import type { Annotator, User, PresenceProvider } from '@annotorious/core';
-import { createCanvasHighlightRenderer, createCSSHighlightRenderer } from './highlight';
-import { createPresencePainter } from './presence';
+import {
+  createCanvasHighlightRenderer,
+  createCSSHighlightRenderer} from './highlight';
+import {
+  createPresencePainter,
+  type HighlightStyle
+} from './presence';
 import { scrollIntoView } from './api';
 import { TextAnnotationStore, TextAnnotatorState, createTextAnnotatorState } from './state';
 import type { TextAnnotation } from './model';
@@ -53,7 +58,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
       : createCanvasHighlightRenderer(container, state, viewport);
 
   if (opts.style)
-    highlightRenderer.setDrawingStyle(opts.style);
+    highlightRenderer.setHighlightStyle(opts.style);
 
   const selectionHandler = SelectionHandler(container, state, opts.offsetReferenceSelector);
 
@@ -71,8 +76,8 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   const setFilter = (filter?: Filter) =>
     highlightRenderer.setFilter(filter);
 
-  const setStyle = (drawingStyle: DrawingStyle | ((annotation: TextAnnotation) => DrawingStyle) | undefined) =>
-    highlightRenderer.setDrawingStyle(drawingStyle);
+  const setStyle = (highlightStyle: HighlightStyle) =>
+    highlightRenderer.setHighlightStyle(highlightStyle);
 
   const setUser = (user: User) => {
     currentUser = user;
