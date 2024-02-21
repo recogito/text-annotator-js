@@ -1,5 +1,5 @@
 import type { TextSelector } from '../model';
-import { NOT_ANNTOTATABLE_SELECTOR } from './splitAnnotatableRanges';
+import { NOT_ANNOTATABLE_SELECTOR } from './splitAnnotatableRanges';
 
 /**
  * Creates a new selector object with the revived DOM range from the given text annotation position
@@ -17,7 +17,7 @@ export const reviveSelector = (selector: TextSelector, container: HTMLElement): 
   const offsetReference = selector.offsetReference || container;
 
   const iterator = document.createNodeIterator(container, NodeFilter.SHOW_TEXT, (node) =>
-    node.parentElement?.closest(NOT_ANNTOTATABLE_SELECTOR)
+    node.parentElement?.closest(NOT_ANNOTATABLE_SELECTOR)
       ? NodeFilter.FILTER_SKIP
       : NodeFilter.FILTER_ACCEPT
   );
