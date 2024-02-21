@@ -1,5 +1,6 @@
-import { reviveTarget, type TextAnnotationStore } from '../state';
+import type { TextAnnotationStore } from '../state';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
+import { reviveTarget } from '../utils';
 
 const getScrollParent = (el: Element) => {
   if (el === null)
@@ -13,7 +14,7 @@ const getScrollParent = (el: Element) => {
     return el;
   else
     return getScrollParent(el.parentElement);
-}
+};
 
 export const scrollIntoView = (container: HTMLElement, store: TextAnnotationStore) => (annotation: TextAnnotation) => {
 
@@ -25,7 +26,8 @@ export const scrollIntoView = (container: HTMLElement, store: TextAnnotationStor
     const parentWidth = scrollParent.clientWidth;
 
     // Position of the annotation relative to viewport
-    const annotationBounds = target.selector.range.getBoundingClientRect();
+    // Note: first selector is not necessarily top one...
+    const annotationBounds = target.selector[0].range.getBoundingClientRect();
 
     // Note: getBoundingClientRect seems to return wrong height! 
     // (Includes block elements?) We'll therefore use the normalized height
@@ -44,22 +46,24 @@ export const scrollIntoView = (container: HTMLElement, store: TextAnnotationStor
     const left = offsetLeft + scrollLeft - (parentWidth - width) / 2;
 
     scrollParent.scroll({ top, left, behavior: 'smooth' });
-  }
+  };
 
   // Get closest scrollable parent
   const scrollParent: Element = getScrollParent(container);
   if (scrollParent) {
     // Get curren version of the annotation from the store
     const current = store.getAnnotation(annotation.id);
-    const { range } = current.target.selector;
 
+    // The 1st selector is the topmost one as well
+    const { range } = current.target.selector[0];
     if (range && !range.collapsed) {
       scroll(current.target);
       return true;
     } else {
       // Try reviving to account for lazy rendering
       const revived = reviveTarget(current.target, container);
-      if (revived.selector.range && !revived.selector.range.collapsed) {
+      const { range } = revived.selector[0];
+      if (range && !range.collapsed) {
         scroll(revived);
         return true;
       }
@@ -67,4 +71,4 @@ export const scrollIntoView = (container: HTMLElement, store: TextAnnotationStor
   }
 
   return false;
-}
+};

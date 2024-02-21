@@ -1,7 +1,7 @@
 import { createAnonymousGuest, createLifecyleObserver, createBaseAnnotator, DrawingStyle, Filter, createUndoStack } from '@annotorious/core';
 import type { Annotator, User, PresenceProvider } from '@annotorious/core';
-import { createPainter } from './presence';
-import { createHighlightLayer } from './highlight';
+import { createCanvasHighlightRenderer, createCSSHighlightRenderer } from './highlight';
+import { createPresencePainter } from './presence';
 import { scrollIntoView } from './api';
 import { TextAnnotationStore, TextAnnotatorState, createTextAnnotatorState } from './state';
 import type { TextAnnotation } from './model';
@@ -24,7 +24,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   opts: TextAnnotatorOptions<E> = {}
 ): TextAnnotator<E> => {
   // Prevent mobile browsers from triggering word selection on single click.
-  container.addEventListener('click', evt => evt.preventDefault());
+  container.addEventListener('click', evt => !(evt.target as Element).closest('a') && evt.preventDefault());
 
   const state: TextAnnotatorState = createTextAnnotatorState(container, opts.pointerAction);
 
@@ -40,9 +40,20 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   
   let currentUser: User = createAnonymousGuest();
 
-  const highlightLayer = createHighlightLayer(container, state, viewport);
+  // Switch on CSS Custom Highlight rendering, if requested in the init 
+  // opts and API is available in this browser
+  // @ts-ignore
+  const useExperimentalCSSRenderer = opts.experimentalCSSRenderer && Boolean(CSS.highlights);
+
+  if (useExperimentalCSSRenderer)
+    console.log('Using experimental CSS Custom Highlight API renderer');
+
+  const highlightRenderer = useExperimentalCSSRenderer
+      ? createCSSHighlightRenderer(container, state, viewport)
+      : createCanvasHighlightRenderer(container, state, viewport);
+
   if (opts.style)
-    highlightLayer.setDrawingStyle(opts.style);
+    highlightRenderer.setDrawingStyle(opts.style);
 
   const selectionHandler = SelectionHandler(container, state, opts.offsetReferenceSelector);
 
@@ -58,10 +69,10 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   const getUser = () => currentUser;
 
   const setFilter = (filter?: Filter) =>
-    highlightLayer.setFilter(filter);
+    highlightRenderer.setFilter(filter);
 
   const setStyle = (drawingStyle: DrawingStyle | ((annotation: TextAnnotation) => DrawingStyle) | undefined) =>
-    highlightLayer.setDrawingStyle(drawingStyle);
+    highlightRenderer.setDrawingStyle(drawingStyle);
 
   const setUser = (user: User) => {
     currentUser = user;
@@ -70,8 +81,8 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
 
   const setPresenceProvider = (provider: PresenceProvider) => {
     if (provider) {
-      highlightLayer.setPainter(createPainter(provider, opts.presence));
-      provider.on('selectionChange', () => highlightLayer.redraw());
+      highlightRenderer.setPainter(createPresencePainter(container, provider, opts.presence));
+      provider.on('selectionChange', () => highlightRenderer.refresh());
     }
   }
 
@@ -84,7 +95,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   }
 
   const destroy = () => {
-    highlightLayer.destroy();
+    highlightRenderer.destroy();
     selectionHandler.destroy();
 
     // Other cleanup actions

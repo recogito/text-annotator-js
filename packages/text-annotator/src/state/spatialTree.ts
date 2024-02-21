@@ -2,7 +2,7 @@ import RBush from 'rbush';
 import type { Store } from '@annotorious/core';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
 import { mergeClientRects } from '../utils';
-import { reviveTarget } from './reviveTarget';
+import { reviveSelector } from '../utils';
 
 export interface IndexedHighlightRect {
 
@@ -34,15 +34,18 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
   const toItems = (target: TextAnnotationTarget): IndexedHighlightRect[] => {
     const offset = container.getBoundingClientRect();
 
-    const isValidRange = 
-      target.selector.range instanceof Range && 
-      !target.selector.range.collapsed &&
-      target.selector.range.startContainer.nodeType === Node.TEXT_NODE && 
-      target.selector.range.endContainer.nodeType === Node.TEXT_NODE;
+    const rects = target.selector.flatMap(s => {
+      const isValidRange =
+        s.range instanceof Range &&
+        !s.range.collapsed &&
+        s.range.startContainer.nodeType === Node.TEXT_NODE &&
+        s.range.endContainer.nodeType === Node.TEXT_NODE;
 
-    const t = isValidRange ? target : reviveTarget(target, container);
+      const revivedRange = isValidRange ? s.range : reviveSelector(s, container).range;
 
-    const rects = Array.from(t.selector.range.getClientRects());
+      return Array.from(revivedRange.getClientRects());
+    });
+
     const merged = mergeClientRects(rects);
 
     return merged.map(rect => {
@@ -76,8 +79,10 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
 
   const remove = (target: TextAnnotationTarget) => {
     const rects = index.get(target.annotation);
-    rects.forEach(rect => tree.remove(rect));
-    index.delete(target.annotation);
+    if (rects) {
+      rects.forEach(rect => tree.remove(rect));
+      index.delete(target.annotation);
+    }
   }
 
   const update = (target: TextAnnotationTarget) => {

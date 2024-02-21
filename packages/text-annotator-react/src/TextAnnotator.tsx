@@ -27,7 +27,6 @@ export const TextAnnotator = <E extends unknown>(props: TextAnnotatorProps<E>) =
     if (!setAnno) return;
 
     const anno = createTextAnnotator(el.current, opts);
-    anno.setStyle(props.style);
     setAnno(anno);
 
     return () => anno.destroy();

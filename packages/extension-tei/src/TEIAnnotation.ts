@@ -9,7 +9,7 @@ export interface TEIAnnotation extends Annotation {
 
 export interface TEIAnnotationTarget extends AnnotationTarget {
 
-  selector: TEIRangeSelector;
+  selector: TEIRangeSelector[];
 
 }
 
