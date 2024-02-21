@@ -14,6 +14,8 @@ export interface TextAnnotationTarget extends AnnotationTarget {
 
 export interface TextSelector {
 
+  id?: string;
+
   quote: string;
   
   start: number;
