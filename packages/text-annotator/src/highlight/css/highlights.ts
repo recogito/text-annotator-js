@@ -11,9 +11,6 @@ const toCSS = (s: DrawingStyle) => {
   return `background-color: ${backgroundColor};`
 }
 
-// const setsEqual = (set1: Set<any>, set2: Set<any>) =>
-//   set1.size === set2.size && [...set1].every(value => set2.has(value));
-
 export const createHighlights = () => {
   const elem = document.createElement('style');
   document.getElementsByTagName('head')[0].appendChild(elem);
