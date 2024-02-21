@@ -64,7 +64,7 @@ const parseW3CTextTargets = (annotation: W3CTextAnnotation, container: HTMLEleme
     }, {});
 
     if (isTextSelector(selector)) {
-      parsed.selector.push(selector);
+      parsed.selector.push({ id: w3cTarget.id, ...selector });
     } else {
       const missingTypes = [
         !selector.start ? 'TextPositionSelector' : undefined,
@@ -141,6 +141,7 @@ export const serializeW3CTextAnnotation = (
 
     return {
       ...targetRest,
+      id: s.id,
       source,
       selector: w3cSelectors
     };
