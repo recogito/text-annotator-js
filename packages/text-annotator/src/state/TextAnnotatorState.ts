@@ -75,6 +75,27 @@ export const createTextAnnotatorState = (
       return [];
     }
   }
+  
+  const bulkUpsertAnnotations = (
+    annotations: TextAnnotation[], 
+    origin = Origin.LOCAL
+  ): TextAnnotation[] => {
+    const revived = annotations.map(a => reviveAnnotation(a, container));
+
+    // Initial page load might take some time. Retry for more robustness.
+    const couldNotRevive = revived.filter(a => !isRevived(a.target.selector));
+    if (couldNotRevive.length > 0)
+      console.warn('Could not revive all targets for these annotations:', couldNotRevive);
+
+    revived.forEach(a => {
+      if (store.getAnnotation(a.id))
+        store.updateAnnotation(a, origin);
+      else 
+        store.addAnnotation(a, origin);
+    })
+
+    return couldNotRevive;
+  }
 
   const updateTarget = (target: TextAnnotationTarget, origin = Origin.LOCAL) => {
     const revived = reviveTarget(target, container);
@@ -160,6 +181,7 @@ export const createTextAnnotatorState = (
       addAnnotation,
       bulkAddAnnotation,
       bulkUpdateTargets,
+      bulkUpsertAnnotations,
       getAnnotationBounds,
       getAt,
       getIntersecting,
