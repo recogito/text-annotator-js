@@ -1,12 +1,12 @@
-const NOT_ANNTOTATABLE_CLASS = 'not-annotatable';
+const NOT_ANNOTATABLE_CLASS = 'not-annotatable';
 
-export const NOT_ANNTOTATABLE_SELECTOR = `.${NOT_ANNTOTATABLE_CLASS}`;
+export const NOT_ANNOTATABLE_SELECTOR = `.${NOT_ANNOTATABLE_CLASS}`;
 
 const isRangeAnnotatable = (range: Range): boolean => {
   const ancestor = range.commonAncestorContainer;
   return ancestor instanceof HTMLElement
-    ? !ancestor.closest(NOT_ANNTOTATABLE_SELECTOR)
-    : !ancestor.parentElement?.closest(NOT_ANNTOTATABLE_SELECTOR);
+    ? !ancestor.closest(NOT_ANNOTATABLE_SELECTOR)
+    : !ancestor.parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
 }
 
 const iterateNotAnnotatableElements = function*(range: Range): Generator<HTMLElement> {
@@ -14,7 +14,7 @@ const iterateNotAnnotatableElements = function*(range: Range): Generator<HTMLEle
     range.commonAncestorContainer,
     NodeFilter.SHOW_ELEMENT,
     (node) =>
-      node instanceof HTMLElement && node.classList.contains(NOT_ANNTOTATABLE_CLASS) && range.intersectsNode(node)
+      node instanceof HTMLElement && node.classList.contains(NOT_ANNOTATABLE_CLASS) && range.intersectsNode(node)
         ? NodeFilter.FILTER_ACCEPT
         : NodeFilter.FILTER_SKIP
   );
@@ -73,6 +73,6 @@ export const splitAnnotatableRanges = (range: Range): Range[] => {
 
 export const getRangeAnnotatableContents = (range: Range): DocumentFragment => {
   const contents = range.cloneContents();
-  contents.querySelectorAll(NOT_ANNTOTATABLE_SELECTOR).forEach((el) => el.remove());
+  contents.querySelectorAll(NOT_ANNOTATABLE_SELECTOR).forEach((el) => el.remove());
   return contents;
 }

@@ -1,4 +1,4 @@
-import { NOT_ANNTOTATABLE_SELECTOR } from './splitAnnotatableRanges';
+import { NOT_ANNOTATABLE_SELECTOR } from './splitAnnotatableRanges';
 
 /**
  * Returns a DocumentFragment consisting of ONLY the annotatable content
@@ -6,6 +6,6 @@ import { NOT_ANNTOTATABLE_SELECTOR } from './splitAnnotatableRanges';
  */
 export const getAnnotatableFragment = (range: Range): DocumentFragment => {
   const fragment = range.cloneContents();
-  fragment.querySelectorAll(NOT_ANNTOTATABLE_SELECTOR).forEach(el => el.remove());
+  fragment.querySelectorAll(NOT_ANNOTATABLE_SELECTOR).forEach(el => el.remove());
   return fragment;
 }
