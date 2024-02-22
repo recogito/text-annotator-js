@@ -2,7 +2,7 @@ import { Origin, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotationTarget } from './model';
-import { debounce, splitAnnotatableRanges, rangeToSelector, trimRange, NOT_ANNTOTATABLE_SELECTOR } from './utils';
+import { debounce, splitAnnotatableRanges, rangeToSelector, trimRange, NOT_ANNOTATABLE_SELECTOR } from './utils';
 
 export const SelectionHandler = (
   container: HTMLElement,
@@ -29,7 +29,7 @@ export const SelectionHandler = (
     // not started on the container, or which are not supposed to
     // be annotatable (like a component popup).
     // Note that Chrome/iOS will sometimes return the root doc as target!
-    const annotatable = !(evt.target as Node).parentElement?.closest(NOT_ANNTOTATABLE_SELECTOR);
+    const annotatable = !(evt.target as Node).parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
     if (annotatable) {
       currentTarget = {
         annotation: uuidv4(),
@@ -97,7 +97,7 @@ export const SelectionHandler = (
   container.addEventListener('pointerdown', onPointerDown);
 
   const onPointerUp = (evt: PointerEvent) => {
-    const annotatable = !(evt.target as Node).parentElement?.closest(NOT_ANNTOTATABLE_SELECTOR);
+    const annotatable = !(evt.target as Node).parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
     if (!annotatable || !isLeftClick)
       return;
 
