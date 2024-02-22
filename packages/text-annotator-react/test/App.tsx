@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { AnnotationBody, Annotorious, useAnnotationStore, useAnnotator } from '@annotorious/react';
 import { TextAnnotator, TextAnnotatorPopup, TextAnnotatorPopupProps } from '../src';
-import { TextAnnotation, TextAnnotator as RecogitoTextAnnotator} from '@recogito/text-annotator';
+import { TextAnnotation, TextAnnotator as RecogitoTextAnnotator, W3CTextFormat } from '@recogito/text-annotator';
 
 const TestPopup = (props: TextAnnotatorPopupProps) => {
 
@@ -62,10 +62,11 @@ const MockStorage = () => {
 }
 
 export const App = () => {
-  
+  const w3cAdapter = useCallback((container: HTMLElement) => W3CTextFormat('https://www.gutenberg.org', container), []);
+
   return (
     <Annotorious>
-      <TextAnnotator>
+      <TextAnnotator adapter={w3cAdapter}>
         <p>
           Tell me, O muse, of that ingenious hero who travelled far and wide 
           after he had sacked the famous town of Troy. Many cities did he 
