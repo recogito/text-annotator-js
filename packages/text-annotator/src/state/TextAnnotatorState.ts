@@ -150,12 +150,13 @@ export const createTextAnnotatorState = (
       return grouped;
     }, {});
 
-    // Resolve annotation IDs
+    // Resolve annotation IDs. Note that the tree could be slightly out of sync (because 
+    // it updates by listening to changes, just like anyone else)
     return Object.entries(groupedByAnnotationId).map(([annotationId, rects]) => ({
       annotation: store.getAnnotation(annotationId),
       rects: rects.map(({ minX, minY, maxX, maxY }) => 
         ({ x: minX, y: minY, width: maxX - minX, height: maxY - minY }))
-    }));
+    })).filter(t => Boolean(t.annotation));
   }
 
   const recalculatePositions = () => tree.recalculate();
