@@ -14,7 +14,7 @@ import type { TextAnnotation, TextAnnotationTarget } from '../model';
 import type { AnnotationRects, TextAnnotationStore } from './TextAnnotationStore';
 import { isRevived, reviveAnnotation, reviveTarget } from '../utils';
 
-export type TextAnnotatorState = AnnotatorState<TextAnnotation> & {
+export interface TextAnnotatorState extends AnnotatorState<TextAnnotation> {
 
   store: TextAnnotationStore;
 
@@ -189,7 +189,7 @@ export const createTextAnnotatorState = (
       getIntersectingRects,
       recalculatePositions,
       updateTarget
-    } as TextAnnotationStore,
+    },
     selection,
     hover,
     viewport
