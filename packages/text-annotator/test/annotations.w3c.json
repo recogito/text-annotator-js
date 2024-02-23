@@ -21,8 +21,8 @@
         },
         {
           "type": "TextPositionSelector",
-          "start": 742,
-          "end": 773
+          "start": 741,
+          "end": 772
         }
       ]
     }
@@ -49,8 +49,8 @@
         },
         {
           "type": "TextPositionSelector",
-          "start": 983,
-          "end": 1031
+          "start": 982,
+          "end": 1030
         }
       ]
     }
@@ -77,8 +77,8 @@
         },
         {
           "type": "TextPositionSelector",
-          "start": 1399,
-          "end": 1572
+          "start": 1408,
+          "end": 1581
         }
       ]
     }
