@@ -3,6 +3,7 @@ import { describe, it, beforeEach, afterEach, expect } from 'vitest';
 import { textAnnotation, incompleteTextAnnotation } from './fixtures';
 import {
   parseW3CTextAnnotation,
+  reviveSelector,
   serializeW3CTextAnnotation,
 } from '../../../src';
 
@@ -19,7 +20,7 @@ afterEach(() => {
 
 describe('parseW3CTextAnnotation', () => {
   it('should parse the sample annotation correctly', () => {
-    const { parsed, error } = parseW3CTextAnnotation(textAnnotation, global.contentContainer);
+    const { parsed, error } = parseW3CTextAnnotation(textAnnotation);
     expect(error).toBeUndefined();
 
     const fixtureBody = textAnnotation.body[0];
@@ -35,18 +36,18 @@ describe('parseW3CTextAnnotation', () => {
     expect(start).toStrictEqual(fixtureTarget.selector[1].start);
     expect(created.getTime()).toEqual(new Date(textAnnotation.created).getTime());
     expect(creator.id).toEqual(textAnnotation.creator.id);
-    expect(range).toBeDefined();
   });
 
   it('should return an error if the selector is incomplete', () => {
-    const { parsed, error } = parseW3CTextAnnotation(incompleteTextAnnotation, global.contentContainer);
+    const { parsed, error } = parseW3CTextAnnotation(incompleteTextAnnotation);
     expect(parsed).toBeUndefined();
     expect(error).toBeDefined();
     expect(error.message).toContain('Missing selector');
   });
 
   it('should serialize the sample annotation correctly', () => {
-    const { parsed, error } = parseW3CTextAnnotation(textAnnotation, global.contentContainer);
+    const { parsed, error } = parseW3CTextAnnotation(textAnnotation);
+    parsed.target.selector = parsed.target.selector.map(selector => reviveSelector(selector, global.contentContainer));
     expect(error).toBeUndefined();
 
     const serialized = serializeW3CTextAnnotation(parsed, textAnnotation.target[0].source, global.contentContainer);
