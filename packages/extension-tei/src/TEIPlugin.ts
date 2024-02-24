@@ -1,7 +1,6 @@
 import type { 
   TextAnnotator,
-  TextAnnotation, 
-  TextAnnotationStore,
+  TextAnnotation,
   TextAnnotationTarget, 
 } from '@recogito/text-annotator';
 import type { 
@@ -43,7 +42,7 @@ export const TEIPlugin = (anno: TextAnnotator): RecogitoTEIAnnotator => {
   const toTEITarget = textToTEITarget(container);
 
   // Monkey-patch the store
-  const store = anno.state.store as TextAnnotationStore;
+  const store = anno.state.store;
 
   const _addAnnotation = store.addAnnotation;
   store.addAnnotation = (annotation: TEIAnnotation | TextAnnotation, origin: Origin) => {
