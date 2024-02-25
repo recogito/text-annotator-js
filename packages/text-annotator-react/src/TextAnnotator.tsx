@@ -1,6 +1,6 @@
 import { ReactNode, useContext, useEffect, useRef } from 'react';
-import { AnnotoriousContext, Filter } from '@annotorious/react';
-import type { HighlightStyle, TextAnnotatorOptions } from '@recogito/text-annotator';
+import { AnnotoriousContext, Filter, FormatAdapter } from '@annotorious/react';
+import type { HighlightStyle, TextAnnotation, TextAnnotatorOptions } from '@recogito/text-annotator';
 import { createTextAnnotator } from '@recogito/text-annotator';
 
 import '@recogito/text-annotator/dist/text-annotator.css';
