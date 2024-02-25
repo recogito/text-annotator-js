@@ -14,7 +14,7 @@ import type { TextAnnotation, TextAnnotationTarget } from '../model';
 import type { AnnotationRects, TextAnnotationStore } from './TextAnnotationStore';
 import { isRevived, reviveAnnotation, reviveTarget } from '../utils';
 
-export type TextAnnotatorState = AnnotatorState<TextAnnotation> & {
+export interface TextAnnotatorState extends AnnotatorState<TextAnnotation> {
 
   store: TextAnnotationStore;
 
@@ -75,6 +75,27 @@ export const createTextAnnotatorState = (
       return [];
     }
   }
+  
+  const bulkUpsertAnnotations = (
+    annotations: TextAnnotation[], 
+    origin = Origin.LOCAL
+  ): TextAnnotation[] => {
+    const revived = annotations.map(a => reviveAnnotation(a, container));
+
+    // Initial page load might take some time. Retry for more robustness.
+    const couldNotRevive = revived.filter(a => !isRevived(a.target.selector));
+    if (couldNotRevive.length > 0)
+      console.warn('Could not revive all targets for these annotations:', couldNotRevive);
+
+    revived.forEach(a => {
+      if (store.getAnnotation(a.id))
+        store.updateAnnotation(a, origin);
+      else 
+        store.addAnnotation(a, origin);
+    })
+
+    return couldNotRevive;
+  }
 
   const updateTarget = (target: TextAnnotationTarget, origin = Origin.LOCAL) => {
     const revived = reviveTarget(target, container);
@@ -129,12 +150,13 @@ export const createTextAnnotatorState = (
       return grouped;
     }, {});
 
-    // Resolve annotation IDs
+    // Resolve annotation IDs. Note that the tree could be slightly out of sync (because 
+    // it updates by listening to changes, just like anyone else)
     return Object.entries(groupedByAnnotationId).map(([annotationId, rects]) => ({
       annotation: store.getAnnotation(annotationId),
       rects: rects.map(({ minX, minY, maxX, maxY }) => 
         ({ x: minX, y: minY, width: maxX - minX, height: maxY - minY }))
-    }));
+    })).filter(t => Boolean(t.annotation));
   }
 
   const recalculatePositions = () => tree.recalculate();
@@ -160,13 +182,14 @@ export const createTextAnnotatorState = (
       addAnnotation,
       bulkAddAnnotation,
       bulkUpdateTargets,
+      bulkUpsertAnnotations,
       getAnnotationBounds,
       getAt,
       getIntersecting,
       getIntersectingRects,
       recalculatePositions,
       updateTarget
-    } as TextAnnotationStore,
+    },
     selection,
     hover,
     viewport

@@ -40,7 +40,6 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
     const offset = container.getBoundingClientRect();
 
     const rects = target.selector.flatMap(s => {
-
       const isValidRange =
         s.range instanceof Range &&
         !s.range.collapsed &&
@@ -48,6 +47,7 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
         s.range.endContainer.nodeType === Node.TEXT_NODE;
 
       const revivedRange = isValidRange ? s.range : reviveSelector(s, container).range;
+      
       return isFirefox ?
         getClientRectsPonyfill(revivedRange) :
         Array.from(revivedRange.getClientRects());
@@ -86,8 +86,10 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
 
   const remove = (target: TextAnnotationTarget) => {
     const rects = index.get(target.annotation);
-    rects.forEach(rect => tree.remove(rect));
-    index.delete(target.annotation);
+    if (rects) {
+      rects.forEach(rect => tree.remove(rect));
+      index.delete(target.annotation);
+    }
   }
 
   const update = (target: TextAnnotationTarget) => {

@@ -21,14 +21,14 @@ export const W3CTextFormat = (
   source: string,
   container: HTMLElement
 ): W3CTextFormatAdapter => ({
-  parse: (serialized) => parseW3CTextAnnotation(serialized, container),
+  parse: (serialized) => parseW3CTextAnnotation(serialized),
   serialize: (annotation) => serializeW3CTextAnnotation(annotation, source, container)
 });
 
 const isTextSelector = (selector: Partial<TextSelector>): selector is TextSelector =>
   selector.quote !== undefined && selector.start !== undefined && selector.end !== undefined;
 
-const parseW3CTextTargets = (annotation: W3CTextAnnotation, container: HTMLElement) => {
+const parseW3CTextTargets = (annotation: W3CTextAnnotation) => {
   const {
     id: annotationId,
     creator,
@@ -64,7 +64,7 @@ const parseW3CTextTargets = (annotation: W3CTextAnnotation, container: HTMLEleme
     }, {});
 
     if (isTextSelector(selector)) {
-      parsed.selector.push(selector);
+      parsed.selector.push({ id: w3cTarget.id, ...selector });
     } else {
       const missingTypes = [
         !selector.start ? 'TextPositionSelector' : undefined,
@@ -79,8 +79,7 @@ const parseW3CTextTargets = (annotation: W3CTextAnnotation, container: HTMLEleme
 };
 
 export const parseW3CTextAnnotation = (
-  annotation: W3CTextAnnotation,
-  container: HTMLElement
+  annotation: W3CTextAnnotation
 ): ParseResult<TextAnnotation> => {
   const annotationId = annotation.id || uuidv4();
 
@@ -93,7 +92,7 @@ export const parseW3CTextAnnotation = (
   } = annotation;
 
   const bodies = parseW3CBodies(body, annotationId);
-  const target = parseW3CTextTargets(annotation, container);
+  const target = parseW3CTextTargets(annotation);
 
   return 'error' in target
     ? { error: target.error }
@@ -141,6 +140,7 @@ export const serializeW3CTextAnnotation = (
 
     return {
       ...targetRest,
+      id: s.id,
       source,
       selector: w3cSelectors
     };

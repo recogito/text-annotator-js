@@ -9,6 +9,7 @@
     },
     "created": "2024-01-05T13:19:14.716Z",
     "target": {
+      "id": "602e0698-6602-46b2-87bc-4085df9eb2bc",
       "annotation": "9b6aa528-660a-4551-8265-66f45c61acab",
       "source": "https://www.gutenberg.org/files/1727/1727-h/1727-h.htm",
       "selector": [
@@ -20,8 +21,8 @@
         },
         {
           "type": "TextPositionSelector",
-          "start": 742,
-          "end": 773
+          "start": 741,
+          "end": 772
         }
       ]
     }
@@ -36,6 +37,7 @@
     },
     "created": "2024-01-05T13:22:51.102Z",
     "target": {
+      "id": "09fa5142-82f2-46ef-81f0-7f1d73cedd35",
       "annotation": "51b54efc-cd3c-4667-91ab-3b24acba9b39",
       "source": "https://www.gutenberg.org/files/1727/1727-h/1727-h.htm",
       "selector": [
@@ -47,8 +49,8 @@
         },
         {
           "type": "TextPositionSelector",
-          "start": 983,
-          "end": 1031
+          "start": 982,
+          "end": 1030
         }
       ]
     }
@@ -63,6 +65,7 @@
     },
     "created": "2024-01-05T13:23:18.956Z",
     "target": {
+      "id": "09fa5142-82f2-46ef-81f0-7f1d73cedd35",
       "annotation": "45d77d69-b9c9-419e-b6f3-672222bb3a23",
       "source": "https://www.gutenberg.org/files/1727/1727-h/1727-h.htm",
       "selector": [
@@ -74,8 +77,8 @@
         },
         {
           "type": "TextPositionSelector",
-          "start": 1399,
-          "end": 1572
+          "start": 1408,
+          "end": 1581
         }
       ]
     }

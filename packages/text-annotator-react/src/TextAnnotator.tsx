@@ -5,9 +5,11 @@ import { createTextAnnotator } from '@recogito/text-annotator';
 
 import '@recogito/text-annotator/dist/text-annotator.css';
 
-export type TextAnnotatorProps<E extends unknown> = TextAnnotatorOptions<E> & {
+export interface TextAnnotatorProps<E extends unknown> extends Omit<TextAnnotatorOptions<E>, 'adapter'>  {
 
   children?: ReactNode | JSX.Element;
+
+  adapter?: FormatAdapter<TextAnnotation, E> | ((container: HTMLElement) => FormatAdapter<TextAnnotation, E>) | null;
 
   filter?: Filter;
 
@@ -26,8 +28,9 @@ export const TextAnnotator = <E extends unknown>(props: TextAnnotatorProps<E>) =
   useEffect(() => {
     if (!setAnno) return;
 
-    const anno = createTextAnnotator(el.current, opts);
-    anno.setStyle(props.style);
+    const adapter = typeof opts.adapter === 'function' ? opts.adapter(el.current) : opts.adapter;
+
+    const anno = createTextAnnotator(el.current, { ...opts, adapter });
     setAnno(anno);
 
     return () => anno.destroy();
