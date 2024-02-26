@@ -84,7 +84,7 @@ const toTEIXPaths = (startPath: string[], endPath: string[], selectedRange: Rang
  * Using the DOM Range from a (revived!) TextSelector, this function computes
  * the TEIRangeSelector corresponding to that range.
  */
-export const selectorToTEIRangeSelector = (selector: TextSelector): TEIRangeSelector => {
+export const textToTEISelector = (selector: TextSelector): TEIRangeSelector => {
   const { range } = selector;
 
   // XPath segments for Range start and end nodes as a list
@@ -114,7 +114,7 @@ export const textToTEITarget = (container: HTMLElement) => (t: TextAnnotationTar
   const target = reviveTarget(t, container);
   return {
     ...t,
-    selector: target.selector.map(selectorToTEIRangeSelector)
+    selector: target.selector.map(textToTEISelector)
   }
 }
 
