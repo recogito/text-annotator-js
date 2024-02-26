@@ -10,7 +10,7 @@ import { SelectionHandler } from './SelectionHandler';
 
 import './TextAnnotator.css';
 
-export interface TextAnnotator<T extends unknown = TextAnnotation> extends Annotator<TextAnnotation, T> {
+export interface TextAnnotator<E extends unknown = TextAnnotation> extends Annotator<TextAnnotation, E> {
 
   element: HTMLElement;
 
