@@ -74,7 +74,7 @@ export const SelectionHandler = (
         id: currentTarget.annotation,
         bodies: [],
         target: currentTarget
-      });
+      }, Origin.LOCAL);
 
       // Reminder: select events don't have offsetX/offsetY - reuse last up/down
       selection.clickSelect(currentTarget.annotation, lastPointerDown);

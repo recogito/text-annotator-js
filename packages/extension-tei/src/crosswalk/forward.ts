@@ -110,7 +110,7 @@ export const selectorToTEIRangeSelector = (selector: TextSelector): TEIRangeSele
   };
 }
 
-export const textToTEITarget =  (container: HTMLElement) => (t: TextAnnotationTarget): TEIAnnotationTarget => {
+export const textToTEITarget = (container: HTMLElement) => (t: TextAnnotationTarget): TEIAnnotationTarget => {
   const target = reviveTarget(t, container);
   return {
     ...t,
