@@ -1,17 +1,17 @@
 import type { DrawingStyle } from '@annotorious/core';
 import type { TextAnnotation } from '../model';
 
-export const DEFAULT_STYLE: HighlightDrawingStyle = {
+export const DEFAULT_STYLE: HighlightStyle = {
   fill: 'rgb(0, 128, 255)', 
   fillOpacity: 0.18 
 };
 
-export const DEFAULT_SELECTED_STYLE: HighlightDrawingStyle = {
+export const DEFAULT_SELECTED_STYLE: HighlightStyle = {
   fill: 'rgb(0, 128, 255)', 
   fillOpacity: 0.45 
 };
 
-export interface HighlightDrawingStyle extends Pick<DrawingStyle, 'fill' | 'fillOpacity'> {
+export interface HighlightStyle extends Pick<DrawingStyle, 'fill' | 'fillOpacity'> {
 
   underlineStyle?: string;
 
@@ -23,7 +23,7 @@ export interface HighlightDrawingStyle extends Pick<DrawingStyle, 'fill' | 'fill
   
 }
 
-export type HighlightStyle =
-  | HighlightDrawingStyle
-  | ((annotation: TextAnnotation, isSelected?: boolean) => HighlightDrawingStyle)
+export type HighlightStyleExpression =
+  | HighlightStyle
+  | ((annotation: TextAnnotation, isSelected?: boolean) => HighlightStyle)
   | undefined;

@@ -4,7 +4,7 @@ import { debounce } from '../../utils';
 import { getViewportBounds, trackViewport } from '../viewport';
 import type { HighlightPainter } from '../HighlightPainter';
 import { createHighlights } from './highlights';
-import type { HighlightStyle } from '../HighlightStyle';
+import type { HighlightStyleExpression } from '../HighlightStyle';
 
 export const createCSSHighlightRenderer = (
   container: HTMLElement, 
@@ -15,7 +15,7 @@ export const createCSSHighlightRenderer = (
 
   let customPainter: HighlightPainter;
 
-  let currentStyle: HighlightStyle;
+  let currentStyle: HighlightStyleExpression;
 
   let currentFilter: Filter | undefined;
 
@@ -67,7 +67,7 @@ export const createCSSHighlightRenderer = (
   }
 
   // Refresh when style changes
-  const setHighlightStyle = (style: HighlightStyle) => {
+  const setHighlightStyle = (style: HighlightStyleExpression) => {
     currentStyle = style;
     refresh();
   }

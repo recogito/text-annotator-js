@@ -1,5 +1,5 @@
 import type { AnnotationRects } from '../state';
-import type { HighlightDrawingStyle } from './HighlightStyle';
+import type { HighlightStyle } from './HighlightStyle';
 import type { ViewportBounds } from './viewport';
 
 export interface HighlightPainter {
@@ -12,7 +12,7 @@ export interface HighlightPainter {
     annotation: AnnotationRects,
     viewportBounds: ViewportBounds,
     isSelected?: boolean
-  ): HighlightDrawingStyle;
+  ): HighlightStyle;
 
   reset(): void;
 

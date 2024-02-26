@@ -5,11 +5,11 @@ import type { ViewportBounds } from '../viewport';
 import {
   DEFAULT_SELECTED_STYLE,
   DEFAULT_STYLE,
-  type HighlightDrawingStyle,
-  type HighlightStyle
+  type HighlightStyle,
+  type HighlightStyleExpression
 } from '../HighlightStyle';
 
-const toCSS = (s: HighlightDrawingStyle) => {
+const toCSS = (s: HighlightStyle) => {
   const backgroundColor = colord(s.fill || DEFAULT_STYLE.fill).alpha(s.fillOpacity || DEFAULT_STYLE.fillOpacity).toHex();
   return `background-color: ${backgroundColor};`
 }
@@ -26,7 +26,7 @@ export const createHighlights = () => {
     highlights: AnnotationRects[], 
     viewportBounds: ViewportBounds,
     selected: string[], 
-    currentStyle: HighlightStyle
+    currentStyle: HighlightStyleExpression
   ) => {
     if (customPainter)
       customPainter.clear();

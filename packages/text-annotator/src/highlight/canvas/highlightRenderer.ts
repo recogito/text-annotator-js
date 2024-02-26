@@ -5,8 +5,8 @@ import { debounce } from '../../utils';
 import {
   DEFAULT_SELECTED_STYLE,
   DEFAULT_STYLE,
-  type HighlightDrawingStyle,
-  type HighlightStyle
+  type HighlightStyle,
+  type HighlightStyleExpression
 } from '../HighlightStyle';
 import type { HighlightPainter } from '../HighlightPainter';
 
@@ -37,7 +37,7 @@ export const createCanvasHighlightRenderer = (
 ) => {
   const { store, selection, hover } = state;
   
-  let currentStyle: HighlightStyle;
+  let currentStyle: HighlightStyleExpression;
 
   let currentFilter: Filter | undefined;
 
@@ -96,7 +96,7 @@ export const createCanvasHighlightRenderer = (
     annotationsInView.forEach(h => {
       const isSelected = selectedIds.has(h.annotation.id);
 
-      const base: HighlightDrawingStyle = currentStyle
+      const base: HighlightStyle = currentStyle
         ? typeof currentStyle === 'function' 
           ? currentStyle(h.annotation, isSelected) 
           : currentStyle 
@@ -124,7 +124,7 @@ export const createCanvasHighlightRenderer = (
     setTimeout(() => onDraw(annotationsInView.map(({ annotation }) => annotation)), 1);
   });  
 
-  const setHighlightStyle = (style: HighlightStyle) => {
+  const setHighlightStyle = (style: HighlightStyleExpression) => {
     currentStyle = style;
     refresh();
   }
