@@ -1,7 +1,7 @@
 import RBush from 'rbush';
 import type { Store } from '@annotorious/core';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
-import { mergeClientRects } from '../utils';
+import { isRevived, mergeClientRects } from '../utils';
 import { getClientRectsPonyfill } from '../utils/getClientRectsPonyfill';
 import { reviveSelector } from '../utils';
 
@@ -40,14 +40,7 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
     const offset = container.getBoundingClientRect();
 
     const rects = target.selector.flatMap(s => {
-      const isValidRange =
-        s.range instanceof Range &&
-        !s.range.collapsed &&
-        s.range.startContainer.nodeType === Node.TEXT_NODE &&
-        s.range.endContainer.nodeType === Node.TEXT_NODE;
-
-      const revivedRange = isValidRange ? s.range : reviveSelector(s, container).range;
-      
+      const revivedRange = isRevived([s]) ? s.range : reviveSelector(s, container).range;
       return isFirefox ?
         getClientRectsPonyfill(revivedRange) :
         Array.from(revivedRange.getClientRects());
