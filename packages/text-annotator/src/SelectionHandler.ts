@@ -54,8 +54,7 @@ export const SelectionHandler = (
     if (sel.isCollapsed || !isLeftClick || !currentTarget) return;
 
     const selectionRange = sel.getRangeAt(0);
-    const trimmedRange = trimRange(selectionRange.cloneRange())
-    const annotatableRanges = splitAnnotatableRanges(trimmedRange);
+    const annotatableRanges = splitAnnotatableRanges(selectionRange.cloneRange());
 
     const hasChanged =
       annotatableRanges.length !== currentTarget.selector.length ||
