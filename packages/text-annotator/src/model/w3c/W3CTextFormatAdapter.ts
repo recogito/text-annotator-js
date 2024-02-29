@@ -38,13 +38,17 @@ const parseW3CTextTargets = (annotation: W3CTextAnnotation) => {
   } = annotation;
 
   const w3cTargets = Array.isArray(target) ? target : [target];
+  if (w3cTargets.length === 0) {
+    return { error: Error(`No targets found for annotation: ${annotation.id}`) };
+  }
 
   const parsed: TextAnnotationTarget = {
     creator: parseW3CUser(creator),
     created: created ? new Date(created) : undefined,
     updated: modified ? new Date(modified) : undefined,
     annotation: annotationId,
-    selector: []
+    selector: [],
+    styleClass: w3cTargets[0].styleClass
   };
 
   for (const w3cTarget of w3cTargets) {

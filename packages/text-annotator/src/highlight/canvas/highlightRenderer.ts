@@ -70,7 +70,7 @@ export const createCanvasHighlightRenderer = (
   container.addEventListener('pointermove', onPointerMove);
 
   const refresh = () => requestAnimationFrame(() => {
-    const bounds = getViewportBounds(container);   
+    const bounds = getViewportBounds(container);
 
     const { top, left, minX, minY, maxX, maxY } = bounds;
     
