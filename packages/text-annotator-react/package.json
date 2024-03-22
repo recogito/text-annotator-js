@@ -41,7 +41,7 @@
   "dependencies": {
     "@annotorious/core": "^3.0.0-rc.19",
     "@annotorious/react": "^3.0.0-rc.19",
-    "@recogito/text-annotator": "*",
+    "@recogito/text-annotator": "3.0.0-rc.18",
     "@neodrag/react": "^2.0.3",
     "CETEIcean": "^1.9.2"
   }
