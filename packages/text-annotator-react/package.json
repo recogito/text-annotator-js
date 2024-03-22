@@ -42,6 +42,7 @@
     "@annotorious/core": "^3.0.0-rc.21",
     "@annotorious/react": "^3.0.0-rc.21",
     "@recogito/text-annotator": "^3.0.0-rc.18",
+    "@recogito/text-annotator-tei": "^3.0.0-rc.18",
     "@neodrag/react": "^2.0.3",
     "CETEIcean": "^1.9.2"
   }
