@@ -39,9 +39,9 @@
     "react-dom": "16.8.0 || >=17.x || >=18.x"
   },
   "dependencies": {
-    "@annotorious/core": "^3.0.0-rc.20",
-    "@annotorious/react": "^3.0.0-rc.20",
-    "@recogito/text-annotator": "3.0.0-rc.18",
+    "@annotorious/core": "^3.0.0-rc.21",
+    "@annotorious/react": "^3.0.0-rc.21",
+    "@recogito/text-annotator": "^3.0.0-rc.18",
     "@neodrag/react": "^2.0.3",
     "CETEIcean": "^1.9.2"
   }
