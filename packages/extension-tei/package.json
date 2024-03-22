@@ -26,7 +26,7 @@
     "./dist/text-annotator.css": "./dist/text-annotator-tei.css"
   },
   "devDependencies": {
-    "@annotorious/core": "^3.0.0-rc.19",
+    "@annotorious/core": "^3.0.0-rc.20",
     "@recogito/text-annotator": "3.0.0-rc.18",
     "CETEIcean": "^1.9.2",
     "typescript": "^5.3.3",
@@ -34,7 +34,7 @@
     "vite-plugin-dts": "^3.7.2"
   },
   "peerDependencies": {
-    "@annotorious/core": "^3.0.0-rc.19",
+    "@annotorious/core": "^3.0.0-rc.20",
     "@recogito/text-annotator": "3.0.0-rc.18"
   }
 }
