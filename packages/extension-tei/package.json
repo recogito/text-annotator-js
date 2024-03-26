@@ -31,7 +31,7 @@
     "CETEIcean": "^1.9.2",
     "typescript": "^5.3.3",
     "vite": "^5.2.6",
-    "vite-plugin-dts": "^3.7.2"
+    "vite-plugin-dts": "^3.7.3"
   },
   "peerDependencies": {
     "@annotorious/core": "^3.0.0-rc.21",
