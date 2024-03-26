@@ -20,12 +20,8 @@ export default defineConfig({
       fileName: (format) => `text-annotator.${format}.js`
     },
     rollupOptions: {
-      external: ['@annotorious/core'],
       output: {
-        assetFileNames: 'text-annotator.[ext]',
-        globals: {
-          '@annotorious/core': 'AnnotoriousCore'
-        }
+        assetFileNames: 'text-annotator.[ext]'
       }
     }
   }
