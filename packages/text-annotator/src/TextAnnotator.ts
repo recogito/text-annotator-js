@@ -1,6 +1,6 @@
 import { createAnonymousGuest, createLifecyleObserver, createBaseAnnotator, DrawingStyle, Filter, createUndoStack } from '@annotorious/core';
 import type { Annotator, User, PresenceProvider } from '@annotorious/core';
-import { createCanvasHighlightRenderer, createCSSHighlightRenderer } from './highlight';
+import { createCanvasHighlightRenderer, createCSSHighlightRenderer, createSpanHighlightRenderer } from './highlight';
 import { createPresencePainter } from './presence';
 import { scrollIntoView } from './api';
 import { TextAnnotationStore, TextAnnotatorState, createTextAnnotatorState } from './state';
@@ -51,8 +51,10 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
     console.log('Using experimental CSS Custom Highlight API renderer');
 
   const highlightRenderer = useExperimentalCSSRenderer
-      ? createCSSHighlightRenderer(container, state, viewport)
+      ? createSpanHighlightRenderer(container, state, viewport)
+      //  createCSSHighlightRenderer(container, state, viewport)
       : createCanvasHighlightRenderer(container, state, viewport);
+     
 
   if (opts.style)
     highlightRenderer.setDrawingStyle(opts.style);
@@ -96,6 +98,10 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
     }
   }
 
+  const setVisible = (visible: boolean) => {
+    // TODO
+  }
+
   const destroy = () => {
     highlightRenderer.destroy();
     selectionHandler.destroy();
@@ -114,6 +120,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
     setUser,
     setSelected,
     setPresenceProvider,
+    setVisible,
     on: lifecycle.on,
     off: lifecycle.off,
     scrollIntoView: scrollIntoView(container, store),

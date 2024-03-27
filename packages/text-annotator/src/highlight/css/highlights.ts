@@ -4,11 +4,22 @@ import type { TextAnnotation } from '../../model';
 import type { HighlightPainter } from '../HighlightPainter';
 import type { AnnotationRects } from 'src/state';
 import type { ViewportBounds } from '../viewport';
-import { DEFAULT_SELECTED_STYLE, DEFAULT_STYLE } from '../HighlightStyle';
+import { DEFAULT_SELECTED_STYLE, DEFAULT_STYLE, HighlightStyle } from '../HighlightStyle';
 
-const toCSS = (s: DrawingStyle) => {
-  const backgroundColor = colord(s.fill || DEFAULT_STYLE.fill).alpha(s.fillOpacity || DEFAULT_STYLE.fillOpacity).toHex();
-  return `background-color: ${backgroundColor};`
+const toCSS = (s?: HighlightStyle) => {
+  const backgroundColor = colord(s?.fill || DEFAULT_STYLE.fill)
+    .alpha(s?.fillOpacity === undefined ? DEFAULT_STYLE.fillOpacity : s.fillOpacity)
+    .toHex();
+
+  const rules = [
+    `background-color:${backgroundColor}`,
+    s?.underlineThickness ? `text-decoration:underline` : undefined,
+    s?.underlineColor ? `text-decoration-color:${s.underlineColor}` : undefined,
+    s?.underlineOffset ? `text-underline-offset:${s.underlineOffset}px` : undefined,
+    s?.underlineThickness ? `text-decoration-thickness:${s.underlineThickness}px` : undefined
+  ].filter(Boolean);
+
+  return rules.join(';');
 }
 
 export const createHighlights = () => {
@@ -51,6 +62,8 @@ export const createHighlights = () => {
       return `::highlight(_${h.annotation.id}) { ${toCSS(style)} }`;
     });
 
+    console.log(updatedCSS.join('\n'));
+
     elem.innerHTML = updatedCSS.join('\n');
 
     // After we have the styles, we need to update the Highlights.
@@ -58,7 +71,8 @@ export const createHighlights = () => {
     // available in TypeScript!
 
     // @ts-ignore
-    toRemove.forEach(id => CSS.highlights.delete(`_${id}`));
+    CSS.highlights.clear();
+    // toRemove.forEach(id => CSS.highlights.delete(`_${id}`));
 
     // Could be improved further by (re-)setting only annotations that
     // have changes.

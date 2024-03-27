@@ -9,9 +9,9 @@ import {
   Origin,
   createViewportState
 } from '@annotorious/core';
-import { IndexedHighlightRect, createSpatialTree } from './spatialTree';
+import { createSpatialTree } from './spatialTree';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
-import type { AnnotationRects, TextAnnotationStore } from './TextAnnotationStore';
+import type { TextAnnotationStore } from './TextAnnotationStore';
 import { isRevived, reviveAnnotation, reviveTarget } from '../utils';
 
 export interface TextAnnotatorState extends AnnotatorState<TextAnnotation> {
@@ -112,17 +112,8 @@ export const createTextAnnotatorState = (
     return annotationId ? store.getAnnotation(annotationId) : undefined;
   }
 
-  const getIntersecting = (minX: number, minY: number, maxX: number, maxY: number) => {
-    const rects = tree.getIntersectingRects(minX, minY, maxX, maxY);
-    const ids = Array.from(new Set(rects.map(item => item.annotation.id)));
-
-    // Note that the tree could be slightly out of sync (because it updates
-    // by listening to changes, just like anyone else)
-    return ids.map(id => store.getAnnotation(id)).filter(Boolean);
-  }
-
   const getAnnotationBounds = (id: string, x?: number, y?: number, buffer = 5): DOMRect => {
-    const rects = tree.getDOMRectsForAnnotation(id);
+    const rects = tree.getAnnotationRects(id);
     if (rects.length === 0) return;
 
     if (x && y) {
@@ -133,30 +124,7 @@ export const createTextAnnotatorState = (
       if (match) return match;
     }
 
-    return tree.getBoundsForAnnotation(id);
-  }
-
-  const getIntersectingRects = (
-    minX: number, 
-    minY: number, 
-    maxX: number, 
-    maxY: number
-  ): AnnotationRects[] => {
-    const rects = tree.getIntersectingRects(minX, minY, maxX, maxY);
-
-    // Group by annotation ID
-    const groupedByAnnotationId: { [key:string]: IndexedHighlightRect[] } = rects.reduce((grouped, rect) => {
-      (grouped[rect.annotation.id] = grouped[rect.annotation.id] || []).push(rect);
-      return grouped;
-    }, {});
-
-    // Resolve annotation IDs. Note that the tree could be slightly out of sync (because 
-    // it updates by listening to changes, just like anyone else)
-    return Object.entries(groupedByAnnotationId).map(([annotationId, rects]) => ({
-      annotation: store.getAnnotation(annotationId),
-      rects: rects.map(({ minX, minY, maxX, maxY }) => 
-        ({ x: minX, y: minY, width: maxX - minX, height: maxY - minY }))
-    })).filter(t => Boolean(t.annotation));
+    return tree.getAnnotationBounds(id);
   }
 
   const recalculatePositions = () => tree.recalculate();
@@ -185,8 +153,7 @@ export const createTextAnnotatorState = (
       bulkUpsertAnnotations,
       getAnnotationBounds,
       getAt,
-      getIntersecting,
-      getIntersectingRects,
+      getIntersecting: tree.getIntersecting,
       recalculatePositions,
       updateTarget
     },

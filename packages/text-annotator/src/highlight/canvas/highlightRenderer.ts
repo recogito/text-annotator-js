@@ -115,6 +115,21 @@ export const createCanvasHighlightRenderer = (
       ctx.globalAlpha = style.fillOpacity || 1;
       
       offsetRects.forEach(({ x, y, width, height }) => ctx.fillRect(x, y - 2.5, width, height + 5));
+
+      if (style.underlineColor) {
+        ctx.globalAlpha = 1;
+        ctx.strokeStyle = style.underlineColor;
+
+        offsetRects.forEach(({ x, y, width, height }) => {
+          ctx.beginPath();
+          ctx.moveTo(x, y + height + 4);
+          ctx.lineTo(x + width, y + height + 4);
+          
+          // Draw the Path
+          ctx.stroke();
+        });
+      }
+
     });
     
     setTimeout(() => onDraw(annotationsInView.map(({ annotation }) => annotation)), 1);
