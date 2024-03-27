@@ -152,10 +152,14 @@ export const createBaseRenderer = (
   // This is an extra precaution. The position of the container
   // might shift (without resizing) due to layout changes higher-up
   // in the DOM. (This happens in Recogito for example)
-  // const config: MutationObserverInit = { attributes: true, childList: true, subtree: true };
+  const config: MutationObserverInit = { attributes: true, childList: true, subtree: true };
 
-  // const mutationObserver = new MutationObserver(refresh);
-  // mutationObserver.observe(document.body, config);
+  const mutationObserver = new MutationObserver((records: MutationRecord[]) => {
+    const isInternal = records.every(record => record.target === container || container.contains(record.target));
+    if (!isInternal) redraw(true);
+  });
+
+  mutationObserver.observe(document.body, config);
 
   const destroy = () => {
     container.removeEventListener('pointermove', onPointerMove);
@@ -171,7 +175,7 @@ export const createBaseRenderer = (
     window.removeEventListener('resize', onResize);
     resizeObserver.disconnect();
 
-    // mutationObserver.disconnect();
+    mutationObserver.disconnect();
   }
 
   return {
