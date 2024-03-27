@@ -100,13 +100,21 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
     currentRendered = highlights;
   }
 
+  const setVisible = (visible: boolean) => {
+    if (visible)
+      highlightLayer.classList.remove('hidden');
+    else
+      highlightLayer.classList.add('hidden');
+  }
+
   const destroy = () => {
     highlightLayer.remove();
   }
 
   return {
     destroy,
-    redraw
+    redraw,
+    setVisible
   }
 
 }

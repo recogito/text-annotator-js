@@ -101,6 +101,10 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
 
   window.addEventListener('resize', onResize);
 
+  const setVisible = (visible: boolean) => {
+    console.log('setVisible not implemented on Canvas renderer');
+  }
+
   const destroy = () => {
     container.removeChild(canvas);
 
@@ -109,6 +113,7 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
 
   return {
     destroy,
+    setVisible,
     redraw
   }
 
