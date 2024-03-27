@@ -284,8 +284,7 @@
         var contentContainer = document.getElementById('content');
 
         var r = createTextAnnotator(contentContainer, {
-          adapter: W3CTextFormat('https://www.gutenberg.org', contentContainer),
-          experimentalCSSRenderer: true
+          adapter: W3CTextFormat('https://www.gutenberg.org', contentContainer)
         });
 
         var annotations;
@@ -310,10 +309,9 @@
         });
 
         r.on('viewportIntersect', (annotations) => {
-          // console.log('viewport', annotations);
+          console.log('viewport', annotations);
         });
 
-        /*
         var filterActive = false;
 
         var toggleButton = document.getElementById('filter');
@@ -373,7 +371,6 @@
             })
           }
         });
-        */
       }
     </script>
   </body>

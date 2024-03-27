@@ -5,10 +5,12 @@ import { createPresencePainter } from './presence';
 import { scrollIntoView } from './api';
 import { TextAnnotationStore, TextAnnotatorState, createTextAnnotatorState } from './state';
 import type { TextAnnotation } from './model';
-import type { TextAnnotatorOptions } from './TextAnnotatorOptions';
+import type { RendererType, TextAnnotatorOptions } from './TextAnnotatorOptions';
 import { SelectionHandler } from './SelectionHandler';
 
 import './TextAnnotator.css';
+
+const USE_DEFAULT_RENDERER: RendererType = 'SPANS';
 
 export interface TextAnnotator<E extends unknown = TextAnnotation> extends Annotator<TextAnnotation, E> {
 
@@ -42,17 +44,23 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   
   let currentUser: User = createAnonymousGuest();
 
-  // Switch on CSS Custom Highlight rendering, if requested in the init 
-  // opts and API is available in this browser
-  // @ts-ignore
-  const useExperimentalCSSRenderer = opts.experimentalCSSRenderer && Boolean(CSS.highlights);
+  // Use selected renderer, or fall back to default. If CSS_HIGHLIGHT is
+  // requested, check if CSS Custom Highlights are supported, and fall
+  // back to default renderer if not.
+  const useRenderer: RendererType =
+    opts.renderer === 'CSS_HIGHLIGHTS' 
+      ? Boolean(CSS.highlights) ? 'CSS_HIGHLIGHTS' : USE_DEFAULT_RENDERER
+      : opts.renderer || USE_DEFAULT_RENDERER;
 
-  if (useExperimentalCSSRenderer)
-    console.log('Using experimental CSS Custom Highlight API renderer');
+  const highlightRenderer = 
+    useRenderer === 'SPANS' ? createSpansRenderer(container, state, viewport) :
+    useRenderer === 'CSS_HIGHLIGHTS' ? createHighlightsRenderer(container, state, viewport) :
+    useRenderer === 'CANVAS' ? createCanvasRenderer(container, state, viewport) : undefined;
 
-  const highlightRenderer = /* */createSpansRenderer(container, state, viewport)
-      //  createCSSHighlightRenderer(container, state, viewport)
-      //: createCanvasHighlightRenderer(container, state, viewport);
+  if (!highlightRenderer)
+    throw `Unknown renderer implementation: ${useRenderer}`;
+
+  console.log(`Using ${useRenderer} renderer`);
      
   if (opts.style)
     highlightRenderer.setStyle(opts.style);

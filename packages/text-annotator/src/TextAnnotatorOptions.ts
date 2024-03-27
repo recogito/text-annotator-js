@@ -7,7 +7,7 @@ export interface TextAnnotatorOptions<T extends unknown = TextAnnotation> {
 
   adapter?: FormatAdapter<TextAnnotation, T> | null;
 
-  renderer?: 'SPAN' | 'CANVAS' | 'CSS_HIGHLIGHT';
+  renderer?: RendererType;
 
   offsetReferenceSelector?: string;
 
@@ -18,3 +18,5 @@ export interface TextAnnotatorOptions<T extends unknown = TextAnnotation> {
   style?: HighlightStyleExpression;
     
 }
+
+export type RendererType = 'SPANS' | 'CANVAS' | 'CSS_HIGHLIGHTS';

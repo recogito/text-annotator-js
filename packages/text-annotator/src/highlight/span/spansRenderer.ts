@@ -53,7 +53,6 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
     // Remove annotations that are no longer visible
     const toRemove = currentRenderedIds.filter(id => !nextRendered.includes(id));
     toRemove.forEach(id => { 
-      console.log('removing', id);
       (currentRendered.get(id) || []).forEach(span => span.remove());
       currentRendered.delete(id);
     });
@@ -65,7 +64,6 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
     const rendered = highlights
       .filter(({ annotation }) => !currentRenderedIds.includes(annotation.id))
       .map(({ rects, annotation }) => {
-        // Create one SPAN per rect
         const spans = rects.map(rect => {
           const span = document.createElement('span');
           span.className = 'r6o-annotation';
