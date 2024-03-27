@@ -18,7 +18,9 @@ export interface RendererImplementation {
     
     style?: HighlightStyleExpression,
 
-    painter?: HighlightPainter
+    painter?: HighlightPainter,
+
+    force?: boolean
   
   ): void;
 
@@ -28,7 +30,7 @@ export interface Renderer {
 
   destroy(): void;
 
-  redraw(): void;
+  redraw(force?: boolean): void;
 
   setStyle(style?: HighlightStyleExpression): void;
 
@@ -75,7 +77,7 @@ export const createBaseRenderer = (
 
   container.addEventListener('pointermove', onPointerMove);
 
-  const redraw = () => {
+  const redraw = (forced: boolean = false) => {
     if (customPainter)
       customPainter.clear();
 
@@ -97,7 +99,7 @@ export const createBaseRenderer = (
       return { annotation, rects, state: { selected, hover: hovered, custom: {} }};
     })
 
-    renderer.redraw(highlights, bounds, currentStyle, customPainter);
+    renderer.redraw(highlights, bounds, currentStyle, customPainter, forced);
 
     setTimeout(() => onDraw(annotationsInView.map(({ annotation }) => annotation)), 1);
   }
@@ -125,7 +127,8 @@ export const createBaseRenderer = (
   const unsubscribeSelection = selection.subscribe(() => redraw());
 
   // Refresh on scroll
-  document.addEventListener('scroll', redraw, { capture: true, passive: true });
+  const onScroll = () => redraw();
+  document.addEventListener('scroll', onScroll, { capture: true, passive: true });
 
   // Refresh on resize
   const onResize = debounce(() => {
@@ -159,7 +162,7 @@ export const createBaseRenderer = (
 
     unsubscribeSelection();
 
-    document.removeEventListener('scroll', redraw);
+    document.removeEventListener('scroll', onScroll);
 
     window.removeEventListener('resize', onResize);
     resizeObserver.disconnect();
