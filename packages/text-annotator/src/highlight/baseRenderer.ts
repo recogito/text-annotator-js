@@ -1,25 +1,57 @@
 import type { DrawingStyle, Filter, ViewportState } from '@annotorious/core';
-import type { TextAnnotatorState } from '../../state';
-import type { TextAnnotation } from '../../model';
-import { debounce } from '../../utils';
-import { getViewportBounds, trackViewport } from '../viewport';
-import { createSpans } from './spans';
-import type { HighlightPainter } from '../HighlightPainter';
+import type { TextAnnotatorState } from '../state';
+import type { TextAnnotation } from '../model';
+import { debounce } from '../utils';
+import { ViewportBounds, getViewportBounds, trackViewport } from './viewport';
+import type { HighlightPainter } from './HighlightPainter';
+import type { Highlight } from './Highlight';
+import type { HighlightStyleExpression } from './HighlightStyle';
 
-export const createSpanHighlightRenderer = (
+export interface RendererImplementation {
+
+  destroy(): void;
+
+  redraw(
+
+    highlights:Highlight[], 
+
+    bounds: ViewportBounds, 
+    
+    style?: HighlightStyleExpression,
+
+    painter?: HighlightPainter
+  
+  ): void;
+
+}
+
+export interface Renderer {
+
+  destroy(): void;
+
+  redraw(): void;
+
+  setStyle(style?: HighlightStyleExpression): void;
+
+  setFilter(filter?: Filter): void;
+
+  setPainter(painter?: HighlightPainter): void;
+
+}
+
+export const createBaseRenderer = (
   container: HTMLElement, 
   state: TextAnnotatorState,
-  viewport: ViewportState
-) => {
+  viewport: ViewportState,
+  renderer: RendererImplementation
+): Renderer => {
   const { store, selection, hover } = state;
 
-  let customPainter: HighlightPainter;
-
-  let currentStyle: DrawingStyle | ((annotation: TextAnnotation, selected?: boolean) => DrawingStyle) | undefined;
+  let currentStyle: HighlightStyleExpression | undefined;
 
   let currentFilter: Filter | undefined;
 
-  const spans = createSpans(container);
+  let customPainter: HighlightPainter;
 
   const onDraw = trackViewport(viewport);
 
@@ -44,7 +76,10 @@ export const createSpanHighlightRenderer = (
 
   container.addEventListener('pointermove', onPointerMove);
 
-  const refresh = () => {
+  const redraw = () => {
+    if (customPainter)
+      customPainter.clear();
+
     const bounds = getViewportBounds(container);   
 
     const { minX, minY, maxX, maxY } = bounds;
@@ -53,40 +88,45 @@ export const createSpanHighlightRenderer = (
       ? store.getIntersecting(minX, minY, maxX, maxY).filter(({ annotation }) => currentFilter(annotation))
       : store.getIntersecting(minX, minY, maxX, maxY);
 
-    // Get current selection
     const selectedIds = selection.selected.map(({ id }) => id);
 
-    spans.refresh(annotationsInView, bounds, selectedIds, currentStyle);
+    const highlights: Highlight[] = annotationsInView.map(({ annotation, rects }) => {
+      const selected = selectedIds.includes(annotation.id);
+      const hovered = annotation.id === hover.current;
+
+      // TODO minor API changes coming up soon...
+      return { annotation, rects, state: { selected, hover: hovered, custom: {} }};
+    })
+
+    renderer.redraw(highlights, bounds, currentStyle, customPainter);
 
     setTimeout(() => onDraw(annotationsInView.map(({ annotation }) => annotation)), 1);
   }
 
-  const setPainter = (painter: HighlightPainter) => {
+  const setPainter = (painter: HighlightPainter) => { 
     customPainter = painter;
-    spans.setPainter(painter);
+    redraw();
   }
 
-  // Refresh when style changes
-  const setDrawingStyle = (style: DrawingStyle | ((a: TextAnnotation, selected?: boolean) => DrawingStyle)) => {
+  const setStyle = (style?: HighlightStyleExpression) => {
     currentStyle = style;
-    refresh();
+    redraw();
   }
 
-  // Refresh when filter changes
   const setFilter = (filter?: Filter) => {
     currentFilter = filter;
-    refresh();
+    redraw();
   } 
 
   // Refresh on store change
-  const onStoreChange = () => refresh();
+  const onStoreChange = () => redraw();
   store.observe(onStoreChange);
 
   // Refresh on selection change
-  const unsubscribeSelection = selection.subscribe(() => refresh());
+  const unsubscribeSelection = selection.subscribe(() => redraw());
 
   // Refresh on scroll
-  document.addEventListener('scroll', refresh, { capture: true, passive: true });
+  document.addEventListener('scroll', redraw, { capture: true, passive: true });
 
   // Refresh on resize
   const onResize = debounce(() => {
@@ -95,7 +135,7 @@ export const createSpanHighlightRenderer = (
     if (customPainter)
       customPainter.reset();
 
-    refresh();
+    redraw();
   });
 
   window.addEventListener('resize', onResize);
@@ -105,7 +145,7 @@ export const createSpanHighlightRenderer = (
 
   // This is an extra precaution. The position of the container
   // might shift (without resizing) due to layout changes higher-up
-  // in the DOM. (This happens in Recogito+ for example)
+  // in the DOM. (This happens in Recogito for example)
   // const config: MutationObserverInit = { attributes: true, childList: true, subtree: true };
 
   // const mutationObserver = new MutationObserver(refresh);
@@ -114,13 +154,13 @@ export const createSpanHighlightRenderer = (
   const destroy = () => {
     container.removeEventListener('pointermove', onPointerMove);
   
-    spans.destroy();
+    renderer.destroy();
   
     store.unobserve(onStoreChange);
 
     unsubscribeSelection();
 
-    document.removeEventListener('scroll', refresh);
+    document.removeEventListener('scroll', redraw);
 
     window.removeEventListener('resize', onResize);
     resizeObserver.disconnect();
@@ -130,8 +170,8 @@ export const createSpanHighlightRenderer = (
 
   return {
     destroy,
-    refresh,
-    setDrawingStyle,
+    redraw,
+    setStyle,
     setFilter,
     setPainter
   }

@@ -1,10 +1,12 @@
-import type { DrawingStyle } from '@annotorious/core';
-import type { TextAnnotation } from '../../model';
+import type { ViewportState } from '@annotorious/core';
+import type { Rect, TextAnnotatorState } from '../../state';
 import type { HighlightPainter } from '../HighlightPainter';
-import type { AnnotationRects, Rect } from 'src/state';
 import type { ViewportBounds } from '../viewport';
+import { createBaseRenderer, type RendererImplementation } from '../baseRenderer';
+import type { Highlight } from '../Highlight';
+import type { HighlightStyleExpression } from '../HighlightStyle';
 
-import './spans.css';
+import './spansRenderer.css';
 
 const computeZIndex = (rect: Rect, all: Rect[]): number => {
   const intersects = (a: Rect, b: Rect): boolean => (
@@ -19,7 +21,7 @@ const computeZIndex = (rect: Rect, all: Rect[]): number => {
   )).length;
 }
 
-export const createSpans = (container: HTMLElement) => {
+const createRenderer = (container: HTMLElement): RendererImplementation => {
 
   container.classList.add('r6o-annotatable');
 
@@ -33,11 +35,11 @@ export const createSpans = (container: HTMLElement) => {
   // Currently rendered SPANs for each annotation ID
   let currentRendered = new Map<string, HTMLSpanElement[]>();
 
-  const refresh = (
-    highlights: AnnotationRects[], 
+  const redraw = (
+    highlights: Highlight[], 
     viewportBounds: ViewportBounds,
-    selected: string[], 
-    currentStyle: DrawingStyle | ((annotation: TextAnnotation, selected: boolean) => DrawingStyle)
+    style?: HighlightStyleExpression,
+    painter?: HighlightPainter
   ) => {
     if (customPainter)
       customPainter.clear();
@@ -91,16 +93,19 @@ export const createSpans = (container: HTMLElement) => {
     rendered.forEach(({ id, spans }) => currentRendered.set(id, spans));
   }
 
-  const setPainter = (painter: HighlightPainter) => customPainter = painter;
-
   const destroy = () => {
     highlightLayer.remove();
   }
 
   return {
     destroy,
-    refresh,
-    setPainter
+    redraw
   }
 
 }
+
+export const createSpansRenderer = (
+  container: HTMLElement, 
+  state: TextAnnotatorState,
+  viewport: ViewportState
+) => createBaseRenderer(container, state, viewport, createRenderer(container));

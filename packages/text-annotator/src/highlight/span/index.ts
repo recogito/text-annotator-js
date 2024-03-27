@@ -1,1 +1,1 @@
-export * from './spanRenderer';
+export * from './spansRenderer';

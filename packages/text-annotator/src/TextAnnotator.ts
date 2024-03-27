@@ -1,6 +1,6 @@
 import { createAnonymousGuest, createLifecyleObserver, createBaseAnnotator, DrawingStyle, Filter, createUndoStack } from '@annotorious/core';
 import type { Annotator, User, PresenceProvider } from '@annotorious/core';
-import { createCanvasHighlightRenderer, createCSSHighlightRenderer, createSpanHighlightRenderer } from './highlight';
+import { createCanvasRenderer, createHighlightsRenderer, createSpansRenderer } from './highlight';
 import { createPresencePainter } from './presence';
 import { scrollIntoView } from './api';
 import { TextAnnotationStore, TextAnnotatorState, createTextAnnotatorState } from './state';
@@ -50,14 +50,12 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   if (useExperimentalCSSRenderer)
     console.log('Using experimental CSS Custom Highlight API renderer');
 
-  const highlightRenderer = useExperimentalCSSRenderer
-      ? createSpanHighlightRenderer(container, state, viewport)
+  const highlightRenderer = /* */createSpansRenderer(container, state, viewport)
       //  createCSSHighlightRenderer(container, state, viewport)
-      : createCanvasHighlightRenderer(container, state, viewport);
+      //: createCanvasHighlightRenderer(container, state, viewport);
      
-
   if (opts.style)
-    highlightRenderer.setDrawingStyle(opts.style);
+    highlightRenderer.setStyle(opts.style);
 
   const selectionHandler = SelectionHandler(container, state, opts.offsetReferenceSelector);
 
@@ -76,7 +74,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
     highlightRenderer.setFilter(filter);
 
   const setStyle = (drawingStyle: DrawingStyle | ((annotation: TextAnnotation) => DrawingStyle) | undefined) =>
-    highlightRenderer.setDrawingStyle(drawingStyle);
+    highlightRenderer.setStyle(drawingStyle);
 
   const setUser = (user: User) => {
     currentUser = user;
@@ -86,7 +84,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   const setPresenceProvider = (provider: PresenceProvider) => {
     if (provider) {
       highlightRenderer.setPainter(createPresencePainter(container, provider, opts.presence));
-      provider.on('selectionChange', () => highlightRenderer.refresh());
+      provider.on('selectionChange', () => highlightRenderer.redraw());
     }
   }
 
