@@ -18,6 +18,7 @@ export default defineConfig(({ command, mode }) => ({
     open: '/test/index.html'
   },
   build: {
+    minify: false,
     lib: {
       entry: './src/index.ts',
       name: 'ReactTextAnnotator',
@@ -26,17 +27,15 @@ export default defineConfig(({ command, mode }) => ({
     },
     rollupOptions: {
       external: [
-        ...Object.keys(packageJson.peerDependencies)
+        ...Object.keys(packageJson.peerDependencies),
+        "@annotorious/core",
+        "@annotorious/react",
+        "@recogito/text-annotator",
+        "@recogito/text-annotator-tei"
       ],
       output: {
         preserveModules: true,
-        assetFileNames: 'react-text-annotator.[ext]',
-        globals: {
-          '@annotorious/react': 'AnnotoriousReact',
-          'openseadragon': 'OpenSeadragon',
-          'react': 'React',
-          'react-dom': 'ReactDOM'
-        }
+        assetFileNames: 'react-text-annotator.[ext]'
       }
     },
     sourcemap: true
