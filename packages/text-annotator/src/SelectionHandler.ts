@@ -2,7 +2,14 @@ import { Origin, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotationTarget } from './model';
-import { debounce, splitAnnotatableRanges, rangeToSelector, trimRange, NOT_ANNOTATABLE_SELECTOR } from './utils';
+import {
+  debounce,
+  splitAnnotatableRanges,
+  rangeToSelector,
+  trimRange,
+  isWhitespaceOrEmpty,
+  NOT_ANNOTATABLE_SELECTOR
+} from './utils';
 
 export const SelectionHandler = (
   container: HTMLElement,
@@ -54,6 +61,8 @@ export const SelectionHandler = (
     if (sel.isCollapsed || !isLeftClick || !currentTarget) return;
 
     const selectionRange = sel.getRangeAt(0);
+    if (isWhitespaceOrEmpty(selectionRange)) return;
+
     const trimmedRange = trimRange(selectionRange.cloneRange())
     const annotatableRanges = splitAnnotatableRanges(trimmedRange);
 
