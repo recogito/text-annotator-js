@@ -1,4 +1,4 @@
-const NOT_ANNOTATABLE_CLASS = 'not-annotatable';
+export const NOT_ANNOTATABLE_CLASS = 'not-annotatable';
 
 export const NOT_ANNOTATABLE_SELECTOR = `.${NOT_ANNOTATABLE_CLASS}`;
 
