@@ -83,6 +83,10 @@ export const createRenderer = (): RendererImplementation => {
     currentRendered = nextRendered;
   }
 
+  const setVisible = (visible: boolean) => {
+    console.log('setVisible not implemented on CSS Custom Highlights renderer');
+  }
+
   const destroy = () => {
     // Clear all highlights from the Highlight Registry
     // @ts-ignore
@@ -94,6 +98,7 @@ export const createRenderer = (): RendererImplementation => {
 
   return {
     destroy,
+    setVisible,
     redraw
   }
 

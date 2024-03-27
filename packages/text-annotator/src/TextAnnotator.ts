@@ -104,9 +104,8 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
     }
   }
 
-  const setVisible = (visible: boolean) => {
-    // TODO
-  }
+  const setVisible = (visible: boolean) =>
+    highlightRenderer.setVisible(visible);
 
   const destroy = () => {
     highlightRenderer.destroy();

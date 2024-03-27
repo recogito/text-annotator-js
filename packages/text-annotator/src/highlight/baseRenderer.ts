@@ -24,6 +24,8 @@ export interface RendererImplementation {
   
   ): void;
 
+  setVisible(visible: boolean): void;
+
 }
 
 export interface Renderer {
@@ -37,6 +39,8 @@ export interface Renderer {
   setFilter(filter?: Filter): void;
 
   setPainter(painter?: HighlightPainter): void;
+
+  setVisible(visible: boolean): void;
 
 }
 
@@ -175,7 +179,8 @@ export const createBaseRenderer = (
     redraw,
     setStyle,
     setFilter,
-    setPainter
+    setPainter,
+    setVisible: renderer.setVisible
   }
 
 }
