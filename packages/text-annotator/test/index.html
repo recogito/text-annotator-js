@@ -283,9 +283,17 @@
       window.onload = async () => {
         var contentContainer = document.getElementById('content');
 
+        const style = ((annotation, state, z) => ({
+          fillOpacity: 0.2,
+          underlineColor: '#00ff00',
+          underlineOffset: z * 3.5,
+          underlineThickness: 2
+        }));
+
         var r = createTextAnnotator(contentContainer, {
           adapter: W3CTextFormat('https://www.gutenberg.org', contentContainer),
-          experimentalCSSRenderer: true
+          renderer: 'SPANS',
+          style
         });
 
         var annotations;
