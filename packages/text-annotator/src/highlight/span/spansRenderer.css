@@ -8,8 +8,8 @@
 }
 
 .r6o-annotatable .r6o-span-highlight-layer .r6o-annotation {
+  border-style: solid;
+  border-width: 0;
   position: absolute;
-  background-color: rgba(255, 255, 0, 0.25);
-  border-bottom: 2px solid rgba(0, 0, 0, 0.8);
   display: block;
 }

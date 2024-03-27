@@ -1,6 +1,5 @@
-import type { DrawingStyle, Filter, ViewportState } from '@annotorious/core';
+import type { Filter, ViewportState } from '@annotorious/core';
 import type { TextAnnotatorState } from '../state';
-import type { TextAnnotation } from '../model';
 import { debounce } from '../utils';
 import { ViewportBounds, getViewportBounds, trackViewport } from './viewport';
 import type { HighlightPainter } from './HighlightPainter';

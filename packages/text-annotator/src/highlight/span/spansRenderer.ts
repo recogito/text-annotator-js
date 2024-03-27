@@ -1,10 +1,11 @@
 import type { ViewportState } from '@annotorious/core';
+import { colord } from 'colord';
 import type { Rect, TextAnnotatorState } from '../../state';
-import type { HighlightPainter } from '../HighlightPainter';
+import { paint, type HighlightPainter } from '../HighlightPainter';
 import type { ViewportBounds } from '../viewport';
 import { createBaseRenderer, type RendererImplementation } from '../baseRenderer';
 import type { Highlight } from '../Highlight';
-import type { HighlightStyleExpression } from '../HighlightStyle';
+import { DEFAULT_STYLE, type HighlightStyleExpression } from '../HighlightStyle';
 
 import './spansRenderer.css';
 
@@ -38,7 +39,7 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
   const redraw = (
     highlights: Highlight[], 
     viewportBounds: ViewportBounds,
-    style?: HighlightStyleExpression,
+    currentStyle?: HighlightStyleExpression,
     painter?: HighlightPainter
   ) => {
     if (customPainter)
@@ -63,11 +64,11 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
     // Add annotations that are visible but not yet rendered
     const rendered = highlights
       .filter(({ annotation }) => !currentRenderedIds.includes(annotation.id))
-      .map(({ rects, annotation }) => {
-        const spans = rects.map(rect => {
+      .map(highlight => {
+        const spans = highlight.rects.map(rect => {
           const span = document.createElement('span');
           span.className = 'r6o-annotation';
-          span.dataset.annotation = annotation.id;
+          span.dataset.annotation = highlight.annotation.id;
   
           span.style.left = `${rect.x}px`;
           span.style.top = `${rect.y}px`;
@@ -75,17 +76,33 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
           span.style.height = `${rect.height}px`;
   
           const zIndex = computeZIndex(rect, allRects);
-  
-          span.style.paddingBottom = `${zIndex * 3.5}px`;
-  
-          // TODO style by annotation!
+
+          const style = paint(highlight, viewportBounds, currentStyle, painter, zIndex);
+
+          const backgroundColor = colord(style?.fill || DEFAULT_STYLE.fill)
+            .alpha(style?.fillOpacity === undefined ? DEFAULT_STYLE.fillOpacity : style.fillOpacity)
+            .toHex();
+
+          span.style.backgroundColor = backgroundColor;
+
+          if (style.underlineStyle)
+            span.style.borderStyle = style.underlineStyle;
+
+          if (style.underlineColor)
+            span.style.borderColor = style.underlineColor;
+
+          if (style.underlineThickness)
+            span.style.borderBottomWidth = `${style.underlineThickness}px`;
+
+          if (style.underlineOffset)
+            span.style.paddingBottom = `${style.underlineOffset}px`;
 
           highlightLayer.appendChild(span);
 
           return span;
         });
 
-        return { id: annotation.id, spans };
+        return { id: highlight.annotation.id, spans };
       });
 
     rendered.forEach(({ id, spans }) => currentRendered.set(id, spans));
