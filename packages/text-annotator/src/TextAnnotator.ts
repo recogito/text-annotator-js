@@ -1,6 +1,6 @@
-import { createAnonymousGuest, createLifecyleObserver, createBaseAnnotator, DrawingStyle, Filter, createUndoStack } from '@annotorious/core';
+import { createAnonymousGuest, createLifecyleObserver, createBaseAnnotator, Filter, createUndoStack } from '@annotorious/core';
 import type { Annotator, User, PresenceProvider } from '@annotorious/core';
-import { createCanvasRenderer, createHighlightsRenderer, createSpansRenderer } from './highlight';
+import { createCanvasRenderer, createHighlightsRenderer, createSpansRenderer, type HighlightStyleExpression } from './highlight';
 import { createPresencePainter } from './presence';
 import { scrollIntoView } from './api';
 import { TextAnnotationStore, TextAnnotatorState, createTextAnnotatorState } from './state';
@@ -9,6 +9,7 @@ import type { RendererType, TextAnnotatorOptions } from './TextAnnotatorOptions'
 import { SelectionHandler } from './SelectionHandler';
 
 import './TextAnnotator.css';
+
 
 const USE_DEFAULT_RENDERER: RendererType = 'SPANS';
 
@@ -81,8 +82,8 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   const setFilter = (filter?: Filter) =>
     highlightRenderer.setFilter(filter);
 
-  const setStyle = (drawingStyle: DrawingStyle | ((annotation: TextAnnotation) => DrawingStyle) | undefined) =>
-    highlightRenderer.setStyle(drawingStyle);
+  const setStyle = (style: HighlightStyleExpression | undefined) =>
+    highlightRenderer.setStyle(style);
 
   const setUser = (user: User) => {
     currentUser = user;
