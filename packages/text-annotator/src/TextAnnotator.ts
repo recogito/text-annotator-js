@@ -61,7 +61,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   if (!highlightRenderer)
     throw `Unknown renderer implementation: ${useRenderer}`;
 
-  console.log(`Using ${useRenderer} renderer`);
+  console.debug(`Using ${useRenderer} renderer`);
      
   if (opts.style)
     highlightRenderer.setStyle(opts.style);
