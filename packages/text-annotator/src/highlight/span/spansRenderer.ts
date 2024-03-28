@@ -42,11 +42,11 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
     viewportBounds: ViewportBounds,
     currentStyle?: HighlightStyleExpression,
     painter?: HighlightPainter,
-    force?: boolean
+    lazy?: boolean
   ) => {
     // Only redraw if annotations or annotation states changed
     const noChanges = dequal(currentRendered, highlights);
-    if (noChanges && !force) return;
+    if (noChanges && lazy) return;
 
     highlightLayer.innerHTML = '';
 

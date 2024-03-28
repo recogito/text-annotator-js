@@ -92,7 +92,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   const setPresenceProvider = (provider: PresenceProvider) => {
     if (provider) {
       highlightRenderer.setPainter(createPresencePainter(container, provider, opts.presence));
-      provider.on('selectionChange', () => highlightRenderer.redraw(true));
+      provider.on('selectionChange', () => highlightRenderer.redraw());
     }
   }
 

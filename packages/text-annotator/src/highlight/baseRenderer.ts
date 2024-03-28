@@ -20,7 +20,7 @@ export interface RendererImplementation {
 
     painter?: HighlightPainter,
 
-    force?: boolean
+    lazy?: boolean
   
   ): void;
 
@@ -81,7 +81,7 @@ export const createBaseRenderer = (
 
   container.addEventListener('pointermove', onPointerMove);
 
-  const redraw = (forced: boolean = false) => {
+  const redraw = (lazy: boolean = true) => {
     if (customPainter)
       customPainter.clear();
 
@@ -103,7 +103,7 @@ export const createBaseRenderer = (
       return { annotation, rects, state: { selected, hover: hovered, custom: {} }};
     })
 
-    renderer.redraw(highlights, bounds, currentStyle, customPainter, forced);
+    renderer.redraw(highlights, bounds, currentStyle, customPainter, lazy);
 
     setTimeout(() => onDraw(annotationsInView.map(({ annotation }) => annotation)), 1);
   }
@@ -131,7 +131,7 @@ export const createBaseRenderer = (
   const unsubscribeSelection = selection.subscribe(() => redraw());
 
   // Refresh on scroll
-  const onScroll = () => redraw();
+  const onScroll = () => redraw(true);
   document.addEventListener('scroll', onScroll, { capture: true, passive: true });
 
   // Refresh on resize
