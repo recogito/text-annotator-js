@@ -82,8 +82,8 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   const setFilter = (filter?: Filter) =>
     highlightRenderer.setFilter(filter);
 
-  const setStyle = (drawingStyle: HighlightStyleExpression | undefined) =>
-    highlightRenderer.setStyle(drawingStyle);
+  const setStyle = (style: HighlightStyleExpression | undefined) =>
+    highlightRenderer.setStyle(style);
 
   const setUser = (user: User) => {
     currentUser = user;
