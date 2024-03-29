@@ -14,7 +14,10 @@ const iterateNotAnnotatableElements = function*(range: Range): Generator<HTMLEle
     range.commonAncestorContainer,
     NodeFilter.SHOW_ELEMENT,
     (node) =>
-      node instanceof HTMLElement && node.classList.contains(NOT_ANNOTATABLE_CLASS) && range.intersectsNode(node)
+      node instanceof HTMLElement // Only elements that can have the class applied
+      && node.classList.contains(NOT_ANNOTATABLE_CLASS) // Only elements that are not annotatable
+      && !node.parentElement.closest(NOT_ANNOTATABLE_SELECTOR) // Only elements that are not descendants of a not annotatable element
+      && range.intersectsNode(node) // Only elements that are within the range
         ? NodeFilter.FILTER_ACCEPT
         : NodeFilter.FILTER_SKIP
   );
