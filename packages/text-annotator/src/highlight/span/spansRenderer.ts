@@ -44,6 +44,8 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
     painter?: HighlightPainter,
     lazy?: boolean
   ) => {
+    console.log('redraw, lazy =', lazy);
+    
     // Only redraw if annotations or annotation states changed
     const noChanges = dequal(currentRendered, highlights);
     if (noChanges && lazy) return;

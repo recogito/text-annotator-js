@@ -81,7 +81,7 @@ export const createBaseRenderer = (
 
   container.addEventListener('pointermove', onPointerMove);
 
-  const redraw = (lazy: boolean = true) => {
+  const redraw = (lazy: boolean = false) => {
     if (customPainter)
       customPainter.clear();
 
@@ -120,7 +120,7 @@ export const createBaseRenderer = (
 
   const setFilter = (filter?: Filter) => {
     currentFilter = filter;
-    redraw();
+    redraw(false);
   } 
 
   // Refresh on store change
