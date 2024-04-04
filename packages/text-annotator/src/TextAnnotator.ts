@@ -1,25 +1,30 @@
-import { createAnonymousGuest, createLifecyleObserver, createBaseAnnotator, Filter, createUndoStack } from '@annotorious/core';
-import type { Annotator, User, PresenceProvider } from '@annotorious/core';
+import { createAnonymousGuest, createLifecyleObserver, createBaseAnnotator, createUndoStack } from '@annotorious/core';
+import type { Annotator, Filter, User, PresenceProvider } from '@annotorious/core';
 import { createCanvasRenderer, createHighlightsRenderer, createSpansRenderer, type HighlightStyleExpression } from './highlight';
 import { createPresencePainter } from './presence';
 import { scrollIntoView } from './api';
 import { TextAnnotationStore, TextAnnotatorState, createTextAnnotatorState } from './state';
+import { annotateRange as _annotateRange } from './utils';
 import type { TextAnnotation } from './model';
 import type { RendererType, TextAnnotatorOptions } from './TextAnnotatorOptions';
 import { SelectionHandler } from './SelectionHandler';
 
 import './TextAnnotator.css';
 
-
 const USE_DEFAULT_RENDERER: RendererType = 'SPANS';
 
 export interface TextAnnotator<E extends unknown = TextAnnotation> extends Annotator<TextAnnotation, E> {
 
+  /** Programmatically annotate the given DOM Range **/
+  annotateRange(range: Range): TextAnnotation | undefined;
+
+  /** The annotated HTML container element **/
   element: HTMLElement;
 
-  // Returns true if successful (or false if the annotation is not currently rendered)
+  /** Scrolls to the given annotation. Returns false if it isn't currently rendered **/
   scrollIntoView(annotation: TextAnnotation): boolean;
 
+  /** Annotator state **/
   state: TextAnnotatorState;
 
 }
@@ -77,6 +82,9 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   // Most of the external API functions are covered in the base annotator
   const base = createBaseAnnotator<TextAnnotation, E>(state, undoStack, opts.adapter);
 
+  const annotateRange = (range: Range) =>
+    _annotateRange(range, currentUser, container, store, opts.offsetReferenceSelector);
+
   const getUser = () => currentUser;
 
   const setFilter = (filter?: Filter) =>
@@ -118,6 +126,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
 
   return {
     ...base,
+    annotateRange,
     destroy,
     element: container,
     getUser,

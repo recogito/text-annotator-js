@@ -1,3 +1,4 @@
+export * from './annotateRange';
 export * from './debounce';
 export * from './getAnnotatableFragment';
 export * from './getClientRectsPonyfill';
