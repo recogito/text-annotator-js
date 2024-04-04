@@ -9,6 +9,7 @@ export * from './rangeToSelector';
 export * from './reviveAnnotation';
 export * from './reviveSelector';
 export * from './reviveTarget';
+export * from './searchInContainer';
 export * from './splitAnnotatableRanges';
 export * from './trimRange';
 

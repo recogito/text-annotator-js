@@ -4,7 +4,7 @@ import { createCanvasRenderer, createHighlightsRenderer, createSpansRenderer, ty
 import { createPresencePainter } from './presence';
 import { scrollIntoView } from './api';
 import { TextAnnotationStore, TextAnnotatorState, createTextAnnotatorState } from './state';
-import { annotateRange as _annotateRange } from './utils';
+import { annotateRange as _annotateRange, searchInContainer, annotateMatch } from './utils';
 import type { TextAnnotation } from './model';
 import type { RendererType, TextAnnotatorOptions } from './TextAnnotatorOptions';
 import { SelectionHandler } from './SelectionHandler';
@@ -17,6 +17,8 @@ export interface TextAnnotator<E extends unknown = TextAnnotation> extends Annot
 
   /** Programmatically annotate the given DOM Range **/
   annotateRange(range: Range): TextAnnotation | undefined;
+
+  search(str: string): void;
 
   /** The annotated HTML container element **/
   element: HTMLElement;
@@ -85,6 +87,11 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   const annotateRange = (range: Range) =>
     _annotateRange(range, currentUser, container, store, opts.offsetReferenceSelector);
 
+  const search = (str: string) => {
+    const selectors = searchInContainer(str, container, opts.offsetReferenceSelector);
+    selectors.forEach(s => annotateMatch(s, currentUser, store));
+  }
+    
   const getUser = () => currentUser;
 
   const setFilter = (filter?: Filter) =>
@@ -130,6 +137,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
     destroy,
     element: container,
     getUser,
+    search,
     setFilter,
     setStyle,
     setUser,
