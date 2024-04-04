@@ -2,8 +2,8 @@ import { v4 as uuidv4 } from 'uuid';
 import type { User } from '@annotorious/core';
 import type { TextSelector } from '../model';
 import { rangeToSelector } from './rangeToSelector';
-import { reviveSelector } from "./reviveSelector";
 import type { TextAnnotationStore } from 'src/state';
+import { splitAnnotatableRanges } from './splitAnnotatableRanges';
 
 interface Match {
 
@@ -13,20 +13,35 @@ interface Match {
 
 }
 
+const getTextContent = (container: HTMLElement) => {
+  const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+
+  let text = '';
+
+  while (walker.nextNode()) {
+    const node = walker.currentNode;
+    text += node.textContent;
+  }
+
+  return text;
+}
+
 export const annotateMatch = (
-  selector: TextSelector, 
+  selector: TextSelector[], 
   currentUser: User,
   store: TextAnnotationStore
 ) => {
 
   const id = uuidv4();
 
+  console.log('annotating', selector);
+
   const annotation = {
     id,
     bodies: [],
     target: {
       annotation: id,
-      selector: [selector],
+      selector: selector,
       creator: currentUser,
       created: new Date()
     }
@@ -39,32 +54,18 @@ export const searchInContainer = (
   str: string, 
   container: HTMLElement,
   offsetReferenceSelector?: string
-): TextSelector[] => {
-  const text = container.innerText;
+): TextSelector[][] => {
+  
+  const selectors: TextSelector[][] = [];
 
-  const matches: Match[] = [];
-
-  let index = 0;
-
-  let startIndex = 0;
-
-  while ((index = text.indexOf(str, startIndex)) !== -1) {
-    let endIndex = index + str.length;
-
-    matches.push({ start: index, end: endIndex });
-
-    startIndex = endIndex;
+  // @ts-ignore window.find is not official standard
+  while (window.find(str) === true) {
+    const sel = document.getSelection();
+    const selectionRange = sel.getRangeAt(0);
+    const annotatableRanges = splitAnnotatableRanges(selectionRange);
+    
+    selectors.push(annotatableRanges.map(r => rangeToSelector(r, container, offsetReferenceSelector)));
   }
 
-  const selectors = matches.map(m => reviveSelector({
-    quote: str,
-    start: m.start,
-    end: m.end,
-    range: undefined
-  }, container));
-
-  // Re-align the ranges with the offset reference, in case there is one!
-  return offsetReferenceSelector
-    ? selectors.map(s => rangeToSelector(s.range, container, offsetReferenceSelector))
-    : selectors;
+  return selectors;
 }
