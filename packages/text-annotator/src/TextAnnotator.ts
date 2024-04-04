@@ -17,6 +17,8 @@ export interface TextAnnotator<E extends unknown = TextAnnotation> extends Annot
 
   element: HTMLElement;
 
+  setStyle(style: HighlightStyleExpression | undefined): void;
+
   // Returns true if successful (or false if the annotation is not currently rendered)
   scrollIntoView(annotation: TextAnnotation): boolean;
 
