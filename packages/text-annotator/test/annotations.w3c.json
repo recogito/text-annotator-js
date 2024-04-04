@@ -82,5 +82,65 @@
         }
       ]
     }
+  },
+  {
+    "id": "d254db75-0950-4cd0-89c9-6a41af09bd06",
+    "@context": "http://www.w3.org/ns/anno.jsonld",
+    "type": "Annotation",
+    "body": [],
+    "creator": {
+      "isGuest": true,
+      "id": "htjjQ0q46ZxyQajyl__F"
+    },
+    "created": "2024-03-26T12:55:49.144Z",
+    "target": [
+      {
+        "annotation": "d254db75-0950-4cd0-89c9-6a41af09bd06",
+        "source": "https://www.gutenberg.org",
+        "selector": [
+          {
+            "type": "TextQuoteSelector",
+            "exact": "t as years went by, the",
+            "prefix": "ry him. Bu",
+            "suffix": "re came a "
+          },
+          {
+            "type": "TextPositionSelector",
+            "start": 988,
+            "end": 1011
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "7bae8714-63d9-4e31-9458-ca3aa465bd1b",
+    "@context": "http://www.w3.org/ns/anno.jsonld",
+    "type": "Annotation",
+    "body": [],
+    "creator": {
+      "isGuest": true,
+      "id": "htjjQ0q46ZxyQajyl__F"
+    },
+    "created": "2024-03-26T12:56:39.961Z",
+    "target": [
+      {
+        "annotation": "7bae8714-63d9-4e31-9458-ca3aa465bd1b",
+        "source": "https://www.gutenberg.org",
+        "selector": [
+          {
+            "type": "TextQuoteSelector",
+            "exact": "d to marry him. But as years we",
+            "prefix": " and wante",
+            "suffix": "nt by, the"
+          },
+          {
+            "type": "TextPositionSelector",
+            "start": 970,
+            "end": 1001
+          }
+        ]
+      }
+    ]
   }
 ]

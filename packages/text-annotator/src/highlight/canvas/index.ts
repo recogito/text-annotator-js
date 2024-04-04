@@ -1,1 +1,1 @@
-export * from './highlightRenderer';
+export * from './canvasRenderer';

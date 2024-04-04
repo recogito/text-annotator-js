@@ -15,9 +15,7 @@ export interface TextAnnotationStore extends Omit<Store<TextAnnotation>, 'addAnn
 
   getAt(x: number, y: number): TextAnnotation | undefined;
 
-  getIntersecting(minX: number, minY: number, maxX: number, maxY: number): TextAnnotation[];
-
-  getIntersectingRects(minX: number, minY: number, maxX: number, maxY: number): AnnotationRects[];
+  getIntersecting(minX: number, minY: number, maxX: number, maxY: number): AnnotationRects[];
 
   recalculatePositions(): void;
 
