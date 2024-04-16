@@ -51,11 +51,15 @@ export const SelectionHandler = (
   container.addEventListener('selectstart', onSelectStart);
 
   const onSelectionChange = debounce( (evt: PointerEvent) => {
+    console.log('sel changed');
+
     const sel = document.getSelection();
 
     // Chrome/iOS does not reliably fire the 'selectstart' event!
     if (evt.timeStamp - (lastPointerDown?.timeStamp || evt.timeStamp) < 1000 && !currentTarget)
       onSelectStart(lastPointerDown);
+
+    console.log('sel', sel.isCollapsed);
 
     if (sel.isCollapsed || !isLeftClick || !currentTarget) return;
 
@@ -66,8 +70,13 @@ export const SelectionHandler = (
     const hasChanged =
       annotatableRanges.length !== currentTarget.selector.length ||
       annotatableRanges.some((r, i) => r.toString() !== currentTarget.selector[i]?.quote);
+
+    console.log('haschanged', hasChanged);
       
     if (!hasChanged) return;
+
+    console.log('changing target');
+
 
     currentTarget = {
       ...currentTarget,
