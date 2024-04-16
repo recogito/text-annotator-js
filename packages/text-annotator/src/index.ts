@@ -31,14 +31,10 @@ export type {
 
 import { 
   createBody as _createBody,
+  Origin as _Origin,
   PointerSelectAction as _PointerSelectAction
 } from '@annotorious/core'; 
 
 export const PointerSelectAction = _PointerSelectAction;
 export const createBody = _createBody;
-
-import {
-  Origin as _Origin,
-} from '@annotorious/core';
-
-export { _Origin as Origin };
+export const Origin = _Origin;
