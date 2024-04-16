@@ -27,9 +27,9 @@
   },
   "devDependencies": {
     "CETEIcean": "^1.9.2",
-    "typescript": "^5.4.3",
-    "vite": "^5.2.7",
-    "vite-plugin-dts": "^3.8.1"
+    "typescript": "^5.4.5",
+    "vite": "^5.2.9",
+    "vite-plugin-dts": "^3.8.3"
   },
   "peerDependencies": {
     "@annotorious/core": "^3.0.0-rc.22",

@@ -30,11 +30,11 @@
     "@types/rbush": "^3.0.3",
     "@types/uuid": "^9.0.8",
     "jsdom": "^24.0.0",
-    "svelte": "^4.2.12",
-    "typescript": "^5.4.3",
-    "vite": "^5.2.7",
-    "vite-plugin-dts": "^3.8.1",
-    "vitest": "^1.4.0"
+    "svelte": "^4.2.14",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.9",
+    "vite-plugin-dts": "^3.8.3",
+    "vitest": "^1.5.0"
   },
   "dependencies": {
     "@annotorious/core": "^3.0.0-rc.22",
