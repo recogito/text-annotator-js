@@ -42,5 +42,7 @@ export type {
 
 export type { 
   TextAnnotation,
-  TextAnnotator as RecogitoTextAnnotator
+  TextAnnotationTarget,
+  TextAnnotator as RecogitoTextAnnotator,
+  TextSelector
 } from '@recogito/text-annotator';
