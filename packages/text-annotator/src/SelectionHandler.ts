@@ -60,6 +60,7 @@ export const SelectionHandler = (
     const hasChanged =
       annotatableRanges.length !== currentTarget.selector.length ||
       annotatableRanges.some((r, i) => r.toString() !== currentTarget.selector[i]?.quote);
+      
     if (!hasChanged) return;
 
     currentTarget = {

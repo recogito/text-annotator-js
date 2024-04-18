@@ -5,7 +5,7 @@ import { createPresencePainter } from './presence';
 import { scrollIntoView } from './api';
 import { TextAnnotationStore, TextAnnotatorState, createTextAnnotatorState } from './state';
 import type { TextAnnotation } from './model';
-import type { RendererType, TextAnnotatorOptions } from './TextAnnotatorOptions';
+import { fillDefaults, type RendererType, type TextAnnotatorOptions } from './TextAnnotatorOptions';
 import { SelectionHandler } from './SelectionHandler';
 
 import './TextAnnotator.css';
@@ -28,10 +28,14 @@ export interface TextAnnotator<E extends unknown = TextAnnotation> extends Annot
 
 export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   container: HTMLElement, 
-  opts: TextAnnotatorOptions<E> = {}
+  options: TextAnnotatorOptions<E> = {}
 ): TextAnnotator<E> => {
   // Prevent mobile browsers from triggering word selection on single click.
   container.addEventListener('click', evt => !(evt.target as Element).closest('a') && evt.preventDefault());
+
+  const opts = fillDefaults<E>(options, {
+    annotationEnabled: true
+  });
 
   const state: TextAnnotatorState = createTextAnnotatorState(container, opts.pointerAction);
 
@@ -66,9 +70,10 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   if (opts.style)
     highlightRenderer.setStyle(opts.style);
 
-  const selectionHandler = SelectionHandler(container, state, opts.offsetReferenceSelector);
+  const selectionHandler = opts.annotationEnabled &&
+    SelectionHandler(container, state, opts.offsetReferenceSelector);
 
-  selectionHandler.setUser(currentUser);
+  selectionHandler?.setUser(currentUser);
 
   /*************************/
   /*      External API     */
@@ -87,7 +92,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
 
   const setUser = (user: User) => {
     currentUser = user;
-    selectionHandler.setUser(user);
+    selectionHandler?.setUser(user);
   }
 
   const setPresenceProvider = (provider: PresenceProvider) => {
@@ -110,7 +115,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
 
   const destroy = () => {
     highlightRenderer.destroy();
-    selectionHandler.destroy();
+    selectionHandler?.destroy();
 
     // Other cleanup actions
     undoStack.destroy();
