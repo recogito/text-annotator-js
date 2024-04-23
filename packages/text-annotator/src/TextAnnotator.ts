@@ -10,7 +10,6 @@ import { SelectionHandler } from './SelectionHandler';
 
 import './TextAnnotator.css';
 
-
 const USE_DEFAULT_RENDERER: RendererType = 'SPANS';
 
 export interface TextAnnotator<E extends unknown = TextAnnotation> extends Annotator<TextAnnotation, E> {
@@ -70,10 +69,8 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   if (opts.style)
     highlightRenderer.setStyle(opts.style);
 
-  const selectionHandler = opts.annotationEnabled &&
-    SelectionHandler(container, state, opts.offsetReferenceSelector);
-
-  selectionHandler?.setUser(currentUser);
+  const selectionHandler = SelectionHandler(container, state, opts.annotationEnabled, opts.offsetReferenceSelector);
+  selectionHandler.setUser(currentUser);
 
   /*************************/
   /*      External API     */
@@ -92,7 +89,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
 
   const setUser = (user: User) => {
     currentUser = user;
-    selectionHandler?.setUser(user);
+    selectionHandler.setUser(user);
   }
 
   const setPresenceProvider = (provider: PresenceProvider) => {
@@ -115,7 +112,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
 
   const destroy = () => {
     highlightRenderer.destroy();
-    selectionHandler?.destroy();
+    selectionHandler.destroy();
 
     // Other cleanup actions
     undoStack.destroy();
