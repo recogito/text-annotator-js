@@ -77,19 +77,28 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
       ctx.fillStyle = style.fill;
       ctx.globalAlpha = style.fillOpacity || 1;
 
-      offsetRects.forEach(({ x, y, width, height }) => ctx.fillRect(x, y - 2.5, width, height + 5));
+
+      /**
+       * The default browser's selection highlight is a bit taller than the text itself.
+       * To match it, we need to draw the highlight a bit taller as well.
+       */
+      const selectionHighlightCompensation = 5;
+      offsetRects.forEach(({ x, y, width, height }) =>
+        ctx.fillRect(
+          x,
+          y - selectionHighlightCompensation / 2,
+          width,
+          height + selectionHighlightCompensation
+        )
+      );
 
       if (style.underlineColor) {
         ctx.globalAlpha = 1;
         ctx.strokeStyle = style.underlineColor;
         ctx.lineWidth = style.underlineThickness ?? 1;
 
-        /**
-         * The underline should be drawn below the text,
-         * so it should be shifted 4px down by default
-         */
-        const defaultUnderlineOffset = 4;
-        const underlineOffset = defaultUnderlineOffset + (style.underlineOffset ?? 0);
+        // Place the underline below the highlighted text + an optional offset
+        const underlineOffset = selectionHighlightCompensation / 2 + (style.underlineOffset ?? 0);
 
         offsetRects.forEach(({ x, y, width, height }) => {
           ctx.beginPath();
