@@ -53,47 +53,64 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
       painter.clear();
 
     const { top, left } = viewportBounds;
-    
+
     highlights.forEach(h => {
-      const base: HighlightStyle = currentStyle 
-        ? typeof currentStyle === 'function' 
-          ? currentStyle(h.annotation, h.state) 
-          : currentStyle 
-        : h.state?.selected 
-          ? DEFAULT_SELECTED_STYLE 
+      const base: HighlightStyle = currentStyle
+        ? typeof currentStyle === 'function'
+          ? currentStyle(h.annotation, h.state)
+          : currentStyle
+        : h.state?.selected
+          ? DEFAULT_SELECTED_STYLE
           : DEFAULT_STYLE;
 
       // Trigger the custom painter (if any) as a side-effect
       const style = painter ? painter.paint(h, viewportBounds) || base : base;
 
       // Offset annotation rects by current scroll position
-      const offsetRects = h.rects.map(({ x, y, width, height }) => ({ 
-        x: x + left, 
-        y: y + top, 
-        width, 
-        height 
+      const offsetRects = h.rects.map(({ x, y, width, height }) => ({
+        x: x + left,
+        y: y + top,
+        width,
+        height
       }));
 
       ctx.fillStyle = style.fill;
       ctx.globalAlpha = style.fillOpacity || 1;
-      
-      offsetRects.forEach(({ x, y, width, height }) => ctx.fillRect(x, y - 2.5, width, height + 5));
+
+
+      /**
+       * The default browser's selection highlight is a bit taller than the text itself.
+       * To match it, we need to draw the highlight a bit taller as well.
+       */
+      const selectionHighlightCompensation = 5;
+      offsetRects.forEach(({ x, y, width, height }) =>
+        ctx.fillRect(
+          x,
+          y - selectionHighlightCompensation / 2,
+          width,
+          height + selectionHighlightCompensation
+        )
+      );
 
       if (style.underlineColor) {
         ctx.globalAlpha = 1;
         ctx.strokeStyle = style.underlineColor;
+        ctx.lineWidth = style.underlineThickness ?? 1;
+
+        // Place the underline below the highlighted text + an optional offset
+        const underlineOffset = selectionHighlightCompensation / 2 + (style.underlineOffset ?? 0);
 
         offsetRects.forEach(({ x, y, width, height }) => {
           ctx.beginPath();
-          ctx.moveTo(x, y + height + 4);
-          ctx.lineTo(x + width, y + height + 4);
-          
+          ctx.moveTo(x, y + height + underlineOffset);
+          ctx.lineTo(x + width, y + height + underlineOffset);
+
           // Draw the Path
           ctx.stroke();
         });
       }
     });
-  });  
+  });
 
   const onResize = debounce(() => {
     resetCanvas(canvas);
