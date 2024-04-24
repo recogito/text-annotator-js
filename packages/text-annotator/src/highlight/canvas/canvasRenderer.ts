@@ -53,47 +53,55 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
       painter.clear();
 
     const { top, left } = viewportBounds;
-    
+
     highlights.forEach(h => {
-      const base: HighlightStyle = currentStyle 
-        ? typeof currentStyle === 'function' 
-          ? currentStyle(h.annotation, h.state) 
-          : currentStyle 
-        : h.state?.selected 
-          ? DEFAULT_SELECTED_STYLE 
+      const base: HighlightStyle = currentStyle
+        ? typeof currentStyle === 'function'
+          ? currentStyle(h.annotation, h.state)
+          : currentStyle
+        : h.state?.selected
+          ? DEFAULT_SELECTED_STYLE
           : DEFAULT_STYLE;
 
       // Trigger the custom painter (if any) as a side-effect
       const style = painter ? painter.paint(h, viewportBounds) || base : base;
 
       // Offset annotation rects by current scroll position
-      const offsetRects = h.rects.map(({ x, y, width, height }) => ({ 
-        x: x + left, 
-        y: y + top, 
-        width, 
-        height 
+      const offsetRects = h.rects.map(({ x, y, width, height }) => ({
+        x: x + left,
+        y: y + top,
+        width,
+        height
       }));
 
       ctx.fillStyle = style.fill;
       ctx.globalAlpha = style.fillOpacity || 1;
-      
+
       offsetRects.forEach(({ x, y, width, height }) => ctx.fillRect(x, y - 2.5, width, height + 5));
 
       if (style.underlineColor) {
         ctx.globalAlpha = 1;
         ctx.strokeStyle = style.underlineColor;
+        ctx.lineWidth = style.underlineThickness ?? 1;
+
+        /**
+         * The underline should be drawn below the text,
+         * so it should be shifted 4px down by default
+         */
+        const defaultUnderlineOffset = 4;
+        const underlineOffset = defaultUnderlineOffset + (style.underlineOffset ?? 0);
 
         offsetRects.forEach(({ x, y, width, height }) => {
           ctx.beginPath();
-          ctx.moveTo(x, y + height + 4);
-          ctx.lineTo(x + width, y + height + 4);
-          
+          ctx.moveTo(x, y + height + underlineOffset);
+          ctx.lineTo(x + width, y + height + underlineOffset);
+
           // Draw the Path
           ctx.stroke();
         });
       }
     });
-  });  
+  });
 
   const onResize = debounce(() => {
     resetCanvas(canvas);
