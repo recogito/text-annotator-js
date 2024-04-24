@@ -36,8 +36,8 @@ export const createBody = _createBody;
 export const Origin = _Origin;
 
 // Essential re-exports from @annotorious/react
-export type {
-  AnnotoriousPlugin
+export {
+ AnnotoriousPlugin
 } from '@annotorious/react';
 
 export type { 
