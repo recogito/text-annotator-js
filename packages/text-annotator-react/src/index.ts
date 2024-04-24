@@ -43,6 +43,12 @@ export {
 export type { 
   TextAnnotation,
   TextAnnotationTarget,
+  TextSelector,
+  W3CTextAnnotation,
+  W3CTextAnnotationTarget,
+  W3CTextSelector,
+  W3CAnnotationStylesheet,
+  HighlightStyle,
   TextAnnotator as RecogitoTextAnnotator,
-  TextSelector
+  TextAnnotationStore
 } from '@recogito/text-annotator';
