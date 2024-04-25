@@ -1,6 +1,7 @@
 export * from './tei';
 export * from './TextAnnotator';
 export * from './TextAnnotatorPopup';
+export * from './TextAnnotatorPlugin';
 
 // Essential re-exports from @annotorious/core
 export type {
@@ -25,24 +26,26 @@ export type {
   W3CAnnotationTarget
 } from '@annotorious/core';
 
-import { 
-  createBody as _createBody,
-  Origin as _Origin,
-  PointerSelectAction as _PointerSelectAction
-} from '@annotorious/core'; 
-
-export const PointerSelectAction = _PointerSelectAction;
-export const createBody = _createBody;
-export const Origin = _Origin;
+export {
+  createBody,
+  Origin,
+  PointerSelectAction
+} from '@annotorious/core';
 
 // Essential re-exports from @annotorious/react
-export type {
-  AnnotoriousPlugin
+export {
+ AnnotoriousPlugin
 } from '@annotorious/react';
 
 export type { 
   TextAnnotation,
   TextAnnotationTarget,
+  TextSelector,
+  W3CTextAnnotation,
+  W3CTextAnnotationTarget,
+  W3CTextSelector,
+  W3CAnnotationStylesheet,
+  HighlightStyle,
   TextAnnotator as RecogitoTextAnnotator,
-  TextSelector
+  TextAnnotationStore
 } from '@recogito/text-annotator';

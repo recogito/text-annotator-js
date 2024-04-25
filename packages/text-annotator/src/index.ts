@@ -29,12 +29,8 @@ export type {
   W3CAnnotationTarget
 } from '@annotorious/core';
 
-import { 
-  createBody as _createBody,
-  Origin as _Origin,
-  PointerSelectAction as _PointerSelectAction
-} from '@annotorious/core'; 
-
-export const PointerSelectAction = _PointerSelectAction;
-export const createBody = _createBody;
-export const Origin = _Origin;
+export {
+  createBody,
+  Origin,
+  PointerSelectAction
+} from '@annotorious/core';
