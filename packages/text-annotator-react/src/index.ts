@@ -1,6 +1,7 @@
 export * from './tei';
 export * from './TextAnnotator';
 export * from './TextAnnotatorPopup';
+export * from './TextAnnotatorPlugin';
 
 // Essential re-exports from @annotorious/core
 export type {
