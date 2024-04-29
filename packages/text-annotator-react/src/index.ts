@@ -47,7 +47,6 @@ export type {
   W3CTextAnnotationTarget,
   W3CTextSelector,
   W3CAnnotationStylesheet,
-  HighlightStyle,
   TextAnnotator as RecogitoTextAnnotator,
   TextAnnotationStore
 } from '@recogito/text-annotator';
