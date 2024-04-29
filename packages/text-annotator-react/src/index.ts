@@ -38,6 +38,8 @@ export {
 } from '@annotorious/react';
 
 export type { 
+  HighlightStyle,
+  HighlightStyleExpression,
   TextAnnotation,
   TextAnnotationTarget,
   TextSelector,
