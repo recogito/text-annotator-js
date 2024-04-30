@@ -136,6 +136,7 @@ export const SelectionHandler = (
   const destroy = () => {
     container.removeEventListener('selectstart', onSelectStart);
     document.removeEventListener('selectionchange', onSelectionChange);
+    
     container.removeEventListener('pointerdown', onPointerDown);
     document.removeEventListener('pointerup', onPointerUp);
   }
