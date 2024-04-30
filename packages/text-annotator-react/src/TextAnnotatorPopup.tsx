@@ -3,23 +3,23 @@ import { useSelection } from '@annotorious/react';
 import type { TextAnnotation, TextSelector } from '@recogito/text-annotator';
 import { getClosestRect, toClientRects } from './utils';
 import {
+  autoPlacement,
   autoUpdate,
-  flip,
   inline,
   offset,
   shift,
   useFloating
 } from '@floating-ui/react';
 
-export interface TextAnnotatorPopupProps {
-
-  selected: { annotation: TextAnnotation, editable?: boolean }[];
-
-}
-
 interface TextAnnotationPopupProps {
 
   popup(props: TextAnnotatorPopupProps): ReactNode;
+
+}
+
+export interface TextAnnotatorPopupProps {
+
+  selected: { annotation: TextAnnotation, editable?: boolean }[];
 
 }
 
@@ -29,13 +29,17 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
   
   const [mousePos, setMousePos] = useState<{ x: number, y: number } | undefined>();
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(selected?.length > 0);
 
-  const { refs, floatingStyles } = useFloating({
-    placement: 'bottom',
+  const { refs, floatingStyles, update } = useFloating({
     open: isOpen,
     onOpenChange: setIsOpen,
-    middleware: [inline(), offset(4), flip({ crossAxis: true }), shift({ crossAxis: true })],
+    middleware: [
+      autoPlacement({ crossAxis: true, padding: 5 }), 
+      inline(), 
+      offset(5), 
+      shift({ crossAxis: true, padding: 5 })
+    ],
     whileElementsMounted: autoUpdate
   });
 
@@ -79,12 +83,20 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
       setMousePos({ x: clientX, y: clientY });
     }
 
+    const config: MutationObserverInit = { attributes: true, childList: true, subtree: true };
+
+    const mutationObserver = new MutationObserver(() =>
+      update());
+
+    mutationObserver.observe(document.body, config);
+
     window.document.addEventListener('pointerup', onPointerUp);
 
     return () => {
+      mutationObserver.disconnect();
       window.document.removeEventListener('pointerup', onPointerUp);
     }
-  }, []);
+  }, [update]);
 
   return (isOpen && selected.length > 0) && (
     <div
