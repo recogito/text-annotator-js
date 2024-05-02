@@ -5,6 +5,7 @@ import { createPresencePainter } from './presence';
 import { scrollIntoView } from './api';
 import { TextAnnotationStore, TextAnnotatorState, createTextAnnotatorState } from './state';
 import type { TextAnnotation } from './model';
+import { NOT_ANNOTATABLE_SELECTOR } from './utils';
 import { fillDefaults, type RendererType, type TextAnnotatorOptions } from './TextAnnotatorOptions';
 import { SelectionHandler } from './SelectionHandler';
 
@@ -30,7 +31,17 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   options: TextAnnotatorOptions<E> = {}
 ): TextAnnotator<E> => {
   // Prevent mobile browsers from triggering word selection on single click.
-  container.addEventListener('click', evt => !(evt.target as Element).closest('a') && evt.preventDefault());
+  container.addEventListener('click', event => {
+    const targetElement = event.target as HTMLElement;
+
+    const shouldPrevent =
+      !targetElement.closest(NOT_ANNOTATABLE_SELECTOR) // Allow clicks within not-annotatable elements
+      && !(event.target as Element).closest('a'); // Allow clicks within links
+
+    if (shouldPrevent) {
+      event.preventDefault();
+    }
+  });
 
   const opts = fillDefaults<E>(options, {
     annotationEnabled: true
