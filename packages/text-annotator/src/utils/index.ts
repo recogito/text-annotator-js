@@ -1,3 +1,4 @@
+export * from './cancelSingleClickEvents';
 export * from './debounce';
 export * from './getAnnotatableFragment';
 export * from './getClientRectsPonyfill';
