@@ -48,7 +48,7 @@ export const TextAnnotator = <E extends unknown>(props: TextAnnotatorProps<E>) =
 
   useEffect(() => {
     if (!anno) return;
-    
+
     anno.setFilter(props.filter);
   }, [anno, props.filter]);
 

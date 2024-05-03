@@ -18,13 +18,10 @@ export type HighlightStyleExpression = HighlightStyle
 
 export const DEFAULT_STYLE: HighlightStyle = { 
   fill: 'rgb(0, 128, 255)', 
-  fillOpacity: 0.18 
+  fillOpacity: 0.18
 };
 
 export const DEFAULT_SELECTED_STYLE: HighlightStyle = { 
   fill: 'rgb(0, 128, 255)', 
   fillOpacity: 0.45 
 };
-  
-
-
