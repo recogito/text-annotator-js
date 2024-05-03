@@ -90,10 +90,12 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
 
     mutationObserver.observe(document.body, config);
 
+    window.document.addEventListener('scroll', update, true);
     window.document.addEventListener('pointerup', onPointerUp);
 
     return () => {
       mutationObserver.disconnect();
+      window.document.removeEventListener('scroll', update, true);
       window.document.removeEventListener('pointerup', onPointerUp);
     }
   }, [update]);
