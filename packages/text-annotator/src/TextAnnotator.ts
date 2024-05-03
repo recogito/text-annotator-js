@@ -5,7 +5,7 @@ import { createPresencePainter } from './presence';
 import { scrollIntoView } from './api';
 import { TextAnnotationStore, TextAnnotatorState, createTextAnnotatorState } from './state';
 import type { TextAnnotation } from './model';
-import { NOT_ANNOTATABLE_SELECTOR, cancelSingleClickEvents } from './utils';
+import { cancelSingleClickEvents } from './utils';
 import { fillDefaults, type RendererType, type TextAnnotatorOptions } from './TextAnnotatorOptions';
 import { SelectionHandler } from './SelectionHandler';
 
