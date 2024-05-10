@@ -1,6 +1,6 @@
 {
   "name": "@recogito/react-text-annotator",
-  "version": "3.0.0-rc.26",
+  "version": "3.0.0-rc.27",
   "description": "Recogito Text Annotator React bindings",
   "author": "Rainer Simon",
   "license": "BSD-3-Clause",
@@ -24,14 +24,14 @@
   "module": "./dist/react-text-annotator.es.js",
   "types": "./dist/index.d.ts",
   "devDependencies": {
-    "@types/react-dom": "^18.2.25",
+    "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.2.1",
     "openseadragon": "4.1.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "typescript": "^5.4.5",
-    "vite": "^5.2.10",
-    "vite-plugin-dts": "^3.9.0",
+    "vite": "^5.2.11",
+    "vite-plugin-dts": "^3.9.1",
     "vite-tsconfig-paths": "^4.3.2"
   },
   "peerDependencies": {
@@ -43,8 +43,8 @@
     "@annotorious/react": "^3.0.0-rc.23",
     "@floating-ui/react": "^0.26.12",
     "@neodrag/react": "^2.0.4",
-    "@recogito/text-annotator": "3.0.0-rc.26",
-    "@recogito/text-annotator-tei": "3.0.0-rc.26",
+    "@recogito/text-annotator": "3.0.0-rc.27",
+    "@recogito/text-annotator-tei": "3.0.0-rc.27",
     "CETEIcean": "^1.9.2"
   }
 }
