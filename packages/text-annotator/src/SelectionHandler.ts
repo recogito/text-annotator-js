@@ -46,8 +46,17 @@ export const SelectionHandler = (
   if (annotationEnabled)
     container.addEventListener('selectstart', onSelectStart);
 
-  const onSelectionChange = debounce( (evt: PointerEvent) => {
+  const onSelectionChange = debounce((evt: PointerEvent) => {
     const sel = document.getSelection();
+
+    // This is to handle cases where the selection is "hijacked" by another element
+    // in a not-annotatable area. A rare case in theory. But rich text editors
+    // will like Quill do it...
+    const annotatable = !sel.anchorNode.parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
+    if (!annotatable) {
+      currentTarget = undefined;
+      return;
+    }
 
     // Chrome/iOS does not reliably fire the 'selectstart' event!
     if (evt.timeStamp - (lastPointerDown?.timeStamp || evt.timeStamp) < 1000 && !currentTarget)
