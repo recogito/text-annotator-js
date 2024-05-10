@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { AnnotationBody, Annotorious, useAnnotationStore, useAnnotator } from '@annotorious/react';
 import { TextAnnotator, TextAnnotatorPopup, TextAnnotatorPopupProps } from '../src';
 import { TextAnnotation, TextAnnotator as RecogitoTextAnnotator, W3CTextFormat } from '@recogito/text-annotator';
@@ -6,6 +6,8 @@ import { TextAnnotation, TextAnnotator as RecogitoTextAnnotator, W3CTextFormat }
 const TestPopup = (props: TextAnnotatorPopupProps) => {
 
   const store = useAnnotationStore();
+
+  const el = useRef<HTMLDivElement>(null);
 
   const anno = useAnnotator<RecogitoTextAnnotator>();
 
@@ -21,8 +23,13 @@ const TestPopup = (props: TextAnnotatorPopupProps) => {
     anno.state.selection.clear();
   }
 
+  useEffect(() => {
+    window.setTimeout(() =>
+      el.current?.querySelector('input')!.focus(), 1);
+  }, []);
+
   return (
-    <div className="popup">
+    <div ref={el} className="popup">
       <input type="text" />
       <button onClick={onClick}>Close</button>
     </div>
