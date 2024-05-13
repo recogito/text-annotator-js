@@ -31,7 +31,7 @@ const TestPopup = (props: TextAnnotatorPopupProps) => {
 
   return (
     <div className="popup">
-      <input ref={inputRef} type="text"/>
+      <input ref={inputRef} type="text" />
       <button onClick={onClick}>Close</button>
     </div>
   );
@@ -202,7 +202,7 @@ export const App = () => {
         }
       />
 
-      <MockStorage/>
+      <MockStorage />
     </Annotorious>
   );
 
