@@ -56,7 +56,7 @@ export const createBaseRenderer = (
 
   let currentFilter: Filter | undefined;
 
-  let customPainter: HighlightPainter;
+  let currentPainter: HighlightPainter;
 
   const onDraw = trackViewport(viewport);
 
@@ -82,8 +82,8 @@ export const createBaseRenderer = (
   container.addEventListener('pointermove', onPointerMove);
 
   const redraw = (lazy: boolean = false) => {
-    if (customPainter)
-      customPainter.clear();
+    if (currentPainter)
+      currentPainter.clear();
 
     const bounds = getViewportBounds(container);   
 
@@ -103,13 +103,13 @@ export const createBaseRenderer = (
       return { annotation, rects, state: { selected, hover: hovered, custom: {} }};
     })
 
-    renderer.redraw(highlights, bounds, currentStyle, customPainter, lazy);
+    renderer.redraw(highlights, bounds, currentStyle, currentPainter, lazy);
 
     setTimeout(() => onDraw(annotationsInView.map(({ annotation }) => annotation)), 1);
   }
 
   const setPainter = (painter: HighlightPainter) => { 
-    customPainter = painter;
+    currentPainter = painter;
     redraw();
   }
 
@@ -138,8 +138,8 @@ export const createBaseRenderer = (
   const onResize = debounce(() => {
     store.recalculatePositions();
 
-    if (customPainter)
-      customPainter.reset();
+    if (currentPainter)
+      currentPainter.reset();
 
     redraw();
   });

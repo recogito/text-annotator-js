@@ -32,7 +32,7 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
 
   container.insertBefore(highlightLayer, container.firstChild);
 
-  let customPainter: HighlightPainter;
+  let currentPainter: HighlightPainter;
 
   // Currently rendered highlights
   let currentRendered: Highlight[] = [];
@@ -50,8 +50,8 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
 
     highlightLayer.innerHTML = '';
 
-    if (customPainter)
-      customPainter.clear();
+    if (currentPainter)
+      currentPainter.clear();
 
     // Rects from all visible annotations, for z-index computation
     const allRects = highlights.reduce<Rect[]>((all, { rects }) => ([...all, ...rects]), []);
