@@ -30,7 +30,7 @@
     "@types/rbush": "^3.0.3",
     "@types/uuid": "^9.0.8",
     "jsdom": "^24.0.0",
-    "svelte": "^4.2.16",
+    "svelte": "^4.2.17",
     "typescript": "^5.4.5",
     "vite": "^5.2.11",
     "vite-plugin-dts": "^3.9.1",
