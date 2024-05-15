@@ -61,13 +61,13 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
      * By default, we should expect that the newer highlight
      * will be rendered over the older one
      */
-    const creationSortedHighlights = [...highlights].sort((highlightA, highlightB) => {
+    const highlightsByCreation = [...highlights].sort((highlightA, highlightB) => {
       const { annotation: { target: { created: createdA } } } = highlightA;
       const { annotation: { target: { created: createdB } } } = highlightB;
       return createdA.getTime() - createdB.getTime();
     })
 
-    creationSortedHighlights.forEach(h => {
+    highlightsByCreation.forEach(h => {
       const base: HighlightStyle = currentStyle
         ? typeof currentStyle === 'function'
           ? currentStyle(h.annotation, h.state)
