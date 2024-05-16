@@ -41,7 +41,7 @@
   "dependencies": {
     "@annotorious/core": "^3.0.0-rc.23",
     "@annotorious/react": "^3.0.0-rc.23",
-    "@floating-ui/react": "^0.26.12",
+    "@floating-ui/react": "^0.26.14",
     "@neodrag/react": "^2.0.4",
     "@recogito/text-annotator": "3.0.0-rc.27",
     "@recogito/text-annotator-tei": "3.0.0-rc.27",
