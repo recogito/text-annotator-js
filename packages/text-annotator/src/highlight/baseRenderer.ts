@@ -99,8 +99,7 @@ export const createBaseRenderer = (
       const selected = selectedIds.includes(annotation.id);
       const hovered = annotation.id === hover.current;
 
-      // TODO minor API changes coming up soon...
-      return { annotation, rects, state: { selected, hover: hovered, custom: {} }};
+      return { annotation, rects, state: { selected, hover: hovered }};
     })
 
     renderer.redraw(highlights, bounds, currentStyle, customPainter, lazy);
