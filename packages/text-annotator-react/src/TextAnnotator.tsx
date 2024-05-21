@@ -41,23 +41,11 @@ export const TextAnnotator = <E extends unknown>(props: TextAnnotatorProps<E>) =
     return () => anno.destroy();
   }, [setAnno]);
 
-  useEffect(() => {
-    if (anno) {
-      anno.setStyle(style);
-    }
-  }, [anno, style]);
+  useEffect(() => anno?.setStyle(style), [anno, style]);
 
-  useEffect(() => {
-    if (anno) {
-      anno.setFilter(filter);
-    }
-  }, [anno, filter]);
+  useEffect(() => anno?.setFilter(filter), [anno, filter]);
 
-  useEffect(() => {
-    if (anno) {
-      anno.setUser(user);
-    }
-  }, [anno, user]);
+  useEffect(() => anno?.setUser(user), [anno, user]);
 
   return (
     <div ref={el} className={className}>
