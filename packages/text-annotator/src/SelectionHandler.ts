@@ -76,7 +76,8 @@ export const SelectionHandler = (
 
     currentTarget = {
       ...currentTarget,
-      selector: annotatableRanges.map(r => rangeToSelector(r, container, offsetReferenceSelector))
+      selector: annotatableRanges.map(r => rangeToSelector(r, container, offsetReferenceSelector)),
+      updated: new Date()
     };
 
     if (store.getAnnotation(currentTarget.annotation)) {
