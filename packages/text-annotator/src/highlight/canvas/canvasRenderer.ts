@@ -54,7 +54,20 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
 
     const { top, left } = viewportBounds;
 
-    highlights.forEach(h => {
+    /**
+     * Highlights rendering on the canvas is an order-sensitive operation.
+     * The later the highlight is rendered, the higher it will be in the visual stack.
+     *
+     * By default, we should expect that the newer highlight
+     * will be rendered over the older one
+     */
+    const highlightsByCreation = [...highlights].sort((highlightA, highlightB) => {
+      const { annotation: { target: { created: createdA } } } = highlightA;
+      const { annotation: { target: { created: createdB } } } = highlightB;
+      return createdA.getTime() - createdB.getTime();
+    })
+
+    highlightsByCreation.forEach(h => {
       const base: HighlightStyle = currentStyle
         ? typeof currentStyle === 'function'
           ? currentStyle(h.annotation, h.state)
