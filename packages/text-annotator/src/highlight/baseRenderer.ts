@@ -100,7 +100,7 @@ export const createBaseRenderer = (
       const hovered = annotation.id === hover.current;
 
       return { annotation, rects, state: { selected, hover: hovered }};
-    })
+    });
 
     renderer.redraw(highlights, bounds, currentStyle, customPainter, lazy);
 

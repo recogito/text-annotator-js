@@ -48,7 +48,7 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
     // Don't redraw the SPANs - but redraw the painter, if any!
     const shouldRedraw = !(noChanges && lazy);
 
-    if (!painter) return;
+    if (!painter && !shouldRedraw) return;
 
     if (shouldRedraw)
       highlightLayer.innerHTML = '';
