@@ -50,3 +50,7 @@ export type {
   TextAnnotator as RecogitoTextAnnotator,
   TextAnnotationStore
 } from '@recogito/text-annotator';
+
+export {
+  W3CTextFormat
+} from '@recogito/text-annotator';
