@@ -1,35 +1,44 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+
 import { AnnotationBody, Annotorious, useAnnotationStore, useAnnotator } from '@annotorious/react';
-import { CETEIcean, TextAnnotatorPopup, TextAnnotatorPopupProps } from '../../src';
 import { TextAnnotation, TextAnnotator as VanillaTextAnnotator } from '@recogito/text-annotator';
-import { TEIAnnotator } from '../../src';
+
+import { TEIAnnotator, CETEIcean, TextAnnotatorPopup, TextAnnotatorPopupProps } from '../../src';
 
 const TestPopup = (props: TextAnnotatorPopupProps) => {
 
   const store = useAnnotationStore();
-
   const anno = useAnnotator<VanillaTextAnnotator>();
+
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const body: AnnotationBody = {
     id: `${Math.random()}`,
     annotation: props.selected[0].annotation.id,
     purpose: 'commenting',
     value: 'A Dummy Comment'
-  }
+  };
 
   const onClick = () => {
     store.addBody(body);
-    anno.state.selection.clear();
-  }
+    anno.cancelSelected();
+  };
+
+  useEffect(() => {
+    const { current: inputEl } = inputRef;
+    if (!inputEl) return;
+
+    setTimeout(() => inputEl.focus({ preventScroll: true }));
+  }, []);
 
   return (
     <div className="popup">
-      <input type="text" />
+      <input ref={inputRef} type="text" />
       <button onClick={onClick}>Close</button>
     </div>
-  )
+  );
 
-}
+};
 
 const MockStorage = () => {
 
@@ -44,11 +53,11 @@ const MockStorage = () => {
       anno.on('deleteAnnotation', (annotation: TextAnnotation) => {
         console.log('delete', annotation);
       });
-    
+
       anno.on('selectionChanged', (annotations: TextAnnotation[]) => {
         console.log('selection changed', annotations);
       });
-    
+
       anno.on('updateAnnotation', (annotation: TextAnnotation, previous: TextAnnotation) => {
         console.log('update', annotation, previous);
       });
@@ -57,7 +66,7 @@ const MockStorage = () => {
 
   return null;
 
-}
+};
 
 export const App = () => {
 
@@ -74,14 +83,15 @@ export const App = () => {
       <TEIAnnotator>
         <CETEIcean tei={tei} />
 
-        <TextAnnotatorPopup 
+        <TextAnnotatorPopup
           popup={props => (
             <TestPopup {...props} />
-          )} />
+          )}
+        />
 
         <MockStorage />
       </TEIAnnotator>
     </Annotorious>
-  )
+  );
 
-}
+};
