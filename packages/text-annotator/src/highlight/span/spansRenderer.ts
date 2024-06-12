@@ -32,8 +32,6 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
 
   container.insertBefore(highlightLayer, container.firstChild);
 
-  let currentPainter: HighlightPainter;
-
   // Currently rendered highlights
   let currentRendered: Highlight[] = [];
 
@@ -44,57 +42,56 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
     painter?: HighlightPainter,
     lazy?: boolean
   ) => {    
-    // Only redraw if annotations or annotation states changed
     const noChanges = dequal(currentRendered, highlights);
-    if (noChanges && lazy) return;
 
-    highlightLayer.innerHTML = '';
+    // If there are no changes and rendering is set to lazy
+    // Don't redraw the SPANs - but redraw the painter, if any!
+    const shouldRedraw = !(noChanges && lazy);
 
-    if (currentPainter)
-      currentPainter.clear();
+    if (!painter && !shouldRedraw) return;
+
+    if (shouldRedraw)
+      highlightLayer.innerHTML = '';
 
     // Rects from all visible annotations, for z-index computation
     const allRects = highlights.reduce<Rect[]>((all, { rects }) => ([...all, ...rects]), []);
 
     highlights.forEach(highlight => {
-      const spans = highlight.rects.map(rect => {
-        const span = document.createElement('span');
-        span.className = 'r6o-annotation';
-        span.dataset.annotation = highlight.annotation.id;
-
-        span.style.left = `${rect.x}px`;
-        span.style.top = `${rect.y}px`;
-        span.style.width = `${rect.width}px`;
-        span.style.height = `${rect.height}px`;
-
+      highlight.rects.map(rect => {
         const zIndex = computeZIndex(rect, allRects);
-
         const style = paint(highlight, viewportBounds, currentStyle, painter, zIndex);
 
-        const backgroundColor = colord(style?.fill || DEFAULT_STYLE.fill)
-          .alpha(style?.fillOpacity === undefined ? DEFAULT_STYLE.fillOpacity : style.fillOpacity)
-          .toHex();
+        if (shouldRedraw) {
+          const span = document.createElement('span');
+          span.className = 'r6o-annotation';
+          span.dataset.annotation = highlight.annotation.id;
 
-        span.style.backgroundColor = backgroundColor;
+          span.style.left = `${rect.x}px`;
+          span.style.top = `${rect.y}px`;
+          span.style.width = `${rect.width}px`;
+          span.style.height = `${rect.height}px`;
 
-        if (style.underlineStyle)
-          span.style.borderStyle = style.underlineStyle;
+          const backgroundColor = colord(style?.fill || DEFAULT_STYLE.fill)
+            .alpha(style?.fillOpacity === undefined ? DEFAULT_STYLE.fillOpacity : style.fillOpacity)
+            .toHex();
 
-        if (style.underlineColor)
-          span.style.borderColor = style.underlineColor;
+          span.style.backgroundColor = backgroundColor;
 
-        if (style.underlineThickness)
-          span.style.borderBottomWidth = `${style.underlineThickness}px`;
+          if (style.underlineStyle)
+            span.style.borderStyle = style.underlineStyle;
 
-        if (style.underlineOffset)
-          span.style.paddingBottom = `${style.underlineOffset}px`;
+          if (style.underlineColor)
+            span.style.borderColor = style.underlineColor;
 
-        highlightLayer.appendChild(span);
+          if (style.underlineThickness)
+            span.style.borderBottomWidth = `${style.underlineThickness}px`;
 
-        return span;
+          if (style.underlineOffset)
+            span.style.paddingBottom = `${style.underlineOffset}px`;
+
+          highlightLayer.appendChild(span);
+        }
       });
-
-      return { id: highlight.annotation.id, spans };
     });
 
     currentRendered = highlights;

@@ -2,7 +2,14 @@ import { Origin, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotationTarget } from './model';
-import { debounce, splitAnnotatableRanges, rangeToSelector, trimRange, NOT_ANNOTATABLE_SELECTOR } from './utils';
+import {
+  debounce,
+  splitAnnotatableRanges,
+  rangeToSelector,
+  trimRange,
+  isWhitespaceOrEmpty,
+  NOT_ANNOTATABLE_SELECTOR
+} from './utils';
 
 export const SelectionHandler = (
   container: HTMLElement,
@@ -52,7 +59,7 @@ export const SelectionHandler = (
     // This is to handle cases where the selection is "hijacked" by another element
     // in a not-annotatable area. A rare case in theory. But rich text editors
     // will like Quill do it...
-    const annotatable = !sel.anchorNode.parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
+    const annotatable = !sel.anchorNode?.parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
     if (!annotatable) {
       currentTarget = undefined;
       return;
@@ -65,6 +72,8 @@ export const SelectionHandler = (
     if (sel.isCollapsed || !isLeftClick || !currentTarget) return;
 
     const selectionRange = sel.getRangeAt(0);
+    if (isWhitespaceOrEmpty(selectionRange)) return;
+
     const trimmedRange = trimRange(selectionRange.cloneRange())
     const annotatableRanges = splitAnnotatableRanges(trimmedRange);
 
@@ -76,7 +85,8 @@ export const SelectionHandler = (
 
     currentTarget = {
       ...currentTarget,
-      selector: annotatableRanges.map(r => rangeToSelector(r, container, offsetReferenceSelector))
+      selector: annotatableRanges.map(r => rangeToSelector(r, container, offsetReferenceSelector)),
+      updated: new Date()
     };
 
     if (store.getAnnotation(currentTarget.annotation)) {
