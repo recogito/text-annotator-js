@@ -11,5 +11,4 @@ export * from './reviveAnnotation';
 export * from './reviveSelector';
 export * from './reviveTarget';
 export * from './splitAnnotatableRanges';
-export * from './trimRange';
 

@@ -73,9 +73,8 @@ export const SelectionHandler = (
 
     const selectionRange = sel.getRangeAt(0);
     if (isWhitespaceOrEmpty(selectionRange)) return;
-
-    const trimmedRange = trimRange(selectionRange.cloneRange())
-    const annotatableRanges = splitAnnotatableRanges(trimmedRange);
+    
+    const annotatableRanges = splitAnnotatableRanges(selectionRange.cloneRange());
 
     const hasChanged =
       annotatableRanges.length !== currentTarget.selector.length ||
