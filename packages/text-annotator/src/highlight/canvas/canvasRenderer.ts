@@ -41,7 +41,7 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
     highlights: Highlight[], 
     viewportBounds: ViewportBounds,
     currentStyle?: HighlightStyleExpression,
-    painter?: HighlightPainter
+    currentPainter?: HighlightPainter
   ) => requestAnimationFrame(() => {
 
     const { width, height } = canvas;
@@ -49,8 +49,8 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
     // New render loop - clear canvases
     ctx.clearRect(-0.5, -0.5, width + 1, height + 1);
 
-    if (painter)
-      painter.clear();
+    if (currentPainter)
+      currentPainter.clear();
 
     const { top, left } = viewportBounds;
 
@@ -77,7 +77,7 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
           : DEFAULT_STYLE;
 
       // Trigger the custom painter (if any) as a side-effect
-      const style = painter ? painter.paint(h, viewportBounds) || base : base;
+      const style = currentPainter ? currentPainter.paint(h, viewportBounds) || base : base;
 
       // Offset annotation rects by current scroll position
       const offsetRects = h.rects.map(({ x, y, width, height }) => ({
