@@ -1,7 +1,21 @@
-import { createPortal } from 'react-dom';
-import { ReactNode, useEffect, useRef, useState } from 'react';
-import { TextAnnotator, TextAnnotation, TextAnnotatorState } from '@recogito/text-annotator';
-import { useAnnotator, useSelection } from '@annotorious/react';
+import { ReactNode, useEffect, useState } from 'react';
+import { useSelection } from '@annotorious/react';
+import type { TextAnnotation, TextSelector } from '@recogito/text-annotator';
+import { getClosestRect, toClientRects } from './utils';
+import {
+  autoPlacement,
+  autoUpdate,
+  inline,
+  offset,
+  shift,
+  useFloating
+} from '@floating-ui/react';
+
+interface TextAnnotationPopupProps {
+
+  popup(props: TextAnnotatorPopupProps): ReactNode;
+
+}
 
 export interface TextAnnotatorPopupProps {
 
@@ -9,68 +23,90 @@ export interface TextAnnotatorPopupProps {
 
 }
 
-export interface TextAnnotatorPopupContainerProps {
-
-  popup(props: TextAnnotatorPopupProps): ReactNode | JSX.Element;
-
-}
-
-export const TextAnnotatorPopup = (props: TextAnnotatorPopupContainerProps) => {
-
-  const el = useRef<HTMLDivElement>(null);
-
-  const r = useAnnotator<TextAnnotator>();
-
-  const [open, setOpen] = useState(false);
+export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
 
   const { selected, pointerEvent } = useSelection<TextAnnotation>();
+  
+  const [mousePos, setMousePos] = useState<{ x: number, y: number } | undefined>();
+
+  const [isOpen, setIsOpen] = useState(selected?.length > 0);
+
+  const { refs, floatingStyles, update } = useFloating({
+    open: isOpen,
+    onOpenChange: setIsOpen,
+    middleware: [
+      autoPlacement({ crossAxis: true, padding: 5 }), 
+      inline(), 
+      offset(5), 
+      shift({ crossAxis: true, padding: 5 })
+    ],
+    whileElementsMounted: autoUpdate
+  });
 
   useEffect(() => {
     // Ignore all selection changes except those
     // accompanied by a pointer event.
     if (pointerEvent) {
       if (selected.length > 0 && pointerEvent.type === 'pointerup') {
-        setOpen(true);
+        setIsOpen(true);
       } else {
-        setOpen(false);
+        setIsOpen(false);
       }
     }
   }, [pointerEvent, selected.map(a => a.annotation.id).join('-')]);
 
   useEffect(() => {
-    if (!(pointerEvent && open && r?.element))
-      return;
+    if (selected?.length > 0) {
+      const selector = selected[0].annotation.target.selector as (TextSelector | TextSelector[]);
+      const range = Array.isArray(selector) ? selector[0].range : selector.range; 
 
-    const { left, top } = r.element.getBoundingClientRect();
-    let x = pointerEvent.clientX - left;
-    let y = pointerEvent.clientY - top;
+      if (range && !range.collapsed) {
+        refs.setReference({
+          getBoundingClientRect: () => {
+            return range.getBoundingClientRect();
+          },
+          getClientRects: () => { 
+            const rect = mousePos 
+              ? getClosestRect(range.getClientRects(), mousePos)
+              : range.getClientRects()[0];
 
-    const { id } = selected[0].annotation;
-    const { offsetX, offsetY } = pointerEvent;
-    const bounds = (r.state as TextAnnotatorState).store.getAnnotationBounds(id, offsetX, offsetY);
-    
-    if (bounds) {
-      x = Math.max(x, bounds.x - left);
-      x = Math.min(x, bounds.right - left);
+            return toClientRects(rect);
+          }
+        });
+      }
+    }
+  }, [open, selected, mousePos]);
+
+  useEffect(() => {
+    const onPointerUp = (event: PointerEvent) => {
+      const { clientX, clientY } = event;
+      setMousePos({ x: clientX, y: clientY });
     }
 
-    el.current.style.left = `${x}px`;
-    el.current.style.top = `${y}px`;
-  }, [open, pointerEvent, r?.element]);
+    const config: MutationObserverInit = { attributes: true, childList: true, subtree: true };
 
-  const onPointerUp = (evt: React.PointerEvent<HTMLDivElement>) =>
-    evt.stopPropagation();
-  
-  return (open && selected.length > 0) ? createPortal(
-    <div 
-      ref={el}
-      className="a9s-popup r6o-popup not-annotatable"
-      style={{ position: 'absolute' }}
-      onPointerUp={onPointerUp}>
+    const mutationObserver = new MutationObserver(() =>
+      update());
 
+    mutationObserver.observe(document.body, config);
+
+    window.document.addEventListener('scroll', update, true);
+    window.document.addEventListener('pointerup', onPointerUp);
+
+    return () => {
+      mutationObserver.disconnect();
+      window.document.removeEventListener('scroll', update, true);
+      window.document.removeEventListener('pointerup', onPointerUp);
+    }
+  }, [update]);
+
+  return (isOpen && selected.length > 0) && (
+    <div
+      className="annotation-popup text-annotation-popup not-annotatable"
+      ref={refs.setFloating}
+      style={floatingStyles}>
       {props.popup({ selected })}
-      
-    </div>, r.element
-  ) : null;
+    </div>
+  )
 
 }

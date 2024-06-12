@@ -5,19 +5,17 @@ export interface TextAnnotationStore extends Omit<Store<TextAnnotation>, 'addAnn
 
   // Minor changes to default Annotorious store - text store returns feedback
   // on annotations that failed to render, to support lazy document loading scenarios
-  addAnnotation(annotation: TextAnnotation, origin: Origin): boolean;
+  addAnnotation(annotation: TextAnnotation, origin?: Origin): boolean;
 
-  bulkAddAnnotation(annotations: TextAnnotation[], replace: boolean, origin: Origin): TextAnnotation[];
+  bulkAddAnnotation(annotations: TextAnnotation[], replace: boolean, origin?: Origin): TextAnnotation[];
 
-  bulkUpsertAnnotations(annotations: TextAnnotation[], origin: Origin): TextAnnotation[];
+  bulkUpsertAnnotations(annotations: TextAnnotation[], origin?: Origin): TextAnnotation[];
 
   getAnnotationBounds(id: string, hintX?: number, hintY?: number, buffer?: number): DOMRect;
 
   getAt(x: number, y: number): TextAnnotation | undefined;
 
-  getIntersecting(minX: number, minY: number, maxX: number, maxY: number): TextAnnotation[];
-
-  getIntersectingRects(minX: number, minY: number, maxX: number, maxY: number): AnnotationRects[];
+  getIntersecting(minX: number, minY: number, maxX: number, maxY: number): AnnotationRects[];
 
   recalculatePositions(): void;
 

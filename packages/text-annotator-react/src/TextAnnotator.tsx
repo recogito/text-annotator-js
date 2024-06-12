@@ -1,10 +1,11 @@
 import { ReactNode, useContext, useEffect, useRef } from 'react';
-import { AnnotoriousContext, DrawingStyle, Filter } from '@annotorious/react';
+import { AnnotoriousContext, Filter } from '@annotorious/react';
 import type { FormatAdapter } from '@annotorious/core';
-import type { TextAnnotation, TextAnnotatorOptions } from '@recogito/text-annotator';
+import type { HighlightStyleExpression, TextAnnotation, TextAnnotatorOptions } from '@recogito/text-annotator';
 import { createTextAnnotator } from '@recogito/text-annotator';
 
 import '@recogito/text-annotator/dist/text-annotator.css';
+
 
 export interface TextAnnotatorProps<E extends unknown> extends Omit<TextAnnotatorOptions<E>, 'adapter'>  {
 
@@ -14,7 +15,9 @@ export interface TextAnnotatorProps<E extends unknown> extends Omit<TextAnnotato
 
   filter?: Filter;
 
-  style?: DrawingStyle | ((annotation: TextAnnotation) => DrawingStyle);
+  style?: HighlightStyleExpression
+
+  className?: string;
 
 }
 
@@ -22,7 +25,7 @@ export const TextAnnotator = <E extends unknown>(props: TextAnnotatorProps<E>) =
 
   const el = useRef<HTMLDivElement>(null);
 
-  const { children, ...opts } = props;
+  const { className, children, ...opts } = props;
 
   const { anno, setAnno } = useContext(AnnotoriousContext);
 
@@ -45,12 +48,12 @@ export const TextAnnotator = <E extends unknown>(props: TextAnnotatorProps<E>) =
 
   useEffect(() => {
     if (!anno) return;
-    
+
     anno.setFilter(props.filter);
   }, [anno, props.filter]);
 
   return (
-    <div ref={el}>
+    <div ref={el} className={className}>
       {children}
     </div>
   )

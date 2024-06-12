@@ -16,7 +16,11 @@ const getScrollParent = (el: Element) => {
     return getScrollParent(el.parentElement);
 };
 
-export const scrollIntoView = (container: HTMLElement, store: TextAnnotationStore) => (annotation: TextAnnotation) => {
+export const scrollIntoView = (
+  container: HTMLElement, store: TextAnnotationStore
+) => (annotationOrId: string | TextAnnotation) => {
+  const id = 
+    typeof annotationOrId === 'string' ? annotationOrId : annotationOrId.id;
 
   // Executes scroll on an annotation with a valid DOM range selector
   const scroll = (target: TextAnnotationTarget) => {
@@ -32,7 +36,7 @@ export const scrollIntoView = (container: HTMLElement, store: TextAnnotationStor
     // Note: getBoundingClientRect seems to return wrong height! 
     // (Includes block elements?) We'll therefore use the normalized height
     // from the spatial index!
-    const { width, height } = store.getAnnotationBounds(annotation.id);
+    const { width, height } = store.getAnnotationBounds(id);
 
     // Position of the annotation relative to scrollParent
     const offsetTop = annotationBounds.top - parentBounds.top;
@@ -52,7 +56,7 @@ export const scrollIntoView = (container: HTMLElement, store: TextAnnotationStor
   const scrollParent: Element = getScrollParent(container);
   if (scrollParent) {
     // Get curren version of the annotation from the store
-    const current = store.getAnnotation(annotation.id);
+    const current = store.getAnnotation(id);
 
     // The 1st selector is the topmost one as well
     const { range } = current.target.selector[0];

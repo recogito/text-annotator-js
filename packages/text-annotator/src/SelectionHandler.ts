@@ -2,11 +2,19 @@ import { Origin, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotationTarget } from './model';
-import { debounce, splitAnnotatableRanges, rangeToSelector, NOT_ANNOTATABLE_SELECTOR } from './utils';
+import {
+  debounce,
+  splitAnnotatableRanges,
+  rangeToSelector,
+  trimRange,
+  isWhitespaceOrEmpty,
+  NOT_ANNOTATABLE_SELECTOR
+} from './utils';
 
 export const SelectionHandler = (
   container: HTMLElement,
   state: TextAnnotatorState,
+  annotationEnabled: boolean,
   offsetReferenceSelector?: string
 ) => {
 
@@ -42,10 +50,20 @@ export const SelectionHandler = (
     }
   }
 
-  container.addEventListener('selectstart', onSelectStart);
+  if (annotationEnabled)
+    container.addEventListener('selectstart', onSelectStart);
 
-  const onSelectionChange = debounce( (evt: PointerEvent) => {
+  const onSelectionChange = debounce((evt: PointerEvent) => {
     const sel = document.getSelection();
+
+    // This is to handle cases where the selection is "hijacked" by another element
+    // in a not-annotatable area. A rare case in theory. But rich text editors
+    // will like Quill do it...
+    const annotatable = !sel.anchorNode?.parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
+    if (!annotatable) {
+      currentTarget = undefined;
+      return;
+    }
 
     // Chrome/iOS does not reliably fire the 'selectstart' event!
     if (evt.timeStamp - (lastPointerDown?.timeStamp || evt.timeStamp) < 1000 && !currentTarget)
@@ -54,16 +72,20 @@ export const SelectionHandler = (
     if (sel.isCollapsed || !isLeftClick || !currentTarget) return;
 
     const selectionRange = sel.getRangeAt(0);
+    if (isWhitespaceOrEmpty(selectionRange)) return;
+    
     const annotatableRanges = splitAnnotatableRanges(selectionRange.cloneRange());
 
     const hasChanged =
       annotatableRanges.length !== currentTarget.selector.length ||
       annotatableRanges.some((r, i) => r.toString() !== currentTarget.selector[i]?.quote);
+      
     if (!hasChanged) return;
 
     currentTarget = {
       ...currentTarget,
-      selector: annotatableRanges.map(r => rangeToSelector(r, container, offsetReferenceSelector))
+      selector: annotatableRanges.map(r => rangeToSelector(r, container, offsetReferenceSelector)),
+      updated: new Date()
     };
 
     if (store.getAnnotation(currentTarget.annotation)) {
@@ -80,7 +102,8 @@ export const SelectionHandler = (
     }
   })
 
-  document.addEventListener('selectionchange', onSelectionChange);
+  if (annotationEnabled)
+    document.addEventListener('selectionchange', onSelectionChange);
 
   // Select events don't carry information about the mouse button
   // Therefore, to prevent right-click selection, we need to listen
@@ -131,6 +154,7 @@ export const SelectionHandler = (
   const destroy = () => {
     container.removeEventListener('selectstart', onSelectStart);
     document.removeEventListener('selectionchange', onSelectionChange);
+    
     container.removeEventListener('pointerdown', onPointerDown);
     document.removeEventListener('pointerup', onPointerUp);
   }
