@@ -6,7 +6,6 @@ import {
   debounce,
   splitAnnotatableRanges,
   rangeToSelector,
-  trimRange,
   isWhitespaceOrEmpty,
   NOT_ANNOTATABLE_SELECTOR
 } from './utils';
