@@ -130,15 +130,15 @@ export const createTextAnnotatorState = (
   const recalculatePositions = () => tree.recalculate();
 
   store.observe(({ changes }) => {
-    const created = (changes.created || []).filter(a => isRevived(a.target.selector));
     const deleted = (changes.deleted || []).filter(a => isRevived(a.target.selector));
+    const created = (changes.created || []).filter(a => isRevived(a.target.selector));
     const updated = (changes.updated || []).filter(u => isRevived(u.newValue.target.selector));
-
-    if (created.length > 0)
-      tree.set(created.map(a => a.target), false);
 
     if (deleted?.length > 0)
       deleted.forEach(a => tree.remove(a.target));
+
+    if (created.length > 0)
+      tree.set(created.map(a => a.target), false);
 
     if (updated?.length > 0)
       updated.forEach(({ newValue }) => tree.update(newValue.target));
