@@ -90,13 +90,18 @@ export const SelectionHandler = (
     if (store.getAnnotation(currentTarget.annotation)) {
       store.updateTarget(currentTarget, Origin.LOCAL);
     } else {
+      // Proper lifecycle management: clear selection first...
+      selection.clear();
+      
+      // ...then add annotation to store...
       store.addAnnotation({
         id: currentTarget.annotation,
         bodies: [],
         target: currentTarget
       });
 
-      // Reminder: select events don't have offsetX/offsetY - reuse last up/down
+      // ...then make the new annotation the current selection. (Reminder:
+      // select events don't have offsetX/offsetY - reuse last up/down)
       selection.clickSelect(currentTarget.annotation, lastPointerDown);
     }
   })
