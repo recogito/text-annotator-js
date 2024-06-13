@@ -103,7 +103,7 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
     const rectsByTarget = targets.map(target => ({ target, rects: toItems(target, offset) }));
     rectsByTarget.forEach(({ target, rects }) => index.set(target.annotation, rects));
 
-    const allRects = rectsByTarget.reduce((all, { rects }) => [...all, ...rects], []);
+    const allRects = rectsByTarget.flatMap(({ rects }) => rects);
     tree.load(allRects);
   }
 
