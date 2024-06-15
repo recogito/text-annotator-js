@@ -103,7 +103,7 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
     const rectsByTarget = targets.map(target => ({ target, rects: toItems(target, offset) }));
     rectsByTarget.forEach(({ target, rects }) => index.set(target.annotation, rects));
 
-    const allRects = rectsByTarget.reduce((all, { rects }) => [...all, ...rects], []);
+    const allRects = rectsByTarget.flatMap(({ rects }) => rects);
     tree.load(allRects);
   }
 
@@ -170,7 +170,7 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
     const rects = tree.search({ minX, minY, maxX, maxY });
 
     // Distinct annotation IDs
-    const annotationIds = new Set(rects.reduce<string[]>((ids, rect) => ([...ids, rect.annotation.id]), []));
+    const annotationIds = new Set(rects.map(rect => rect.annotation.id));
 
     // Resolve annotation IDs. Note that the tree could be slightly out of sync (because 
     // it updates by listening to changes, just like anyone else)
