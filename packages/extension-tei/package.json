@@ -32,7 +32,7 @@
     "vite-plugin-dts": "^3.9.1"
   },
   "peerDependencies": {
-    "@annotorious/core": "^3.0.0-rc.28",
+    "@annotorious/core": "^3.0.0-rc.29",
     "@recogito/text-annotator": "3.0.0-rc.30"
   }
 }
