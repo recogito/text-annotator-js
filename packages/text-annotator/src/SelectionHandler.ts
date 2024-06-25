@@ -135,10 +135,8 @@ export const SelectionHandler = (
     const clickSelect = () => {
       const { x, y } = container.getBoundingClientRect();
 
-      const hovered = store.getAt(evt.clientX - x, evt.clientY - y);
-
-      const isVisibleHover = hovered && (!currentFilter || currentFilter(hovered));
-      if (isVisibleHover) {
+      const hovered = store.getAt(evt.clientX - x, evt.clientY - y, currentFilter);
+      if (hovered) {
         const { selected } = selection;
 
         if (selected.length !== 1 || selected[0].id !== hovered.id)

@@ -1,4 +1,4 @@
-import type { Origin, Store } from '@annotorious/core';
+import type { Filter, Origin, Store } from '@annotorious/core';
 import type { TextAnnotation } from '../model';
 
 export interface TextAnnotationStore extends Omit<Store<TextAnnotation>, 'addAnnotation' | 'bulkAddAnnotation'> {
@@ -13,7 +13,7 @@ export interface TextAnnotationStore extends Omit<Store<TextAnnotation>, 'addAnn
 
   getAnnotationBounds(id: string, hintX?: number, hintY?: number, buffer?: number): DOMRect;
 
-  getAt(x: number, y: number): TextAnnotation | undefined;
+  getAt(x: number, y: number, filter?: Filter): TextAnnotation | undefined;
 
   getIntersecting(minX: number, minY: number, maxX: number, maxY: number): AnnotationRects[];
 

@@ -1,4 +1,4 @@
-import type { PointerSelectAction, Store, ViewportState } from '@annotorious/core';
+import type { Filter, PointerSelectAction, Store, ViewportState } from '@annotorious/core';
 import { 
   createHoverState, 
   createSelectionState, 
@@ -107,9 +107,10 @@ export const createTextAnnotatorState = (
     store.bulkUpdateTargets(revived, origin);
   }
 
-  const getAt = (x: number, y: number): TextAnnotation | undefined => {
-    const annotationId = tree.getAt(x, y);
-    return annotationId ? store.getAnnotation(annotationId) : undefined;
+  const getAt = (x: number, y: number, filter?: Filter): TextAnnotation | undefined => {
+    const annotations = tree.getAt(x, y, Boolean(filter)).map(id => store.getAnnotation(id));
+    const filtered = filter ? annotations.filter(filter) : annotations;
+    return filtered.length > 0 ? filtered[0] : undefined;
   }
 
   const getAnnotationBounds = (id: string, x?: number, y?: number, buffer = 5): DOMRect => {

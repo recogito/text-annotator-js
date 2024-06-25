@@ -107,7 +107,7 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
     tree.load(allRects);
   }
 
-  const getAt = (x: number, y: number): string | undefined => {
+  const getAt = (x: number, y: number, all = false): string[] => {
     const hits = tree.search({
       minX: x,
       minY: y,
@@ -122,7 +122,9 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
     // Get smallest rect
     if (hits.length > 0) {
       hits.sort((a, b) => area(a) - area(b));
-      return hits[0].annotation.id;
+      return all ? hits.map(h => h.annotation.id) : [ hits[0].annotation.id ];
+    } else {
+      return [];
     }
   }
 
