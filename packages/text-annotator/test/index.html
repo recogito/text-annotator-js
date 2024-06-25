@@ -339,7 +339,12 @@
             toggleButton.innerText = `${toggleButtonLabel} on`;
           } else {
             // Dummy filter - just filter randomly
-            r.setFilter(_annotation => Math.random() < 0.5);
+            r.setFilter(a => {
+              return (
+                a.id !== '9b6aa528-660a-4551-8265-66f45c61acab' &&
+                a.id !== '45d77d69-b9c9-419e-b6f3-672222bb3a23'
+              );
+            });
 
             filterActive = true;
             toggleButton.innerText = `${toggleButtonLabel} off`;

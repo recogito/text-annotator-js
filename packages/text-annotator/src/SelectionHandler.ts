@@ -1,4 +1,4 @@
-import { Origin, type User } from '@annotorious/core';
+import { Filter, Origin, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotationTarget } from './model';
@@ -17,13 +17,17 @@ export const SelectionHandler = (
   offsetReferenceSelector?: string
 ) => {
 
+  let currentUser: User | undefined;
+
+  const setUser = (user?: User) => currentUser = user;
+
+  let currentFilter: Filter | undefined;
+
+  const setFilter = (filter?: Filter) => currentFilter = filter;
+
   const { store, selection } = state;
 
-  let currentUser: User;
-
   let currentTarget: TextAnnotationTarget | undefined;
-
-  const setUser = (user: User) => currentUser = user;
 
   let isLeftClick = false;
 
@@ -132,7 +136,9 @@ export const SelectionHandler = (
       const { x, y } = container.getBoundingClientRect();
 
       const hovered = store.getAt(evt.clientX - x, evt.clientY - y);
-      if (hovered) {
+
+      const isVisibleHover = hovered && (!currentFilter || currentFilter(hovered));
+      if (isVisibleHover) {
         const { selected } = selection;
 
         if (selected.length !== 1 || selected[0].id !== hovered.id)
@@ -165,6 +171,7 @@ export const SelectionHandler = (
 
   return {
     destroy,
+    setFilter,
     setUser
   }
 

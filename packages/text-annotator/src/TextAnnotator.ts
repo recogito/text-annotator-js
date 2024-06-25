@@ -82,8 +82,10 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
 
   const getUser = () => currentUser;
 
-  const setFilter = (filter?: Filter) =>
+  const setFilter = (filter?: Filter) => {
     highlightRenderer.setFilter(filter);
+    selectionHandler.setFilter(filter);
+  }
 
   const setStyle = (style: HighlightStyleExpression | undefined) =>
     highlightRenderer.setStyle(style);
