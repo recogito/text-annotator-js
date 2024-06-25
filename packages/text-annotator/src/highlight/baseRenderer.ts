@@ -63,10 +63,8 @@ export const createBaseRenderer = (
   const onPointerMove = (event: PointerEvent) => {
     const {x, y} = container.getBoundingClientRect();
 
-    const hit = store.getAt(event.clientX - x, event.clientY - y);
-    const isVisibleHit = hit && (!currentFilter || currentFilter(hit));
-
-    if (isVisibleHit) {
+    const hit = store.getAt(event.clientX - x, event.clientY - y, currentFilter);
+    if (hit) {
       if (hover.current !== hit.id) {
         container.classList.add('hovered');
         hover.set(hit.id);
