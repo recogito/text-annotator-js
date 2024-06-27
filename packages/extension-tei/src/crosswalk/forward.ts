@@ -1,4 +1,4 @@
-import { isRevived, reviveTarget } from '@recogito/text-annotator';
+import { reviveTarget as reviveTextOffsetTarget } from '@recogito/text-annotator';
 import type { 
   TextAnnotation, 
   TextAnnotationTarget, 
@@ -108,6 +108,54 @@ export const textToTEISelector = (selector: TextSelector): TEIRangeSelector => {
     quote: selector.quote.replace(/\s+/g, ' '),
     range
   };
+}
+
+export const reviveTarget = (t: TextAnnotationTarget, container: HTMLElement) => {
+  const selector = Array.isArray(t.selector) ? t.selector[0] : t.selector;
+  
+  if ('start' in selector && 'end' in selector) {
+    return reviveTextOffsetTarget(t, container);
+  } else {
+    const start = (selector as TEIRangeSelector).startSelector?.value;
+    const end = (selector as TEIRangeSelector).endSelector?.value;
+
+    if (!start || !end) {
+      console.error(t);
+      throw 'Could not revive TEI target.'
+    }
+
+    const evaluateSelector = (value: string) => {
+      const splitIdx = value.indexOf('::');
+
+      if (splitIdx < 0) return;
+
+      const path = value.substring(0, splitIdx).replace(/\/([^[/]+)/g, (_, p1) => {
+        return '/tei-' + p1.toLowerCase();
+      }).replace(/xml:/g, '');
+
+      const node = document.evaluate('.' + path,
+        container, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+
+      const offset = parseInt(value.substring(splitIdx + 2));
+
+      return [node, offset] as [Node, number];
+    }
+
+    const [startNode, startOffset] = evaluateSelector(start);
+    const [endNode, endOffset] = evaluateSelector(end);
+
+    const range = document.createRange();
+    range.setStart(startNode.firstChild, startOffset);
+    range.setEnd(endNode.firstChild, endOffset);
+
+    return reviveTextOffsetTarget({
+      ...t,
+      selector: [{
+        ...(selector as TEIRangeSelector),
+        range
+      }]
+    }, container)
+  }
 }
 
 export const textToTEITarget =  (container: HTMLElement) => (t: TextAnnotationTarget): TEIAnnotationTarget => {
