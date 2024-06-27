@@ -37,10 +37,10 @@
     "vitest": "^1.6.0"
   },
   "dependencies": {
-    "@annotorious/core": "^3.0.0-rc.29",
+    "@annotorious/core": "^3.0.0-rc.30",
     "colord": "^2.9.3",
     "dequal": "^2.0.3",
-    "rbush": "^3.0.1",
+    "rbush": "^4.0.0",
     "uuid": "^10.0.0"
   }
 }
