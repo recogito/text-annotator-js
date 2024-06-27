@@ -105,7 +105,7 @@ export const textToTEISelector = (selector: TextSelector): TEIRangeSelector => {
       type: 'XPathSelector',
       value: end
     },
-    quote: selector.quote.replace(/\s+/g, ' '),
+    quote: selector.quote?.replace(/\s+/g, ' '),
     range
   };
 }
