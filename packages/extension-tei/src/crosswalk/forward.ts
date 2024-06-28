@@ -1,4 +1,4 @@
-import { reviveTarget as reviveTextOffsetTarget } from '@recogito/text-annotator';
+import { rangeToSelector, reviveTarget as reviveTextOffsetTarget } from '@recogito/text-annotator';
 import type { 
   TextAnnotation, 
   TextAnnotationTarget, 
@@ -116,10 +116,10 @@ export const reviveTarget = (t: TextAnnotationTarget, container: HTMLElement) =>
   if ('start' in selector && 'end' in selector) {
     return reviveTextOffsetTarget(t, container);
   } else {
-    const start = (selector as TEIRangeSelector).startSelector?.value;
-    const end = (selector as TEIRangeSelector).endSelector?.value;
+    const startExpression = (selector as TEIRangeSelector).startSelector?.value;
+    const endExpression = (selector as TEIRangeSelector).endSelector?.value;
 
-    if (!start || !end) {
+    if (!startExpression || !endExpression) {
       console.error(t);
       throw 'Could not revive TEI target.'
     }
@@ -141,20 +141,23 @@ export const reviveTarget = (t: TextAnnotationTarget, container: HTMLElement) =>
       return [node, offset] as [Node, number];
     }
 
-    const [startNode, startOffset] = evaluateSelector(start);
-    const [endNode, endOffset] = evaluateSelector(end);
+    const [startNode, startOffset] = evaluateSelector(startExpression);
+    const [endNode, endOffset] = evaluateSelector(endExpression);
 
     const range = document.createRange();
     range.setStart(startNode.firstChild, startOffset);
     range.setEnd(endNode.firstChild, endOffset);
 
+    const textSelector = rangeToSelector(range, container);
+
     return reviveTextOffsetTarget({
       ...t,
       selector: [{
+        ...textSelector,
         ...(selector as TEIRangeSelector),
         range
       }]
-    }, container)
+    }, container);
   }
 }
 
