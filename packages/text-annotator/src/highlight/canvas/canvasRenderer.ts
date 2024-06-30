@@ -14,7 +14,7 @@ const createCanvas = () => {
   canvas.height = window.innerHeight;
   canvas.className = 'r6o-highlight-layer bg';
   return canvas;
-}
+};
 
 const resetCanvas = (canvas: HTMLCanvasElement, highres?: boolean) => {
   canvas.width = highres ? 2 * window.innerWidth : window.innerWidth;
@@ -26,7 +26,7 @@ const resetCanvas = (canvas: HTMLCanvasElement, highres?: boolean) => {
     context.scale(2, 2);
     context.translate(0.5, 0.5);
   }
-}
+};
 
 const createRenderer = (container: HTMLElement): RendererImplementation => {
 
@@ -37,8 +37,8 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
 
   container.insertBefore(canvas, container.firstChild);
 
-  const redraw = (   
-    highlights: Highlight[], 
+  const redraw = (
+    highlights: Highlight[],
     viewportBounds: ViewportBounds,
     currentStyle?: HighlightStyleExpression,
     currentPainter?: HighlightPainter
@@ -65,7 +65,7 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
       const { annotation: { target: { created: createdA } } } = highlightA;
       const { annotation: { target: { created: createdB } } } = highlightB;
       return createdA.getTime() - createdB.getTime();
-    })
+    });
 
     highlightsByCreation.forEach(h => {
       const base: HighlightStyle = currentStyle
@@ -90,19 +90,8 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
       ctx.fillStyle = style.fill;
       ctx.globalAlpha = style.fillOpacity || 1;
 
-
-      /**
-       * The default browser's selection highlight is a bit taller than the text itself.
-       * To match it, we need to draw the highlight a bit taller as well.
-       */
-      const selectionHighlightCompensation = 5;
       offsetRects.forEach(({ x, y, width, height }) =>
-        ctx.fillRect(
-          x,
-          y - selectionHighlightCompensation / 2,
-          width,
-          height + selectionHighlightCompensation
-        )
+        ctx.fillRect(x, y, width, height)
       );
 
       if (style.underlineColor) {
@@ -111,7 +100,7 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
         ctx.lineWidth = style.underlineThickness ?? 1;
 
         // Place the underline below the highlighted text + an optional offset
-        const underlineOffset = selectionHighlightCompensation / 2 + (style.underlineOffset ?? 0);
+        const underlineOffset = style.underlineOffset ?? 0;
 
         offsetRects.forEach(({ x, y, width, height }) => {
           ctx.beginPath();
@@ -133,24 +122,24 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
 
   const setVisible = (visible: boolean) => {
     console.log('setVisible not implemented on Canvas renderer');
-  }
+  };
 
   const destroy = () => {
     container.removeChild(canvas);
 
     window.removeEventListener('resize', onResize);
-  }
+  };
 
   return {
     destroy,
     setVisible,
     redraw
-  }
+  };
 
-}
+};
 
 export const createCanvasRenderer = (
-  container: HTMLElement, 
+  container: HTMLElement,
   state: TextAnnotatorState,
   viewport: ViewportState
 ) => createBaseRenderer(container, state, viewport, createRenderer(container));
