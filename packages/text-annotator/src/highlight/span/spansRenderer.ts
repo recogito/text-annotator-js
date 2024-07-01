@@ -2,7 +2,7 @@ import type { ViewportState } from '@annotorious/core';
 import { colord } from 'colord';
 import { dequal } from 'dequal/lite';
 import type { Rect, TextAnnotatorState } from '../../state';
-import { paint, type HighlightPainter } from '../HighlightPainter';
+import { type HighlightPainter, paint } from '../HighlightPainter';
 import type { ViewportBounds } from '../viewport';
 import { createBaseRenderer, type RendererImplementation } from '../baseRenderer';
 import type { Highlight } from '../Highlight';
@@ -71,11 +71,9 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
           span.style.width = `${rect.width}px`;
           span.style.height = `${rect.height}px`;
 
-          const backgroundColor = colord(style?.fill || DEFAULT_STYLE.fill)
+          span.style.backgroundColor = colord(style?.fill || DEFAULT_STYLE.fill)
             .alpha(style?.fillOpacity === undefined ? DEFAULT_STYLE.fillOpacity : style.fillOpacity)
             .toHex();
-
-          span.style.backgroundColor = backgroundColor;
 
           if (style.underlineStyle)
             span.style.borderStyle = style.underlineStyle;
@@ -87,7 +85,7 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
             span.style.borderBottomWidth = `${style.underlineThickness}px`;
 
           if (style.underlineOffset)
-            span.style.paddingBottom = `${style.underlineOffset}px`;
+            span.style.height = `${rect.height + style.underlineOffset}px`
 
           highlightLayer.appendChild(span);
         }
