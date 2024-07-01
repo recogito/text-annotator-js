@@ -9,6 +9,7 @@
 }
 
 .r6o-highlight-layer.bg {
-    z-index: 1;
+    /* Prevents fading out of the text */
     mix-blend-mode: multiply;
+    z-index: 1;
 }
