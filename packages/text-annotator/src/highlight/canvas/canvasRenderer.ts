@@ -8,6 +8,8 @@ import type { Highlight } from '../Highlight';
 import type { TextAnnotatorState } from 'src/state';
 import type { ViewportState } from '@annotorious/core';
 
+import './canvasRenderer.css';
+
 const createCanvas = () => {
   const canvas = document.createElement('canvas');
   canvas.width = window.innerWidth;
