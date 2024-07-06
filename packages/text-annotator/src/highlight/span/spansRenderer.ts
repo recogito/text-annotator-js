@@ -2,7 +2,7 @@ import type { ViewportState } from '@annotorious/core';
 import { colord } from 'colord';
 import { dequal } from 'dequal/lite';
 import type { Rect, TextAnnotatorState } from '../../state';
-import { paint, type HighlightPainter } from '../HighlightPainter';
+import { type HighlightPainter, paint } from '../HighlightPainter';
 import type { ViewportBounds } from '../viewport';
 import { createBaseRenderer, type RendererImplementation } from '../baseRenderer';
 import type { Highlight } from '../Highlight';
@@ -21,7 +21,7 @@ const computeZIndex = (rect: Rect, all: Rect[]): number => {
     intersects(rect, other) &&
     other.width > rect.width
   )).length;
-}
+};
 
 const createRenderer = (container: HTMLElement): RendererImplementation => {
 
@@ -36,12 +36,12 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
   let currentRendered: Highlight[] = [];
 
   const redraw = (
-    highlights: Highlight[], 
+    highlights: Highlight[],
     viewportBounds: ViewportBounds,
     currentStyle?: HighlightStyleExpression,
     painter?: HighlightPainter,
     lazy?: boolean
-  ) => {    
+  ) => {
     const noChanges = dequal(currentRendered, highlights);
 
     // If there are no changes and rendering is set to lazy
@@ -71,11 +71,9 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
           span.style.width = `${rect.width}px`;
           span.style.height = `${rect.height}px`;
 
-          const backgroundColor = colord(style?.fill || DEFAULT_STYLE.fill)
+          span.style.backgroundColor = colord(style?.fill || DEFAULT_STYLE.fill)
             .alpha(style?.fillOpacity === undefined ? DEFAULT_STYLE.fillOpacity : style.fillOpacity)
             .toHex();
-
-          span.style.backgroundColor = backgroundColor;
 
           if (style.underlineStyle)
             span.style.borderStyle = style.underlineStyle;
@@ -95,29 +93,29 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
     });
 
     currentRendered = highlights;
-  }
+  };
 
   const setVisible = (visible: boolean) => {
     if (visible)
       highlightLayer.classList.remove('hidden');
     else
       highlightLayer.classList.add('hidden');
-  }
+  };
 
   const destroy = () => {
     highlightLayer.remove();
-  }
+  };
 
   return {
     destroy,
     redraw,
     setVisible
-  }
+  };
 
-}
+};
 
 export const createSpansRenderer = (
-  container: HTMLElement, 
+  container: HTMLElement,
   state: TextAnnotatorState,
   viewport: ViewportState
 ) => createBaseRenderer(container, state, viewport, createRenderer(container));
