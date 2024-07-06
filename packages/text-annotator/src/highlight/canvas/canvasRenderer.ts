@@ -1,12 +1,12 @@
-import type { ViewportBounds } from '../viewport';
+import type { ViewportState } from '@annotorious/core';
+import type { TextAnnotatorState } from '../../state';
 import { debounce } from '../../utils';
+import type { ViewportBounds } from '../viewport';
 import type { HighlightStyle } from '../HighlightStyle';
 import { DEFAULT_SELECTED_STYLE, DEFAULT_STYLE, HighlightStyleExpression } from '../HighlightStyle';
 import type { HighlightPainter } from '../HighlightPainter';
 import { createBaseRenderer, type RendererImplementation } from '../baseRenderer';
 import type { Highlight } from '../Highlight';
-import type { TextAnnotatorState } from 'src/state';
-import type { ViewportState } from '@annotorious/core';
 
 import './canvasRenderer.css';
 
@@ -14,7 +14,7 @@ const createCanvas = () => {
   const canvas = document.createElement('canvas');
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-  canvas.className = 'r6o-highlight-layer bg';
+  canvas.className = 'r6o-canvas-highlight-layer bg';
   return canvas;
 }
 

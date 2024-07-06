@@ -5,13 +5,15 @@ import type { HighlightPainter } from '../highlight/HighlightPainter';
 import type { PresencePainterOptions } from 'src/presence';
 import type { ViewportBounds } from '../highlight/viewport';
 
+import './PresencePainter.css';
+
 const createCanvas = () => {
   const canvas = document.createElement('canvas');
 
   // Retina resolution for crisp font rendering
   canvas.width = 2 * window.innerWidth;
   canvas.height = 2 * window.innerHeight;
-  canvas.className = 'r6o-highlight-layer presence';
+  canvas.className = 'r6o-presence-layer';
 
   const context = canvas.getContext('2d');
   context.scale(2, 2);
