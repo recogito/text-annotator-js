@@ -37,7 +37,7 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
   const canvas = createCanvas();
   const ctx = canvas.getContext('2d');
 
-  container.insertBefore(canvas, container.firstChild);
+  document.body.appendChild(canvas);
 
   const redraw = (
     highlights: Highlight[],
@@ -127,7 +127,7 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
   }
 
   const destroy = () => {
-    container.removeChild(canvas);
+    canvas.remove();
 
     window.removeEventListener('resize', onResize);
   }
