@@ -21,7 +21,7 @@ const computeZIndex = (rect: Rect, all: Rect[]): number => {
     intersects(rect, other) &&
     other.width > rect.width
   )).length;
-};
+}
 
 const createRenderer = (container: HTMLElement): RendererImplementation => {
 
@@ -93,18 +93,18 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
     });
 
     currentRendered = highlights;
-  };
+  }
 
   const setVisible = (visible: boolean) => {
     if (visible)
       highlightLayer.classList.remove('hidden');
     else
       highlightLayer.classList.add('hidden');
-  };
+  }
 
   const destroy = () => {
     highlightLayer.remove();
-  };
+  }
 
   return {
     destroy,
@@ -112,7 +112,7 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
     setVisible
   };
 
-};
+}
 
 export const createSpansRenderer = (
   container: HTMLElement,

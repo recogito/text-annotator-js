@@ -21,7 +21,7 @@ const toCSS = (s?: HighlightStyle) => {
   ].filter(Boolean);
 
   return rules.join(';');
-};
+}
 
 export const createRenderer = (): RendererImplementation => {
   const elem = document.createElement('style');
@@ -81,11 +81,11 @@ export const createRenderer = (): RendererImplementation => {
     });
 
     currentRendered = nextRendered;
-  };
+  }
 
   const setVisible = (visible: boolean) => {
     console.log('setVisible not implemented on CSS Custom Highlights renderer');
-  };
+  }
 
   const destroy = () => {
     // Clear all highlights from the Highlight Registry
@@ -94,7 +94,7 @@ export const createRenderer = (): RendererImplementation => {
 
     // Remove the stylesheet
     elem.remove();
-  };
+  }
 
   return {
     destroy,
@@ -102,7 +102,7 @@ export const createRenderer = (): RendererImplementation => {
     redraw
   };
 
-};
+}
 
 export const createHighlightsRenderer = (
   container: HTMLElement,

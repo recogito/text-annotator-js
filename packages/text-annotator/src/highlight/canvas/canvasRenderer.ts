@@ -16,7 +16,7 @@ const createCanvas = () => {
   canvas.height = window.innerHeight;
   canvas.className = 'r6o-canvas-highlight-layer bg';
   return canvas;
-};
+}
 
 const resetCanvas = (canvas: HTMLCanvasElement, highres?: boolean) => {
   canvas.width = highres ? 2 * window.innerWidth : window.innerWidth;
@@ -28,7 +28,7 @@ const resetCanvas = (canvas: HTMLCanvasElement, highres?: boolean) => {
     context.scale(2, 2);
     context.translate(0.5, 0.5);
   }
-};
+}
 
 const createRenderer = (container: HTMLElement): RendererImplementation => {
 
@@ -124,13 +124,13 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
 
   const setVisible = (visible: boolean) => {
     console.log('setVisible not implemented on Canvas renderer');
-  };
+  }
 
   const destroy = () => {
     container.removeChild(canvas);
 
     window.removeEventListener('resize', onResize);
-  };
+  }
 
   return {
     destroy,
