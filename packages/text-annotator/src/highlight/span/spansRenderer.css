@@ -12,8 +12,13 @@
 }
 
 .r6o-annotatable .r6o-span-highlight-layer .r6o-annotation {
-  border-style: solid;
-  border-width: 0;
   position: absolute;
   display: block;
+  border-width: 0;
+  border-style: solid;
+}
+
+.r6o-annotation {
+  /* `padding` should grow beyond the `height` and be used as the underline offset */
+  box-sizing: content-box;
 }

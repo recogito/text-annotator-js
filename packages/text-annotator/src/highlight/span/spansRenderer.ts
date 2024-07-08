@@ -21,7 +21,7 @@ const computeZIndex = (rect: Rect, all: Rect[]): number => {
     intersects(rect, other) &&
     other.width > rect.width
   )).length;
-}
+};
 
 const createRenderer = (container: HTMLElement): RendererImplementation => {
 
@@ -36,12 +36,12 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
   let currentRendered: Highlight[] = [];
 
   const redraw = (
-    highlights: Highlight[], 
+    highlights: Highlight[],
     viewportBounds: ViewportBounds,
     currentStyle?: HighlightStyleExpression,
     painter?: HighlightPainter,
     lazy?: boolean
-  ) => {    
+  ) => {
     const noChanges = dequal(currentRendered, highlights);
 
     // If there are no changes and rendering is set to lazy
@@ -85,7 +85,7 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
             span.style.borderBottomWidth = `${style.underlineThickness}px`;
 
           if (style.underlineOffset)
-            span.style.height = `${rect.height + style.underlineOffset}px`
+            span.style.paddingBottom = `${style.underlineOffset}px`;
 
           highlightLayer.appendChild(span);
         }
@@ -93,29 +93,29 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
     });
 
     currentRendered = highlights;
-  }
+  };
 
   const setVisible = (visible: boolean) => {
     if (visible)
       highlightLayer.classList.remove('hidden');
     else
       highlightLayer.classList.add('hidden');
-  }
+  };
 
   const destroy = () => {
     highlightLayer.remove();
-  }
+  };
 
   return {
     destroy,
     redraw,
     setVisible
-  }
+  };
 
-}
+};
 
 export const createSpansRenderer = (
-  container: HTMLElement, 
+  container: HTMLElement,
   state: TextAnnotatorState,
   viewport: ViewportState
 ) => createBaseRenderer(container, state, viewport, createRenderer(container));
