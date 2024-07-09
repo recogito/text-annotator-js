@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotationTarget } from './model';
 import {
+  clonePointerEvent,
   debounce,
   splitAnnotatableRanges,
   rangeToSelector,
@@ -118,13 +119,11 @@ export const SelectionHandler = (
    */
   const onPointerDown = (evt: PointerEvent) => {
     /**
-     * Note that the event itself can be ephemeral!
+     * Cloning the event to prevent it from accidentally being `undefined`
      * @see https://github.com/recogito/text-annotator-js/commit/65d13f3108c429311cf8c2523f6babbbc946013d#r144033948
      */
-    const { target, timeStamp, offsetX, offsetY, type } = evt;
-    lastDownEvent = { ...evt, target, timeStamp, offsetX, offsetY, type };
-
-    isLeftClick = evt.button === 0;
+    lastDownEvent = clonePointerEvent(evt);
+    isLeftClick = lastDownEvent.button === 0;
   }
   container.addEventListener('pointerdown', onPointerDown);
 
@@ -158,7 +157,6 @@ export const SelectionHandler = (
       selection.userSelect(currentTarget.annotation, evt);
     }
   }
-
   document.addEventListener('pointerup', onPointerUp);
 
   const destroy = () => {
