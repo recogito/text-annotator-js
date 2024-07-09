@@ -32,5 +32,5 @@ export type {
 export {
   createBody,
   Origin,
-  PointerSelectAction
+  UserSelectAction
 } from '@annotorious/core';

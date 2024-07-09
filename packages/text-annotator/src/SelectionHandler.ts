@@ -1,4 +1,4 @@
-import { Filter, Origin, type User } from '@annotorious/core';
+import { Filter, Origin, type Selection, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotationTarget } from './model';
@@ -104,9 +104,8 @@ export const SelectionHandler = (
         target: currentTarget
       });
 
-      // ...then make the new annotation the current selection. (Reminder:
-      // select events don't have offsetX/offsetY - reuse last up/down)
-      selection.clickSelect(currentTarget.annotation, lastPointerDown);
+      // ...then make the new annotation the current selection
+      selection.userSelect(currentTarget.annotation, lastDownEvent);
     }
   })
 
@@ -131,8 +130,8 @@ export const SelectionHandler = (
     if (!annotatable || !isLeftClick)
       return;
 
-    // Logic for selecting an existing annotation by clicking it
-    const clickSelect = () => {
+    // Logic for selecting an existing annotation
+    const userSelect = () => {
       const { x, y } = container.getBoundingClientRect();
 
       const hovered = store.getAt(evt.clientX - x, evt.clientY - y, currentFilter);
@@ -140,7 +139,7 @@ export const SelectionHandler = (
         const { selected } = selection;
 
         if (selected.length !== 1 || selected[0].id !== hovered.id)
-          selection.clickSelect(hovered.id, evt);
+          selection.userSelect(hovered.id, evt);
       } else if (!selection.isEmpty()) {
         selection.clear();
       }
@@ -151,9 +150,9 @@ export const SelectionHandler = (
     // Just a click, not a selection
     if (document.getSelection().isCollapsed && timeDifference < 300) {
       currentTarget = undefined;
-      clickSelect();
+      userSelect();
     } else if (currentTarget) {
-      selection.clickSelect(currentTarget.annotation, evt);
+      selection.userSelect(currentTarget.annotation, evt);
     }
   }
 
@@ -174,3 +173,4 @@ export const SelectionHandler = (
   }
 
 }
+
