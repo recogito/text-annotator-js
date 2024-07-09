@@ -31,26 +31,25 @@ export const SelectionHandler = (
 
   let isLeftClick = false;
 
-  let lastPointerDown: PointerEvent | undefined;
+  let lastDownEvent: Selection['event'] | undefined;
 
-  const onSelectStart = (evt: PointerEvent) => {
+  const onSelectStart = (evt: Event) => {
     if (!isLeftClick) return;
 
-    // Make sure we don't listen to selection changes that were
-    // not started on the container, or which are not supposed to
-    // be annotatable (like a component popup).
-    // Note that Chrome/iOS will sometimes return the root doc as target!
+    /**
+     * Make sure we don't listen to selection changes that were
+     * not started on the container, or which are not supposed to
+     * be annotatable (like a component popup).
+     * Note that Chrome/iOS will sometimes return the root doc as target!
+     */
     const annotatable = !(evt.target as Node).parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
-    if (annotatable) {
-      currentTarget = {
-        annotation: uuidv4(),
-        selector: [],
-        creator: currentUser,
-        created: new Date()
-      };
-    } else {
-      currentTarget = undefined;
-    }
+
+    currentTarget = annotatable ? {
+      annotation: uuidv4(),
+      selector: [],
+      creator: currentUser,
+      created: new Date()
+    } : undefined;
   }
 
   if (annotationEnabled)
@@ -69,8 +68,8 @@ export const SelectionHandler = (
     }
 
     // Chrome/iOS does not reliably fire the 'selectstart' event!
-    if (evt.timeStamp - (lastPointerDown?.timeStamp || evt.timeStamp) < 1000 && !currentTarget)
-      onSelectStart(lastPointerDown);
+    if (evt.timeStamp - (lastDownEvent?.timeStamp || evt.timeStamp) < 1000 && !currentTarget)
+      onSelectStart(lastDownEvent);
 
     if (sel.isCollapsed || !isLeftClick || !currentTarget) return;
 
@@ -112,17 +111,21 @@ export const SelectionHandler = (
   if (annotationEnabled)
     document.addEventListener('selectionchange', onSelectionChange);
 
-  // Select events don't carry information about the mouse button
-  // Therefore, to prevent right-click selection, we need to listen
-  // to the initial pointerdown event and remember the button
+  /**
+   * Select events don't carry information about the mouse button
+   * Therefore, to prevent right-click selection, we need to listen
+   * to the initial pointerdown event and remember the button
+   */
   const onPointerDown = (evt: PointerEvent) => {
-    // Note that the event itself can be ephemeral!
+    /**
+     * Note that the event itself can be ephemeral!
+     * @see https://github.com/recogito/text-annotator-js/commit/65d13f3108c429311cf8c2523f6babbbc946013d#r144033948
+     */
     const { target, timeStamp, offsetX, offsetY, type } = evt;
-    lastPointerDown = { ...evt, target, timeStamp, offsetX, offsetY, type };
+    lastDownEvent = { ...evt, target, timeStamp, offsetX, offsetY, type };
 
     isLeftClick = evt.button === 0;
   }
-
   container.addEventListener('pointerdown', onPointerDown);
 
   const onPointerUp = (evt: PointerEvent) => {
@@ -145,7 +148,7 @@ export const SelectionHandler = (
       }
     }
 
-    const timeDifference = evt.timeStamp - lastPointerDown.timeStamp;
+    const timeDifference = evt.timeStamp - lastDownEvent.timeStamp;
 
     // Just a click, not a selection
     if (document.getSelection().isCollapsed && timeDifference < 300) {
