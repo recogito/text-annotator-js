@@ -54,3 +54,10 @@ export type {
 export {
   W3CTextFormat
 } from '@recogito/text-annotator';
+
+export type {
+  RecogitoTEIAnnotator,
+  TEIAnnotation,
+  TEIAnnotationTarget,
+  TEIRangeSelector
+} from '@recogito/text-annotator-tei';

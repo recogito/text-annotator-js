@@ -1,4 +1,4 @@
-import type { PointerSelectAction, Store, ViewportState } from '@annotorious/core';
+import type { Filter, PointerSelectAction, Store, ViewportState } from '@annotorious/core';
 import { 
   createHoverState, 
   createSelectionState, 
@@ -107,9 +107,10 @@ export const createTextAnnotatorState = (
     store.bulkUpdateTargets(revived, origin);
   }
 
-  const getAt = (x: number, y: number): TextAnnotation | undefined => {
-    const annotationId = tree.getAt(x, y);
-    return annotationId ? store.getAnnotation(annotationId) : undefined;
+  const getAt = (x: number, y: number, filter?: Filter): TextAnnotation | undefined => {
+    const annotations = tree.getAt(x, y, Boolean(filter)).map(id => store.getAnnotation(id));
+    const filtered = filter ? annotations.filter(filter) : annotations;
+    return filtered.length > 0 ? filtered[0] : undefined;
   }
 
   const getAnnotationBounds = (id: string, x?: number, y?: number, buffer = 5): DOMRect => {
@@ -130,15 +131,15 @@ export const createTextAnnotatorState = (
   const recalculatePositions = () => tree.recalculate();
 
   store.observe(({ changes }) => {
-    const created = (changes.created || []).filter(a => isRevived(a.target.selector));
     const deleted = (changes.deleted || []).filter(a => isRevived(a.target.selector));
+    const created = (changes.created || []).filter(a => isRevived(a.target.selector));
     const updated = (changes.updated || []).filter(u => isRevived(u.newValue.target.selector));
-
-    if (created.length > 0)
-      tree.set(created.map(a => a.target), false);
 
     if (deleted?.length > 0)
       deleted.forEach(a => tree.remove(a.target));
+
+    if (created.length > 0)
+      tree.set(created.map(a => a.target), false);
 
     if (updated?.length > 0)
       updated.forEach(({ newValue }) => tree.update(newValue.target));

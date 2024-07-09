@@ -1,4 +1,4 @@
-import { createAnonymousGuest, createLifecyleObserver, createBaseAnnotator, Filter, createUndoStack } from '@annotorious/core';
+import { createAnonymousGuest, createLifecycleObserver, createBaseAnnotator, Filter, createUndoStack } from '@annotorious/core';
 import type { Annotator, User, PresenceProvider } from '@annotorious/core';
 import { createCanvasRenderer, createHighlightsRenderer, createSpansRenderer, type HighlightStyleExpression } from './highlight';
 import { createPresencePainter } from './presence';
@@ -47,7 +47,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
 
   const undoStack = createUndoStack(store);
 
-  const lifecycle = createLifecyleObserver<TextAnnotation, E>(state, undoStack, opts.adapter);
+  const lifecycle = createLifecycleObserver<TextAnnotation, E>(state, undoStack, opts.adapter);
   
   let currentUser: User = createAnonymousGuest();
 
@@ -84,6 +84,11 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
 
   const getUser = () => currentUser;
 
+  const setFilter = (filter?: Filter) => {
+    highlightRenderer.setFilter(filter);
+    selectionHandler.setFilter(filter);
+  }
+
   const setUser = (user: User) => {
     currentUser = user;
     selectionHandler.setUser(user);
@@ -117,7 +122,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
     destroy,
     element: container,
     getUser,
-    setFilter: highlightRenderer.setFilter.bind(highlightRenderer),
+    setFilter,
     setStyle: highlightRenderer.setStyle.bind(highlightRenderer),
     redraw: highlightRenderer.redraw.bind(highlightRenderer),
     setUser,

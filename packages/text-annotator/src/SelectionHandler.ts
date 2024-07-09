@@ -1,8 +1,14 @@
-import { Origin, type User } from '@annotorious/core';
+import { Filter, Origin, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotationTarget } from './model';
-import { debounce, splitAnnotatableRanges, rangeToSelector, trimRange, NOT_ANNOTATABLE_SELECTOR } from './utils';
+import {
+  debounce,
+  splitAnnotatableRanges,
+  rangeToSelector,
+  isWhitespaceOrEmpty,
+  NOT_ANNOTATABLE_SELECTOR
+} from './utils';
 
 export const SelectionHandler = (
   container: HTMLElement,
@@ -11,13 +17,17 @@ export const SelectionHandler = (
   offsetReferenceSelector?: string
 ) => {
 
+  let currentUser: User | undefined;
+
+  const setUser = (user?: User) => currentUser = user;
+
+  let currentFilter: Filter | undefined;
+
+  const setFilter = (filter?: Filter) => currentFilter = filter;
+
   const { store, selection } = state;
 
-  let currentUser: User;
-
   let currentTarget: TextAnnotationTarget | undefined;
-
-  const setUser = (user: User) => currentUser = user;
 
   let isLeftClick = false;
 
@@ -65,8 +75,9 @@ export const SelectionHandler = (
     if (sel.isCollapsed || !isLeftClick || !currentTarget) return;
 
     const selectionRange = sel.getRangeAt(0);
-    const trimmedRange = trimRange(selectionRange.cloneRange())
-    const annotatableRanges = splitAnnotatableRanges(trimmedRange);
+    if (isWhitespaceOrEmpty(selectionRange)) return;
+    
+    const annotatableRanges = splitAnnotatableRanges(selectionRange.cloneRange());
 
     const hasChanged =
       annotatableRanges.length !== currentTarget.selector.length ||
@@ -76,19 +87,25 @@ export const SelectionHandler = (
 
     currentTarget = {
       ...currentTarget,
-      selector: annotatableRanges.map(r => rangeToSelector(r, container, offsetReferenceSelector))
+      selector: annotatableRanges.map(r => rangeToSelector(r, container, offsetReferenceSelector)),
+      updated: new Date()
     };
 
     if (store.getAnnotation(currentTarget.annotation)) {
       store.updateTarget(currentTarget, Origin.LOCAL);
     } else {
+      // Proper lifecycle management: clear selection first...
+      selection.clear();
+      
+      // ...then add annotation to store...
       store.addAnnotation({
         id: currentTarget.annotation,
         bodies: [],
         target: currentTarget
       });
 
-      // Reminder: select events don't have offsetX/offsetY - reuse last up/down
+      // ...then make the new annotation the current selection. (Reminder:
+      // select events don't have offsetX/offsetY - reuse last up/down)
       selection.clickSelect(currentTarget.annotation, lastPointerDown);
     }
   })
@@ -118,7 +135,7 @@ export const SelectionHandler = (
     const clickSelect = () => {
       const { x, y } = container.getBoundingClientRect();
 
-      const hovered = store.getAt(evt.clientX - x, evt.clientY - y);
+      const hovered = store.getAt(evt.clientX - x, evt.clientY - y, currentFilter);
       if (hovered) {
         const { selected } = selection;
 
@@ -152,6 +169,7 @@ export const SelectionHandler = (
 
   return {
     destroy,
+    setFilter,
     setUser
   }
 
