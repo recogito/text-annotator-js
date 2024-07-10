@@ -31,12 +31,13 @@ export const SelectionHandler = (
 
   let currentTarget: TextAnnotationTarget | undefined;
 
-  let isLeftClick = false;
+  let isLeftClick: boolean | undefined;
 
   let lastDownEvent: Selection['event'] | undefined;
 
   const onSelectStart = (evt: Event) => {
-    if (!isLeftClick) return;
+    if (isLeftClick === false)
+      return;
 
     /**
      * Make sure we don't listen to selection changes that were
@@ -57,7 +58,7 @@ export const SelectionHandler = (
   if (annotationEnabled)
     container.addEventListener('selectstart', onSelectStart);
 
-  const onSelectionChange = debounce((evt: PointerEvent) => {
+  const onSelectionChange = debounce((evt: Event) => {
     const sel = document.getSelection();
 
     // This is to handle cases where the selection is "hijacked" by another element
@@ -70,10 +71,13 @@ export const SelectionHandler = (
     }
 
     // Chrome/iOS does not reliably fire the 'selectstart' event!
-    if (evt.timeStamp - (lastDownEvent?.timeStamp || evt.timeStamp) < 1000 && !currentTarget)
-      onSelectStart(lastDownEvent);
+    if (evt.timeStamp - (lastDownEvent?.timeStamp || evt.timeStamp) < 1000 && !currentTarget) {
+      onSelectStart(lastDownEvent || evt);
+    }
 
-    if (sel.isCollapsed || !isLeftClick || !currentTarget) return;
+    if (sel.isCollapsed || !currentTarget || isLeftClick === false)
+      return;
+
 
     const selectionRange = sel.getRangeAt(0);
     if (isWhitespaceOrEmpty(selectionRange)) return;
@@ -129,7 +133,9 @@ export const SelectionHandler = (
   container.addEventListener('pointerdown', onPointerDown);
 
   const onKeyDown = (evt: KeyboardEvent) => {
-    lastDownEvent = cloneKeyboardEvent(evt);
+    if (!evt.repeat) {
+      lastDownEvent = cloneKeyboardEvent(evt);
+    }
   }
   container.addEventListener('keydown', onKeyDown);
 
@@ -166,7 +172,7 @@ export const SelectionHandler = (
   document.addEventListener('pointerup', onPointerUp);
 
   const onKeyUp = (evt: KeyboardEvent) => {
-    if (currentTarget) {
+    if (!evt.repeat && currentTarget) {
       selection.userSelect(currentTarget.annotation, evt);
     }
   }
