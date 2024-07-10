@@ -29,7 +29,7 @@ export type {
 export {
   createBody,
   Origin,
-  PointerSelectAction
+  UserSelectAction
 } from '@annotorious/core';
 
 // Essential re-exports from @annotorious/react
