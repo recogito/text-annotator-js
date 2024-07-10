@@ -4,6 +4,7 @@ import type { TextAnnotatorState } from './state';
 import type { TextAnnotationTarget } from './model';
 import {
   clonePointerEvent,
+  cloneKeyboardEvent,
   debounce,
   splitAnnotatableRanges,
   rangeToSelector,
@@ -76,13 +77,13 @@ export const SelectionHandler = (
 
     const selectionRange = sel.getRangeAt(0);
     if (isWhitespaceOrEmpty(selectionRange)) return;
-    
+
     const annotatableRanges = splitAnnotatableRanges(selectionRange.cloneRange());
 
     const hasChanged =
       annotatableRanges.length !== currentTarget.selector.length ||
       annotatableRanges.some((r, i) => r.toString() !== currentTarget.selector[i]?.quote);
-      
+
     if (!hasChanged) return;
 
     currentTarget = {
@@ -96,7 +97,7 @@ export const SelectionHandler = (
     } else {
       // Proper lifecycle management: clear selection first...
       selection.clear();
-      
+
       // ...then add annotation to store...
       store.addAnnotation({
         id: currentTarget.annotation,
@@ -126,6 +127,11 @@ export const SelectionHandler = (
     isLeftClick = lastDownEvent.button === 0;
   }
   container.addEventListener('pointerdown', onPointerDown);
+
+  const onKeyDown = (evt: KeyboardEvent) => {
+    lastDownEvent = cloneKeyboardEvent(evt);
+  }
+  container.addEventListener('keydown', onKeyDown);
 
   const onPointerUp = (evt: PointerEvent) => {
     const annotatable = !(evt.target as Node).parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
@@ -159,12 +165,22 @@ export const SelectionHandler = (
   }
   document.addEventListener('pointerup', onPointerUp);
 
+  const onKeyUp = (evt: KeyboardEvent) => {
+    if (currentTarget) {
+      selection.userSelect(currentTarget.annotation, evt);
+    }
+  }
+  container.addEventListener('keyup', onKeyUp);
+
   const destroy = () => {
     container.removeEventListener('selectstart', onSelectStart);
     document.removeEventListener('selectionchange', onSelectionChange);
-    
+
     container.removeEventListener('pointerdown', onPointerDown);
     document.removeEventListener('pointerup', onPointerUp);
+
+    container.removeEventListener('keydown', onKeyDown);
+    container.removeEventListener('keyup', onKeyUp);
   }
 
   return {
