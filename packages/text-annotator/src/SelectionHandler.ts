@@ -1,5 +1,7 @@
 import { Filter, Origin, type Selection, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
+import hotkeys from 'hotkeys-js';
+import { Key } from 'ts-key-enum';
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotationTarget } from './model';
 import {
@@ -171,12 +173,35 @@ export const SelectionHandler = (
   }
   document.addEventListener('pointerup', onPointerUp);
 
-  const onKeyUp = (evt: KeyboardEvent) => {
-    if (!evt.repeat && currentTarget) {
-      selection.userSelect(currentTarget.annotation, evt);
+  /**
+   * Track the "Shift" key lift which signifies the end of a select operation.
+   * Unfortunately, we cannot track modifier key immediately, so a wildcard is used
+   */
+  hotkeys('*', { keyup: true, keydown: false }, (evt) => {
+    if (hotkeys.shift && evt.key === Key.Shift) {
+      if (!evt.repeat && currentTarget) {
+        selection.userSelect(currentTarget.annotation, evt);
+      }
     }
-  }
-  container.addEventListener('keyup', onKeyUp);
+  });
+
+  /**
+   * Track the "select all" command on lifting the keys.
+   * Unfortunately, system-related shortcuts can be captured
+   * only on `keydown` event, so an additional flag is used.
+   */
+  let selectAllCaptured = false;
+  hotkeys('ctrl+a, ⌘+a', { keyup: false, keydown: true }, () => {
+    selectAllCaptured = true;
+  });
+  hotkeys('*', { keyup: true, keydown: false }, (evt) => {
+    if (selectAllCaptured) {
+      if (!evt.repeat && currentTarget) {
+        selection.userSelect(currentTarget.annotation, evt);
+      }
+    }
+    selectAllCaptured = false;
+  });
 
   const destroy = () => {
     container.removeEventListener('selectstart', onSelectStart);
@@ -186,7 +211,7 @@ export const SelectionHandler = (
     document.removeEventListener('pointerup', onPointerUp);
 
     container.removeEventListener('keydown', onKeyDown);
-    container.removeEventListener('keyup', onKeyUp);
+    hotkeys.unbind();
   }
 
   return {
