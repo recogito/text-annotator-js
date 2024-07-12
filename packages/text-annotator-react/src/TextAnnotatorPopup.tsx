@@ -1,14 +1,16 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useState, PointerEvent } from 'react';
 import { useAnnotator, useSelection } from '@annotorious/react';
-import { type TextAnnotation, type TextAnnotator, type TextSelector } from '@recogito/text-annotator';
-import { getClosestRect, toClientRects } from './utils';
+import { type TextAnnotation, type TextAnnotator } from '@recogito/text-annotator';
 import {
-  autoPlacement,
   autoUpdate,
-  inline, limitShift,
+  inline,
+  limitShift,
   offset,
   shift,
-  useFloating
+  useDismiss,
+  useFloating,
+  useInteractions,
+  useRole
 } from '@floating-ui/react';
 
 interface TextAnnotationPopupProps {
@@ -31,7 +33,7 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
 
   const [isOpen, setOpen] = useState(selected?.length > 0);
 
-  const { refs, floatingStyles, update } = useFloating({
+  const { refs, floatingStyles, context } = useFloating({
     placement: 'top',
     open: isOpen,
     onOpenChange: (open, _event, reason) => {
@@ -43,6 +45,10 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
     middleware: [offset(10), inline(), shift({ padding: 10, limiter: limitShift() })],
     whileElementsMounted: autoUpdate
   });
+
+  const dismiss = useDismiss(context);
+  const role = useRole(context, { role: 'tooltip' });
+  const { getFloatingProps } = useInteractions([dismiss, role]);
 
   const selectedKey = selected.map(a => a.annotation.id).join('-');
   useEffect(() => {
@@ -67,11 +73,19 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
     });
   }, [isOpen, annotation, refs]);
 
+  // Prevent text-annotator from handling the irrelevant events triggered from the popup
+  const getStopEventsPropagationProps = useCallback(
+    () => ({ onPointerUp: (event: PointerEvent<HTMLDivElement>) => event.stopPropagation() }),
+    []
+  );
+
   return isOpen && selected.length > 0 ? (
     <div
       className="annotation-popup text-annotation-popup not-annotatable"
       ref={refs.setFloating}
-      style={floatingStyles}>
+      style={floatingStyles}
+      {...getFloatingProps()}
+      {...getStopEventsPropagationProps()}>
       {props.popup({ selected })}
     </div>
   ) : null;
