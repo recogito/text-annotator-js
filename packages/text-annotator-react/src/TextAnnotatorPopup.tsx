@@ -4,7 +4,6 @@ import { type TextAnnotation, type TextAnnotator } from '@recogito/text-annotato
 import {
   autoUpdate,
   inline,
-  limitShift,
   offset,
   shift,
   useDismiss,
@@ -42,7 +41,11 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
         r?.cancelSelected();
       }
     },
-    middleware: [offset(10), inline(), shift({ padding: 10, limiter: limitShift() })],
+    middleware: [
+      offset(10),
+      inline(),
+      shift({ mainAxis: false, crossAxis: true, padding: 10 })
+    ],
     whileElementsMounted: autoUpdate
   });
 
