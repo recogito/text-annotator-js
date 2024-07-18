@@ -134,13 +134,6 @@ export const SelectionHandler = (
   }
   container.addEventListener('pointerdown', onPointerDown);
 
-  const onKeyDown = (evt: KeyboardEvent) => {
-    if (!evt.repeat) {
-      lastDownEvent = cloneKeyboardEvent(evt);
-    }
-  }
-  container.addEventListener('keydown', onKeyDown);
-
   const onPointerUp = (evt: PointerEvent) => {
     const annotatable = !(evt.target as Node).parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
     if (!annotatable || !isLeftClick)
@@ -174,8 +167,18 @@ export const SelectionHandler = (
   document.addEventListener('pointerup', onPointerUp);
 
   /**
+   * Track arbitrary keydown events to use them during
+   * the `selectionchange` annotation selection.
+   */
+  hotkeys('*', { element: container, keyup: false, keydown: true }, (evt, handler) => {
+    if (!evt.repeat) {
+      lastDownEvent = cloneKeyboardEvent(evt);
+    }
+  });
+
+  /**
    * Track the "Shift" key lift which signifies the end of a select operation.
-   * Unfortunately, we cannot track modifier key immediately, so a wildcard is used
+   * Unfortunately, we cannot track modifier key immediately, so the wildcard is used.
    */
   hotkeys('*', { keyup: true, keydown: false }, (evt) => {
     if (hotkeys.shift && evt.key === Key.Shift) {
@@ -210,7 +213,6 @@ export const SelectionHandler = (
     container.removeEventListener('pointerdown', onPointerDown);
     document.removeEventListener('pointerup', onPointerUp);
 
-    container.removeEventListener('keydown', onKeyDown);
     hotkeys.unbind();
   }
 
