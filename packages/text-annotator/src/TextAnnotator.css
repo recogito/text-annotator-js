@@ -2,13 +2,11 @@ html, body {
   overscroll-behavior-y: none;
 }
 
-/* https://stackoverflow.com/questions/42507623/blue-highlight-on-onclick-on-buttons-in-chrome-mobile */
 .r6o-annotatable {
-  -webkit-tap-highlight-color: transparent;
-}
-
-.r6o-annotatable, .r6o-annotatable * {
   position: relative;
+
+  /* https://stackoverflow.com/questions/42507623/blue-highlight-on-onclick-on-buttons-in-chrome-mobile */
+  -webkit-tap-highlight-color: transparent;
 }
 
 .hovered * {
