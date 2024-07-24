@@ -11,7 +11,9 @@ export interface TextAnnotationStore extends Omit<Store<TextAnnotation>, 'addAnn
 
   bulkUpsertAnnotations(annotations: TextAnnotation[], origin?: Origin): TextAnnotation[];
 
-  getAnnotationBounds(id: string, hintX?: number, hintY?: number, buffer?: number): DOMRect;
+  getAnnotationRects(id: string): DOMRect[];
+
+  getAnnotationBounds(id: string, hintX?: number, hintY?: number, buffer?: number): DOMRect | undefined;
 
   getAt(x: number, y: number, filter?: Filter): TextAnnotation | undefined;
 

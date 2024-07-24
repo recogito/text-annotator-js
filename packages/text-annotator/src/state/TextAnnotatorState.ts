@@ -113,7 +113,7 @@ export const createTextAnnotatorState = (
     return filtered.length > 0 ? filtered[0] : undefined;
   }
 
-  const getAnnotationBounds = (id: string, x?: number, y?: number, buffer = 5): DOMRect => {
+  const getAnnotationBounds = (id: string, x?: number, y?: number, buffer = 5): DOMRect | undefined => {
     const rects = tree.getAnnotationRects(id);
     if (rects.length === 0) return;
 
@@ -154,7 +154,8 @@ export const createTextAnnotatorState = (
       bulkUpsertAnnotations,
       getAnnotationBounds,
       getAt,
-      getIntersecting: tree.getIntersecting,
+      getIntersecting: tree.getIntersecting.bind(tree),
+      getAnnotationRects: tree.getAnnotationRects.bind(tree),
       recalculatePositions,
       updateTarget
     },
