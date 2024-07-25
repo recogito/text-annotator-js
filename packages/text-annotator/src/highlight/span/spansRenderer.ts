@@ -10,17 +10,20 @@ import { DEFAULT_STYLE, type HighlightStyleExpression } from '../HighlightStyle'
 
 import './spansRenderer.css';
 
-const computeZIndex = (rect: Rect, all: Rect[]): number => {
+const computeZIndex = (rect: Rect, all: Highlight[]): number => {
   const intersects = (a: Rect, b: Rect): boolean => (
     a.x <= b.x + b.width && a.x + a.width >= b.x &&
     a.y <= b.y + b.height && a.y + a.height >= b.y
   )
 
-  return all.filter(other => (
-    rect !== other &&
-    intersects(rect, other) &&
-    other.width > rect.width
-  )).length;
+  const getLength = (h: Highlight) => 
+    h.rects.reduce((total, rect) => total + rect.width, 0);
+
+  // Any highlights that intersect this rect, sorted by total length
+  const intersecting = all.filter(({ rects }) => rects.some(r => intersects(rect, r)));
+  intersecting.sort((a, b) => getLength(b) - getLength(a));
+
+  return intersecting.findIndex(h => h.rects.includes(rect));
 }
 
 const createRenderer = (container: HTMLElement): RendererImplementation => {
@@ -53,12 +56,9 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
     if (shouldRedraw)
       highlightLayer.innerHTML = '';
 
-    // Rects from all visible annotations, for z-index computation
-    const allRects = highlights.reduce<Rect[]>((all, { rects }) => ([...all, ...rects]), []);
-
     highlights.forEach(highlight => {
       highlight.rects.map(rect => {
-        const zIndex = computeZIndex(rect, allRects);
+        const zIndex = computeZIndex(rect, highlights);
         const style = paint(highlight, viewportBounds, currentStyle, painter, zIndex);
 
         if (shouldRedraw) {
