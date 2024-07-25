@@ -1,6 +1,6 @@
 import { PointerEvent, ReactNode, useCallback, useEffect, useState } from 'react';
 import { useAnnotator, useSelection } from '@annotorious/react';
-import { denormalizeRectWithOffset, type TextAnnotation, type TextAnnotator } from '@recogito/text-annotator';
+import { toDomRectList, denormalizeRectWithOffset, type TextAnnotation, type TextAnnotator } from '@recogito/text-annotator';
 import {
   autoUpdate,
   inline,
@@ -71,9 +71,10 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
       ),
       getClientRects: () => {
         const rects = r.state.store.getAnnotationRects(annotation.id);
-        return rects.map(
+        const denormalizedRects = rects.map(
           rect => denormalizeRectWithOffset(rect, r.element.getBoundingClientRect())
         );
+        return toDomRectList(denormalizedRects);
       }
     });
   }, [isOpen, annotation?.id, r]);
