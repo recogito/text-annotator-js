@@ -13,8 +13,9 @@
 }
 
 .r6o-annotatable .r6o-span-highlight-layer .r6o-annotation {
-  display: block;
   border-style: solid;
-  position: absolute;
   border-width: 0;
+  box-sizing: content-box;
+  display: block;
+  position: absolute;
 }
