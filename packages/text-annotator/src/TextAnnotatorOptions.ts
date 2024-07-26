@@ -7,7 +7,7 @@ export interface TextAnnotatorOptions<T extends unknown = TextAnnotation> {
 
   adapter?: FormatAdapter<TextAnnotation, T> | null;
 
-  annotationEnabled?: boolean;
+  annotatingEnabled?: boolean;
 
   renderer?: RendererType;
 
@@ -18,7 +18,7 @@ export interface TextAnnotatorOptions<T extends unknown = TextAnnotation> {
   presence?: PresencePainterOptions;
 
   style?: HighlightStyleExpression;
-    
+
 }
 
 export type RendererType = 'SPANS' | 'CANVAS' | 'CSS_HIGHLIGHTS';
@@ -30,7 +30,7 @@ export const fillDefaults = <T extends unknown = TextAnnotation>  (
 
   return {
     ...opts,
-    annotationEnabled: opts.annotationEnabled === undefined ? defaults.annotationEnabled : opts.annotationEnabled
+    annotatingEnabled: opts.annotatingEnabled ?? defaults.annotatingEnabled
   };
 
 };
