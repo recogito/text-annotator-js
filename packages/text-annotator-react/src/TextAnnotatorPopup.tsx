@@ -5,6 +5,7 @@ import {
   autoUpdate,
   inline,
   offset,
+  flip,
   shift,
   useDismiss,
   useFloating,
@@ -46,6 +47,7 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
     middleware: [
       offset(10),
       inline(),
+      flip(),
       shift({ mainAxis: false, crossAxis: true, padding: 10 })
     ],
     whileElementsMounted: autoUpdate
