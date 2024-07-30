@@ -34,7 +34,7 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
 
   const [isOpen, setOpen] = useState(selected?.length > 0);
 
-  const { refs, floatingStyles, context } = useFloating({
+  const { refs, floatingStyles, update, context } = useFloating({
     placement: 'top',
     open: isOpen,
     onOpenChange: (open, _event, reason) => {
@@ -86,6 +86,20 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
     () => ({ onPointerUp: (event: PointerEvent<HTMLDivElement>) => event.stopPropagation() }),
     []
   );
+
+  useEffect(() => {
+    const config: MutationObserverInit = { attributes: true, childList: true, subtree: true };
+
+    const mutationObserver = new MutationObserver(() => update());
+    mutationObserver.observe(document.body, config);
+
+    window.document.addEventListener('scroll', update, true);
+
+    return () => {
+      mutationObserver.disconnect();
+      window.document.removeEventListener('scroll', update, true);
+    }
+  }, [update]);
 
   return isOpen && selected.length > 0 ? (
     <div
