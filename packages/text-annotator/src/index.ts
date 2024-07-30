@@ -24,6 +24,7 @@ export type {
   StoreObserver,
   ParseResult,
   User,
+  UserSelectActionExpression,
   W3CAnnotation,
   W3CAnnotationBody,
   W3CAnnotationTarget

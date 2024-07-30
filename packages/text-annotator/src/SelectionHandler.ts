@@ -17,7 +17,7 @@ import {
 export const SelectionHandler = (
   container: HTMLElement,
   state: TextAnnotatorState,
-  annotationEnabled: boolean,
+  annotatingEnabled: boolean,
   offsetReferenceSelector?: string
 ) => {
 
@@ -57,7 +57,7 @@ export const SelectionHandler = (
     } : undefined;
   }
 
-  if (annotationEnabled)
+  if (annotatingEnabled)
     container.addEventListener('selectstart', onSelectStart);
 
   const onSelectionChange = debounce((evt: Event) => {
@@ -116,7 +116,7 @@ export const SelectionHandler = (
     }
   })
 
-  if (annotationEnabled)
+  if (annotatingEnabled)
     document.addEventListener('selectionchange', onSelectionChange);
 
   /**

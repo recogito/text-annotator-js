@@ -27,7 +27,7 @@ export interface TextAnnotator<E extends unknown = TextAnnotation> extends Annot
 }
 
 export const createTextAnnotator = <E extends unknown = TextAnnotation>(
-  container: HTMLElement, 
+  container: HTMLElement,
   options: TextAnnotatorOptions<E> = {}
 ): TextAnnotator<E> => {
   // Prevent mobile browsers from triggering word selection on single click.
@@ -37,10 +37,10 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   programmaticallyFocusable(container);
 
   const opts = fillDefaults<E>(options, {
-    annotationEnabled: true
+    annotatingEnabled: true
   });
 
-  const state: TextAnnotatorState = createTextAnnotatorState(container, opts.userSelectAction);
+  const state: TextAnnotatorState = createTextAnnotatorState(container, opts.userAction);
 
   const { selection, viewport } = state;
 
@@ -49,18 +49,18 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   const undoStack = createUndoStack(store);
 
   const lifecycle = createLifecycleObserver<TextAnnotation, E>(state, undoStack, opts.adapter);
-  
+
   let currentUser: User = createAnonymousGuest();
 
   // Use selected renderer, or fall back to default. If CSS_HIGHLIGHT is
   // requested, check if CSS Custom Highlights are supported, and fall
   // back to default renderer if not.
   const useRenderer: RendererType =
-    opts.renderer === 'CSS_HIGHLIGHTS' 
+    opts.renderer === 'CSS_HIGHLIGHTS'
       ? Boolean(CSS.highlights) ? 'CSS_HIGHLIGHTS' : USE_DEFAULT_RENDERER
       : opts.renderer || USE_DEFAULT_RENDERER;
 
-  const highlightRenderer = 
+  const highlightRenderer =
     useRenderer === 'SPANS' ? createSpansRenderer(container, state, viewport) :
     useRenderer === 'CSS_HIGHLIGHTS' ? createHighlightsRenderer(container, state, viewport) :
     useRenderer === 'CANVAS' ? createCanvasRenderer(container, state, viewport) : undefined;
@@ -69,11 +69,11 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
     throw `Unknown renderer implementation: ${useRenderer}`;
 
   console.debug(`Using ${useRenderer} renderer`);
-     
+
   if (opts.style)
     highlightRenderer.setStyle(opts.style);
 
-  const selectionHandler = SelectionHandler(container, state, opts.annotationEnabled, opts.offsetReferenceSelector);
+  const selectionHandler = SelectionHandler(container, state, opts.annotatingEnabled, opts.offsetReferenceSelector);
   selectionHandler.setUser(currentUser);
 
   /*************************/
