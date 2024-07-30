@@ -1,9 +1,10 @@
 import type { Color, PresenceProvider, PresentUser } from '@annotorious/core';
 import type { AnnotationRects } from '../state';
-import type { HighlightStyle } from '../highlight/HighlightStyle';
-import type { HighlightPainter } from '../highlight/HighlightPainter';
-import type { PresencePainterOptions } from 'src/presence';
+import type { HighlightStyle, HighlightPainter } from '../highlight';
+import type { PresencePainterOptions } from '../presence';
 import type { ViewportBounds } from '../highlight/viewport';
+
+import './PresencePainter.css';
 
 const createCanvas = () => {
   const canvas = document.createElement('canvas');
@@ -11,7 +12,7 @@ const createCanvas = () => {
   // Retina resolution for crisp font rendering
   canvas.width = 2 * window.innerWidth;
   canvas.height = 2 * window.innerHeight;
-  canvas.className = 'r6o-highlight-layer presence';
+  canvas.className = 'r6o-presence-layer';
 
   const context = canvas.getContext('2d');
   context.scale(2, 2);
@@ -30,7 +31,7 @@ export const createPresencePainter = (
 
   const ctx = canvas.getContext('2d');
 
-  container.appendChild(canvas);
+  document.body.appendChild(canvas);
 
   const trackedAnnotations = new Map<string, PresentUser>();
 

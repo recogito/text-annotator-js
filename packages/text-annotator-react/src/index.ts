@@ -21,6 +21,7 @@ export type {
   StoreObserver,
   ParseResult,
   User,
+  UserSelectActionExpression,
   W3CAnnotation,
   W3CAnnotationBody,
   W3CAnnotationTarget
@@ -29,7 +30,7 @@ export type {
 export {
   createBody,
   Origin,
-  PointerSelectAction
+  UserSelectAction,
 } from '@annotorious/core';
 
 // Essential re-exports from @annotorious/react
@@ -50,3 +51,14 @@ export type {
   TextAnnotator as RecogitoTextAnnotator,
   TextAnnotationStore
 } from '@recogito/text-annotator';
+
+export {
+  W3CTextFormat
+} from '@recogito/text-annotator';
+
+export type {
+  RecogitoTEIAnnotator,
+  TEIAnnotation,
+  TEIAnnotationTarget,
+  TEIRangeSelector
+} from '@recogito/text-annotator-tei';

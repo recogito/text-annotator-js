@@ -1,14 +1,16 @@
-import { ReactNode, useEffect, useState } from 'react';
-import { useSelection } from '@annotorious/react';
-import type { TextAnnotation, TextSelector } from '@recogito/text-annotator';
-import { getClosestRect, toClientRects } from './utils';
+import { ReactNode, useCallback, useEffect, useState, PointerEvent } from 'react';
+import { useAnnotator, useSelection } from '@annotorious/react';
+import { type TextAnnotation, type TextAnnotator } from '@recogito/text-annotator';
 import {
-  autoPlacement,
   autoUpdate,
   inline,
   offset,
+  flip,
   shift,
-  useFloating
+  useDismiss,
+  useFloating,
+  useInteractions,
+  useRole
 } from '@floating-ui/react';
 
 interface TextAnnotationPopupProps {
@@ -25,88 +27,91 @@ export interface TextAnnotatorPopupProps {
 
 export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
 
-  const { selected, pointerEvent } = useSelection<TextAnnotation>();
-  
-  const [mousePos, setMousePos] = useState<{ x: number, y: number } | undefined>();
+  const r = useAnnotator<TextAnnotator>();
 
-  const [isOpen, setIsOpen] = useState(selected?.length > 0);
+  const { selected, event } = useSelection<TextAnnotation>();
 
-  const { refs, floatingStyles, update } = useFloating({
+  const annotation = selected[0]?.annotation;
+
+  const [isOpen, setOpen] = useState(selected?.length > 0);
+
+  const { refs, floatingStyles, update, context } = useFloating({
+    placement: 'top',
     open: isOpen,
-    onOpenChange: setIsOpen,
+    onOpenChange: (open, _event, reason) => {
+      setOpen(open);
+      if (!open && reason === 'escape-key') {
+        r?.cancelSelected();
+      }
+    },
     middleware: [
-      autoPlacement({ crossAxis: true, padding: 5 }), 
-      inline(), 
-      offset(5), 
-      shift({ crossAxis: true, padding: 5 })
+      offset(10),
+      inline(),
+      flip(),
+      shift({ mainAxis: false, crossAxis: true, padding: 10 })
     ],
     whileElementsMounted: autoUpdate
   });
 
+  const dismiss = useDismiss(context);
+
+  const role = useRole(context, { role: 'tooltip' });
+  
+  const { getFloatingProps } = useInteractions([dismiss, role]);
+
+  const selectedKey = selected.map(a => a.annotation.id).join('-');
+
   useEffect(() => {
-    // Ignore all selection changes except those
-    // accompanied by a pointer event.
-    if (pointerEvent) {
-      if (selected.length > 0 && pointerEvent.type === 'pointerup') {
-        setIsOpen(true);
-      } else {
-        setIsOpen(false);
+    // Ignore all selection changes except those accompanied by a pointer event.
+    if (event) {
+      setOpen(selected.length > 0 && event.type === 'pointerup');
+    }
+  }, [event?.type, selectedKey]);
+
+  useEffect(() => {
+    if (!isOpen || !annotation) return;
+
+    const {
+      target: {
+        selector: [{ range }]
       }
-    }
-  }, [pointerEvent, selected.map(a => a.annotation.id).join('-')]);
+    } = annotation;
+
+    refs.setPositionReference({
+      getBoundingClientRect: range.getBoundingClientRect.bind(range),
+      getClientRects: range.getClientRects.bind(range)
+    });
+  }, [isOpen, annotation, refs]);
+
+  // Prevent text-annotator from handling the irrelevant events triggered from the popup
+  const getStopEventsPropagationProps = useCallback(
+    () => ({ onPointerUp: (event: PointerEvent<HTMLDivElement>) => event.stopPropagation() }),
+    []
+  );
 
   useEffect(() => {
-    if (selected?.length > 0) {
-      const selector = selected[0].annotation.target.selector as (TextSelector | TextSelector[]);
-      const range = Array.isArray(selector) ? selector[0].range : selector.range; 
-
-      if (range && !range.collapsed) {
-        refs.setReference({
-          getBoundingClientRect: () => {
-            return range.getBoundingClientRect();
-          },
-          getClientRects: () => { 
-            const rect = mousePos 
-              ? getClosestRect(range.getClientRects(), mousePos)
-              : range.getClientRects()[0];
-
-            return toClientRects(rect);
-          }
-        });
-      }
-    }
-  }, [open, selected, mousePos]);
-
-  useEffect(() => {
-    const onPointerUp = (event: PointerEvent) => {
-      const { clientX, clientY } = event;
-      setMousePos({ x: clientX, y: clientY });
-    }
-
     const config: MutationObserverInit = { attributes: true, childList: true, subtree: true };
 
-    const mutationObserver = new MutationObserver(() =>
-      update());
-
+    const mutationObserver = new MutationObserver(() => update());
     mutationObserver.observe(document.body, config);
 
     window.document.addEventListener('scroll', update, true);
-    window.document.addEventListener('pointerup', onPointerUp);
 
     return () => {
       mutationObserver.disconnect();
       window.document.removeEventListener('scroll', update, true);
-      window.document.removeEventListener('pointerup', onPointerUp);
     }
   }, [update]);
 
-  return (isOpen && selected.length > 0) && (
+  return isOpen && selected.length > 0 ? (
     <div
       className="annotation-popup text-annotation-popup not-annotatable"
       ref={refs.setFloating}
-      style={floatingStyles}>
+      style={floatingStyles}
+      {...getFloatingProps()}
+      {...getStopEventsPropagationProps()}>
       {props.popup({ selected })}
     </div>
-  )
+  ) : null;
 
 }

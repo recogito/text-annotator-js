@@ -6,36 +6,37 @@ import { TextAnnotation, TextAnnotator as RecogitoTextAnnotator, W3CTextFormat }
 const TestPopup = (props: TextAnnotatorPopupProps) => {
 
   const store = useAnnotationStore();
-
-  const el = useRef<HTMLDivElement>(null);
-
   const anno = useAnnotator<RecogitoTextAnnotator>();
+
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const body: AnnotationBody = {
     id: `${Math.random()}`,
     annotation: props.selected[0].annotation.id,
     purpose: 'commenting',
     value: 'A Dummy Comment'
-  }
+  };
 
   const onClick = () => {
     store.addBody(body);
-    anno.state.selection.clear();
-  }
+    anno.cancelSelected();
+  };
 
   useEffect(() => {
-    window.setTimeout(() =>
-      el.current?.querySelector('input')!.focus(), 1);
+    const { current: inputEl } = inputRef;
+    if (!inputEl) return;
+
+    setTimeout(() => inputEl.focus({ preventScroll: true }));
   }, []);
 
   return (
-    <div ref={el} className="popup">
-      <input type="text" />
+    <div className="popup">
+      <input ref={inputRef} type="text" />
       <button onClick={onClick}>Close</button>
     </div>
-  )
+  );
 
-}
+};
 
 const MockStorage = () => {
 
@@ -61,12 +62,12 @@ const MockStorage = () => {
       anno.off('deleteAnnotation', handleDeleteAnnotation);
       anno.off('selectionChanged', handleSelectionChanged);
       anno.off('updateAnnotation', handleUpdateAnnotation);
-    }
+    };
   }, [anno]);
 
   return null;
 
-}
+};
 
 export const App = () => {
   const w3cAdapter = useCallback((container: HTMLElement) => W3CTextFormat('https://www.gutenberg.org', container), []);
@@ -201,8 +202,8 @@ export const App = () => {
         }
       />
 
-      <MockStorage/>
+      <MockStorage />
     </Annotorious>
-  )
+  );
 
-}
+};

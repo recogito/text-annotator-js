@@ -4,17 +4,14 @@
   "target": {
     "annotation": "5430edac-706b-4943-9b87-fd6e8f281b39",
     "selector": [{
-      "start": 3436,
       "startSelector": {
         "type": "XPathSelector",
         "value": "//castItem[@xml:id='WITCHES_Mac']::13"
       },
-      "end": 5102,
       "endSelector": {
         "type": "XPathSelector",
         "value": "//castItem[@xml:id='Ross_Mac']/role[1]/name[1]::4"
-      },
-      "quote": "Three Witches, the Weïrd Sisters Duncan king of Scotland Malcolm his elder son Donalbain Duncan’s younger son Macbeth thane of Glamis Lady Macbeth Seyton attendant to Macbeth Three Murderers in Macbeth’s service both attending upon Lady Macbeth A Doctor A Gentlewoman A Porter Banquo commander, with Macbeth, of Duncan’s army Fleance his son Macduff a Scottish noble Lady Macduff Their son Scottish Nobles Lennox Ross"
+      }
     }],
     "creator": {
       "isGuest": true,

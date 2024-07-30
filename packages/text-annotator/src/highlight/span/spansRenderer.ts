@@ -2,7 +2,7 @@ import type { ViewportState } from '@annotorious/core';
 import { colord } from 'colord';
 import { dequal } from 'dequal/lite';
 import type { Rect, TextAnnotatorState } from '../../state';
-import { paint, type HighlightPainter } from '../HighlightPainter';
+import { type HighlightPainter, paint } from '../HighlightPainter';
 import type { ViewportBounds } from '../viewport';
 import { createBaseRenderer, type RendererImplementation } from '../baseRenderer';
 import type { Highlight } from '../Highlight';
@@ -10,17 +10,20 @@ import { DEFAULT_STYLE, type HighlightStyleExpression } from '../HighlightStyle'
 
 import './spansRenderer.css';
 
-const computeZIndex = (rect: Rect, all: Rect[]): number => {
+const computeZIndex = (rect: Rect, all: Highlight[]): number => {
   const intersects = (a: Rect, b: Rect): boolean => (
     a.x <= b.x + b.width && a.x + a.width >= b.x &&
     a.y <= b.y + b.height && a.y + a.height >= b.y
   );
 
-  return all.filter(other => (
-    rect !== other &&
-    intersects(rect, other) &&
-    other.width > rect.width
-  )).length;
+  const getLength = (h: Highlight) => 
+    h.rects.reduce((total, rect) => total + rect.width, 0);
+
+  // Any highlights that intersect this rect, sorted by total length
+  const intersecting = all.filter(({ rects }) => rects.some(r => intersects(rect, r)));
+  intersecting.sort((a, b) => getLength(b) - getLength(a));
+
+  return intersecting.findIndex(h => h.rects.includes(rect));
 }
 
 const createRenderer = (container: HTMLElement): RendererImplementation => {
@@ -36,29 +39,26 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
   let currentRendered: Highlight[] = [];
 
   const redraw = (
-    highlights: Highlight[], 
+    highlights: Highlight[],
     viewportBounds: ViewportBounds,
     currentStyle?: HighlightStyleExpression,
     painter?: HighlightPainter,
     lazy?: boolean
-  ) => {    
+  ) => {
     const noChanges = dequal(currentRendered, highlights);
 
     // If there are no changes and rendering is set to lazy
     // Don't redraw the SPANs - but redraw the painter, if any!
     const shouldRedraw = !(noChanges && lazy);
 
-    if (!painter) return;
+    if (!painter && !shouldRedraw) return;
 
     if (shouldRedraw)
       highlightLayer.innerHTML = '';
 
-    // Rects from all visible annotations, for z-index computation
-    const allRects = highlights.reduce<Rect[]>((all, { rects }) => ([...all, ...rects]), []);
-
     highlights.forEach(highlight => {
       highlight.rects.map(rect => {
-        const zIndex = computeZIndex(rect, allRects);
+        const zIndex = computeZIndex(rect, highlights);
         const style = paint(highlight, viewportBounds, currentStyle, painter, zIndex);
 
         if (shouldRedraw) {
@@ -71,11 +71,9 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
           span.style.width = `${rect.width}px`;
           span.style.height = `${rect.height}px`;
 
-          const backgroundColor = colord(style?.fill || DEFAULT_STYLE.fill)
+          span.style.backgroundColor = colord(style?.fill || DEFAULT_STYLE.fill)
             .alpha(style?.fillOpacity === undefined ? DEFAULT_STYLE.fillOpacity : style.fillOpacity)
             .toHex();
-
-          span.style.backgroundColor = backgroundColor;
 
           if (style.underlineStyle)
             span.style.borderStyle = style.underlineStyle;
@@ -112,12 +110,12 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
     destroy,
     redraw,
     setVisible
-  }
+  };
 
 }
 
 export const createSpansRenderer = (
-  container: HTMLElement, 
+  container: HTMLElement,
   state: TextAnnotatorState,
   viewport: ViewportState
 ) => createBaseRenderer(container, state, viewport, createRenderer(container));
