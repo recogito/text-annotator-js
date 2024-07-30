@@ -25,9 +25,11 @@ export interface TextAnnotatorPopupProps {
 }
 
 export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
+
   const r = useAnnotator<TextAnnotator>();
 
-  const { selected, pointerEvent } = useSelection<TextAnnotation>();
+  const { selected, event } = useSelection<TextAnnotation>();
+
   const annotation = selected[0]?.annotation;
 
   const [isOpen, setOpen] = useState(selected?.length > 0);
@@ -50,16 +52,19 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
   });
 
   const dismiss = useDismiss(context);
+
   const role = useRole(context, { role: 'tooltip' });
+  
   const { getFloatingProps } = useInteractions([dismiss, role]);
 
   const selectedKey = selected.map(a => a.annotation.id).join('-');
+
   useEffect(() => {
     // Ignore all selection changes except those accompanied by a pointer event.
-    if (pointerEvent) {
-      setOpen(selected.length > 0 && pointerEvent.type === 'pointerup');
+    if (event) {
+      setOpen(selected.length > 0 && event.type === 'pointerup');
     }
-  }, [pointerEvent?.type, selectedKey]);
+  }, [event?.type, selectedKey]);
 
   useEffect(() => {
     if (!isOpen || !annotation) return;
