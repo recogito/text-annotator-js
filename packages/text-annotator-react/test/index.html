@@ -5,49 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RecogitoJS React</title>
     <style>
-      html, body {
-        background: #fff;
-        padding: 40px;
-        margin: 0;
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-      }
+        *, *:before, *:after {
+            box-sizing: border-box;
+        }
 
-      h1 {
-        margin: 0;
-        padding: 0 0 20px 0;
-      }
-      
-      p {
-        font-size: 17px;
-        line-height: 160%;
-      }
+        html, body {
+            background: #fff;
+            padding: 40px;
+            margin: 0;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+        }
 
-      .popup {
-        background-color: #fff;
-        border: 1px solid gray;
-        padding: 20px;
-      }
+        h1 {
+            margin: 0;
+            padding: 0 0 20px 0;
+        }
 
-      #debug {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        background-color: rgba(0, 0, 0, 0.65);
-        color: #fff;
-      }
+        p {
+            font-size: 17px;
+            line-height: 160%;
+        }
 
-      #debug p {
-        padding: 0;
-        margin: 0;
-      }
+        .popup {
+            background-color: #fff;
+            border: 1px solid gray;
+            padding: 20px;
+        }
+
+        #debug {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.65);
+            color: #fff;
+        }
+
+        #debug p {
+            padding: 0;
+            margin: 0;
+        }
     </style>
   </head>
   <body>
-    <div id="root"></div>
-    <!-- div id="debug"></div -->
-    <script type="module" src="./index.tsx"></script>
+  <div id="root"></div>
+  <!-- div id="debug"></div -->
+  <script type="module" src="./index.tsx"></script>
   </body>
 </html>

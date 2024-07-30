@@ -14,7 +14,7 @@ const computeZIndex = (rect: Rect, all: Highlight[]): number => {
   const intersects = (a: Rect, b: Rect): boolean => (
     a.x <= b.x + b.width && a.x + a.width >= b.x &&
     a.y <= b.y + b.height && a.y + a.height >= b.y
-  );
+  )
 
   const getLength = (h: Highlight) => 
     h.rects.reduce((total, rect) => total + rect.width, 0);
@@ -118,4 +118,4 @@ export const createSpansRenderer = (
   container: HTMLElement,
   state: TextAnnotatorState,
   viewport: ViewportState
-) => createBaseRenderer(container, state, viewport, createRenderer(container));
+) => createBaseRenderer(container, state, viewport, createRenderer(container))
