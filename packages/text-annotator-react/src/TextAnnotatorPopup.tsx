@@ -1,6 +1,6 @@
-import { ReactNode, useCallback, useEffect, useState, PointerEvent } from 'react';
+import { PointerEvent, ReactNode, useCallback, useEffect, useState } from 'react';
 import { useAnnotator, useSelection } from '@annotorious/react';
-import { type TextAnnotation, type TextAnnotator } from '@recogito/text-annotator';
+import { toDomRectList, denormalizeRectWithOffset, type TextAnnotation, type TextAnnotator } from '@recogito/text-annotator';
 import {
   autoUpdate,
   inline,
@@ -69,19 +69,22 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
   }, [event?.type, selectedKey]);
 
   useEffect(() => {
-    if (!isOpen || !annotation) return;
-
-    const {
-      target: {
-        selector: [{ range }]
-      }
-    } = annotation;
+    if (!isOpen || !annotation?.id || !r) return;
 
     refs.setPositionReference({
-      getBoundingClientRect: range.getBoundingClientRect.bind(range),
-      getClientRects: range.getClientRects.bind(range)
+      getBoundingClientRect: () => denormalizeRectWithOffset(
+        r.state.store.getAnnotationBounds(annotation.id),
+        r.element.getBoundingClientRect()
+      ),
+      getClientRects: () => {
+        const rects = r.state.store.getAnnotationRects(annotation.id);
+        const denormalizedRects = rects.map(
+          rect => denormalizeRectWithOffset(rect, r.element.getBoundingClientRect())
+        );
+        return toDomRectList(denormalizedRects);
+      }
     });
-  }, [isOpen, annotation, refs]);
+  }, [isOpen, annotation?.id, r]);
 
   // Prevent text-annotator from handling the irrelevant events triggered from the popup
   const getStopEventsPropagationProps = useCallback(

@@ -65,7 +65,7 @@ const union = (a: DOMRect, b: DOMRect): DOMRect => {
   return new DOMRect(left, top, right - left, bottom - top);
 }
 
-export const mergeClientRects = (rects: DOMRect[]) => rects.reduce((merged, rectA) => {
+export const mergeClientRects = (rects: DOMRect[]) => rects.reduce<DOMRect[]>((merged, rectA) => {
   // Some browser report empty rects - discard
   if (rectA.width === 0 || rectA.height === 0)
     return merged;
@@ -102,4 +102,13 @@ export const mergeClientRects = (rects: DOMRect[]) => rects.reduce((merged, rect
   }
 
   return wasMerged ? next : [ ...next, rectA ];
-}, [] as DOMRect[]);
+}, []);
+
+export const toDomRectList = (rects: DOMRect[]): DOMRectList => ({
+  length: rects.length,
+  item: (index) => rects[index],
+  [Symbol.iterator]: function* (): IterableIterator<DOMRect> {
+    for (let i = 0; i < this.length; i++)
+      yield this.item(i)!;
+  }
+})
