@@ -1,4 +1,4 @@
-import type { FormatAdapter, PointerSelectAction } from '@annotorious/core';
+import type { FormatAdapter, UserSelectActionExpression } from '@annotorious/core';
 import type { PresencePainterOptions } from './presence';
 import type { TextAnnotation } from './model';
 import type { HighlightStyleExpression } from './highlight';
@@ -13,7 +13,7 @@ export interface TextAnnotatorOptions<T extends unknown = TextAnnotation> {
 
   offsetReferenceSelector?: string;
 
-  pointerAction?: PointerSelectAction | ((annotation: TextAnnotation) => PointerSelectAction);
+  userAction?: UserSelectActionExpression<TextAnnotation>,
 
   presence?: PresencePainterOptions;
 

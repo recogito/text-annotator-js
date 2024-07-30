@@ -29,8 +29,8 @@
     "openseadragon": "4.1.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "typescript": "^5.5.3",
-    "vite": "^5.3.4",
+    "typescript": "5.5.3",
+    "vite": "^5.3.5",
     "vite-plugin-dts": "^3.9.1",
     "vite-tsconfig-paths": "^4.3.2"
   },
@@ -45,9 +45,9 @@
     }
   },
   "dependencies": {
-    "@annotorious/core": "^3.0.0-rc.30",
-    "@annotorious/react": "^3.0.0-rc.30",
-    "@floating-ui/react": "^0.26.19",
+    "@annotorious/core": "^3.0.0-rc.31",
+    "@annotorious/react": "^3.0.0-rc.31",
+    "@floating-ui/react": "^0.26.20",
     "@recogito/text-annotator": "3.0.0-rc.36",
     "@recogito/text-annotator-tei": "3.0.0-rc.36",
     "CETEIcean": "^1.9.3"

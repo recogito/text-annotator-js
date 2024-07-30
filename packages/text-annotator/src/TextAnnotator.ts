@@ -37,7 +37,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
     annotatingEnabled: true
   });
 
-  const state: TextAnnotatorState = createTextAnnotatorState(container, opts.pointerAction);
+  const state: TextAnnotatorState = createTextAnnotatorState(container, opts.userAction);
 
   const { selection, viewport } = state;
 

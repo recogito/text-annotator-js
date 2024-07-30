@@ -106,7 +106,7 @@ export const SelectionHandler = (
 
       // ...then make the new annotation the current selection. (Reminder:
       // select events don't have offsetX/offsetY - reuse last up/down)
-      selection.clickSelect(currentTarget.annotation, lastPointerDown);
+      selection.userSelect(currentTarget.annotation, lastPointerDown);
     }
   })
 
@@ -140,7 +140,7 @@ export const SelectionHandler = (
         const { selected } = selection;
 
         if (selected.length !== 1 || selected[0].id !== hovered.id)
-          selection.clickSelect(hovered.id, evt);
+          selection.userSelect(hovered.id, evt);
       } else if (!selection.isEmpty()) {
         selection.clear();
       }
@@ -153,7 +153,7 @@ export const SelectionHandler = (
       currentTarget = undefined;
       clickSelect();
     } else if (currentTarget) {
-      selection.clickSelect(currentTarget.annotation, evt);
+      selection.userSelect(currentTarget.annotation, evt);
     }
   }
 
