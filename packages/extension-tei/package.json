@@ -1,6 +1,6 @@
 {
   "name": "@recogito/text-annotator-tei",
-  "version": "3.0.0-rc.36",
+  "version": "3.0.0-rc.39",
   "description": "Recogito Text Annotator TEI extension",
   "author": "Rainer Simon",
   "license": "BSD-3-Clause",
@@ -27,12 +27,12 @@
   },
   "devDependencies": {
     "CETEIcean": "^1.9.3",
-    "typescript": "^5.5.3",
-    "vite": "^5.3.4",
+    "typescript": "5.5.3",
+    "vite": "^5.3.5",
     "vite-plugin-dts": "^3.9.1"
   },
   "peerDependencies": {
-    "@annotorious/core": "^3.0.0-rc.30",
-    "@recogito/text-annotator": "3.0.0-rc.36"
+    "@annotorious/core": "^3.0.0-rc.31",
+    "@recogito/text-annotator": "3.0.0-rc.39"
   }
 }

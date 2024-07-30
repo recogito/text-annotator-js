@@ -1,4 +1,4 @@
-import type { Filter, PointerSelectAction, Store, ViewportState } from '@annotorious/core';
+import type { Filter, UserSelectAction, Store, ViewportState, UserSelectActionExpression } from '@annotorious/core';
 import { 
   createHoverState, 
   createSelectionState, 
@@ -28,14 +28,14 @@ export interface TextAnnotatorState extends AnnotatorState<TextAnnotation> {
 
 export const createTextAnnotatorState = (
   container: HTMLElement,
-  defaultPointerAction?: PointerSelectAction | ((annotation: TextAnnotation) => PointerSelectAction)
+  defaultUserAction?: UserSelectActionExpression<TextAnnotation>
 ): TextAnnotatorState => {
 
   const store: Store<TextAnnotation> = createStore<TextAnnotation>();
 
   const tree = createSpatialTree(store, container);
 
-  const selection = createSelectionState<TextAnnotation>(store, defaultPointerAction);
+  const selection = createSelectionState<TextAnnotation>(store, defaultUserAction);
 
   const hover = createHoverState(store);
 

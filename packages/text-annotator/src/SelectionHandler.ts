@@ -13,7 +13,7 @@ import {
 export const SelectionHandler = (
   container: HTMLElement,
   state: TextAnnotatorState,
-  annotationEnabled: boolean,
+  annotatingEnabled: boolean,
   offsetReferenceSelector?: string
 ) => {
 
@@ -53,7 +53,7 @@ export const SelectionHandler = (
     }
   }
 
-  if (annotationEnabled)
+  if (annotatingEnabled)
     container.addEventListener('selectstart', onSelectStart);
 
   const onSelectionChange = debounce((evt: PointerEvent) => {
@@ -106,11 +106,11 @@ export const SelectionHandler = (
 
       // ...then make the new annotation the current selection. (Reminder:
       // select events don't have offsetX/offsetY - reuse last up/down)
-      selection.clickSelect(currentTarget.annotation, lastPointerDown);
+      selection.userSelect(currentTarget.annotation, lastPointerDown);
     }
   })
 
-  if (annotationEnabled)
+  if (annotatingEnabled)
     document.addEventListener('selectionchange', onSelectionChange);
 
   // Select events don't carry information about the mouse button
@@ -140,7 +140,7 @@ export const SelectionHandler = (
         const { selected } = selection;
 
         if (selected.length !== 1 || selected[0].id !== hovered.id)
-          selection.clickSelect(hovered.id, evt);
+          selection.userSelect(hovered.id, evt);
       } else if (!selection.isEmpty()) {
         selection.clear();
       }
@@ -153,7 +153,7 @@ export const SelectionHandler = (
       currentTarget = undefined;
       clickSelect();
     } else if (currentTarget) {
-      selection.clickSelect(currentTarget.annotation, evt);
+      selection.userSelect(currentTarget.annotation, evt);
     }
   }
 
