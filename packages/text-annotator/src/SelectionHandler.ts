@@ -1,8 +1,12 @@
-import { Filter, Origin, type User } from '@annotorious/core';
+import { Filter, Origin, type Selection, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
+import hotkeys from 'hotkeys-js';
+import { Key } from 'ts-key-enum';
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotationTarget } from './model';
 import {
+  clonePointerEvent,
+  cloneKeyboardEvent,
   debounce,
   splitAnnotatableRanges,
   rangeToSelector,
@@ -29,34 +33,34 @@ export const SelectionHandler = (
 
   let currentTarget: TextAnnotationTarget | undefined;
 
-  let isLeftClick = false;
+  let isLeftClick: boolean | undefined;
 
-  let lastPointerDown: PointerEvent | undefined;
+  let lastDownEvent: Selection['event'] | undefined;
 
-  const onSelectStart = (evt: PointerEvent) => {
-    if (!isLeftClick) return;
+  const onSelectStart = (evt: Event) => {
+    if (isLeftClick === false)
+      return;
 
-    // Make sure we don't listen to selection changes that were
-    // not started on the container, or which are not supposed to
-    // be annotatable (like a component popup).
-    // Note that Chrome/iOS will sometimes return the root doc as target!
+    /**
+     * Make sure we don't listen to selection changes that were
+     * not started on the container, or which are not supposed to
+     * be annotatable (like a component popup).
+     * Note that Chrome/iOS will sometimes return the root doc as target!
+     */
     const annotatable = !(evt.target as Node).parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
-    if (annotatable) {
-      currentTarget = {
-        annotation: uuidv4(),
-        selector: [],
-        creator: currentUser,
-        created: new Date()
-      };
-    } else {
-      currentTarget = undefined;
-    }
+
+    currentTarget = annotatable ? {
+      annotation: uuidv4(),
+      selector: [],
+      creator: currentUser,
+      created: new Date()
+    } : undefined;
   }
 
   if (annotatingEnabled)
     container.addEventListener('selectstart', onSelectStart);
 
-  const onSelectionChange = debounce((evt: PointerEvent) => {
+  const onSelectionChange = debounce((evt: Event) => {
     const sel = document.getSelection();
 
     // This is to handle cases where the selection is "hijacked" by another element
@@ -69,20 +73,23 @@ export const SelectionHandler = (
     }
 
     // Chrome/iOS does not reliably fire the 'selectstart' event!
-    if (evt.timeStamp - (lastPointerDown?.timeStamp || evt.timeStamp) < 1000 && !currentTarget)
-      onSelectStart(lastPointerDown);
+    if (evt.timeStamp - (lastDownEvent?.timeStamp || evt.timeStamp) < 1000 && !currentTarget) {
+      onSelectStart(lastDownEvent || evt);
+    }
 
-    if (sel.isCollapsed || !isLeftClick || !currentTarget) return;
+    if (sel.isCollapsed || !currentTarget || isLeftClick === false)
+      return;
+
 
     const selectionRange = sel.getRangeAt(0);
     if (isWhitespaceOrEmpty(selectionRange)) return;
-    
+
     const annotatableRanges = splitAnnotatableRanges(selectionRange.cloneRange());
 
     const hasChanged =
       annotatableRanges.length !== currentTarget.selector.length ||
       annotatableRanges.some((r, i) => r.toString() !== currentTarget.selector[i]?.quote);
-      
+
     if (!hasChanged) return;
 
     currentTarget = {
@@ -96,7 +103,7 @@ export const SelectionHandler = (
     } else {
       // Proper lifecycle management: clear selection first...
       selection.clear();
-      
+
       // ...then add annotation to store...
       store.addAnnotation({
         id: currentTarget.annotation,
@@ -104,26 +111,27 @@ export const SelectionHandler = (
         target: currentTarget
       });
 
-      // ...then make the new annotation the current selection. (Reminder:
-      // select events don't have offsetX/offsetY - reuse last up/down)
-      selection.userSelect(currentTarget.annotation, lastPointerDown);
+      // ...then make the new annotation the current selection
+      selection.userSelect(currentTarget.annotation, lastDownEvent);
     }
   })
 
   if (annotatingEnabled)
     document.addEventListener('selectionchange', onSelectionChange);
 
-  // Select events don't carry information about the mouse button
-  // Therefore, to prevent right-click selection, we need to listen
-  // to the initial pointerdown event and remember the button
+  /**
+   * Select events don't carry information about the mouse button
+   * Therefore, to prevent right-click selection, we need to listen
+   * to the initial pointerdown event and remember the button
+   */
   const onPointerDown = (evt: PointerEvent) => {
-    // Note that the event itself can be ephemeral!
-    const { target, timeStamp, offsetX, offsetY, type } = evt;
-    lastPointerDown = { ...evt, target, timeStamp, offsetX, offsetY, type };
-
-    isLeftClick = evt.button === 0;
+    /**
+     * Cloning the event to prevent it from accidentally being `undefined`
+     * @see https://github.com/recogito/text-annotator-js/commit/65d13f3108c429311cf8c2523f6babbbc946013d#r144033948
+     */
+    lastDownEvent = clonePointerEvent(evt);
+    isLeftClick = lastDownEvent.button === 0;
   }
-
   container.addEventListener('pointerdown', onPointerDown);
 
   const onPointerUp = (evt: PointerEvent) => {
@@ -131,8 +139,8 @@ export const SelectionHandler = (
     if (!annotatable || !isLeftClick)
       return;
 
-    // Logic for selecting an existing annotation by clicking it
-    const clickSelect = () => {
+    // Logic for selecting an existing annotation
+    const userSelect = () => {
       const { x, y } = container.getBoundingClientRect();
 
       const hovered = store.getAt(evt.clientX - x, evt.clientY - y, currentFilter);
@@ -146,25 +154,66 @@ export const SelectionHandler = (
       }
     }
 
-    const timeDifference = evt.timeStamp - lastPointerDown.timeStamp;
+    const timeDifference = evt.timeStamp - lastDownEvent.timeStamp;
 
     // Just a click, not a selection
     if (document.getSelection().isCollapsed && timeDifference < 300) {
       currentTarget = undefined;
-      clickSelect();
+      userSelect();
     } else if (currentTarget) {
       selection.userSelect(currentTarget.annotation, evt);
     }
   }
-
   document.addEventListener('pointerup', onPointerUp);
+
+  /**
+   * Track arbitrary keydown events to use them during
+   * the `selectionchange` annotation selection.
+   */
+  hotkeys('*', { element: container, keyup: false, keydown: true }, (evt, handler) => {
+    if (!evt.repeat) {
+      lastDownEvent = cloneKeyboardEvent(evt);
+    }
+  });
+
+  /**
+   * Track the "Shift" key lift which signifies the end of a select operation.
+   * Unfortunately, we cannot track modifier key immediately, so the wildcard is used.
+   */
+  hotkeys('*', { keyup: true, keydown: false }, (evt) => {
+    if (hotkeys.shift && evt.key === Key.Shift) {
+      if (!evt.repeat && currentTarget) {
+        selection.userSelect(currentTarget.annotation, evt);
+      }
+    }
+  });
+
+  /**
+   * Track the "select all" command on lifting the keys.
+   * Unfortunately, system-related shortcuts can be captured
+   * only on `keydown` event, so an additional flag is used.
+   */
+  let selectAllCaptured = false;
+  hotkeys('ctrl+a, ⌘+a', { keyup: false, keydown: true }, () => {
+    selectAllCaptured = true;
+  });
+  hotkeys('*', { keyup: true, keydown: false }, (evt) => {
+    if (selectAllCaptured) {
+      if (!evt.repeat && currentTarget) {
+        selection.userSelect(currentTarget.annotation, evt);
+      }
+    }
+    selectAllCaptured = false;
+  });
 
   const destroy = () => {
     container.removeEventListener('selectstart', onSelectStart);
     document.removeEventListener('selectionchange', onSelectionChange);
-    
+
     container.removeEventListener('pointerdown', onPointerDown);
     document.removeEventListener('pointerup', onPointerUp);
+
+    hotkeys.unbind();
   }
 
   return {
@@ -174,3 +223,4 @@ export const SelectionHandler = (
   }
 
 }
+

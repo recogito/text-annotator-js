@@ -9,6 +9,10 @@ html, body {
   -webkit-tap-highlight-color: transparent;
 }
 
+.r6o-annotatable.no-focus-outline {
+  outline: none
+}
+
 .hovered * {
   cursor: pointer;
 }
@@ -17,6 +21,6 @@ html, body {
   background: rgba(0, 128, 255, 0.18);
 }
 
-::-moz-selection, ::-moz-selection{
+::-moz-selection, ::-moz-selection {
   background: rgba(0, 128, 255, 0.18);
 }

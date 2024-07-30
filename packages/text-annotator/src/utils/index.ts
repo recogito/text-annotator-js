@@ -1,4 +1,5 @@
 export * from './cancelSingleClickEvents';
+export * from './programmaticallyFocusable';
 export * from './debounce';
 export * from './getAnnotatableFragment';
 export * from './getClientRectsPonyfill';
@@ -11,4 +12,5 @@ export * from './reviveAnnotation';
 export * from './reviveSelector';
 export * from './reviveTarget';
 export * from './splitAnnotatableRanges';
+export * from './cloneEvents';
 
