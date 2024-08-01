@@ -10,10 +10,9 @@ import {
   NOT_ANNOTATABLE_SELECTOR
 } from './utils';
 
-export const SelectionHandler = (
+export const createSelectionHandler = (
   container: HTMLElement,
   state: TextAnnotatorState,
-  annotatingEnabled: boolean,
   offsetReferenceSelector?: string
 ) => {
 
@@ -25,6 +24,10 @@ export const SelectionHandler = (
 
   const setFilter = (filter?: Filter) => currentFilter = filter;
 
+  let currentAnnotatingEnabled = true;
+
+  const setAnnotatingEnabled = (enabled: boolean) => currentAnnotatingEnabled = enabled;
+
   const { store, selection } = state;
 
   let currentTarget: TextAnnotationTarget | undefined;
@@ -34,6 +37,8 @@ export const SelectionHandler = (
   let lastPointerDown: PointerEvent | undefined;
 
   const onSelectStart = (evt: PointerEvent) => {
+    if (!currentAnnotatingEnabled) return;
+
     if (!isLeftClick) return;
 
     // Make sure we don't listen to selection changes that were
@@ -53,10 +58,11 @@ export const SelectionHandler = (
     }
   }
 
-  if (annotatingEnabled)
-    container.addEventListener('selectstart', onSelectStart);
+  container.addEventListener('selectstart', onSelectStart);
 
   const onSelectionChange = debounce((evt: PointerEvent) => {
+    if (!currentAnnotatingEnabled) return;
+
     const sel = document.getSelection();
 
     // This is to handle cases where the selection is "hijacked" by another element
@@ -110,8 +116,7 @@ export const SelectionHandler = (
     }
   })
 
-  if (annotatingEnabled)
-    document.addEventListener('selectionchange', onSelectionChange);
+  document.addEventListener('selectionchange', onSelectionChange);
 
   // Select events don't carry information about the mouse button
   // Therefore, to prevent right-click selection, we need to listen
@@ -170,7 +175,8 @@ export const SelectionHandler = (
   return {
     destroy,
     setFilter,
-    setUser
+    setUser,
+    setAnnotatingEnabled
   }
 
 }
