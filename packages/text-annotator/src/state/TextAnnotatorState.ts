@@ -28,14 +28,14 @@ export interface TextAnnotatorState extends AnnotatorState<TextAnnotation> {
 
 export const createTextAnnotatorState = (
   container: HTMLElement,
-  defaultUserAction?: UserSelectActionExpression<TextAnnotation>
+  defaultUserSelectAction?: UserSelectActionExpression<TextAnnotation>
 ): TextAnnotatorState => {
 
   const store: Store<TextAnnotation> = createStore<TextAnnotation>();
 
   const tree = createSpatialTree(store, container);
 
-  const selection = createSelectionState<TextAnnotation>(store, defaultUserAction);
+  const selection = createSelectionState<TextAnnotation>(store, defaultUserSelectAction);
 
   const hover = createHoverState(store);
 
