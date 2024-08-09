@@ -40,6 +40,7 @@
     "@annotorious/core": "^3.0.0-rc.31",
     "colord": "^2.9.3",
     "dequal": "^2.0.3",
+    "nanoevents": "^9.0.0",
     "rbush": "^4.0.0",
     "uuid": "^10.0.0"
   }
