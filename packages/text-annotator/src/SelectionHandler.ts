@@ -76,13 +76,13 @@ export const SelectionHandler = (
 
     const selectionRange = sel.getRangeAt(0);
     if (isWhitespaceOrEmpty(selectionRange)) return;
-    
+
     const annotatableRanges = splitAnnotatableRanges(selectionRange.cloneRange());
 
     const hasChanged =
       annotatableRanges.length !== currentTarget.selector.length ||
       annotatableRanges.some((r, i) => r.toString() !== currentTarget.selector[i]?.quote);
-      
+
     if (!hasChanged) return;
 
     currentTarget = {
@@ -96,7 +96,7 @@ export const SelectionHandler = (
     } else {
       // Proper lifecycle management: clear selection first...
       selection.clear();
-      
+
       // ...then add annotation to store...
       store.addAnnotation({
         id: currentTarget.annotation,
@@ -148,13 +148,26 @@ export const SelectionHandler = (
 
     const timeDifference = evt.timeStamp - lastPointerDown.timeStamp;
 
-    // Just a click, not a selection
-    if (document.getSelection().isCollapsed && timeDifference < 300) {
-      currentTarget = undefined;
-      clickSelect();
-    } else if (currentTarget) {
-      selection.userSelect(currentTarget.annotation, evt);
-    }
+    /**
+     * We must check the `isCollapsed` within the 0-timeout
+     * to handle the annotation dismissal after a click properly.
+     *
+     * Otherwise, the `isCollapsed` will return an obsolete `false` value,
+     * click won't be processed, and the annotation will get falsely re-selected.
+     *
+     * @see https://github.com/recogito/text-annotator-js/issues/136
+     */
+    setTimeout(() => {
+      const { isCollapsed } = document.getSelection()
+
+      // Just a click, not a selection
+      if (isCollapsed && timeDifference < 300) {
+        currentTarget = undefined;
+        clickSelect();
+      } else if (currentTarget) {
+        selection.userSelect(currentTarget.annotation, evt);
+      }
+    });
   }
 
   document.addEventListener('pointerup', onPointerUp);
@@ -162,7 +175,7 @@ export const SelectionHandler = (
   const destroy = () => {
     container.removeEventListener('selectstart', onSelectStart);
     document.removeEventListener('selectionchange', onSelectionChange);
-    
+
     container.removeEventListener('pointerdown', onPointerDown);
     document.removeEventListener('pointerup', onPointerUp);
   }
