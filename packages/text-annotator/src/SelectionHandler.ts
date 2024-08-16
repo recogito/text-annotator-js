@@ -77,7 +77,7 @@ export const SelectionHandler = (
       onSelectStart(lastDownEvent || evt);
     }
 
-    // The selection couldn't get started -> bail out from selection change processing
+    // The selection isn't active -> bail out from selection change processing
     if (!currentTarget)
       return;
 
