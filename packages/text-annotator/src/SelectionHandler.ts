@@ -72,17 +72,31 @@ export const SelectionHandler = (
     if (evt.timeStamp - (lastPointerDown?.timeStamp || evt.timeStamp) < 1000 && !currentTarget)
       onSelectStart(lastPointerDown);
 
-    if (sel.isCollapsed || !isLeftClick || !currentTarget) return;
+    // The selection couldn't get started -> bail out from selection change processing
+    if (!currentTarget)
+      return;
+
+    /**
+     * The selection range got collapsed during the selecting process.
+     * The previously created annotation isn't relevant anymore and can be discarded
+     *
+     * @see https://github.com/recogito/text-annotator-js/issues/139
+     */
+    if (sel.isCollapsed && store.getAnnotation(currentTarget.annotation)) {
+      selection.clear();
+      store.deleteAnnotation(currentTarget.annotation);
+      return;
+    }
 
     const selectionRange = sel.getRangeAt(0);
     if (isWhitespaceOrEmpty(selectionRange)) return;
-    
+
     const annotatableRanges = splitAnnotatableRanges(selectionRange.cloneRange());
 
     const hasChanged =
       annotatableRanges.length !== currentTarget.selector.length ||
       annotatableRanges.some((r, i) => r.toString() !== currentTarget.selector[i]?.quote);
-      
+
     if (!hasChanged) return;
 
     currentTarget = {
@@ -96,7 +110,7 @@ export const SelectionHandler = (
     } else {
       // Proper lifecycle management: clear selection first...
       selection.clear();
-      
+
       // ...then add annotation to store...
       store.addAnnotation({
         id: currentTarget.annotation,
@@ -162,7 +176,7 @@ export const SelectionHandler = (
   const destroy = () => {
     container.removeEventListener('selectstart', onSelectStart);
     document.removeEventListener('selectionchange', onSelectionChange);
-    
+
     container.removeEventListener('pointerdown', onPointerDown);
     document.removeEventListener('pointerup', onPointerUp);
   }
