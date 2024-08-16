@@ -178,44 +178,26 @@ export const SelectionHandler = (
   }
   document.addEventListener('pointerup', onPointerUp);
 
-  /**
-   * Track arbitrary keydown events to use them during
-   * the `selectionchange` annotation selection.
-   */
-  hotkeys('*', { element: container, keyup: false, keydown: true }, (evt, handler) => {
+
+  const arrowKeys = ['up', 'down', 'left', 'right'];
+  const selectionKeys = [
+    ...arrowKeys.map(key => `shift+${key}`),
+    'ctrl+a',
+    '⌘+a'
+  ];
+
+  hotkeys(selectionKeys.join(','), { element: container, keydown: true, keyup: false }, (evt) => {
     if (!evt.repeat) {
       lastDownEvent = cloneKeyboardEvent(evt);
     }
   });
 
-  /**
-   * Track the "Shift" key lift which signifies the end of a select operation.
-   * Unfortunately, we cannot track modifier key immediately, so the wildcard is used.
-   */
-  hotkeys('*', { keyup: true, keydown: false }, (evt) => {
-    if (hotkeys.shift && evt.key === Key.Shift) {
-      if (!evt.repeat && currentTarget) {
-        selection.userSelect(currentTarget.annotation, evt);
-      }
+  // Free caret movement through the text resets the annotation selection
+  hotkeys(arrowKeys.join(','), { element: container, keydown: true }, (evt) => {
+    if (!evt.repeat) {
+      currentTarget = undefined;
+      selection.clear();
     }
-  });
-
-  /**
-   * Track the "select all" command on lifting the keys.
-   * Unfortunately, system-related shortcuts can be captured
-   * only on `keydown` event, so an additional flag is used.
-   */
-  let selectAllCaptured = false;
-  hotkeys('ctrl+a, ⌘+a', { keyup: false, keydown: true }, () => {
-    selectAllCaptured = true;
-  });
-  hotkeys('*', { keyup: true, keydown: false }, (evt) => {
-    if (selectAllCaptured) {
-      if (!evt.repeat && currentTarget) {
-        selection.userSelect(currentTarget.annotation, evt);
-      }
-    }
-    selectAllCaptured = false;
   });
 
   const destroy = () => {
