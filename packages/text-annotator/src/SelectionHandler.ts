@@ -72,7 +72,7 @@ export const SelectionHandler = (
     if (evt.timeStamp - (lastPointerDown?.timeStamp || evt.timeStamp) < 1000 && !currentTarget)
       onSelectStart(lastPointerDown);
 
-    // The selection couldn't get started -> bail out from selection change processing
+    // The selection isn't active -> bail out from selection change processing
     if (!currentTarget)
       return;
 
