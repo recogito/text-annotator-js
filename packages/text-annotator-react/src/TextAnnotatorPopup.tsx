@@ -62,10 +62,15 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
 
   useEffect(() => {
     // Ignore all selection changes except those accompanied by a user event.
-    if (event) {
-      setOpen(selected.length > 0 && (event.type === 'pointerup' || event.type === 'keydown'));
+    if (selected.length > 0 && event) {
+      setOpen(event.type === 'pointerup' || event.type === 'keydown');
     }
-  }, [event, selectedKey]);
+
+    // Close the popup if the selection is cleared
+    if (selected.length === 0 && isOpen) {
+      setOpen(false);
+    }
+  }, [isOpen, event, selectedKey]);
 
   useEffect(() => {
     if (!isOpen || !annotation) return;
