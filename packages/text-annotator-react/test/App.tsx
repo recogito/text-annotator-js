@@ -1,14 +1,23 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { AnnotationBody, Annotorious, useAnnotationStore, useAnnotator } from '@annotorious/react';
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import { TextAnnotator, TextAnnotatorPopup, TextAnnotatorPopupProps } from '../src';
 import { TextAnnotation, TextAnnotator as RecogitoTextAnnotator, W3CTextFormat } from '@recogito/text-annotator';
 
-const TestPopup = (props: TextAnnotatorPopupProps) => {
+const TestPopup = forwardRef<
+  Pick<HTMLDivElement, 'focus'>,
+  TextAnnotatorPopupProps
+>((props, ref) => {
 
   const store = useAnnotationStore();
   const anno = useAnnotator<RecogitoTextAnnotator>();
 
   const inputRef = useRef<HTMLInputElement | null>(null);
+
+  useImperativeHandle(ref, () => ({
+    focus: (options) => inputRef.current?.focus(options || { preventScroll: true })
+  }), []);
+
 
   const body: AnnotationBody = {
     id: `${Math.random()}`,
@@ -29,7 +38,7 @@ const TestPopup = (props: TextAnnotatorPopupProps) => {
     </div>
   );
 
-};
+});
 
 const MockStorage = () => {
 

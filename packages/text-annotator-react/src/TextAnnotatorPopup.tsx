@@ -1,4 +1,4 @@
-import { ReactNode, useCallback, useEffect, useState, PointerEvent } from 'react';
+import { ReactNode, useCallback, useEffect, useState, PointerEvent, useRef, MutableRefObject } from 'react';
 import { useAnnotator, useSelection } from '@annotorious/react';
 import { type TextAnnotation, type TextAnnotator } from '@recogito/text-annotator';
 import {
@@ -19,7 +19,9 @@ interface TextAnnotationPopupProps {
 
 }
 
-export interface TextAnnotatorPopupProps {
+export interface TextAnnotatorPopupProps<TElement extends HTMLElement = HTMLElement> {
+
+  ref: MutableRefObject<TElement | null>;
 
   selected: { annotation: TextAnnotation, editable?: boolean }[];
 
@@ -53,13 +55,10 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
   });
 
   const dismiss = useDismiss(context);
-
   const role = useRole(context, { role: 'tooltip' });
-
   const { getFloatingProps } = useInteractions([dismiss, role]);
 
   const selectedKey = selected.map(a => a.annotation.id).join('-');
-
   useEffect(() => {
     // Ignore all selection changes except those accompanied by a user event.
     if (selected.length > 0 && event) {
@@ -107,6 +106,18 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
     }
   }, [update]);
 
+  const popupContentRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const { current: popupContent } = popupContentRef;
+    if (!popupContent)
+      return;
+
+    if (isOpen && event?.type === 'pointerup') {
+      popupContent.focus();
+    }
+  }, [isOpen, event?.type]);
+
   return isOpen && selected.length > 0 ? (
     <div
       className="annotation-popup text-annotation-popup not-annotatable"
@@ -114,7 +125,7 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
       style={floatingStyles}
       {...getFloatingProps()}
       {...getStopEventsPropagationProps()}>
-      {props.popup({ selected })}
+      {props.popup({ ref: popupContentRef, selected })}
     </div>
   ) : null;
 
