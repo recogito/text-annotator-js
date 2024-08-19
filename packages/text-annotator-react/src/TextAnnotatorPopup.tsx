@@ -1,4 +1,13 @@
-import { ReactNode, useCallback, useEffect, useState, PointerEvent, useRef, MutableRefObject } from 'react';
+import {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useState,
+  PointerEvent,
+  useRef,
+  MutableRefObject,
+  CSSProperties
+} from 'react';
 import { useAnnotator, useSelection } from '@annotorious/react';
 import { type TextAnnotation, type TextAnnotator } from '@recogito/text-annotator';
 import {
@@ -12,22 +21,27 @@ import {
   useInteractions,
   useRole
 } from '@floating-ui/react';
+import { createPortal } from 'react-dom';
 
-interface TextAnnotationPopupProps {
+interface TextAnnotationPopupProps<TRefElement extends HTMLElement> {
 
-  popup(props: TextAnnotatorPopupProps): ReactNode;
+  focusMessage?: string;
+
+  popup(props: TextAnnotatorPopupProps<TRefElement>): ReactNode;
 
 }
 
-export interface TextAnnotatorPopupProps<TElement extends HTMLElement = HTMLElement> {
+export interface TextAnnotatorPopupProps<TRefElement extends HTMLElement = HTMLElement> {
 
-  ref: MutableRefObject<TElement | null>;
+  ref: MutableRefObject<TRefElement | null>;
 
   selected: { annotation: TextAnnotation, editable?: boolean }[];
 
 }
 
-export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
+export const TextAnnotatorPopup = <TRefElement extends HTMLElement = HTMLElement>(props: TextAnnotationPopupProps<TRefElement>) => {
+
+  const { popup, focusMessage } = props;
 
   const r = useAnnotator<TextAnnotator>();
 
@@ -106,27 +120,72 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
     }
   }, [update]);
 
-  const popupContentRef = useRef<HTMLElement | null>(null);
+  const popupContentRef = useRef<TRefElement | null>(null);
+  const popupAnnouncerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const { current: popupContent } = popupContentRef;
     if (!popupContent)
       return;
 
-    if (isOpen && event?.type === 'pointerup') {
+    if (!isOpen || !event)
+      return;
+
+    let announcementTimout: ReturnType<typeof setTimeout>;
+
+    if (event.type === 'pointerup') {
+      /**
+       * When the selection "finishes" using the pointer device,
+       * we can immediately focus on the popup content.
+       * That's useful to quickly write down a note or pick a highlight color
+       */
       popupContent.focus();
+    } else if (event.type === 'keydown') {
+      announcementTimout = setTimeout(() => {
+        /**
+         * When the selection is performed using the keyboard, there's no certain "finished" state.
+         * Even after we show the popup, users might want to continue selecting text.
+         * Therefore, we shouldn't shift the focus from the page,
+         * but make a recommendation on how to navigate to the popup.
+         */
+        const { current: popupAnnouncer } = popupAnnouncerRef;
+        if (popupAnnouncer) {
+          popupAnnouncer.textContent = focusMessage;
+        }
+      }, 25)
     }
-  }, [isOpen, event?.type]);
+
+    return () => {
+      clearTimeout(announcementTimout);
+    }
+  }, [isOpen, event]);
 
   return isOpen && selected.length > 0 ? (
-    <div
-      className="annotation-popup text-annotation-popup not-annotatable"
-      ref={refs.setFloating}
-      style={floatingStyles}
-      {...getFloatingProps()}
-      {...getStopEventsPropagationProps()}>
-      {props.popup({ ref: popupContentRef, selected })}
-    </div>
+    <>
+      <div
+        className="annotation-popup text-annotation-popup not-annotatable"
+        ref={refs.setFloating}
+        style={floatingStyles}
+        {...getFloatingProps()}
+        {...getStopEventsPropagationProps()}>
+        {popup({ ref: popupContentRef, selected })}
+      </div>
+      {focusMessage && createPortal(
+        <span ref={popupAnnouncerRef} style={visuallyHiddenStyles} aria-live="assertive" aria-atomic />,
+        document.body
+      )}
+    </>
   ) : null;
 
 }
+
+const visuallyHiddenStyles: CSSProperties = {
+  position: 'absolute',
+  height: '1px',
+  width: '1px',
+  clipPath: 'inset(50%)',
+  overflow: 'hidden',
+  whiteSpace: 'nowrap',
+  border: 0,
+  padding: 0,
+};

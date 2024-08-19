@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useRef } from 'react';
-import { AnnotationBody, Annotorious, useAnnotationStore, useAnnotator } from '@annotorious/react';
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
+import React, { FC, forwardRef, useCallback, useEffect } from 'react';
+import { AnnotationBody, Annotorious, useAnnotationStore, useAnnotator, useSelection } from '@annotorious/react';
 import { TextAnnotator, TextAnnotatorPopup, TextAnnotatorPopupProps } from '../src';
 import { TextAnnotation, TextAnnotator as RecogitoTextAnnotator, W3CTextFormat } from '@recogito/text-annotator';
 
@@ -11,13 +10,6 @@ const TestPopup = forwardRef<
 
   const store = useAnnotationStore();
   const anno = useAnnotator<RecogitoTextAnnotator>();
-
-  const inputRef = useRef<HTMLInputElement | null>(null);
-
-  useImperativeHandle(ref, () => ({
-    focus: (options) => inputRef.current?.focus(options || { preventScroll: true })
-  }), []);
-
 
   const body: AnnotationBody = {
     id: `${Math.random()}`,
@@ -33,7 +25,7 @@ const TestPopup = forwardRef<
 
   return (
     <div className="popup">
-      <input ref={inputRef} type="text" />
+      <input ref={ref} type="text" />
       <button onClick={onClick}>Close</button>
     </div>
   );
