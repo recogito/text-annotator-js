@@ -22,13 +22,6 @@ const TestPopup = (props: TextAnnotatorPopupProps) => {
     anno.cancelSelected();
   };
 
-  useEffect(() => {
-    const { current: inputEl } = inputRef;
-    if (!inputEl) return;
-
-    setTimeout(() => inputEl.focus({ preventScroll: true }));
-  }, []);
-
   return (
     <div className="popup">
       <input ref={inputRef} type="text" />
