@@ -10,7 +10,7 @@ import {
   useDismiss,
   useFloating,
   useInteractions,
-  useRole
+  useRole, FloatingPortal, FloatingFocusManager
 } from '@floating-ui/react';
 
 interface TextAnnotationPopupProps {
@@ -65,12 +65,14 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
     if (selected.length > 0 && event) {
       setOpen(event.type === 'pointerup' || event.type === 'keydown');
     }
+  }, [selectedKey, event]);
 
+  useEffect(() => {
     // Close the popup if the selection is cleared
     if (selected.length === 0 && isOpen) {
       setOpen(false);
     }
-  }, [isOpen, event, selectedKey]);
+  }, [isOpen, selectedKey]);
 
   useEffect(() => {
     if (!isOpen || !annotation) return;
@@ -108,14 +110,21 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
   }, [update]);
 
   return isOpen && selected.length > 0 ? (
-    <div
-      className="annotation-popup text-annotation-popup not-annotatable"
-      ref={refs.setFloating}
-      style={floatingStyles}
-      {...getFloatingProps()}
-      {...getStopEventsPropagationProps()}>
-      {props.popup({ selected })}
-    </div>
+    <FloatingPortal>
+      <FloatingFocusManager
+        context={context}
+        visuallyHiddenDismiss="Dismiss the annotation dialog"
+      >
+        <div
+          className="annotation-popup text-annotation-popup not-annotatable"
+          ref={refs.setFloating}
+          style={floatingStyles}
+          {...getFloatingProps()}
+          {...getStopEventsPropagationProps()}>
+          {props.popup({ selected })}
+        </div>
+      </FloatingFocusManager>
+    </FloatingPortal>
   ) : null;
 
 }
