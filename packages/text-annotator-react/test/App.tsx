@@ -1,11 +1,9 @@
-import React, { FC, forwardRef, useCallback, useEffect } from 'react';
+import React, { FC, useCallback, useEffect } from 'react';
 import { AnnotationBody, Annotorious, useAnnotationStore, useAnnotator, useSelection } from '@annotorious/react';
 import { TextAnnotator, TextAnnotatorPopup, TextAnnotatorPopupProps } from '../src';
 import { TextAnnotation, TextAnnotator as RecogitoTextAnnotator, W3CTextFormat } from '@recogito/text-annotator';
 
-const TestPopup= forwardRef<
-  HTMLInputElement, TextAnnotatorPopupProps
->((props, ref) => {
+const TestPopup: FC<TextAnnotatorPopupProps> = (props) => {
 
   const { selected } = props;
 
@@ -26,12 +24,12 @@ const TestPopup= forwardRef<
 
   return (
     <div className="popup">
-      <input ref={ref} type="text" />
+      <input type="text" />
       <button onClick={onClick}>Close</button>
     </div>
   );
 
-});
+}
 
 const MockStorage: FC = () => {
 
