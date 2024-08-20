@@ -1,7 +1,6 @@
 import { Filter, Origin, type Selection, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import hotkeys from 'hotkeys-js';
-import { Key } from 'ts-key-enum';
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotationTarget } from './model';
 import {
