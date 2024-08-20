@@ -53,9 +53,7 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
   });
 
   const dismiss = useDismiss(context);
-
   const role = useRole(context, { role: 'tooltip' });
-
   const { getFloatingProps } = useInteractions([dismiss, role]);
 
   const selectedKey = selected.map(a => a.annotation.id).join('-');
@@ -113,6 +111,13 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
     <FloatingPortal>
       <FloatingFocusManager
         context={context}
+        initialFocus={
+          /**
+           * Don't shift focus to the floating element
+           * when the selection performed with the keyboard
+           */
+          event?.type === 'keydown' ? -1 : 0
+        }
         visuallyHiddenDismiss="Dismiss the annotation dialog"
       >
         <div
