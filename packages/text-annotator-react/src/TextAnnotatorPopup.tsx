@@ -118,6 +118,8 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
     <FloatingPortal>
       <FloatingFocusManager
         context={context}
+        modal={false}
+        closeOnFocusOut={false}
         initialFocus={
           /**
            * Don't shift focus to the floating element
@@ -125,7 +127,6 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
            */
           event?.type === 'keydown' ? -1 : 0
         }
-        visuallyHiddenDismiss="Dismiss the annotation dialog"
       >
         <div
           className="annotation-popup text-annotation-popup not-annotatable"
