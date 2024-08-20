@@ -8,7 +8,7 @@ import { TEIAnnotator, CETEIcean, TextAnnotatorPopup, TextAnnotatorPopupProps } 
 const TestPopup = (props: TextAnnotatorPopupProps) => {
 
   const store = useAnnotationStore();
-  const anno = useAnnotator<VanillaTextAnnotator>();
+  const r = useAnnotator<VanillaTextAnnotator>();
 
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -21,7 +21,7 @@ const TestPopup = (props: TextAnnotatorPopupProps) => {
 
   const onClick = () => {
     store.addBody(body);
-    anno.cancelSelected();
+    r.cancelSelected();
   };
 
   return (
@@ -35,27 +35,27 @@ const TestPopup = (props: TextAnnotatorPopupProps) => {
 
 const MockStorage = () => {
 
-  const anno = useAnnotator<VanillaTextAnnotator>();
+  const r = useAnnotator<VanillaTextAnnotator>();
 
   useEffect(() => {
-    if (anno) {
-      anno.on('createAnnotation', (annotation: TextAnnotation) => {
+    if (r) {
+      r.on('createAnnotation', (annotation: TextAnnotation) => {
         console.log('create', annotation);
       });
 
-      anno.on('deleteAnnotation', (annotation: TextAnnotation) => {
+      r.on('deleteAnnotation', (annotation: TextAnnotation) => {
         console.log('delete', annotation);
       });
 
-      anno.on('selectionChanged', (annotations: TextAnnotation[]) => {
+      r.on('selectionChanged', (annotations: TextAnnotation[]) => {
         console.log('selection changed', annotations);
       });
 
-      anno.on('updateAnnotation', (annotation: TextAnnotation, previous: TextAnnotation) => {
+      r.on('updateAnnotation', (annotation: TextAnnotation, previous: TextAnnotation) => {
         console.log('update', annotation, previous);
       });
     }
-  }, [anno]);
+  }, [r]);
 
   return null;
 

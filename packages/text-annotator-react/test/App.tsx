@@ -6,7 +6,7 @@ import { TextAnnotation, TextAnnotator as RecogitoTextAnnotator, W3CTextFormat }
 const TestPopup = (props: TextAnnotatorPopupProps) => {
 
   const store = useAnnotationStore();
-  const anno = useAnnotator<RecogitoTextAnnotator>();
+  const r = useAnnotator<RecogitoTextAnnotator>();
 
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -19,7 +19,7 @@ const TestPopup = (props: TextAnnotatorPopupProps) => {
 
   const onClick = () => {
     store.addBody(body);
-    anno.cancelSelected();
+    r.cancelSelected();
   };
 
   return (
@@ -33,30 +33,30 @@ const TestPopup = (props: TextAnnotatorPopupProps) => {
 
 const MockStorage = () => {
 
-  const anno = useAnnotator<RecogitoTextAnnotator>();
+  const r = useAnnotator<RecogitoTextAnnotator>();
 
   useEffect(() => {
-    if (!anno) return;
+    if (!r) return;
 
     const handleCreateAnnotation = (annotation: TextAnnotation) => console.log('create', annotation);
-    anno.on('createAnnotation', handleCreateAnnotation);
+    r.on('createAnnotation', handleCreateAnnotation);
 
     const handleDeleteAnnotation = (annotation: TextAnnotation) => console.log('delete', annotation);
-    anno.on('deleteAnnotation', handleDeleteAnnotation);
+    r.on('deleteAnnotation', handleDeleteAnnotation);
 
     const handleSelectionChanged = (annotations: TextAnnotation[]) => console.log('selection changed', annotations);
-    anno.on('selectionChanged', handleSelectionChanged);
+    r.on('selectionChanged', handleSelectionChanged);
 
     const handleUpdateAnnotation = (annotation: TextAnnotation, previous: TextAnnotation) => console.log('update', annotation, previous);
-    anno.on('updateAnnotation', handleUpdateAnnotation);
+    r.on('updateAnnotation', handleUpdateAnnotation);
 
     return () => {
-      anno.off('createAnnotation', handleCreateAnnotation);
-      anno.off('deleteAnnotation', handleDeleteAnnotation);
-      anno.off('selectionChanged', handleSelectionChanged);
-      anno.off('updateAnnotation', handleUpdateAnnotation);
+      r.off('createAnnotation', handleCreateAnnotation);
+      r.off('deleteAnnotation', handleDeleteAnnotation);
+      r.off('selectionChanged', handleSelectionChanged);
+      r.off('updateAnnotation', handleUpdateAnnotation);
     };
-  }, [anno]);
+  }, [r]);
 
   return null;
 
