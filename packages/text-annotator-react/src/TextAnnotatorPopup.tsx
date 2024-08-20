@@ -3,6 +3,7 @@ import {
   useCallback,
   useEffect,
   useState,
+  useRef,
   PointerEvent
 } from 'react';
 import { useAnnotator, useSelection } from '@annotorious/react';
@@ -114,6 +115,8 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
     }
   }, [update]);
 
+  useRestoreSelectionCaret({ floatingOpen: isOpen });
+
   return isOpen && selected.length > 0 ? (
     <FloatingPortal>
       <FloatingFocusManager
@@ -141,3 +144,45 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
   ) : null;
 
 }
+
+export const useRestoreSelectionCaret = (args: { floatingOpen: boolean }) => {
+  const { floatingOpen } = args;
+
+  const focusNodeRef = useRef<Node | null>(null);
+  const focusOffsetRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!floatingOpen) return;
+
+    const sel = document.getSelection();
+    focusNodeRef.current = sel?.focusNode;
+    focusOffsetRef.current = sel?.focusOffset;
+
+
+    console.log('Save selection', sel.focusOffset, sel.anchorOffset);
+  }, [floatingOpen]);
+
+  useEffect(() => {
+    if (floatingOpen) return;
+
+    const { current: focusNode } = focusNodeRef;
+    const { current: focusOffset } = focusOffsetRef;
+    if (!focusNode) return;
+
+
+    setTimeout(() => {
+      /**
+       * Restore the caret only after it got lost and automatically moved to the `body`.
+       * It happens when user clicks on the close button within the floating element.
+       */
+      const sel = document.getSelection();
+      if (sel && sel.isCollapsed && sel.anchorNode === document.body) {
+        sel.removeAllRanges();
+        sel.setPosition(
+          focusNode,
+          focusOffset + 1 // Select after the last letter
+        );
+      }
+    });
+  }, [floatingOpen]);
+};
