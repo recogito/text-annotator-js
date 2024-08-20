@@ -148,27 +148,28 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
 export const useRestoreSelectionCaret = (args: { floatingOpen: boolean }) => {
   const { floatingOpen } = args;
 
-  const focusNodeRef = useRef<Node | null>(null);
-  const focusOffsetRef = useRef<number | null>(null);
+  const { selected } = useSelection<TextAnnotation>();
+  const annotation = selected[0]?.annotation;
+
+  const focusNodeRef = useRef<Selection['focusNode'] | null>(null);
+  const focusOffsetRef = useRef<Selection['focusOffset'] | null>(null);
 
   useEffect(() => {
-    if (!floatingOpen) return;
+    if (!floatingOpen || !annotation) return;
 
     const sel = document.getSelection();
-    focusNodeRef.current = sel?.focusNode;
-    focusOffsetRef.current = sel?.focusOffset;
-
-
-    console.log('Save selection', sel.focusOffset, sel.anchorOffset);
-  }, [floatingOpen]);
+    if (sel) {
+      focusNodeRef.current = sel.focusNode;
+      focusOffsetRef.current = sel.focusOffset;
+    }
+  }, [floatingOpen, annotation]);
 
   useEffect(() => {
     if (floatingOpen) return;
 
-    const { current: focusNode } = focusNodeRef;
-    const { current: focusOffset } = focusOffsetRef;
-    if (!focusNode) return;
-
+    const focusNode = focusNodeRef.current;
+    const focusOffset = focusOffsetRef.current;
+    if (focusNode === null || focusOffset === null) return;
 
     setTimeout(() => {
       /**
@@ -178,10 +179,7 @@ export const useRestoreSelectionCaret = (args: { floatingOpen: boolean }) => {
       const sel = document.getSelection();
       if (sel && sel.isCollapsed && sel.anchorNode === document.body) {
         sel.removeAllRanges();
-        sel.setPosition(
-          focusNode,
-          focusOffset + 1 // Select after the last letter
-        );
+        sel.setPosition(focusNode, focusOffset);
       }
     });
   }, [floatingOpen]);
