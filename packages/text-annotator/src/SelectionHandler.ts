@@ -1,7 +1,6 @@
 import { Filter, Origin, type Selection, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import hotkeys from 'hotkeys-js';
-import { Key } from 'ts-key-enum';
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotationTarget } from './model';
 import {
@@ -206,7 +205,7 @@ export const SelectionHandler = (
   });
 
   // Free caret movement through the text resets the annotation selection
-  hotkeys(arrowKeys.join(','), { element: container, keydown: true }, (evt) => {
+  hotkeys(arrowKeys.join(','), { keydown: true }, (evt) => {
     if (!evt.repeat) {
       currentTarget = undefined;
       selection.clear();

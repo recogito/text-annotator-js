@@ -3,10 +3,7 @@ import {
   useCallback,
   useEffect,
   useState,
-  PointerEvent,
-  useRef,
-  MutableRefObject,
-  CSSProperties
+  PointerEvent
 } from 'react';
 import { useAnnotator, useSelection } from '@annotorious/react';
 import { type TextAnnotation, type TextAnnotator } from '@recogito/text-annotator';
@@ -19,29 +16,24 @@ import {
   useDismiss,
   useFloating,
   useInteractions,
-  useRole
+  useRole,
+  FloatingPortal,
+  FloatingFocusManager
 } from '@floating-ui/react';
-import { createPortal } from 'react-dom';
 
-interface TextAnnotationPopupProps<TRefElement extends HTMLElement> {
+interface TextAnnotationPopupProps {
 
-  focusMessage?: string;
-
-  popup(props: TextAnnotatorPopupProps<TRefElement>): ReactNode;
+  popup(props: TextAnnotatorPopupProps): ReactNode;
 
 }
 
-export interface TextAnnotatorPopupProps<TRefElement extends HTMLElement = HTMLElement> {
-
-  ref: MutableRefObject<TRefElement | null>;
+export interface TextAnnotatorPopupProps {
 
   selected: { annotation: TextAnnotation, editable?: boolean }[];
 
 }
 
-export const TextAnnotatorPopup = <TRefElement extends HTMLElement = HTMLElement>(props: TextAnnotationPopupProps<TRefElement>) => {
-
-  const { popup, focusMessage } = props;
+export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
 
   const r = useAnnotator<TextAnnotator>();
 
@@ -78,12 +70,14 @@ export const TextAnnotatorPopup = <TRefElement extends HTMLElement = HTMLElement
     if (selected.length > 0 && event) {
       setOpen(event.type === 'pointerup' || event.type === 'keydown');
     }
+  }, [selectedKey, event]);
 
+  useEffect(() => {
     // Close the popup if the selection is cleared
     if (selected.length === 0 && isOpen) {
       setOpen(false);
     }
-  }, [isOpen, event, selectedKey]);
+  }, [isOpen, selectedKey]);
 
   useEffect(() => {
     if (!isOpen || !annotation) return;
@@ -120,72 +114,29 @@ export const TextAnnotatorPopup = <TRefElement extends HTMLElement = HTMLElement
     }
   }, [update]);
 
-  const popupContentRef = useRef<TRefElement | null>(null);
-  const popupAnnouncerRef = useRef<HTMLElement | null>(null);
-
-  useEffect(() => {
-    const { current: popupContent } = popupContentRef;
-    if (!popupContent)
-      return;
-
-    if (!isOpen || !event)
-      return;
-
-    let announcementTimout: ReturnType<typeof setTimeout>;
-
-    if (event.type === 'pointerup') {
-      /**
-       * When the selection "finishes" using the pointer device,
-       * we can immediately focus on the popup content.
-       * That's useful to quickly write down a note or pick a highlight color
-       */
-      popupContent.focus();
-    } else if (event.type === 'keydown') {
-      announcementTimout = setTimeout(() => {
-        /**
-         * When the selection is performed using the keyboard, there's no certain "finished" state.
-         * Even after we show the popup, users might want to continue selecting text.
-         * Therefore, we shouldn't shift the focus from the page,
-         * but make a recommendation on how to navigate to the popup.
-         */
-        const { current: popupAnnouncer } = popupAnnouncerRef;
-        if (popupAnnouncer) {
-          popupAnnouncer.textContent = focusMessage;
-        }
-      }, 25)
-    }
-
-    return () => {
-      clearTimeout(announcementTimout);
-    }
-  }, [isOpen, event]);
-
   return isOpen && selected.length > 0 ? (
-    <>
-      <div
-        className="annotation-popup text-annotation-popup not-annotatable"
-        ref={refs.setFloating}
-        style={floatingStyles}
-        {...getFloatingProps()}
-        {...getStopEventsPropagationProps()}>
-        {popup({ ref: popupContentRef, selected })}
-      </div>
-      {focusMessage && createPortal(
-        <span ref={popupAnnouncerRef} style={visuallyHiddenStyles} aria-live="assertive" aria-atomic />,
-        document.body
-      )}
-    </>
+    <FloatingPortal>
+      <FloatingFocusManager
+        context={context}
+        initialFocus={
+          /**
+           * Don't shift focus to the floating element
+           * when the selection performed with the keyboard
+           */
+          event?.type === 'keydown' ? -1 : 0
+        }
+        visuallyHiddenDismiss="Dismiss the annotation dialog"
+      >
+        <div
+          className="annotation-popup text-annotation-popup not-annotatable"
+          ref={refs.setFloating}
+          style={floatingStyles}
+          {...getFloatingProps()}
+          {...getStopEventsPropagationProps()}>
+          {props.popup({ selected })}
+        </div>
+      </FloatingFocusManager>
+    </FloatingPortal>
   ) : null;
 
 }
-
-const visuallyHiddenStyles: CSSProperties = {
-  position: 'absolute',
-  height: '1px',
-  width: '1px',
-  clipPath: 'inset(50%)',
-  overflow: 'hidden',
-  whiteSpace: 'nowrap',
-  border: 0,
-  padding: 0,
-};
