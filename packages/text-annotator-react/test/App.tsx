@@ -3,17 +3,18 @@ import { AnnotationBody, Annotorious, useAnnotationStore, useAnnotator, useSelec
 import { TextAnnotator, TextAnnotatorPopup, TextAnnotatorPopupProps } from '../src';
 import { TextAnnotation, TextAnnotator as RecogitoTextAnnotator, W3CTextFormat } from '@recogito/text-annotator';
 
-const TestPopup = forwardRef<
-  Pick<HTMLDivElement, 'focus'>,
-  TextAnnotatorPopupProps
+const TestPopup= forwardRef<
+  HTMLInputElement, TextAnnotatorPopupProps
 >((props, ref) => {
+
+  const { selected } = props;
 
   const store = useAnnotationStore();
   const anno = useAnnotator<RecogitoTextAnnotator>();
 
   const body: AnnotationBody = {
     id: `${Math.random()}`,
-    annotation: props.selected[0].annotation.id,
+    annotation: selected[0].annotation.id,
     purpose: 'commenting',
     value: 'A Dummy Comment'
   };
@@ -32,7 +33,7 @@ const TestPopup = forwardRef<
 
 });
 
-const MockStorage = () => {
+const MockStorage: FC = () => {
 
   const anno = useAnnotator<RecogitoTextAnnotator>();
 
@@ -63,7 +64,7 @@ const MockStorage = () => {
 
 };
 
-export const App = () => {
+export const App: FC = () => {
   const w3cAdapter = useCallback((container: HTMLElement) => W3CTextFormat('https://www.gutenberg.org', container), []);
 
   return (
@@ -190,7 +191,8 @@ export const App = () => {
         </p>
       </TextAnnotator>
 
-      <TextAnnotatorPopup
+      <TextAnnotatorPopup<HTMLInputElement>
+        focusMessage="Press Tab to move to the note editing dialog"
         popup={
           props => (<TestPopup {...props} />)
         }
