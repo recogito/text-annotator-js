@@ -191,8 +191,7 @@ export const App: FC = () => {
         </p>
       </TextAnnotator>
 
-      <TextAnnotatorPopup<HTMLInputElement>
-        focusMessage="Press Tab to move to the note editing dialog"
+      <TextAnnotatorPopup
         popup={
           props => (<TestPopup {...props} />)
         }
