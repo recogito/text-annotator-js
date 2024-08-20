@@ -205,7 +205,7 @@ export const SelectionHandler = (
   });
 
   // Free caret movement through the text resets the annotation selection
-  hotkeys(arrowKeys.join(','), { element: container, keydown: true }, (evt) => {
+  hotkeys(arrowKeys.join(','), { keydown: true }, (evt) => {
     if (!evt.repeat) {
       currentTarget = undefined;
       selection.clear();
