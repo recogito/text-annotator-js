@@ -1,4 +1,4 @@
-import { PointerEvent, ReactNode, useCallback, useEffect, useState } from 'react';
+import React, { PointerEvent, ReactNode, useCallback, useEffect, useState } from 'react';
 import {
   autoUpdate,
   flip,
@@ -16,7 +16,8 @@ import {
 import { useAnnotator, useSelection } from '@annotorious/react';
 import type { TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
 
-import { useRestoreSelectionCaret } from './hooks';
+import { useRestoreSelectionCaret } from '../hooks';
+import './TextAnnotatorPopup.css';
 
 interface TextAnnotationPopupProps {
 
@@ -38,6 +39,10 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
   const annotation = selected[0]?.annotation;
 
   const [isOpen, setOpen] = useState(selected?.length > 0);
+
+  const handleClose = () => {
+    r?.cancelSelected();
+  }
 
   const { refs, floatingStyles, update, context } = useFloating({
     placement: 'top',
@@ -69,7 +74,7 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
   });
 
   const dismiss = useDismiss(context);
-  const role = useRole(context, { role: 'tooltip' });
+  const role = useRole(context, { role: 'dialog' });
   const { getFloatingProps } = useInteractions([dismiss, role]);
 
   const selectedKey = selected.map(a => a.annotation.id).join('-');
@@ -146,6 +151,11 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
           {...getFloatingProps()}
           {...getStopEventsPropagationProps()}>
           {props.popup({ selected })}
+
+          {/* It lets keyboard/sr users to know that the dialog closes when they focus out of its */}
+          <button className="popup-close-message" onClick={handleClose}>
+            This dialog closes when you leave it.
+          </button>
         </div>
       </FloatingFocusManager>
     </FloatingPortal>
