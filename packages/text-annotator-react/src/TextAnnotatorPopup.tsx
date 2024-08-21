@@ -126,6 +126,7 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
            */
           event?.type === 'keydown' ? -1 : 0
         }
+        returnFocus={false}
       >
         <div
           className="annotation-popup text-annotation-popup not-annotatable"
