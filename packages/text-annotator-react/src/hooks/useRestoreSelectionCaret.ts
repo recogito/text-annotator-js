@@ -35,11 +35,18 @@ export const useRestoreSelectionCaret = (args: { floatingOpen: boolean }) => {
     const { current: selectionRange } = selectionRangeRef;
     if (!selectionRange) return;
 
+    const { startContainer, startOffset } = selectionRange;
+
     setTimeout(() => {
       const sel = document.getSelection();
       if (sel && sel.isCollapsed && sel.anchorNode === document.body) {
         sel.removeAllRanges();
-        sel.setPosition(selectionRange.startContainer, selectionRange.startOffset);
+        sel.setPosition(startContainer, startOffset);
+
+        const startContainerElement = startContainer instanceof HTMLElement
+          ? startContainer
+          : startContainer.parentElement;
+        startContainerElement.focus({ preventScroll: true });
       }
     });
   }, [floatingOpen]);
