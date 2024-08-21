@@ -3,41 +3,43 @@ import { useEffect, useRef } from 'react';
 import { useSelection } from '@annotorious/react';
 import type { TextAnnotation } from '@recogito/text-annotator';
 
+/**
+ * Restores the caret position after the floating element gets closed
+ * and the selection is lost and moved to the `body`.
+ * The caret is placed at the start of the previous selection range.
+ *
+ * However, when the floating element is dismissed with intentional
+ * caret repositioning via the mouse click or arrow key navigation ->
+ * we shouldn't restore its position to the previous selection.
+ */
 export const useRestoreSelectionCaret = (args: { floatingOpen: boolean }) => {
   const { floatingOpen } = args;
 
   const { selected } = useSelection<TextAnnotation>();
   const annotation = selected[0]?.annotation;
 
-  const focusNodeRef = useRef<Selection['focusNode'] | null>(null);
-  const focusOffsetRef = useRef<Selection['focusOffset'] | null>(null);
+  const selectionRangeRef = useRef<Range | null>(null);
 
   useEffect(() => {
     if (!floatingOpen || !annotation) return;
 
     const sel = document.getSelection();
     if (sel) {
-      focusNodeRef.current = sel.focusNode;
-      focusOffsetRef.current = sel.focusOffset;
+      selectionRangeRef.current = sel.getRangeAt(0).cloneRange();
     }
   }, [floatingOpen, annotation]);
 
   useEffect(() => {
     if (floatingOpen) return;
 
-    const focusNode = focusNodeRef.current;
-    const focusOffset = focusOffsetRef.current;
-    if (focusNode === null || focusOffset === null) return;
+    const { current: selectionRange } = selectionRangeRef;
+    if (!selectionRange) return;
 
     setTimeout(() => {
-      /**
-       * Restore the caret only after it got lost and automatically moved to the `body`.
-       * It happens when user clicks on the close button within the floating element.
-       */
       const sel = document.getSelection();
       if (sel && sel.isCollapsed && sel.anchorNode === document.body) {
         sel.removeAllRanges();
-        sel.setPosition(focusNode, focusOffset);
+        sel.setPosition(selectionRange.startContainer, selectionRange.startOffset);
       }
     });
   }, [floatingOpen]);
