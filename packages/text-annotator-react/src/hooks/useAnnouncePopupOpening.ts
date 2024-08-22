@@ -45,7 +45,7 @@ export const useAnnouncePopupOpening = (args: { message?: string, floatingOpen: 
   const idleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (!floatingOpen || event?.type !== 'keydown') return;
+    if (!floatingOpen) return;
 
     const scheduleIdleAnnouncement = () => {
       clearTimeout(idleTimeoutRef.current);
