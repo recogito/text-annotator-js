@@ -22,6 +22,8 @@ export const useAnnouncePopupOpening = (args: { message?: string, floatingOpen: 
    * its `polite` announcements live area
    */
   useLayoutEffect(() => {
+    if (!message) return;
+
     announce('', 'polite');
     return () => destroyAnnouncer();
   }, []);
@@ -45,7 +47,7 @@ export const useAnnouncePopupOpening = (args: { message?: string, floatingOpen: 
   const idleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (!floatingOpen) return;
+    if (!floatingOpen || !message) return;
 
     const scheduleIdleAnnouncement = () => {
       clearTimeout(idleTimeoutRef.current);
