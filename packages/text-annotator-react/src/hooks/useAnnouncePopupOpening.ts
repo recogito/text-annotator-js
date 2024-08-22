@@ -26,7 +26,7 @@ export const useAnnouncePopupOpening = (args: { message?: string, floatingOpen: 
 
     announce('', 'polite');
     return () => destroyAnnouncer();
-  }, []);
+  }, [message]);
 
   /**
    * Screen reader requires messages to always be unique!
@@ -47,7 +47,7 @@ export const useAnnouncePopupOpening = (args: { message?: string, floatingOpen: 
   const idleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (!floatingOpen || !message) return;
+    if (!floatingOpen || event?.type !== 'keydown' || !message) return;
 
     const scheduleIdleAnnouncement = () => {
       clearTimeout(idleTimeoutRef.current);
@@ -61,5 +61,5 @@ export const useAnnouncePopupOpening = (args: { message?: string, floatingOpen: 
       clearTimeout(idleTimeoutRef.current);
       store.unobserve(scheduleIdleAnnouncement);
     };
-  }, [floatingOpen, event?.type, announcePopupNavigation, store]);
+  }, [floatingOpen, event?.type, message, announcePopupNavigation, store]);
 };
