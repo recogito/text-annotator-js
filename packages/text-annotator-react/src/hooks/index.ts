@@ -1,2 +1,2 @@
 export * from './useRestoreSelectionCaret';
-export * from './useAnnouncePopupOpening';
+export * from './useAnnouncePopupNavigation';

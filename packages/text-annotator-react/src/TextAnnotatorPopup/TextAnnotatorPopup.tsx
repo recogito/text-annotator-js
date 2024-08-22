@@ -16,7 +16,7 @@ import {
 import { useAnnotator, useSelection } from '@annotorious/react';
 import type { TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
 
-import { useAnnouncePopupOpening, useRestoreSelectionCaret } from '../hooks';
+import { useAnnouncePopupNavigation, useRestoreSelectionCaret } from '../hooks';
 import './TextAnnotatorPopup.css';
 
 interface TextAnnotationPopupProps {
@@ -132,7 +132,16 @@ export const TextAnnotatorPopup: FC<TextAnnotationPopupProps> = (props) => {
   }, [update]);
 
   useRestoreSelectionCaret({ floatingOpen: isOpen });
-  useAnnouncePopupOpening({ message: popupNavigationMessage, floatingOpen: isOpen });
+
+  /**
+   * Announce the navigation hint only on the keyboard selection,
+   * because the focus isn't shifted to the popup automatically then
+   */
+  useAnnouncePopupNavigation({
+    disabled: event?.type !== 'keydown',
+    floatingOpen: isOpen,
+    message: popupNavigationMessage,
+  });
 
   return isOpen && selected.length > 0 ? (
     <FloatingPortal>

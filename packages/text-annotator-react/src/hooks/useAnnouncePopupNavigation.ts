@@ -8,10 +8,17 @@ import { exhaustiveUniqueRandom } from 'unique-random';
 // Generate random numbers that do not repeat until the entire range has appeared
 const uniqueRandom = exhaustiveUniqueRandom(1, 300);
 
-export const useAnnouncePopupOpening = (args: { message?: string, floatingOpen: boolean }) => {
+interface AnnouncePopupOpeningArgs {
+    message?: string;
+    floatingOpen: boolean;
+    disabled?: boolean;
+}
+
+export const useAnnouncePopupNavigation = (args: AnnouncePopupOpeningArgs) => {
   const {
     message = 'Press Tab to move to Notes Dialog',
-    floatingOpen
+    floatingOpen,
+    disabled = false
   } = args;
 
   const store = useAnnotationStore();
@@ -47,7 +54,7 @@ export const useAnnouncePopupOpening = (args: { message?: string, floatingOpen: 
   const idleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (!floatingOpen || event?.type !== 'keydown' || !message) return;
+    if (disabled || !floatingOpen || !message) return;
 
     const scheduleIdleAnnouncement = () => {
       clearTimeout(idleTimeoutRef.current);
