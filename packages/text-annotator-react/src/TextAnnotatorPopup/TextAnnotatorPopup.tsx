@@ -1,4 +1,4 @@
-import React, { PointerEvent, ReactNode, useCallback, useEffect, useState } from 'react';
+import React, { FC, PointerEvent, ReactNode, useCallback, useEffect, useState } from 'react';
 import {
   autoUpdate,
   flip,
@@ -21,6 +21,8 @@ import './TextAnnotatorPopup.css';
 
 interface TextAnnotationPopupProps {
 
+  popupNavigationMessage?: string;
+
   popup(props: TextAnnotatorPopupProps): ReactNode;
 
 }
@@ -31,7 +33,9 @@ export interface TextAnnotatorPopupProps {
 
 }
 
-export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
+export const TextAnnotatorPopup: FC<TextAnnotationPopupProps> = (props) => {
+
+  const { popup, popupNavigationMessage } = props;
 
   const r = useAnnotator<TextAnnotator>();
 
@@ -128,7 +132,7 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
   }, [update]);
 
   useRestoreSelectionCaret({ floatingOpen: isOpen });
-  useAnnouncePopupOpening({ floatingOpen: isOpen });
+  useAnnouncePopupOpening({ message: popupNavigationMessage, floatingOpen: isOpen });
 
   return isOpen && selected.length > 0 ? (
     <FloatingPortal>
@@ -151,7 +155,7 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
           style={floatingStyles}
           {...getFloatingProps()}
           {...getStopEventsPropagationProps()}>
-          {props.popup({ selected })}
+          {popup({ selected })}
 
           {/* It lets keyboard/sr users to know that the dialog closes when they focus out of its */}
           <button className="popup-close-message" onClick={handleClose}>
