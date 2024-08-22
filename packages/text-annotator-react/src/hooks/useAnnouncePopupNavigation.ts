@@ -5,9 +5,6 @@ import type { TextAnnotation } from '@recogito/text-annotator';
 import { announce, destroyAnnouncer } from '@react-aria/live-announcer';
 import { exhaustiveUniqueRandom } from 'unique-random';
 
-// Generate random numbers that do not repeat until the entire range has appeared
-const uniqueRandom = exhaustiveUniqueRandom(1, 300);
-
 interface AnnouncePopupOpeningArgs {
     message?: string;
     floatingOpen: boolean;
@@ -23,6 +20,9 @@ export const useAnnouncePopupNavigation = (args: AnnouncePopupOpeningArgs) => {
 
   const store = useAnnotationStore();
   const { event } = useSelection<TextAnnotation>();
+
+  // Generate random numbers that do not repeat until the entire 1-10000 range has appeared
+  const uniqueRandom = useCallback(exhaustiveUniqueRandom(1, 10000), []);
 
   /**
    * Initialize the `LiveAnnouncer` class and
