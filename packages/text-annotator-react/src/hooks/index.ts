@@ -1,1 +1,2 @@
-export { useRestoreSelectionCaret } from './useRestoreSelectionCaret';
+export * from './useRestoreSelectionCaret';
+export * from './useAnnouncePopupOpening';

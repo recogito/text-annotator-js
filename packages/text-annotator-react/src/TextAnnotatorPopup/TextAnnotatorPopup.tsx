@@ -16,7 +16,7 @@ import {
 import { useAnnotator, useSelection } from '@annotorious/react';
 import type { TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
 
-import { useRestoreSelectionCaret } from '../hooks';
+import { useAnnouncePopupOpening, useRestoreSelectionCaret } from '../hooks';
 import './TextAnnotatorPopup.css';
 
 interface TextAnnotationPopupProps {
@@ -128,6 +128,7 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
   }, [update]);
 
   useRestoreSelectionCaret({ floatingOpen: isOpen });
+  useAnnouncePopupOpening({ floatingOpen: isOpen });
 
   return isOpen && selected.length > 0 ? (
     <FloatingPortal>
