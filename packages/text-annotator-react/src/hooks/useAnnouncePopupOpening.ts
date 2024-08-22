@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 
 import { Origin, useAnnotationStore, useSelection } from '@annotorious/react';
 import type { TextAnnotation } from '@recogito/text-annotator';
@@ -15,41 +15,46 @@ export const useAnnouncePopupOpening = (args: { floatingOpen: boolean }) => {
   const { event } = useSelection<TextAnnotation>();
 
   /**
-   * Initialize the `LiveAnnouncer` helper
-   * and append live areas to the DOM
+   * Initialize the `LiveAnnouncer` class and
+   * its `polite` announcements live area
    */
   useLayoutEffect(() => {
     announce('', 'polite');
     return () => destroyAnnouncer()
   }, [])
 
+  /**
+   * Screen reader requires messages to always be unique!
+   * Otherwise, the hint will be announced once per page.
+   */
+  const announcementSeed = useMemo(() => floatingOpen ? uniqueRandom() : 0, [floatingOpen])
 
   const announcePopupNavigation = useCallback(() => {
     /**
-     * Screen reader requires messages to always be unique!
-     * Otherwise, the hint will be announced only a single time.
-     * To imitate the uniqueness w/o mutating the message - we can append spaces at the end.
+     * To imitate the uniqueness of the announced message
+     * w/o mutating it - we can append spaces at the end.
      */
-    const spaces = Array.from({ length: uniqueRandom() }).map(() => ' ').join('');
-    announce(`Press Tab to move to Highlights and Comments Dialog ${spaces}`, 'polite');
-  }, []);
+    const uniqueSpaces = Array.from({ length: announcementSeed }).map(() => ' ').join('');
+    announce(`Press Tab to move to Highlights and Comments Dialog ${uniqueSpaces}`, 'polite');
+  }, [announcementSeed]);
 
+  const idleTimeoutMs = 700;
   const idleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!floatingOpen || event?.type !== 'keydown') return;
 
     const scheduleIdleAnnouncement = () => {
-      const { current: idleTimeout } = idleTimeoutRef;
-      if (idleTimeout)
-        clearTimeout(idleTimeout);
-
-      idleTimeoutRef.current = setTimeout(announcePopupNavigation, 1000);
+      clearTimeout(idleTimeoutRef.current);
+      idleTimeoutRef.current = setTimeout(announcePopupNavigation, idleTimeoutMs);
     }
 
     scheduleIdleAnnouncement()
     store.observe(scheduleIdleAnnouncement, { origin: Origin.LOCAL });
 
-    return () => store.unobserve(scheduleIdleAnnouncement)
+    return () => {
+      clearTimeout(idleTimeoutRef.current);
+      store.unobserve(scheduleIdleAnnouncement);
+    }
   }, [store, announcePopupNavigation, floatingOpen, event?.type]);
 };
