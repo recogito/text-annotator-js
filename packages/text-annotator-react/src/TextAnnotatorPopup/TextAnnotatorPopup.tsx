@@ -152,7 +152,7 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
           {...getStopEventsPropagationProps()}>
           {props.popup({ selected })}
 
-          {/* It lets keyboard/sr users to know that the dialog closes when they focus out of its */}
+          {/* It lets keyboard/sr users to know that the dialog closes when they focus out of it */}
           <button className="popup-close-message" onClick={handleClose}>
             This dialog closes when you leave it.
           </button>
