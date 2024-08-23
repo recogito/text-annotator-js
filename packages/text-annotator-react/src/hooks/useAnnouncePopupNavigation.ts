@@ -7,6 +7,7 @@ import { exhaustiveUniqueRandom } from 'unique-random';
 
 interface AnnouncePopupOpeningArgs {
     message?: string;
+    idle?: number;
     floatingOpen: boolean;
     disabled?: boolean;
 }
@@ -14,6 +15,7 @@ interface AnnouncePopupOpeningArgs {
 export const useAnnouncePopupNavigation = (args: AnnouncePopupOpeningArgs) => {
   const {
     message = 'Press Tab to move to Notes Dialog',
+    idle = 700,
     floatingOpen,
     disabled = false
   } = args;
@@ -50,7 +52,6 @@ export const useAnnouncePopupNavigation = (args: AnnouncePopupOpeningArgs) => {
     announce(`${message} ${uniqueSpaces}`, 'polite');
   }, [message, announcementSeed]);
 
-  const idleTimeoutMs = 700;
   const idleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -58,7 +59,7 @@ export const useAnnouncePopupNavigation = (args: AnnouncePopupOpeningArgs) => {
 
     const scheduleIdleAnnouncement = () => {
       clearTimeout(idleTimeoutRef.current);
-      idleTimeoutRef.current = setTimeout(announcePopupNavigation, idleTimeoutMs);
+      idleTimeoutRef.current = setTimeout(announcePopupNavigation, idle);
     };
 
     scheduleIdleAnnouncement();
