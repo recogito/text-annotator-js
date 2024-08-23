@@ -41,16 +41,12 @@ export const SelectionHandler = (
     // be annotatable (like a component popup).
     // Note that Chrome/iOS will sometimes return the root doc as target!
     const annotatable = !(evt.target as Node).parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
-    if (annotatable) {
-      currentTarget = {
-        annotation: uuidv4(),
-        selector: [],
-        creator: currentUser,
-        created: new Date()
-      };
-    } else {
-      currentTarget = undefined;
-    }
+    currentTarget = annotatable ? {
+      annotation: uuidv4(),
+      selector: [],
+      creator: currentUser,
+      created: new Date()
+    } : undefined;
   }
 
   if (annotatingEnabled)
@@ -136,6 +132,7 @@ export const SelectionHandler = (
     lastPointerDown = { ...evt, target, timeStamp, offsetX, offsetY, type };
 
     isLeftClick = evt.button === 0;
+    currentTarget = undefined;
   }
 
   container.addEventListener('pointerdown', onPointerDown);
@@ -160,11 +157,11 @@ export const SelectionHandler = (
       }
     }
 
+    const sel = document.getSelection();
     const timeDifference = evt.timeStamp - lastPointerDown.timeStamp;
 
     // Just a click, not a selection
-    if (document.getSelection().isCollapsed && timeDifference < 300) {
-      currentTarget = undefined;
+    if (sel?.isCollapsed && timeDifference < 300) {
       clickSelect();
     } else if (currentTarget) {
       selection.userSelect(currentTarget.annotation, evt);
