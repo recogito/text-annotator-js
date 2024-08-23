@@ -9,6 +9,7 @@ interface AnnouncePopupOpeningArgs {
     message?: string;
     idle?: number;
     floatingOpen: boolean;
+    floatingFocused?: boolean;
     disabled?: boolean;
 }
 
@@ -31,11 +32,11 @@ export const useAnnouncePopupNavigation = (args: AnnouncePopupOpeningArgs) => {
    * its `polite` announcements live area
    */
   useLayoutEffect(() => {
-    if (!message) return;
+    if (disabled || !message) return;
 
     announce('', 'polite');
     return () => destroyAnnouncer();
-  }, [message]);
+  }, [disabled, message]);
 
   /**
    * Screen reader requires messages to always be unique!
@@ -69,5 +70,6 @@ export const useAnnouncePopupNavigation = (args: AnnouncePopupOpeningArgs) => {
       clearTimeout(idleTimeoutRef.current);
       store.unobserve(scheduleIdleAnnouncement);
     };
-  }, [floatingOpen, event?.type, message, announcePopupNavigation, store]);
+  }, [disabled, floatingOpen, event?.type, message, announcePopupNavigation, store]);
+
 };
