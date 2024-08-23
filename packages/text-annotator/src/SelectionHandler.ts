@@ -158,10 +158,10 @@ export const SelectionHandler = (
      * @see https://github.com/recogito/text-annotator-js/issues/136
      */
     setTimeout(() => {
-      const { isCollapsed } = document.getSelection()
+      const sel = document.getSelection()
 
       // Just a click, not a selection
-      if (isCollapsed && timeDifference < 300) {
+      if (sel?.isCollapsed && timeDifference < 300) {
         currentTarget = undefined;
         clickSelect();
       } else if (currentTarget) {
