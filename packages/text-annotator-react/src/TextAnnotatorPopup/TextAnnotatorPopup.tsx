@@ -43,10 +43,14 @@ export const TextAnnotatorPopup: FC<TextAnnotationPopupProps> = (props) => {
   const annotation = selected[0]?.annotation;
 
   const [isOpen, setOpen] = useState(selected?.length > 0);
+  const handleClose = () => r?.cancelSelected();
 
-  const handleClose = () => {
-    r?.cancelSelected();
-  }
+  const [isFloatingFocused, setFloatingFocused] = useState(false);
+  const handleFloatingFocus = () => setFloatingFocused(true);
+  const handleFloatingBlur = () => setFloatingFocused(false);
+  useEffect(() => {
+    if (!isOpen) handleFloatingBlur();
+  }, [isOpen, handleFloatingBlur]);
 
   const { refs, floatingStyles, update, context } = useFloating({
     placement: 'top',
@@ -64,7 +68,7 @@ export const TextAnnotatorPopup: FC<TextAnnotationPopupProps> = (props) => {
            */
           event instanceof FocusEvent
         ) {
-          r?.cancelSelected();
+          handleClose();
         }
       }
     },
@@ -138,7 +142,7 @@ export const TextAnnotatorPopup: FC<TextAnnotationPopupProps> = (props) => {
    * because the focus isn't shifted to the popup automatically then
    */
   useAnnouncePopupNavigation({
-    disabled: event?.type !== 'keydown',
+    disabled: isFloatingFocused,
     floatingOpen: isOpen,
     message: popupNavigationMessage,
   });
@@ -162,6 +166,8 @@ export const TextAnnotatorPopup: FC<TextAnnotationPopupProps> = (props) => {
           className="annotation-popup text-annotation-popup not-annotatable"
           ref={refs.setFloating}
           style={floatingStyles}
+          onFocus={handleFloatingFocus}
+          onBlur={handleFloatingBlur}
           {...getFloatingProps()}
           {...getStopEventsPropagationProps()}>
           {popup({ selected })}
