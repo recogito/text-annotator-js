@@ -93,18 +93,21 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
   }, [isOpen, selectedKey]);
 
   useEffect(() => {
-    if (!isOpen || !annotation) return;
+    if (isOpen && annotation) {
+      const {
+        target: {
+          selector: [{ range }]
+        }
+      } = annotation;
 
-    const {
-      target: {
-        selector: [{ range }]
-      }
-    } = annotation;
-
-    refs.setPositionReference({
-      getBoundingClientRect: range.getBoundingClientRect.bind(range),
-      getClientRects: range.getClientRects.bind(range)
-    });
+      refs.setPositionReference({
+        getBoundingClientRect: range.getBoundingClientRect.bind(range),
+        getClientRects: range.getClientRects.bind(range)
+      });
+    } else {
+      // Don't leave the reference depending on the previously selected annotation
+      refs.setPositionReference(null);
+    }
   }, [isOpen, annotation, refs]);
 
   // Prevent text-annotator from handling the irrelevant events triggered from the popup
