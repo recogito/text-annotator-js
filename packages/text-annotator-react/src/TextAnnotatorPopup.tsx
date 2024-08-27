@@ -62,22 +62,25 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
   }, [pointerEvent?.type, selectedKey]);
 
   useEffect(() => {
-    if (!isOpen || !annotation?.id || !r) return;
+    if (!annotation?.id || !r) return;
 
-    refs.setPositionReference({
-      getBoundingClientRect: () => denormalizeRectWithOffset(
-        r.state.store.getAnnotationBounds(annotation.id),
-        r.element.getBoundingClientRect()
-      ),
-      getClientRects: () => {
-        const rects = r.state.store.getAnnotationRects(annotation.id);
-        const denormalizedRects = rects.map(
-          rect => denormalizeRectWithOffset(rect, r.element.getBoundingClientRect())
-        );
-        return toDomRectList(denormalizedRects);
-      }
-    });
-  }, [isOpen, annotation?.id, r]);
+    if (isOpen) {
+      refs.setPositionReference({
+        getBoundingClientRect: () => denormalizeRectWithOffset(
+          r.state.store.getAnnotationBounds(annotation.id),
+          r.element.getBoundingClientRect()
+        ),
+        getClientRects: () => {
+          const rects = r.state.store.getAnnotationRects(annotation.id);
+          const denormalizedRects = rects.map(
+            rect => denormalizeRectWithOffset(rect, r.element.getBoundingClientRect())
+          );
+          return toDomRectList(denormalizedRects);
+        }
+      });
+    } else {
+      refs.setPositionReference(null);
+    }
   }, [isOpen, annotation?.id, annotation?.target, r]);
 
   // Prevent text-annotator from handling the irrelevant events triggered from the popup
