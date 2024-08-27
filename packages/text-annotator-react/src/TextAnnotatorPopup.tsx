@@ -78,6 +78,7 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
       }
     });
   }, [isOpen, annotation?.id, r]);
+  }, [isOpen, annotation?.id, annotation?.target, r]);
 
   // Prevent text-annotator from handling the irrelevant events triggered from the popup
   const getStopEventsPropagationProps = useCallback(
