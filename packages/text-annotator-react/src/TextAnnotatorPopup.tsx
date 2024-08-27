@@ -62,9 +62,9 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
   }, [pointerEvent?.type, selectedKey]);
 
   useEffect(() => {
-    if (!annotation?.id || !r) return;
+    if (!r) return;
 
-    if (isOpen) {
+    if (isOpen && annotation?.id) {
       refs.setPositionReference({
         getBoundingClientRect: () => denormalizeRectWithOffset(
           r.state.store.getAnnotationBounds(annotation.id),
@@ -79,6 +79,7 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
         }
       });
     } else {
+      // Don't leave the reference depending on the previously selected annotation
       refs.setPositionReference(null);
     }
   }, [isOpen, annotation?.id, annotation?.target, r]);
