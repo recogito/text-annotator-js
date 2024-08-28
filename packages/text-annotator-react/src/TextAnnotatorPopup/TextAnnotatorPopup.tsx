@@ -16,7 +16,6 @@ import {
 import { useAnnotator, useSelection } from '@annotorious/react';
 import type { TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
 
-import { useRestoreSelectionRange } from '../hooks';
 import './TextAnnotatorPopup.css';
 
 interface TextAnnotationPopupProps {
@@ -42,9 +41,7 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
 
   const handleClose = () => {
     r?.cancelSelected();
-  }
-
-  const restoreSelection = useRestoreSelectionRange();
+  };
 
   const { refs, floatingStyles, update, context } = useFloating({
     placement: 'top',
@@ -54,8 +51,8 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
 
       if (!open) {
         if (reason === 'escape-key' || reason === 'focus-out') {
+          console.log('FOCUS OUT!');
           r?.cancelSelected();
-          restoreSelection();
         }
       }
     },
@@ -122,7 +119,7 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
     return () => {
       mutationObserver.disconnect();
       window.document.removeEventListener('scroll', update, true);
-    }
+    };
   }, [update]);
 
   return isOpen && selected.length > 0 ? (
@@ -157,4 +154,4 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
     </FloatingPortal>
   ) : null;
 
-}
+};
