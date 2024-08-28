@@ -166,7 +166,6 @@ export const SelectionHandler = (
       }
     }
 
-    const sel = document.getSelection();
     const timeDifference = evt.timeStamp - lastDownEvent.timeStamp;
 
     /**
@@ -183,7 +182,6 @@ export const SelectionHandler = (
 
       // Just a click, not a selection
       if (sel?.isCollapsed && timeDifference < 300) {
-        currentTarget = undefined;
         userSelect();
       } else if (currentTarget) {
         selection.userSelect(currentTarget.annotation, evt);
