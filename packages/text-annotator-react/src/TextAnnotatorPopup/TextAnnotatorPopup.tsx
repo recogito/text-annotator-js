@@ -47,19 +47,11 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
   const { refs, floatingStyles, update, context } = useFloating({
     placement: 'top',
     open: isOpen,
-    onOpenChange: (open, event, reason) => {
+    onOpenChange: (open, _event, reason) => {
       setOpen(open);
 
       if (!open) {
-        if (
-          reason === 'escape-key' ||
-          /**
-           * When the focus leaves the floating - cancel the selection.
-           * However, it doesn't have a distinct reason yet, will be resolved in the discussion:
-           * @see https://github.com/floating-ui/floating-ui/discussions/3012#discussioncomment-10405906
-           */
-          event instanceof FocusEvent
-        ) {
+        if (reason === 'escape-key' || reason === 'focus-out') {
           r?.cancelSelected();
         }
       }
