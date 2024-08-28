@@ -1,1 +1,1 @@
-export { useRestoreSelectionCaret } from './useRestoreSelectionCaret';
+export { useRestoreSelectionRange } from './useRestoreSelectionRange';
