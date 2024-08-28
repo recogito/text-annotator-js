@@ -1,6 +1,7 @@
+import debounce from 'debounce';
 import type { Filter, ViewportState } from '@annotorious/core';
+
 import type { TextAnnotatorState } from '../state';
-import { debounce } from '../utils';
 import { ViewportBounds, getViewportBounds, trackViewport } from './viewport';
 import type { HighlightPainter } from './HighlightPainter';
 import type { Highlight } from './Highlight';
@@ -169,6 +170,7 @@ export const createBaseRenderer = (
 
     document.removeEventListener('scroll', onScroll);
 
+    onResize.clear();
     window.removeEventListener('resize', onResize);
     resizeObserver.disconnect();
 

@@ -1,9 +1,10 @@
 import { Filter, Origin, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
+import debounce from 'debounce';
+
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotationTarget } from './model';
 import {
-  debounce,
   splitAnnotatableRanges,
   rangeToSelector,
   isWhitespaceOrEmpty,
@@ -82,13 +83,13 @@ export const createSelectionHandler = (
 
     const selectionRange = sel.getRangeAt(0);
     if (isWhitespaceOrEmpty(selectionRange)) return;
-    
+
     const annotatableRanges = splitAnnotatableRanges(selectionRange.cloneRange());
 
     const hasChanged =
       annotatableRanges.length !== currentTarget.selector.length ||
       annotatableRanges.some((r, i) => r.toString() !== currentTarget.selector[i]?.quote);
-      
+
     if (!hasChanged) return;
 
     currentTarget = {
@@ -102,7 +103,7 @@ export const createSelectionHandler = (
     } else {
       // Proper lifecycle management: clear selection first...
       selection.clear();
-      
+
       // ...then add annotation to store...
       store.addAnnotation({
         id: currentTarget.annotation,
@@ -165,9 +166,14 @@ export const createSelectionHandler = (
   document.addEventListener('pointerup', onPointerUp);
 
   const destroy = () => {
+    currentTarget = undefined;
+    lastPointerDown = undefined;
+
+    onSelectionChange.clear();
+
     container.removeEventListener('selectstart', onSelectStart);
     document.removeEventListener('selectionchange', onSelectionChange);
-    
+
     container.removeEventListener('pointerdown', onPointerDown);
     document.removeEventListener('pointerup', onPointerUp);
   }
