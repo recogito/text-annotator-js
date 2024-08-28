@@ -117,7 +117,7 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
     });
   });
 
-  const onResize = debounce(() => resetCanvas(canvas));
+  const onResize = debounce(() => resetCanvas(canvas), 10);
 
   window.addEventListener('resize', onResize);
 
