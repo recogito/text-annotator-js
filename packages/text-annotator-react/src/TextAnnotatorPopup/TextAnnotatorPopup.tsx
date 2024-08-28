@@ -60,7 +60,6 @@ export const TextAnnotatorPopup: FC<TextAnnotationPopupProps> = (props) => {
 
       if (!open) {
         if (reason === 'escape-key' || reason === 'focus-out') {
-          console.log('FOCUS OUT!');
           handleClose();
         }
       }
