@@ -27,7 +27,15 @@ export const createSelectionHandler = (
 
   let currentAnnotatingEnabled = true;
 
-  const setAnnotatingEnabled = (enabled: boolean) => currentAnnotatingEnabled = enabled;
+  const setAnnotatingEnabled = (enabled: boolean) => {
+    currentAnnotatingEnabled = enabled;
+    onSelectionChange.clear();
+
+    if (!enabled) {
+      currentTarget = undefined;
+      lastPointerDown = undefined;
+    }
+  };
 
   const { store, selection } = state;
 
