@@ -47,7 +47,7 @@
   "dependencies": {
     "@annotorious/core": "^3.0.0-rc.31",
     "@annotorious/react": "^3.0.0-rc.31",
-    "@floating-ui/react": "^0.26.20",
+    "@floating-ui/react": "^0.26.23",
     "@react-aria/live-announcer": "^3.3.4",
     "@recogito/text-annotator": "3.0.0-rc.39",
     "@recogito/text-annotator-tei": "3.0.0-rc.39",

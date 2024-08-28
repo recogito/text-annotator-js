@@ -54,7 +54,7 @@ export const SelectionHandler = (
       creator: currentUser,
       created: new Date()
     } : undefined;
-  }
+  };
 
   if (annotatingEnabled)
     container.addEventListener('selectstart', onSelectStart);
@@ -77,18 +77,20 @@ export const SelectionHandler = (
     }
 
     // The selection isn't active -> bail out from selection change processing
-    if (!currentTarget)
-      return;
+    if (!currentTarget) return;
 
-    /**
-     * The selection range got collapsed during the selecting process.
-     * The previously created annotation isn't relevant anymore and can be discarded
-     *
-     * @see https://github.com/recogito/text-annotator-js/issues/139
-     */
-    if (sel.isCollapsed && store.getAnnotation(currentTarget.annotation)) {
-      selection.clear();
-      store.deleteAnnotation(currentTarget.annotation);
+    if (sel.isCollapsed) {
+      /**
+       * The selection range got collapsed during the selecting process.
+       * The previously created annotation isn't relevant anymore and can be discarded
+       *
+       * @see https://github.com/recogito/text-annotator-js/issues/139
+       */
+      if (store.getAnnotation(currentTarget.annotation)) {
+        selection.clear();
+        store.deleteAnnotation(currentTarget.annotation);
+      }
+
       return;
     }
 
@@ -125,7 +127,7 @@ export const SelectionHandler = (
       // ...then make the new annotation the current selection
       selection.userSelect(currentTarget.annotation, lastDownEvent);
     }
-  })
+  });
 
   if (annotatingEnabled)
     document.addEventListener('selectionchange', onSelectionChange);
@@ -142,7 +144,8 @@ export const SelectionHandler = (
      */
     lastDownEvent = clonePointerEvent(evt);
     isLeftClick = lastDownEvent.button === 0;
-  }
+    currentTarget = undefined;
+  };
   container.addEventListener('pointerdown', onPointerDown);
 
   const onPointerUp = (evt: PointerEvent) => {
@@ -163,7 +166,7 @@ export const SelectionHandler = (
       } else if (!selection.isEmpty()) {
         selection.clear();
       }
-    }
+    };
 
     const timeDifference = evt.timeStamp - lastDownEvent.timeStamp;
 
@@ -177,17 +180,16 @@ export const SelectionHandler = (
      * @see https://github.com/recogito/text-annotator-js/issues/136
      */
     setTimeout(() => {
-      const { isCollapsed } = document.getSelection()
+      const sel = document.getSelection();
 
       // Just a click, not a selection
-      if (isCollapsed && timeDifference < 300) {
-        currentTarget = undefined;
+      if (sel?.isCollapsed && timeDifference < 300) {
         userSelect();
       } else if (currentTarget) {
         selection.userSelect(currentTarget.annotation, evt);
       }
     });
-  }
+  };
   document.addEventListener('pointerup', onPointerUp);
 
 
@@ -220,13 +222,13 @@ export const SelectionHandler = (
     document.removeEventListener('pointerup', onPointerUp);
 
     hotkeys.unbind();
-  }
+  };
 
   return {
     destroy,
     setFilter,
     setUser
-  }
+  };
 
-}
+};
 
