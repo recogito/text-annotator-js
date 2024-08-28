@@ -96,8 +96,10 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
 
   const getUser = () => currentUser;
 
-  const setAnnotatingEnabled = (enabled: boolean) => {
-    selectionHandler.setAnnotatingEnabled(enabled);
+  const setAnnotatingEnabled = (enabled?: boolean) => {
+    selectionHandler.setAnnotatingEnabled(
+      enabled === undefined ? true : enabled
+    );
   };
 
   const setFilter = (filter?: Filter) => {
