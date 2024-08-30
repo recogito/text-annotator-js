@@ -20,6 +20,7 @@ export interface TextAnnotatorOptions<T extends unknown = TextAnnotation> {
   style?: HighlightStyleExpression;
 
   user?: User;
+  
 }
 
 export type RendererType = 'SPANS' | 'CANVAS' | 'CSS_HIGHLIGHTS';

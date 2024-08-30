@@ -1,4 +1,4 @@
-import type { Filter, UserSelectAction, Store, ViewportState, UserSelectActionExpression } from '@annotorious/core';
+import type { Filter, Store, ViewportState, UserSelectActionExpression } from '@annotorious/core';
 import { 
   createHoverState, 
   createSelectionState, 
@@ -35,7 +35,9 @@ export const createTextAnnotatorState = (
 
   const tree = createSpatialTree(store, container);
 
-  const selection = createSelectionState<TextAnnotation>(store, defaultUserSelectAction);
+  // Temporary
+  const selection = createSelectionState<TextAnnotation>(store)
+  selection.setUserSelectAction(defaultUserSelectAction);
 
   const hover = createHoverState(store);
 

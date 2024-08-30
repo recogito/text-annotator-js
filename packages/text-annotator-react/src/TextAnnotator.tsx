@@ -26,6 +26,7 @@ export const TextAnnotator = <E extends unknown>(props: TextAnnotatorProps<E>) =
   const el = useRef<HTMLDivElement>(null);
 
   const { className, children, ...opts } = props;
+  
   const { style, filter, user } = opts;
 
   const { anno, setAnno } = useContext(AnnotoriousContext);
@@ -51,6 +52,6 @@ export const TextAnnotator = <E extends unknown>(props: TextAnnotatorProps<E>) =
     <div ref={el} className={className}>
       {children}
     </div>
-  );
+  )
 
-};
+}
