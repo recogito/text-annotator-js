@@ -159,7 +159,7 @@ export const SelectionHandler = (
       return;
 
     // Logic for selecting an existing annotation
-    const userSelect = () => {
+    const clickSelect = () => {
       const { x, y } = container.getBoundingClientRect();
 
       const hovered =
@@ -189,16 +189,17 @@ export const SelectionHandler = (
      * @see https://github.com/recogito/text-annotator-js/issues/136
      */
     setTimeout(() => {
-      const sel = document.getSelection();
+      const sel = document.getSelection()
 
       // Just a click, not a selection
       if (sel?.isCollapsed && timeDifference < 300) {
-        userSelect();
+        clickSelect();
       } else if (currentTarget) {
         selection.userSelect(currentTarget.annotation, evt);
       }
     });
-  };
+  }
+
   document.addEventListener('pointerup', onPointerUp);
 
 
