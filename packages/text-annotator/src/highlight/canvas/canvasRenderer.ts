@@ -1,4 +1,3 @@
-import debounce from 'debounce';
 import type { ViewportState } from '@annotorious/core';
 
 import type { TextAnnotatorState } from '../../state';
@@ -8,6 +7,7 @@ import { DEFAULT_SELECTED_STYLE, DEFAULT_STYLE, HighlightStyleExpression } from 
 import type { HighlightPainter } from '../HighlightPainter';
 import { createBaseRenderer, type RendererImplementation } from '../baseRenderer';
 import type { Highlight } from '../Highlight';
+import { debounce } from '../../utils';
 
 import './canvasRenderer.css';
 
@@ -117,7 +117,7 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
     });
   });
 
-  const onResize = debounce(() => resetCanvas(canvas), 10).bind(undefined);
+  const onResize = debounce(() => resetCanvas(canvas));
 
   window.addEventListener('resize', onResize);
 

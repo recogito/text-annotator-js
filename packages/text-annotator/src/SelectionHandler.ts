@@ -1,10 +1,10 @@
 import { Filter, Origin, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
-import debounce from 'debounce';
 
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotationTarget } from './model';
 import {
+  debounce,
   splitAnnotatableRanges,
   rangeToSelector,
   isWhitespaceOrEmpty,
@@ -128,7 +128,7 @@ export const createSelectionHandler = (
       // select events don't have offsetX/offsetY - reuse last up/down)
       selection.userSelect(currentTarget.annotation, lastPointerDown);
     }
-  }, 10).bind(undefined);
+  });
 
   document.addEventListener('selectionchange', onSelectionChange);
 
