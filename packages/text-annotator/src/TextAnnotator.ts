@@ -34,7 +34,8 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   cancelSingleClickEvents(container);
 
   const opts = fillDefaults<E>(options, {
-    annotatingEnabled: true
+    annotatingEnabled: true,
+    user: createAnonymousGuest()
   });
 
   const state: TextAnnotatorState = createTextAnnotatorState(container, opts.userSelectAction);
@@ -47,7 +48,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
 
   const lifecycle = createLifecycleObserver<TextAnnotation, E>(state, undoStack, opts.adapter);
 
-  let currentUser: User = createAnonymousGuest();
+  let currentUser: User = opts.user;
 
   // Use selected renderer, or fall back to default. If CSS_HIGHLIGHT is
   // requested, check if CSS Custom Highlights are supported, and fall
