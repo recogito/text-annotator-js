@@ -7,6 +7,7 @@ import {
   splitAnnotatableRanges,
   rangeToSelector,
   isWhitespaceOrEmpty,
+  trimRangeToContainer,
   NOT_ANNOTATABLE_SELECTOR
 } from './utils';
 
@@ -69,15 +70,19 @@ export const SelectionHandler = (
     }
 
     // Chrome/iOS does not reliably fire the 'selectstart' event!
-    if (evt.timeStamp - (lastPointerDown?.timeStamp || evt.timeStamp) < 1000 && !currentTarget)
+    const timeDifference = evt.timeStamp - (lastPointerDown?.timeStamp || evt.timeStamp);
+    if (timeDifference < 1000 && !currentTarget)
       onSelectStart(lastPointerDown);
 
     if (sel.isCollapsed || !isLeftClick || !currentTarget) return;
 
     const selectionRange = sel.getRangeAt(0);
-    if (isWhitespaceOrEmpty(selectionRange)) return;
-    
-    const annotatableRanges = splitAnnotatableRanges(selectionRange.cloneRange());
+
+    // The selection should be captured only within the annotatable container
+    const containedRange = trimRangeToContainer(selectionRange, container);
+    if (isWhitespaceOrEmpty(containedRange)) return;
+
+    const annotatableRanges = splitAnnotatableRanges(containedRange.cloneRange());
 
     const hasChanged =
       annotatableRanges.length !== currentTarget.selector.length ||
@@ -124,7 +129,7 @@ export const SelectionHandler = (
     isLeftClick = evt.button === 0;
   }
 
-  container.addEventListener('pointerdown', onPointerDown);
+  document.addEventListener('pointerdown', onPointerDown);
 
   const onPointerUp = (evt: PointerEvent) => {
     const annotatable = !(evt.target as Node).parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
@@ -135,7 +140,11 @@ export const SelectionHandler = (
     const clickSelect = () => {
       const { x, y } = container.getBoundingClientRect();
 
-      const hovered = store.getAt(evt.clientX - x, evt.clientY - y, currentFilter);
+      const hovered =
+        evt.target instanceof Node &&
+        container.contains(evt.target) &&
+        store.getAt(evt.clientX - x, evt.clientY - y, currentFilter);
+
       if (hovered) {
         const { selected } = selection;
 
@@ -161,9 +170,8 @@ export const SelectionHandler = (
 
   const destroy = () => {
     container.removeEventListener('selectstart', onSelectStart);
-    document.removeEventListener('selectionchange', onSelectionChange);
-    
-    container.removeEventListener('pointerdown', onPointerDown);
+    document.removeEventListener('selectionchange', onSelectionChange);    
+    document.removeEventListener('pointerdown', onPointerDown);
     document.removeEventListener('pointerup', onPointerUp);
   }
 
