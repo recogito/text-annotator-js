@@ -10,6 +10,7 @@ import {
   splitAnnotatableRanges,
   rangeToSelector,
   isWhitespaceOrEmpty,
+  trimRangeToContainer,
   NOT_ANNOTATABLE_SELECTOR
 } from './utils';
 
@@ -72,7 +73,8 @@ export const SelectionHandler = (
     }
 
     // Chrome/iOS does not reliably fire the 'selectstart' event!
-    if (evt.timeStamp - (lastDownEvent?.timeStamp || evt.timeStamp) < 1000 && !currentTarget) {
+    const timeDifference = evt.timeStamp - (lastDownEvent?.timeStamp || evt.timeStamp);
+    if (timeDifference < 1000 && !currentTarget) {
       onSelectStart(lastDownEvent || evt);
     }
 
@@ -95,9 +97,12 @@ export const SelectionHandler = (
     }
 
     const selectionRange = sel.getRangeAt(0);
-    if (isWhitespaceOrEmpty(selectionRange)) return;
 
-    const annotatableRanges = splitAnnotatableRanges(selectionRange.cloneRange());
+// The selection should be captured only within the annotatable container
+    const containedRange = trimRangeToContainer(selectionRange, container);
+    if (isWhitespaceOrEmpty(containedRange)) return;
+
+    const annotatableRanges = splitAnnotatableRanges(containedRange.cloneRange());
 
     const hasChanged =
       annotatableRanges.length !== currentTarget.selector.length ||
@@ -146,7 +151,7 @@ export const SelectionHandler = (
     isLeftClick = lastDownEvent.button === 0;
     currentTarget = undefined;
   };
-  container.addEventListener('pointerdown', onPointerDown);
+  document.addEventListener('pointerdown', onPointerDown);
 
   const onPointerUp = (evt: PointerEvent) => {
     const annotatable = !(evt.target as Node).parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
@@ -154,10 +159,14 @@ export const SelectionHandler = (
       return;
 
     // Logic for selecting an existing annotation
-    const userSelect = () => {
+    const clickSelect = () => {
       const { x, y } = container.getBoundingClientRect();
 
-      const hovered = store.getAt(evt.clientX - x, evt.clientY - y, currentFilter);
+      const hovered =
+        evt.target instanceof Node &&
+        container.contains(evt.target) &&
+        store.getAt(evt.clientX - x, evt.clientY - y, currentFilter);
+
       if (hovered) {
         const { selected } = selection;
 
@@ -180,16 +189,17 @@ export const SelectionHandler = (
      * @see https://github.com/recogito/text-annotator-js/issues/136
      */
     setTimeout(() => {
-      const sel = document.getSelection();
+      const sel = document.getSelection()
 
       // Just a click, not a selection
       if (sel?.isCollapsed && timeDifference < 300) {
-        userSelect();
+        clickSelect();
       } else if (currentTarget) {
         selection.userSelect(currentTarget.annotation, evt);
       }
     });
-  };
+  }
+
   document.addEventListener('pointerup', onPointerUp);
 
 
@@ -231,7 +241,7 @@ export const SelectionHandler = (
     container.removeEventListener('selectstart', onSelectStart);
     document.removeEventListener('selectionchange', onSelectionChange);
 
-    container.removeEventListener('pointerdown', onPointerDown);
+    document.removeEventListener('pointerdown', onPointerDown);
     document.removeEventListener('pointerup', onPointerUp);
 
     hotkeys.unbind();
