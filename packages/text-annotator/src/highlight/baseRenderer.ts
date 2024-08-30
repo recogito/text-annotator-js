@@ -140,7 +140,7 @@ export const createBaseRenderer = (
       currentPainter.reset();
 
     redraw();
-  }, 10);
+  }, 10).bind(undefined);
 
   window.addEventListener('resize', onResize);
 

@@ -128,7 +128,7 @@ export const createSelectionHandler = (
       // select events don't have offsetX/offsetY - reuse last up/down)
       selection.userSelect(currentTarget.annotation, lastPointerDown);
     }
-  }, 10)
+  }, 10).bind(undefined);
 
   document.addEventListener('selectionchange', onSelectionChange);
 
