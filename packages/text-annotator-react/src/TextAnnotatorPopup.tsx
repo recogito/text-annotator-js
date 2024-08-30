@@ -5,6 +5,7 @@ import {
   autoUpdate,
   inline,
   offset,
+  flip,
   shift,
   useDismiss,
   useFloating,
@@ -25,14 +26,16 @@ export interface TextAnnotatorPopupProps {
 }
 
 export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
+
   const r = useAnnotator<TextAnnotator>();
 
-  const { selected, pointerEvent } = useSelection<TextAnnotation>();
+  const { selected, event } = useSelection<TextAnnotation>();
+
   const annotation = selected[0]?.annotation;
 
   const [isOpen, setOpen] = useState(selected?.length > 0);
 
-  const { refs, floatingStyles, context } = useFloating({
+  const { refs, floatingStyles, update, context } = useFloating({
     placement: 'top',
     open: isOpen,
     onOpenChange: (open, _event, reason) => {
@@ -44,22 +47,26 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
     middleware: [
       offset(10),
       inline(),
+      flip(),
       shift({ mainAxis: false, crossAxis: true, padding: 10 })
     ],
     whileElementsMounted: autoUpdate
   });
 
   const dismiss = useDismiss(context);
+
   const role = useRole(context, { role: 'tooltip' });
+  
   const { getFloatingProps } = useInteractions([dismiss, role]);
 
   const selectedKey = selected.map(a => a.annotation.id).join('-');
+
   useEffect(() => {
     // Ignore all selection changes except those accompanied by a pointer event.
-    if (pointerEvent) {
-      setOpen(selected.length > 0 && pointerEvent.type === 'pointerup');
+    if (event) {
+      setOpen(selected.length > 0 && event.type === 'pointerup');
     }
-  }, [pointerEvent?.type, selectedKey]);
+  }, [event?.type, selectedKey]);
 
   useEffect(() => {
     if (!r) return;
@@ -89,6 +96,20 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
     () => ({ onPointerUp: (event: PointerEvent<HTMLDivElement>) => event.stopPropagation() }),
     []
   );
+
+  useEffect(() => {
+    const config: MutationObserverInit = { attributes: true, childList: true, subtree: true };
+
+    const mutationObserver = new MutationObserver(() => update());
+    mutationObserver.observe(document.body, config);
+
+    window.document.addEventListener('scroll', update, true);
+
+    return () => {
+      mutationObserver.disconnect();
+      window.document.removeEventListener('scroll', update, true);
+    }
+  }, [update]);
 
   return isOpen && selected.length > 0 ? (
     <div

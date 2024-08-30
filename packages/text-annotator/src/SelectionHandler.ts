@@ -7,13 +7,14 @@ import {
   splitAnnotatableRanges,
   rangeToSelector,
   isWhitespaceOrEmpty,
+  trimRangeToContainer,
   NOT_ANNOTATABLE_SELECTOR
 } from './utils';
 
 export const SelectionHandler = (
   container: HTMLElement,
   state: TextAnnotatorState,
-  annotationEnabled: boolean,
+  annotatingEnabled: boolean,
   offsetReferenceSelector?: string
 ) => {
 
@@ -53,7 +54,7 @@ export const SelectionHandler = (
     }
   }
 
-  if (annotationEnabled)
+  if (annotatingEnabled)
     container.addEventListener('selectstart', onSelectStart);
 
   const onSelectionChange = debounce((evt: PointerEvent) => {
@@ -69,15 +70,19 @@ export const SelectionHandler = (
     }
 
     // Chrome/iOS does not reliably fire the 'selectstart' event!
-    if (evt.timeStamp - (lastPointerDown?.timeStamp || evt.timeStamp) < 1000 && !currentTarget)
+    const timeDifference = evt.timeStamp - (lastPointerDown?.timeStamp || evt.timeStamp);
+    if (timeDifference < 1000 && !currentTarget)
       onSelectStart(lastPointerDown);
 
     if (sel.isCollapsed || !isLeftClick || !currentTarget) return;
 
     const selectionRange = sel.getRangeAt(0);
-    if (isWhitespaceOrEmpty(selectionRange)) return;
-    
-    const annotatableRanges = splitAnnotatableRanges(selectionRange.cloneRange());
+
+    // The selection should be captured only within the annotatable container
+    const containedRange = trimRangeToContainer(selectionRange, container);
+    if (isWhitespaceOrEmpty(containedRange)) return;
+
+    const annotatableRanges = splitAnnotatableRanges(containedRange.cloneRange());
 
     const hasChanged =
       annotatableRanges.length !== currentTarget.selector.length ||
@@ -106,11 +111,11 @@ export const SelectionHandler = (
 
       // ...then make the new annotation the current selection. (Reminder:
       // select events don't have offsetX/offsetY - reuse last up/down)
-      selection.clickSelect(currentTarget.annotation, lastPointerDown);
+      selection.userSelect(currentTarget.annotation, lastPointerDown);
     }
   })
 
-  if (annotationEnabled)
+  if (annotatingEnabled)
     document.addEventListener('selectionchange', onSelectionChange);
 
   // Select events don't carry information about the mouse button
@@ -124,7 +129,7 @@ export const SelectionHandler = (
     isLeftClick = evt.button === 0;
   }
 
-  container.addEventListener('pointerdown', onPointerDown);
+  document.addEventListener('pointerdown', onPointerDown);
 
   const onPointerUp = (evt: PointerEvent) => {
     const annotatable = !(evt.target as Node).parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
@@ -135,12 +140,16 @@ export const SelectionHandler = (
     const clickSelect = () => {
       const { x, y } = container.getBoundingClientRect();
 
-      const hovered = store.getAt(evt.clientX - x, evt.clientY - y, currentFilter);
+      const hovered =
+        evt.target instanceof Node &&
+        container.contains(evt.target) &&
+        store.getAt(evt.clientX - x, evt.clientY - y, currentFilter);
+
       if (hovered) {
         const { selected } = selection;
 
         if (selected.length !== 1 || selected[0].id !== hovered.id)
-          selection.clickSelect(hovered.id, evt);
+          selection.userSelect(hovered.id, evt);
       } else if (!selection.isEmpty()) {
         selection.clear();
       }
@@ -153,7 +162,7 @@ export const SelectionHandler = (
       currentTarget = undefined;
       clickSelect();
     } else if (currentTarget) {
-      selection.clickSelect(currentTarget.annotation, evt);
+      selection.userSelect(currentTarget.annotation, evt);
     }
   }
 
@@ -161,9 +170,8 @@ export const SelectionHandler = (
 
   const destroy = () => {
     container.removeEventListener('selectstart', onSelectStart);
-    document.removeEventListener('selectionchange', onSelectionChange);
-    
-    container.removeEventListener('pointerdown', onPointerDown);
+    document.removeEventListener('selectionchange', onSelectionChange);    
+    document.removeEventListener('pointerdown', onPointerDown);
     document.removeEventListener('pointerup', onPointerUp);
   }
 
