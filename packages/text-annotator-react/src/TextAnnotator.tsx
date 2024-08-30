@@ -7,7 +7,7 @@ import { createTextAnnotator } from '@recogito/text-annotator';
 import '@recogito/text-annotator/dist/text-annotator.css';
 
 
-export interface TextAnnotatorProps<E extends unknown> extends Omit<TextAnnotatorOptions<E>, 'adapter'>  {
+export interface TextAnnotatorProps<E extends unknown> extends Omit<TextAnnotatorOptions<E>, 'adapter'> {
 
   children?: ReactNode | JSX.Element;
 
@@ -15,7 +15,7 @@ export interface TextAnnotatorProps<E extends unknown> extends Omit<TextAnnotato
 
   filter?: Filter;
 
-  style?: HighlightStyleExpression
+  style?: HighlightStyleExpression;
 
   className?: string;
 
@@ -26,6 +26,7 @@ export const TextAnnotator = <E extends unknown>(props: TextAnnotatorProps<E>) =
   const el = useRef<HTMLDivElement>(null);
 
   const { className, children, ...opts } = props;
+  const { style, filter, user } = opts;
 
   const { anno, setAnno } = useContext(AnnotoriousContext);
 
@@ -40,22 +41,16 @@ export const TextAnnotator = <E extends unknown>(props: TextAnnotatorProps<E>) =
     return () => anno.destroy();
   }, [setAnno]);
 
-  useEffect(() => {
-    if (!anno) return;
+  useEffect(() => anno?.setStyle(style), [anno, style]);
 
-    anno.setStyle(props.style);
-  }, [anno, props.style]);
+  useEffect(() => anno?.setFilter(filter), [anno, filter]);
 
-  useEffect(() => {
-    if (!anno) return;
-
-    anno.setFilter(props.filter);
-  }, [anno, props.filter]);
+  useEffect(() => anno?.setUser(user), [anno, user]);
 
   return (
     <div ref={el} className={className}>
       {children}
     </div>
-  )
+  );
 
-}
+};
