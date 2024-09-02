@@ -191,7 +191,7 @@ export const SelectionHandler = (
 
     const timeDifference = evt.timeStamp - lastDownEvent.timeStamp;
 
-    /**
+      /**
      * We must check the `isCollapsed` within the 0-timeout
      * to handle the annotation dismissal after a click properly.
      *
@@ -205,7 +205,7 @@ export const SelectionHandler = (
 
       // Just a click, not a selection
       if (sel?.isCollapsed && timeDifference < CLICK_TIMEOUT) {
-      currentTarget = undefined;
+        currentTarget = undefined;
         clickSelect();
       } else if (currentTarget && store.getAnnotation(currentTarget.annotation)) {
         selection.userSelect(currentTarget.annotation, evt);
