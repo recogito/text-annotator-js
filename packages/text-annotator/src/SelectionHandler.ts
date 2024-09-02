@@ -73,19 +73,26 @@ export const SelectionHandler = (
 
     const timeDifference = evt.timeStamp - (lastDownEvent?.timeStamp || evt.timeStamp);
 
-    if (timeDifference < 1000 && !currentTarget) {
+    /**
+     * The selection start needs to be emulated only for the pointer events!
+     * The keyboard ones are consistently fired on desktops
+     * and the `timeDifference` will always be <10ms. between the `keydown` and `selectionchange`
+     */
+    if (lastDownEvent?.type === 'pointerdown') {
+      if (timeDifference < 1000 && !currentTarget) {
 
-      // Chrome/iOS does not reliably fire the 'selectstart' event!
-      onSelectStart(lastDownEvent || evt);
+        // Chrome/iOS does not reliably fire the 'selectstart' event!
+        onSelectStart(lastDownEvent || evt);
 
-    } else if (sel.isCollapsed && timeDifference < CLICK_TIMEOUT) {
+      } else if (sel.isCollapsed && timeDifference < CLICK_TIMEOUT) {
 
-      /*
-       Firefox doesn't fire the 'selectstart' when user clicks
-       over the text, which collapses the selection
-      */
-      onSelectStart(lastDownEvent || evt);
+        /*
+         Firefox doesn't fire the 'selectstart' when user clicks
+         over the text, which collapses the selection
+        */
+        onSelectStart(lastDownEvent || evt);
 
+      }
     }
 
     // The selection isn't active -> bail out from selection change processing
