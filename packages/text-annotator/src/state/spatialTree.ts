@@ -86,7 +86,6 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
 
   const insert = (target: TextAnnotationTarget) => {
     const rects = toItems(target, container.getBoundingClientRect());
-
     rects.forEach(rect => tree.insert(rect));
     index.set(target.annotation, rects);
   }
