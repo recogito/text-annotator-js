@@ -129,7 +129,7 @@ export const SelectionHandler = (
     isLeftClick = evt.button === 0;
   }
 
-  document.addEventListener('pointerdown', onPointerDown);
+  container.addEventListener('pointerdown', onPointerDown);
 
   const onPointerUp = (evt: PointerEvent) => {
     const annotatable = !(evt.target as Node).parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
@@ -171,7 +171,7 @@ export const SelectionHandler = (
   const destroy = () => {
     container.removeEventListener('selectstart', onSelectStart);
     document.removeEventListener('selectionchange', onSelectionChange);    
-    document.removeEventListener('pointerdown', onPointerDown);
+    container.removeEventListener('pointerdown', onPointerDown);
     document.removeEventListener('pointerup', onPointerUp);
   }
 
