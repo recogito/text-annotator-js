@@ -44,9 +44,9 @@ export interface Renderer {
 
 }
 
-export const createBaseRenderer = (
+export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorState> (
   container: HTMLElement, 
-  state: TextAnnotatorState,
+  state: T,
   viewport: ViewportState,
   renderer: RendererImplementation
 ): Renderer => {
