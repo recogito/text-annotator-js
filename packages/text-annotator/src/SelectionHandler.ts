@@ -52,9 +52,6 @@ export const SelectionHandler = (
     } : undefined;
   }
 
-  if (annotatingEnabled)
-    container.addEventListener('selectstart', onSelectStart);
-
   const onSelectionChange = debounce((evt: PointerEvent) => {
     const sel = document.getSelection();
 
@@ -137,10 +134,7 @@ export const SelectionHandler = (
       // select events don't have offsetX/offsetY - reuse last up/down)
       selection.userSelect(currentTarget.annotation, lastPointerDown);
     }
-  })
-
-  if (annotatingEnabled)
-    document.addEventListener('selectionchange', onSelectionChange);
+  });
 
   // Select events don't carry information about the mouse button
   // Therefore, to prevent right-click selection, we need to listen
@@ -152,8 +146,6 @@ export const SelectionHandler = (
 
     isLeftClick = evt.button === 0;
   }
-
-  document.addEventListener('pointerdown', onPointerDown);
 
   const onPointerUp = (evt: PointerEvent) => {
     const annotatable = !(evt.target as Node).parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
@@ -191,14 +183,22 @@ export const SelectionHandler = (
     }
   }
 
+  container.addEventListener('pointerdown', onPointerDown);
   document.addEventListener('pointerup', onPointerUp);
 
+  if (annotatingEnabled) {
+    container.addEventListener('selectstart', onSelectStart);
+    document.addEventListener('selectionchange', onSelectionChange);
+  }
+
   const destroy = () => {
+    container.removeEventListener('pointerdown', onPointerDown);
+    document.removeEventListener('pointerup', onPointerUp);
+
     container.removeEventListener('selectstart', onSelectStart);
     document.removeEventListener('selectionchange', onSelectionChange);
 
-    document.removeEventListener('pointerdown', onPointerDown);
-    document.removeEventListener('pointerup', onPointerUp);
+
   }
 
   return {
