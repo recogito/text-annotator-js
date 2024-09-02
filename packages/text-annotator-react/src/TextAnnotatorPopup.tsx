@@ -19,7 +19,7 @@ interface TextAnnotationPopupProps {
 
 }
 
-interface TextAnnotationPopupContentProps {
+export interface TextAnnotationPopupContentProps {
 
   annotation: TextAnnotation;
   
