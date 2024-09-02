@@ -14,9 +14,9 @@ import type { TextAnnotation, TextAnnotationTarget } from '../model';
 import type { TextAnnotationStore } from './TextAnnotationStore';
 import { isRevived, reviveAnnotation, reviveTarget } from '../utils';
 
-export interface TextAnnotatorState extends AnnotatorState<TextAnnotation> {
+export interface TextAnnotatorState<T extends TextAnnotation = TextAnnotation> extends AnnotatorState<T> {
 
-  store: TextAnnotationStore;
+  store: TextAnnotationStore<T>;
 
   selection: SelectionState<TextAnnotation>;
 
