@@ -11,7 +11,7 @@ import {
 } from '@annotorious/core';
 import { createSpatialTree } from './spatialTree';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
-import type { TextAnnotationStore } from './TextAnnotationStore';
+import type { AnnotationRects, TextAnnotationStore } from './TextAnnotationStore';
 import { isRevived, reviveAnnotation, reviveTarget } from '../utils';
 
 export interface TextAnnotatorState<T extends TextAnnotation = TextAnnotation> extends AnnotatorState<T> {
@@ -130,6 +130,13 @@ export const createTextAnnotatorState = (
     return tree.getAnnotationBounds(id);
   }
 
+  const getIntersecting = (
+    minX: number,
+    minY: number,
+    maxX: number,
+    maxY: number,
+  ): AnnotationRects[] => tree.getIntersecting(minX, minY, maxX, maxY);
+
   const getAnnotationRects = (id: string): DOMRect[] => tree.getAnnotationRects(id);
 
   const recalculatePositions = () => tree.recalculate();
@@ -158,9 +165,8 @@ export const createTextAnnotatorState = (
       bulkUpsertAnnotations,
       getAnnotationBounds,
       getAnnotationRects,
+      getIntersecting,
       getAt,
-      getIntersecting: tree.getIntersecting.bind(tree),
-      getAnnotationRects: tree.getAnnotationRects.bind(tree),
       recalculatePositions,
       updateTarget
     },
