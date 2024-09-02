@@ -15,13 +15,17 @@ import {
 
 interface TextAnnotationPopupProps {
 
-  popup(props: TextAnnotatorPopupProps): ReactNode;
+  popup(props: TextAnnotationPopupContentProps): ReactNode;
 
 }
 
-export interface TextAnnotatorPopupProps {
+interface TextAnnotationPopupContentProps {
 
-  selected: { annotation: TextAnnotation, editable?: boolean }[];
+  annotation: TextAnnotation;
+  
+  editable?: boolean;
+
+  event?: PointerEvent;
 
 }
 
@@ -110,7 +114,11 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
       style={floatingStyles}
       {...getFloatingProps()}
       {...getStopEventsPropagationProps()}>
-      {props.popup({ selected })}
+      {props.popup({
+        annotation: selected[0].annotation,
+        editable: selected[0].editable,
+        event
+       })}
     </div>
   ) : null;
 

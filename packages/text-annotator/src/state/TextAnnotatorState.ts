@@ -1,4 +1,4 @@
-import type { Filter, UserSelectAction, Store, ViewportState, UserSelectActionExpression } from '@annotorious/core';
+import type { Filter, Store, ViewportState, UserSelectActionExpression } from '@annotorious/core';
 import { 
   createHoverState, 
   createSelectionState, 
@@ -14,9 +14,9 @@ import type { TextAnnotation, TextAnnotationTarget } from '../model';
 import type { TextAnnotationStore } from './TextAnnotationStore';
 import { isRevived, reviveAnnotation, reviveTarget } from '../utils';
 
-export interface TextAnnotatorState extends AnnotatorState<TextAnnotation> {
+export interface TextAnnotatorState<T extends TextAnnotation = TextAnnotation> extends AnnotatorState<T> {
 
-  store: TextAnnotationStore;
+  store: TextAnnotationStore<T>;
 
   selection: SelectionState<TextAnnotation>;
 
@@ -28,14 +28,16 @@ export interface TextAnnotatorState extends AnnotatorState<TextAnnotation> {
 
 export const createTextAnnotatorState = (
   container: HTMLElement,
-  defaultUserAction?: UserSelectActionExpression<TextAnnotation>
+  defaultUserSelectAction?: UserSelectActionExpression<TextAnnotation>
 ): TextAnnotatorState => {
 
   const store: Store<TextAnnotation> = createStore<TextAnnotation>();
 
   const tree = createSpatialTree(store, container);
 
-  const selection = createSelectionState<TextAnnotation>(store, defaultUserAction);
+  // Temporary
+  const selection = createSelectionState<TextAnnotation>(store)
+  selection.setUserSelectAction(defaultUserSelectAction);
 
   const hover = createHoverState(store);
 
@@ -128,6 +130,8 @@ export const createTextAnnotatorState = (
     return tree.getAnnotationBounds(id);
   }
 
+  const getAnnotationRects = (id: string): DOMRect[] => tree.getAnnotationRects(id);
+
   const recalculatePositions = () => tree.recalculate();
 
   store.observe(({ changes }) => {
@@ -153,6 +157,7 @@ export const createTextAnnotatorState = (
       bulkUpdateTargets,
       bulkUpsertAnnotations,
       getAnnotationBounds,
+      getAnnotationRects,
       getAt,
       getIntersecting: tree.getIntersecting,
       recalculatePositions,
