@@ -186,7 +186,7 @@ export const SelectionHandler = (
     if (sel?.isCollapsed && timeDifference < CLICK_TIMEOUT) {
       currentTarget = undefined;
       clickSelect();
-    } else if (currentTarget) {
+    } else if (currentTarget && store.getAnnotation(currentTarget.annotation)) {
       selection.userSelect(currentTarget.annotation, evt);
     }
   }
