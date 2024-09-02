@@ -14,6 +14,8 @@ import {
   NOT_ANNOTATABLE_SELECTOR
 } from './utils';
 
+const CLICK_TIMEOUT = 300;
+
 export const SelectionHandler = (
   container: HTMLElement,
   state: TextAnnotatorState,
@@ -57,9 +59,6 @@ export const SelectionHandler = (
     } : undefined;
   };
 
-  if (annotatingEnabled)
-    container.addEventListener('selectstart', onSelectStart);
-
   const onSelectionChange = debounce((evt: Event) => {
     const sel = document.getSelection();
 
@@ -72,10 +71,21 @@ export const SelectionHandler = (
       return;
     }
 
-    // Chrome/iOS does not reliably fire the 'selectstart' event!
     const timeDifference = evt.timeStamp - (lastDownEvent?.timeStamp || evt.timeStamp);
+
     if (timeDifference < 1000 && !currentTarget) {
+
+      // Chrome/iOS does not reliably fire the 'selectstart' event!
       onSelectStart(lastDownEvent || evt);
+
+    } else if (sel.isCollapsed && timeDifference < CLICK_TIMEOUT) {
+
+      /*
+       Firefox doesn't fire the 'selectstart' when user clicks
+       over the text, which collapses the selection
+      */
+      onSelectStart(lastDownEvent || evt);
+
     }
 
     // The selection isn't active -> bail out from selection change processing
@@ -98,7 +108,7 @@ export const SelectionHandler = (
 
     const selectionRange = sel.getRangeAt(0);
 
-// The selection should be captured only within the annotatable container
+    // The selection should be captured only within the annotatable container
     const containedRange = trimRangeToContainer(selectionRange, container);
     if (isWhitespaceOrEmpty(containedRange)) return;
 
@@ -134,9 +144,6 @@ export const SelectionHandler = (
     }
   });
 
-  if (annotatingEnabled)
-    document.addEventListener('selectionchange', onSelectionChange);
-
   /**
    * Select events don't carry information about the mouse button
    * Therefore, to prevent right-click selection, we need to listen
@@ -149,9 +156,7 @@ export const SelectionHandler = (
      */
     lastDownEvent = clonePointerEvent(evt);
     isLeftClick = lastDownEvent.button === 0;
-    currentTarget = undefined;
   };
-  document.addEventListener('pointerdown', onPointerDown);
 
   const onPointerUp = (evt: PointerEvent) => {
     const annotatable = !(evt.target as Node).parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
@@ -192,16 +197,20 @@ export const SelectionHandler = (
       const sel = document.getSelection()
 
       // Just a click, not a selection
-      if (sel?.isCollapsed && timeDifference < 300) {
+      if (sel?.isCollapsed && timeDifference < CLICK_TIMEOUT) {
+      currentTarget = undefined;
         clickSelect();
-      } else if (currentTarget) {
+      } else if (currentTarget && store.getAnnotation(currentTarget.annotation)) {
         selection.userSelect(currentTarget.annotation, evt);
       }
     });
   }
 
+  document.addEventListener('pointerdown', onPointerDown);
   document.addEventListener('pointerup', onPointerUp);
 
+  container.addEventListener('selectstart', onSelectStart);
+  document.addEventListener('selectionchange', onSelectionChange);
 
   const arrowKeys = ['up', 'down', 'left', 'right'];
   const selectionKeys = [
@@ -238,11 +247,11 @@ export const SelectionHandler = (
   hotkeys(arrowKeys.join(','), { keydown: true, keyup: false }, handleArrowKeyPress);
 
   const destroy = () => {
-    container.removeEventListener('selectstart', onSelectStart);
-    document.removeEventListener('selectionchange', onSelectionChange);
-
     document.removeEventListener('pointerdown', onPointerDown);
     document.removeEventListener('pointerup', onPointerUp);
+
+    container.removeEventListener('selectstart', onSelectStart);
+    document.removeEventListener('selectionchange', onSelectionChange);
 
     hotkeys.unbind();
   };
