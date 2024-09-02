@@ -67,14 +67,26 @@ export const SelectionHandler = (
       return;
     }
 
-    // Chrome/iOS does not reliably fire the 'selectstart' event!
+
     const timeDifference = evt.timeStamp - (lastPointerDown?.timeStamp || evt.timeStamp);
-    if (timeDifference < 1000 && !currentTarget)
+
+    if (timeDifference < 1000 && !currentTarget) {
+
+      // Chrome/iOS does not reliably fire the 'selectstart' event!
       onSelectStart(lastPointerDown);
 
+    } else if (sel.isCollapsed && timeDifference < CLICK_TIMEOUT) {
+
+      /*
+       Firefox doesn't fire the 'selectstart' when user clicks
+       over the text, which collapses the selection
+      */
+      onSelectStart(lastPointerDown);
+
+    }
+
     // The selection isn't active -> bail out from selection change processing
-    if (!currentTarget)
-      return;
+    if (!currentTarget) return;
 
     /**
      * The selection range got collapsed during the selecting process.
