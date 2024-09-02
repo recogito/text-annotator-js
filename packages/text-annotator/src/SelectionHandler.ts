@@ -11,6 +11,8 @@ import {
   NOT_ANNOTATABLE_SELECTOR
 } from './utils';
 
+const CLICK_TIMEOUT = 300;
+
 export const SelectionHandler = (
   container: HTMLElement,
   state: TextAnnotatorState,
@@ -88,7 +90,7 @@ export const SelectionHandler = (
 
     const selectionRange = sel.getRangeAt(0);
 
-// The selection should be captured only within the annotatable container
+    // The selection should be captured only within the annotatable container
     const containedRange = trimRangeToContainer(selectionRange, container);
     if (isWhitespaceOrEmpty(containedRange)) return;
 
@@ -137,7 +139,6 @@ export const SelectionHandler = (
     lastPointerDown = { ...evt, target, timeStamp, offsetX, offsetY, type };
 
     isLeftClick = evt.button === 0;
-    currentTarget = undefined;
   }
 
   document.addEventListener('pointerdown', onPointerDown);
@@ -170,7 +171,8 @@ export const SelectionHandler = (
     const timeDifference = evt.timeStamp - lastPointerDown.timeStamp;
 
     // Just a click, not a selection
-    if (sel?.isCollapsed && timeDifference < 300) {
+    if (sel?.isCollapsed && timeDifference < CLICK_TIMEOUT) {
+      currentTarget = undefined;
       clickSelect();
     } else if (currentTarget) {
       selection.userSelect(currentTarget.annotation, evt);
