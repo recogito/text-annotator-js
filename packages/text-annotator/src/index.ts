@@ -25,6 +25,7 @@ export type {
   ParseResult,
   User,
   UserSelectActionExpression,
+  ViewportState,
   W3CAnnotation,
   W3CAnnotationBody,
   W3CAnnotationTarget
