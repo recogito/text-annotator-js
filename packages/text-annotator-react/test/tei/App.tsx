@@ -3,9 +3,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { AnnotationBody, Annotorious, useAnnotationStore, useAnnotator } from '@annotorious/react';
 import { TextAnnotation, TextAnnotator as VanillaTextAnnotator } from '@recogito/text-annotator';
 
-import { TEIAnnotator, CETEIcean, TextAnnotatorPopup, TextAnnotatorPopupProps } from '../../src';
+import { TEIAnnotator, CETEIcean, TextAnnotatorPopup, type TextAnnotationPopupContentProps } from '../../src';
 
-const TestPopup = (props: TextAnnotatorPopupProps) => {
+const TestPopup = (props: TextAnnotationPopupContentProps) => {
 
   const store = useAnnotationStore();
   const r = useAnnotator<VanillaTextAnnotator>();
@@ -14,7 +14,7 @@ const TestPopup = (props: TextAnnotatorPopupProps) => {
 
   const body: AnnotationBody = {
     id: `${Math.random()}`,
-    annotation: props.selected[0].annotation.id,
+    annotation: props.annotation.id,
     purpose: 'commenting',
     value: 'A Dummy Comment'
   };
