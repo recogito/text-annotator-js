@@ -1,18 +1,18 @@
 import React, { FC, useCallback, useEffect } from 'react';
 import { AnnotationBody, Annotorious, useAnnotationStore, useAnnotator, useSelection } from '@annotorious/react';
-import { TextAnnotator, TextAnnotatorPopup, TextAnnotatorPopupProps } from '../src';
-import { TextAnnotation, TextAnnotator as RecogitoTextAnnotator, W3CTextFormat } from '@recogito/text-annotator';
+import { TextAnnotator, TextAnnotatorPopup, type TextAnnotationPopupContentProps } from '../src';
+import { W3CTextFormat, type TextAnnotation, type TextAnnotator as RecogitoTextAnnotator } from '@recogito/text-annotator';
 
-const TestPopup: FC<TextAnnotatorPopupProps> = (props) => {
+const TestPopup: FC<TextAnnotationPopupContentProps> = (props) => {
 
-  const { selected } = props;
+  const { annotation } = props;
 
   const store = useAnnotationStore();
   const r = useAnnotator<RecogitoTextAnnotator>();
 
   const body: AnnotationBody = {
     id: `${Math.random()}`,
-    annotation: selected[0].annotation.id,
+    annotation: annotation.id,
     purpose: 'commenting',
     value: 'A Dummy Comment'
   };

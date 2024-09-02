@@ -23,13 +23,17 @@ interface TextAnnotationPopupProps {
 
   popupNavigationMessage?: string;
 
-  popup(props: TextAnnotatorPopupProps): ReactNode;
+  popup(props: TextAnnotationPopupContentProps): ReactNode;
 
 }
 
-export interface TextAnnotatorPopupProps {
+export interface TextAnnotationPopupContentProps {
 
-  selected: { annotation: TextAnnotation, editable?: boolean }[];
+  annotation: TextAnnotation;
+
+  editable?: boolean;
+
+  event?: PointerEvent;
 
 }
 
@@ -163,7 +167,11 @@ export const TextAnnotatorPopup: FC<TextAnnotationPopupProps> = (props) => {
           onBlur={handleFloatingBlur}
           {...getFloatingProps()}
           {...getStopEventsPropagationProps()}>
-          {popup({ selected })}
+          {popup({
+            annotation: selected[0].annotation,
+            editable: selected[0].editable,
+            event
+          })}
 
           {/* It lets keyboard/sr users to know that the dialog closes when they focus out of it */}
           <button className="popup-close-message" onClick={handleClose}>
