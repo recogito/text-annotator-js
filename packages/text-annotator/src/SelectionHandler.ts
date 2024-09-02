@@ -68,8 +68,6 @@ export const createSelectionHandler = (
     }
   }
 
-  container.addEventListener('selectstart', onSelectStart);
-
   const onSelectionChange = debounce((evt: PointerEvent) => {
     if (!currentAnnotatingEnabled) return;
 
@@ -130,8 +128,6 @@ export const createSelectionHandler = (
     }
   });
 
-  document.addEventListener('selectionchange', onSelectionChange);
-
   // Select events don't carry information about the mouse button
   // Therefore, to prevent right-click selection, we need to listen
   // to the initial pointerdown event and remember the button
@@ -142,8 +138,6 @@ export const createSelectionHandler = (
 
     isLeftClick = evt.button === 0;
   }
-
-  document.addEventListener('pointerdown', onPointerDown);
 
   const onPointerUp = (evt: PointerEvent) => {
     const annotatable = !(evt.target as Node).parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
@@ -180,7 +174,11 @@ export const createSelectionHandler = (
     }
   }
 
+  container.addEventListener('pointerdown', onPointerDown);
   document.addEventListener('pointerup', onPointerUp);
+
+  container.addEventListener('selectstart', onSelectStart);
+  document.addEventListener('selectionchange', onSelectionChange);
 
   const destroy = () => {
     currentTarget = undefined;
@@ -188,11 +186,12 @@ export const createSelectionHandler = (
 
     onSelectionChange.clear();
 
+    container.removeEventListener('pointerdown', onPointerDown);
+    document.removeEventListener('pointerup', onPointerUp);
+
     container.removeEventListener('selectstart', onSelectStart);
     document.removeEventListener('selectionchange', onSelectionChange);
 
-    document.removeEventListener('pointerdown', onPointerDown);
-    document.removeEventListener('pointerup', onPointerUp);
   }
 
   return {

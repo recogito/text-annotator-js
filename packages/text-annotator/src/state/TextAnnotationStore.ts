@@ -1,29 +1,31 @@
 import type { Filter, Origin, Store } from '@annotorious/core';
 import type { TextAnnotation } from '../model';
 
-export interface TextAnnotationStore extends Omit<Store<TextAnnotation>, 'addAnnotation' | 'bulkAddAnnotation'> {
+export interface TextAnnotationStore<T extends TextAnnotation = TextAnnotation> extends Omit<Store<T>, 'addAnnotation' | 'bulkAddAnnotation'> {
 
   // Minor changes to default Annotorious store - text store returns feedback
   // on annotations that failed to render, to support lazy document loading scenarios
-  addAnnotation(annotation: TextAnnotation, origin?: Origin): boolean;
+  addAnnotation(annotation: T, origin?: Origin): boolean;
 
-  bulkAddAnnotation(annotations: TextAnnotation[], replace: boolean, origin?: Origin): TextAnnotation[];
+  bulkAddAnnotation(annotations: T[], replace: boolean, origin?: Origin): T[];
 
-  bulkUpsertAnnotations(annotations: TextAnnotation[], origin?: Origin): TextAnnotation[];
+  bulkUpsertAnnotations(annotations: T[], origin?: Origin): T[];
 
   getAnnotationBounds(id: string, hintX?: number, hintY?: number, buffer?: number): DOMRect;
 
+  getAnnotationRects(id: string): DOMRect[];
+
   getAt(x: number, y: number, filter?: Filter): TextAnnotation | undefined;
 
-  getIntersecting(minX: number, minY: number, maxX: number, maxY: number): AnnotationRects[];
+  getIntersecting(minX: number, minY: number, maxX: number, maxY: number): AnnotationRects<T>[];
 
   recalculatePositions(): void;
 
 }
 
-export interface AnnotationRects {
+export interface AnnotationRects <T extends TextAnnotation = TextAnnotation>{
 
-  annotation: TextAnnotation;
+  annotation: T;
 
   rects: Rect[];
 
