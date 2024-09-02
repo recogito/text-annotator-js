@@ -130,6 +130,8 @@ export const createTextAnnotatorState = (
     return tree.getAnnotationBounds(id);
   }
 
+  const getAnnotationRects = (id: string): DOMRect[] => tree.getAnnotationRects(id);
+
   const recalculatePositions = () => tree.recalculate();
 
   store.observe(({ changes }) => {
@@ -155,6 +157,7 @@ export const createTextAnnotatorState = (
       bulkUpdateTargets,
       bulkUpsertAnnotations,
       getAnnotationBounds,
+      getAnnotationRects,
       getAt,
       getIntersecting: tree.getIntersecting,
       recalculatePositions,

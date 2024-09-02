@@ -114,8 +114,8 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
 
 }
 
-export const createSpansRenderer = (
+export const createSpansRenderer = <T extends TextAnnotatorState = TextAnnotatorState> (
   container: HTMLElement,
-  state: TextAnnotatorState,
+  state: T,
   viewport: ViewportState
 ) => createBaseRenderer(container, state, viewport, createRenderer(container));

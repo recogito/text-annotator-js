@@ -13,6 +13,8 @@ export interface TextAnnotationStore extends Omit<Store<TextAnnotation>, 'addAnn
 
   getAnnotationBounds(id: string, hintX?: number, hintY?: number, buffer?: number): DOMRect;
 
+  getAnnotationRects(id: string): DOMRect[];
+
   getAt(x: number, y: number, filter?: Filter): TextAnnotation | undefined;
 
   getIntersecting(minX: number, minY: number, maxX: number, maxY: number): AnnotationRects[];
