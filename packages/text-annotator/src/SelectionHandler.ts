@@ -116,6 +116,9 @@ export const SelectionHandler = (
   // Therefore, to prevent right-click selection, we need to listen
   // to the initial pointerdown event and remember the button
   const onPointerDown = (evt: PointerEvent) => {
+    const annotatable = !(evt.target as Node).parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
+    if (!annotatable) return;
+
     // Note that the event itself can be ephemeral!
     const { target, timeStamp, offsetX, offsetY, type } = evt;
     lastPointerDown = { ...evt, target, timeStamp, offsetX, offsetY, type };
@@ -125,8 +128,7 @@ export const SelectionHandler = (
 
   const onPointerUp = (evt: PointerEvent) => {
     const annotatable = !(evt.target as Node).parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
-    if (!annotatable || !isLeftClick)
-      return;
+    if (!annotatable || !isLeftClick) return;
 
     // Logic for selecting an existing annotation by clicking it
     const clickSelect = () => {
