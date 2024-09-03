@@ -1,3 +1,4 @@
+export * from './api';
 export * from './highlight';
 export * from './model';
 export * from './state';
