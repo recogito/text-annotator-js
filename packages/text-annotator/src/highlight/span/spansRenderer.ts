@@ -66,7 +66,7 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
     const highlightsByCreation = [...highlights].sort((highlightA, highlightB) => {
       const { annotation: { target: { created: createdA } } } = highlightA;
       const { annotation: { target: { created: createdB } } } = highlightB;
-      return createdA.getTime() - createdB.getTime();
+      return createdA && createdB ? createdA.getTime() - createdB.getTime() : 0;
     });
 
     highlightsByCreation.forEach(highlight => {
