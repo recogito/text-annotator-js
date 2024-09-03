@@ -189,6 +189,7 @@ export const SelectionHandler = (
       }
     };
 
+    const sel = document.getSelection();
     const timeDifference = evt.timeStamp - lastDownEvent.timeStamp;
 
       /**
