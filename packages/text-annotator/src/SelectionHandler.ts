@@ -174,13 +174,26 @@ export const SelectionHandler = (
     const sel = document.getSelection();
     const timeDifference = evt.timeStamp - lastPointerDown.timeStamp;
 
-    // Just a click, not a selection
-    if (sel?.isCollapsed && timeDifference < CLICK_TIMEOUT) {
-      currentTarget = undefined;
-      clickSelect();
-    } else if (currentTarget && store.getAnnotation(currentTarget.annotation)) {
-      selection.userSelect(currentTarget.annotation, evt);
-    }
+    /**
+     * We must check the `isCollapsed` within the 0-timeout
+     * to handle the annotation dismissal after a click properly.
+     *
+     * Otherwise, the `isCollapsed` will return an obsolete `false` value,
+     * click won't be processed, and the annotation will get falsely re-selected.
+     *
+     * @see https://github.com/recogito/text-annotator-js/issues/136
+     */
+    setTimeout(() => {
+      const sel = document.getSelection()
+
+      // Just a click, not a selection
+      if (sel?.isCollapsed && timeDifference < CLICK_TIMEOUT) {
+        currentTarget = undefined;
+        clickSelect();
+      } else if (currentTarget && store.getAnnotation(currentTarget.annotation)) {
+        selection.userSelect(currentTarget.annotation, evt);
+      }
+    });
   }
 
   container.addEventListener('pointerdown', onPointerDown);
@@ -197,7 +210,6 @@ export const SelectionHandler = (
 
     container.removeEventListener('selectstart', onSelectStart);
     document.removeEventListener('selectionchange', onSelectionChange);
-
 
   }
 
