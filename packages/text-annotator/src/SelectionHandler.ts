@@ -171,7 +171,7 @@ export const SelectionHandler = (
     });
   }
 
-  container.addEventListener('pointerdown', onPointerDown);
+  document.addEventListener('pointerdown', onPointerDown);
   document.addEventListener('pointerup', onPointerUp);
 
   if (annotatingEnabled) {
@@ -180,7 +180,7 @@ export const SelectionHandler = (
   }
 
   const destroy = () => {
-    container.removeEventListener('pointerdown', onPointerDown);
+    document.removeEventListener('pointerdown', onPointerDown);
     document.removeEventListener('pointerup', onPointerUp);
 
     container.removeEventListener('selectstart', onSelectStart);
