@@ -13,14 +13,14 @@ import './TextAnnotator.css';
 
 const USE_DEFAULT_RENDERER: RendererType = 'SPANS';
 
-export interface TextAnnotator<E extends unknown = TextAnnotation> extends Annotator<TextAnnotation, E> {
+export interface TextAnnotator<I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation> extends Annotator<TextAnnotation, E> {
 
   element: HTMLElement;
 
   setStyle(style: HighlightStyleExpression | undefined): void;
 
   // Returns true if successful (or false if the annotation is not currently rendered)
-  scrollIntoView(annotation: TextAnnotation): boolean;
+  scrollIntoView(annotation: I): boolean;
 
   state: TextAnnotatorState;
 
@@ -29,7 +29,7 @@ export interface TextAnnotator<E extends unknown = TextAnnotation> extends Annot
 export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   container: HTMLElement,
   options: TextAnnotatorOptions<TextAnnotation, E> = {}
-): TextAnnotator<E> => {
+): TextAnnotator<TextAnnotation, E> => {
   // Prevent mobile browsers from triggering word selection on single click.
   cancelSingleClickEvents(container);
 
