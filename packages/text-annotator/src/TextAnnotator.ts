@@ -28,12 +28,12 @@ export interface TextAnnotator<E extends unknown = TextAnnotation> extends Annot
 
 export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   container: HTMLElement,
-  options: TextAnnotatorOptions<E> = {}
+  options: TextAnnotatorOptions<TextAnnotation, E> = {}
 ): TextAnnotator<E> => {
   // Prevent mobile browsers from triggering word selection on single click.
   cancelSingleClickEvents(container);
 
-  const opts = fillDefaults<E>(options, {
+  const opts = fillDefaults<TextAnnotation, E>(options, {
     annotatingEnabled: true,
     user: createAnonymousGuest()
   });
