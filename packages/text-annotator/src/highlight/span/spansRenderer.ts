@@ -56,7 +56,29 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
     if (shouldRedraw)
       highlightLayer.innerHTML = '';
 
-    highlights.forEach(highlight => {
+    /**
+     * Highlights rendering in the span highlight layer is an order-sensitive operation.
+     * The later the highlight is rendered, the higher it will be in the visual stack.
+     *
+     * By default, we should expect that the newer highlight
+     * will be rendered over the older one
+     */
+
+    /**
+     * Note that I need to disable temporarily. Turns out annotation loading WITHOUT
+     * an adapter does not yet revive dates, causing this to fail. Needs to be
+     * fixed directly in the Annotorious Annotator.
+     *
+    const highlightsByCreation = [...highlights].sort((highlightA, highlightB) => {
+      const { annotation: { target: { created: createdA } } } = highlightA;
+      const { annotation: { target: { created: createdB } } } = highlightB;
+      console.log(highlightA.annotation);
+      console.log(highlightB.annotation);
+      return createdA && createdB ? createdA.getTime() - createdB.getTime() : 0;
+    });
+    */
+
+    [...highlights]/*highlightsByCreation*/.forEach(highlight => {
       highlight.rects.map(rect => {
         const zIndex = computeZIndex(rect, highlights);
         const style = paint(highlight, viewportBounds, currentStyle, painter, zIndex);
