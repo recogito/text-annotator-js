@@ -18,7 +18,7 @@ const TestPopup = (props: TextAnnotationPopupContentProps) => {
   };
 
   const onClick = () => {
-    store.addBody(body);
+    store!.addBody(body);
     anno.cancelSelected();
   };
 
