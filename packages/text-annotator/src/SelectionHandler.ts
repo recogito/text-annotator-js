@@ -1,7 +1,7 @@
 import debounce from 'debounce';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Filter, Origin, type User } from '@annotorious/core';
+import { Origin, type Filter, type User } from '@annotorious/core';
 
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotationTarget } from './model';
@@ -127,7 +127,7 @@ export const createSelectionHandler = (
       // select events don't have offsetX/offsetY - reuse last up/down)
       selection.userSelect(currentTarget.annotation, lastPointerDown);
     }
-  });
+  }, 10);
 
   // Select events don't carry information about the mouse button
   // Therefore, to prevent right-click selection, we need to listen

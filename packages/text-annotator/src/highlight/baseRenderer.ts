@@ -140,7 +140,7 @@ export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorS
     currentPainter?.reset();
 
     redraw();
-  });
+  }, 10);
 
   window.addEventListener('resize', onResize);
 
