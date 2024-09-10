@@ -4,13 +4,8 @@ import { createNanoEvents, type Unsubscribe } from 'nanoevents';
 
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
 import { isRevived, mergeClientRects } from '../utils';
-import { getClientRectsPonyfill } from '../utils/getClientRectsPonyfill';
 import { reviveSelector } from '../utils';
 import type { AnnotationRects } from './TextAnnotationStore';
-
-const isFirefox = false; // navigator.userAgent.match(/firefox|fxios/i);
-
-if (isFirefox) console.warn('Firefox interop enabled');
 
 interface IndexedHighlightRect {
 
@@ -38,7 +33,7 @@ export interface SpatialTreeEvents {
 
 }
 
-export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLElement) => {
+export const createSpatialTree = <T extends TextAnnotation>(store: Store<T>, container: HTMLElement) => {
 
   const tree = new RBush<IndexedHighlightRect>();
 
@@ -50,9 +45,7 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
   const toItems = (target: TextAnnotationTarget, offset: DOMRect): IndexedHighlightRect[] => {
     const rects = target.selector.flatMap(s => {
       const revivedRange = isRevived([s]) ? s.range : reviveSelector(s, container).range;
-      return isFirefox ?
-        getClientRectsPonyfill(revivedRange) :
-        Array.from(revivedRange.getClientRects());
+      return Array.from(revivedRange.getClientRects());
     });
 
     const merged = mergeClientRects(rects)
@@ -176,7 +169,7 @@ export const createSpatialTree = (store: Store<TextAnnotation>, container: HTMLE
     minY: number, 
     maxX: number, 
     maxY: number,
-  ): AnnotationRects[] => {
+  ): AnnotationRects<T>[] => {
     // All rects in this area, regardless of annotation
     const rects = tree.search({ minX, minY, maxX, maxY });
 

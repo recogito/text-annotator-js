@@ -7,7 +7,7 @@ import { createTextAnnotator } from '@recogito/text-annotator';
 import '@recogito/text-annotator/dist/text-annotator.css';
 
 
-export interface TextAnnotatorProps<E extends unknown> extends Omit<TextAnnotatorOptions<E>, 'adapter'> {
+export interface TextAnnotatorProps<E extends unknown> extends Omit<TextAnnotatorOptions<TextAnnotation, E>, 'adapter'> {
 
   children?: ReactNode | JSX.Element;
 

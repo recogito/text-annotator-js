@@ -10,7 +10,7 @@ import { NOT_ANNOTATABLE_SELECTOR } from './splitAnnotatableRanges';
  *
  * @returns the revived selector
  */
-export const reviveSelector = (selector: TextSelector, container: HTMLElement): TextSelector => {
+export const reviveSelector = <T extends TextSelector>(selector: T, container: HTMLElement): T => {
 
   const { start, end } = selector;
 
