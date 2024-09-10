@@ -2,7 +2,7 @@ import type { TextAnnotationTarget } from '../model';
 import { isRevived } from './isRevived';
 import { reviveSelector } from './reviveSelector';
 
-export const reviveTarget = (target: TextAnnotationTarget, container: HTMLElement): TextAnnotationTarget =>
+export const reviveTarget = <T extends TextAnnotationTarget = TextAnnotationTarget>(target: T, container: HTMLElement): T =>
   isRevived(target.selector)
     ? target
     : ({

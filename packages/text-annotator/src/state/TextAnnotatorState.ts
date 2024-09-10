@@ -18,20 +18,20 @@ export interface TextAnnotatorState<T extends TextAnnotation = TextAnnotation> e
 
   store: TextAnnotationStore<T>;
 
-  selection: SelectionState<TextAnnotation>;
+  selection: SelectionState<T>;
 
-  hover: HoverState<TextAnnotation>;
+  hover: HoverState<T>;
 
   viewport: ViewportState;
 
 }
 
-export const createTextAnnotatorState = (
+export const createTextAnnotatorState = <T extends TextAnnotation>(
   container: HTMLElement,
   defaultUserSelectAction?: UserSelectActionExpression<TextAnnotation>
-): TextAnnotatorState => {
+): TextAnnotatorState<T> => {
 
-  const store: Store<TextAnnotation> = createStore<TextAnnotation>();
+  const store: Store<T> = createStore<T>();
 
   const tree = createSpatialTree(store, container);
 
@@ -44,7 +44,7 @@ export const createTextAnnotatorState = (
   const viewport = createViewportState();
 
   // Wrap store interface to intercept annotations and revive DOM ranges, if needed
-  const addAnnotation = (annotation: TextAnnotation, origin = Origin.LOCAL): boolean => {
+  const addAnnotation = (annotation: T, origin = Origin.LOCAL): boolean => {
     const revived = reviveAnnotation(annotation, container);
 
     const isValid = isRevived(revived.target.selector);
@@ -55,10 +55,10 @@ export const createTextAnnotatorState = (
   }
 
   const bulkAddAnnotation = (
-    annotations: TextAnnotation[], 
+    annotations: T[], 
     replace = true, 
     origin = Origin.LOCAL
-  ): TextAnnotation[] => {
+  ): T[] => {
     const revived = annotations.map(a => reviveAnnotation(a, container));
 
     // Initial page load might take some time. Retry for more robustness.
@@ -79,9 +79,9 @@ export const createTextAnnotatorState = (
   }
   
   const bulkUpsertAnnotations = (
-    annotations: TextAnnotation[], 
+    annotations: T[], 
     origin = Origin.LOCAL
-  ): TextAnnotation[] => {
+  ): T[] => {
     const revived = annotations.map(a => reviveAnnotation(a, container));
 
     // Initial page load might take some time. Retry for more robustness.
@@ -109,7 +109,7 @@ export const createTextAnnotatorState = (
     store.bulkUpdateTargets(revived, origin);
   }
 
-  const getAt = (x: number, y: number, filter?: Filter): TextAnnotation | undefined => {
+  const getAt = (x: number, y: number, filter?: Filter): T | undefined => {
     const annotations = tree.getAt(x, y, Boolean(filter)).map(id => store.getAnnotation(id));
     const filtered = filter ? annotations.filter(filter) : annotations;
     return filtered.length > 0 ? filtered[0] : undefined;

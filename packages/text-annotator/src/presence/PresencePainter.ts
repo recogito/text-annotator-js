@@ -22,7 +22,6 @@ const createCanvas = () => {
 }
 
 export const createPresencePainter = (
-  container: HTMLElement, 
   provider: PresenceProvider, 
   opts: PresencePainterOptions = {}
 ): HighlightPainter => {
