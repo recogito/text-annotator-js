@@ -10,5 +10,4 @@ export * from './reviveSelector';
 export * from './reviveTarget';
 export * from './splitAnnotatableRanges';
 export * from './trimRangeToContainer';
-export * from './debounce';
 

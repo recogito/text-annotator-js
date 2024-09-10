@@ -1,10 +1,11 @@
-import { Filter, Origin, type User } from '@annotorious/core';
+import debounce from 'debounce';
 import { v4 as uuidv4 } from 'uuid';
+
+import { Filter, Origin, type User } from '@annotorious/core';
 
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotationTarget } from './model';
 import {
-  debounce,
   splitAnnotatableRanges,
   rangeToSelector,
   isWhitespaceOrEmpty,

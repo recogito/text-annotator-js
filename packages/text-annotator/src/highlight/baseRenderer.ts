@@ -1,3 +1,5 @@
+import debounce from 'debounce';
+
 import type { Filter, ViewportState } from '@annotorious/core';
 
 import type { TextAnnotatorState } from '../state';
@@ -5,7 +7,6 @@ import { ViewportBounds, getViewportBounds, trackViewport } from './viewport';
 import type { HighlightPainter } from './HighlightPainter';
 import type { Highlight } from './Highlight';
 import type { HighlightStyleExpression } from './HighlightStyle';
-import { debounce } from '../utils';
 
 export interface RendererImplementation {
 
