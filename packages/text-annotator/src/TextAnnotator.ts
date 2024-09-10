@@ -2,10 +2,11 @@ import {
   createAnonymousGuest,
   createLifecycleObserver,
   createBaseAnnotator,
-  Filter,
-  createUndoStack
+  createUndoStack,
+  type Filter,
 } from '@annotorious/core';
 import type { Annotator, User, PresenceProvider } from '@annotorious/core';
+
 import {
   createCanvasRenderer,
   createHighlightsRenderer,
@@ -35,7 +36,7 @@ export interface TextAnnotator<I extends TextAnnotation = TextAnnotation, E exte
 
   setAnnotatingEnabled: (enabled: boolean) => void;
 
-  state: TextAnnotatorState;
+  state: TextAnnotatorState<I>;
 
 }
 
@@ -118,7 +119,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
 
   const setPresenceProvider = (provider: PresenceProvider) => {
     if (provider) {
-      highlightRenderer.setPainter(createPresencePainter(container, provider, opts.presence));
+      highlightRenderer.setPainter(createPresencePainter(provider, opts.presence));
       provider.on('selectionChange', () => highlightRenderer.redraw());
     }
   }
