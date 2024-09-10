@@ -22,7 +22,7 @@ export interface TextAnnotator<I extends TextAnnotation = TextAnnotation, E exte
   // Returns true if successful (or false if the annotation is not currently rendered)
   scrollIntoView(annotation: I): boolean;
 
-  state: TextAnnotatorState;
+  state: TextAnnotatorState<I>;
 
 }
 
