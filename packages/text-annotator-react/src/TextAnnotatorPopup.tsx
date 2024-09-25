@@ -15,8 +15,6 @@ import {
 
 interface TextAnnotationPopupProps {
 
-  requirePointerEvent?: boolean;
-
   popup(props: TextAnnotationPopupContentProps): ReactNode;
 
 }
@@ -68,13 +66,10 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
   const selectedKey = selected.map(a => a.annotation.id).join('-');
 
   useEffect(() => {
-    if (props.requirePointerEvent && event) {
-      // Ignore all selection changes except those accompanied by a pointer event.
+    // Ignore all selection changes except those accompanied by a pointer event.
+    if (event)
       setOpen(selected.length > 0 && event.type === 'pointerup');
-    } else {
-      setOpen(selected.length > 0);
-    }
-  }, [event?.type, selectedKey, props.requirePointerEvent]);
+  }, [event?.type, selectedKey]);
 
   useEffect(() => {
     if (!isOpen || !annotation) return;
