@@ -3,9 +3,11 @@ import { colord } from 'colord';
 import type { HighlightPainter } from '../HighlightPainter';
 import type { TextAnnotatorState } from 'src/state';
 import type { ViewportBounds } from '../viewport';
-import { DEFAULT_SELECTED_STYLE, DEFAULT_STYLE, HighlightStyle, HighlightStyleExpression } from '../HighlightStyle';
-import { RendererImplementation, createBaseRenderer } from '../baseRenderer';
+import { DEFAULT_SELECTED_STYLE, DEFAULT_STYLE } from '../HighlightStyle';
+import type { HighlightStyle, HighlightStyleExpression } from '../HighlightStyle';
+import { type RendererImplementation, createBaseRenderer } from '../baseRenderer';
 import type { Highlight } from '../Highlight';
+import type { TextAnnotation } from 'src/model';
 
 const toCSS = (s?: HighlightStyle) => {
   const backgroundColor = colord(s?.fill || DEFAULT_STYLE.fill)
@@ -106,6 +108,6 @@ export const createRenderer = (): RendererImplementation => {
 
 export const createHighlightsRenderer = (
   container: HTMLElement,
-  state: TextAnnotatorState,
+  state: TextAnnotatorState<TextAnnotation, unknown>,
   viewport: ViewportState
 ) => createBaseRenderer(container, state, viewport, createRenderer());

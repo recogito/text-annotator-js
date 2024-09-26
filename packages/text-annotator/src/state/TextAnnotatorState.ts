@@ -1,42 +1,44 @@
-import type { Filter, Store, ViewportState, UserSelectActionExpression } from '@annotorious/core';
+import type { Filter, Store, ViewportState, UserSelectActionExpression, Annotation } from '@annotorious/core';
 import { 
   createHoverState, 
   createSelectionState, 
   createStore, 
+  Origin,
+  createViewportState
+} from '@annotorious/core';
+import type { 
   AnnotatorState, 
   SelectionState, 
   HoverState, 
-  Origin,
-  createViewportState
 } from '@annotorious/core';
 import { createSpatialTree } from './spatialTree';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
 import type { AnnotationRects, TextAnnotationStore } from './TextAnnotationStore';
 import { isRevived, reviveAnnotation, reviveTarget } from '../utils';
 
-export interface TextAnnotatorState<T extends TextAnnotation = TextAnnotation> extends AnnotatorState<T> {
+export interface TextAnnotatorState<I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation> extends AnnotatorState<I, E> {
 
-  store: TextAnnotationStore<T>;
+  store: TextAnnotationStore<I>;
 
-  selection: SelectionState<T>;
+  selection: SelectionState<I, E>;
 
-  hover: HoverState<T>;
+  hover: HoverState<I>;
 
   viewport: ViewportState;
 
 }
 
-export const createTextAnnotatorState = <T extends TextAnnotation>(
+export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation>(
   container: HTMLElement,
-  defaultUserSelectAction?: UserSelectActionExpression<TextAnnotation>
-): TextAnnotatorState<T> => {
+  defaultUserSelectAction?: UserSelectActionExpression<E>
+): TextAnnotatorState<I, E> => {
 
-  const store: Store<T> = createStore<T>();
+  const store: Store<I> = createStore<I>();
 
   const tree = createSpatialTree(store, container);
 
   // Temporary
-  const selection = createSelectionState<TextAnnotation>(store)
+  const selection = createSelectionState<I, E>(store)
   selection.setUserSelectAction(defaultUserSelectAction);
 
   const hover = createHoverState(store);
@@ -44,7 +46,7 @@ export const createTextAnnotatorState = <T extends TextAnnotation>(
   const viewport = createViewportState();
 
   // Wrap store interface to intercept annotations and revive DOM ranges, if needed
-  const addAnnotation = (annotation: T, origin = Origin.LOCAL): boolean => {
+  const addAnnotation = (annotation: I, origin = Origin.LOCAL): boolean => {
     const revived = reviveAnnotation(annotation, container);
 
     const isValid = isRevived(revived.target.selector);
@@ -55,11 +57,11 @@ export const createTextAnnotatorState = <T extends TextAnnotation>(
   }
 
   const bulkAddAnnotation = (
-    annotations: T[], 
+    annotations: I[], 
     replace = true, 
     origin = Origin.LOCAL
-  ): T[] => {
-    const revived = annotations.map(a => reviveAnnotation(a, container));
+  ): I[] => {
+    const revived = annotations.map(a => reviveAnnotation<I>(a, container));
 
     // Initial page load might take some time. Retry for more robustness.
     const couldNotRevive = revived.filter(a => !isRevived(a.target.selector));
@@ -79,9 +81,9 @@ export const createTextAnnotatorState = <T extends TextAnnotation>(
   }
   
   const bulkUpsertAnnotations = (
-    annotations: T[], 
+    annotations: I[], 
     origin = Origin.LOCAL
-  ): T[] => {
+  ): I[] => {
     const revived = annotations.map(a => reviveAnnotation(a, container));
 
     // Initial page load might take some time. Retry for more robustness.
@@ -109,7 +111,7 @@ export const createTextAnnotatorState = <T extends TextAnnotation>(
     store.bulkUpdateTargets(revived, origin);
   }
 
-  const getAt = (x: number, y: number, filter?: Filter): T | undefined => {
+  const getAt = (x: number, y: number, filter?: Filter): I | undefined => {
     const annotations = tree.getAt(x, y, Boolean(filter)).map(id => store.getAnnotation(id));
     const filtered = filter ? annotations.filter(filter) : annotations;
     return filtered.length > 0 ? filtered[0] : undefined;
