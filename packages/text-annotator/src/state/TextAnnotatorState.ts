@@ -137,7 +137,7 @@ export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotati
     minY: number,
     maxX: number,
     maxY: number,
-  ): AnnotationRects<T>[] => tree.getIntersecting(minX, minY, maxX, maxY);
+  ): AnnotationRects<I>[] => tree.getIntersecting(minX, minY, maxX, maxY);
 
   const getAnnotationRects = (id: string): DOMRect[] => tree.getAnnotationRects(id);
 
