@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Origin, type Filter, type User } from '@annotorious/core';
 
 import type { TextAnnotatorState } from './state';
-import type { TextAnnotationTarget } from './model';
+import type { TextAnnotation, TextAnnotationTarget } from './model';
 import {
   splitAnnotatableRanges,
   rangeToSelector,
@@ -15,7 +15,7 @@ import {
 
 export const createSelectionHandler = (
   container: HTMLElement,
-  state: TextAnnotatorState,
+  state: TextAnnotatorState<TextAnnotation, unknown>,
   offsetReferenceSelector?: string
 ) => {
 

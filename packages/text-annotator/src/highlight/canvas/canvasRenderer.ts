@@ -5,10 +5,11 @@ import type { ViewportState } from '@annotorious/core';
 import type { TextAnnotatorState } from '../../state';
 import type { ViewportBounds } from '../viewport';
 import type { HighlightStyle } from '../HighlightStyle';
-import { DEFAULT_SELECTED_STYLE, DEFAULT_STYLE, HighlightStyleExpression } from '../HighlightStyle';
+import { DEFAULT_SELECTED_STYLE, DEFAULT_STYLE, type HighlightStyleExpression } from '../HighlightStyle';
 import type { HighlightPainter } from '../HighlightPainter';
 import { createBaseRenderer, type RendererImplementation } from '../baseRenderer';
 import type { Highlight } from '../Highlight';
+import type { TextAnnotation } from 'src/model';
 
 import './canvasRenderer.css';
 
@@ -143,6 +144,6 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
 
 export const createCanvasRenderer = (
   container: HTMLElement,
-  state: TextAnnotatorState,
+  state: TextAnnotatorState<TextAnnotation, unknown>,
   viewport: ViewportState
 ) => createBaseRenderer(container, state, viewport, createRenderer(container));
