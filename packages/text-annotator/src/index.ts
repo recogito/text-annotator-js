@@ -1,8 +1,10 @@
+export * from './api';
 export * from './highlight';
 export * from './model';
 export * from './state';
 export * from './utils';
-export * from './presence/PresencePainterOptions';
+export * from './presence';
+export * from './SelectionHandler';
 export * from './TextAnnotator';
 export * from './TextAnnotatorOptions';
 
@@ -25,6 +27,7 @@ export type {
   ParseResult,
   User,
   UserSelectActionExpression,
+  ViewportState,
   W3CAnnotation,
   W3CAnnotationBody,
   W3CAnnotationTarget

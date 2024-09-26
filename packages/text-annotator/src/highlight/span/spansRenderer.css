@@ -1,11 +1,12 @@
 .r6o-annotatable .r6o-span-highlight-layer {
-  height: 100%;
-  left: 0;
-  mix-blend-mode: multiply;
-  pointer-events: none;
   position: absolute;
   top: 0;
+  left: 0;
   width: 100%;
+  height: 100%;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .r6o-annotatable .r6o-span-highlight-layer.hidden {

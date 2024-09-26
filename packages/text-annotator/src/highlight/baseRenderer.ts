@@ -1,7 +1,7 @@
 import type { Filter, ViewportState } from '@annotorious/core';
 import type { TextAnnotatorState } from '../state';
 import { debounce } from '../utils';
-import { ViewportBounds, getViewportBounds, trackViewport } from './viewport';
+import { type ViewportBounds, getViewportBounds, trackViewport } from './viewport';
 import type { HighlightPainter } from './HighlightPainter';
 import type { Highlight } from './Highlight';
 import type { HighlightStyleExpression } from './HighlightStyle';
@@ -44,9 +44,9 @@ export interface Renderer {
 
 }
 
-export const createBaseRenderer = (
+export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorState> (
   container: HTMLElement, 
-  state: TextAnnotatorState,
+  state: T,
   viewport: ViewportState,
   renderer: RendererImplementation
 ): Renderer => {

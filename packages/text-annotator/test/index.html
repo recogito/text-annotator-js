@@ -294,7 +294,7 @@
 
 			const style = ((annotation, state, z) =>
 				({
-					fillOpacity: 0.2,
+					fillOpacity: state.selected ? 0.9 : 0.2,
 					underlineColor: '#9b3c06',
 					underlineOffset: (z * 3.5) || 0,
 					underlineThickness: 2

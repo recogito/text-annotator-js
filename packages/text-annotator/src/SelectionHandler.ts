@@ -1,18 +1,19 @@
-import { Filter, Origin, type User } from '@annotorious/core';
+import { type Filter, Origin, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotatorState } from './state';
-import type { TextAnnotationTarget } from './model';
+import type { TextAnnotation, TextAnnotationTarget } from './model';
 import {
   debounce,
   splitAnnotatableRanges,
   rangeToSelector,
   isWhitespaceOrEmpty,
+  trimRangeToContainer,
   NOT_ANNOTATABLE_SELECTOR
 } from './utils';
 
 export const SelectionHandler = (
   container: HTMLElement,
-  state: TextAnnotatorState,
+  state: TextAnnotatorState<TextAnnotation, unknown>,
   annotatingEnabled: boolean,
   offsetReferenceSelector?: string
 ) => {
@@ -53,9 +54,6 @@ export const SelectionHandler = (
     }
   }
 
-  if (annotatingEnabled)
-    container.addEventListener('selectstart', onSelectStart);
-
   const onSelectionChange = debounce((evt: PointerEvent) => {
     const sel = document.getSelection();
 
@@ -69,20 +67,24 @@ export const SelectionHandler = (
     }
 
     // Chrome/iOS does not reliably fire the 'selectstart' event!
-    if (evt.timeStamp - (lastPointerDown?.timeStamp || evt.timeStamp) < 1000 && !currentTarget)
+    const timeDifference = evt.timeStamp - (lastPointerDown?.timeStamp || evt.timeStamp);
+    if (timeDifference < 1000 && !currentTarget)
       onSelectStart(lastPointerDown);
 
     if (sel.isCollapsed || !isLeftClick || !currentTarget) return;
 
     const selectionRange = sel.getRangeAt(0);
-    if (isWhitespaceOrEmpty(selectionRange)) return;
-    
-    const annotatableRanges = splitAnnotatableRanges(selectionRange.cloneRange());
+
+    // The selection should be captured only within the annotatable container
+    const containedRange = trimRangeToContainer(selectionRange, container);
+    if (isWhitespaceOrEmpty(containedRange)) return;
+
+    const annotatableRanges = splitAnnotatableRanges(containedRange.cloneRange());
 
     const hasChanged =
       annotatableRanges.length !== currentTarget.selector.length ||
       annotatableRanges.some((r, i) => r.toString() !== currentTarget.selector[i]?.quote);
-      
+
     if (!hasChanged) return;
 
     currentTarget = {
@@ -96,7 +98,7 @@ export const SelectionHandler = (
     } else {
       // Proper lifecycle management: clear selection first...
       selection.clear();
-      
+
       // ...then add annotation to store...
       store.addAnnotation({
         id: currentTarget.annotation,
@@ -108,10 +110,7 @@ export const SelectionHandler = (
       // select events don't have offsetX/offsetY - reuse last up/down)
       selection.userSelect(currentTarget.annotation, lastPointerDown);
     }
-  })
-
-  if (annotatingEnabled)
-    document.addEventListener('selectionchange', onSelectionChange);
+  });
 
   // Select events don't carry information about the mouse button
   // Therefore, to prevent right-click selection, we need to listen
@@ -124,8 +123,6 @@ export const SelectionHandler = (
     isLeftClick = evt.button === 0;
   }
 
-  container.addEventListener('pointerdown', onPointerDown);
-
   const onPointerUp = (evt: PointerEvent) => {
     const annotatable = !(evt.target as Node).parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
     if (!annotatable || !isLeftClick)
@@ -135,7 +132,11 @@ export const SelectionHandler = (
     const clickSelect = () => {
       const { x, y } = container.getBoundingClientRect();
 
-      const hovered = store.getAt(evt.clientX - x, evt.clientY - y, currentFilter);
+      const hovered =
+        evt.target instanceof Node &&
+        container.contains(evt.target) &&
+        store.getAt(evt.clientX - x, evt.clientY - y, currentFilter);
+
       if (hovered) {
         const { selected } = selection;
 
@@ -148,23 +149,43 @@ export const SelectionHandler = (
 
     const timeDifference = evt.timeStamp - lastPointerDown.timeStamp;
 
-    // Just a click, not a selection
-    if (document.getSelection().isCollapsed && timeDifference < 300) {
-      currentTarget = undefined;
-      clickSelect();
-    } else if (currentTarget) {
-      selection.userSelect(currentTarget.annotation, evt);
-    }
+    /**
+     * We must check the `isCollapsed` within the 0-timeout
+     * to handle the annotation dismissal after a click properly.
+     *
+     * Otherwise, the `isCollapsed` will return an obsolete `false` value,
+     * click won't be processed, and the annotation will get falsely re-selected.
+     *
+     * @see https://github.com/recogito/text-annotator-js/issues/136
+     */
+    setTimeout(() => {
+      const sel = document.getSelection()
+
+      // Just a click, not a selection
+      if (sel?.isCollapsed && timeDifference < 300) {
+        currentTarget = undefined;
+        clickSelect();
+      } else if (currentTarget) {
+        selection.userSelect(currentTarget.annotation, evt);
+      }
+    });
   }
 
+  container.addEventListener('pointerdown', onPointerDown);
   document.addEventListener('pointerup', onPointerUp);
 
+  if (annotatingEnabled) {
+    container.addEventListener('selectstart', onSelectStart);
+    document.addEventListener('selectionchange', onSelectionChange);
+  }
+
   const destroy = () => {
-    container.removeEventListener('selectstart', onSelectStart);
-    document.removeEventListener('selectionchange', onSelectionChange);
-    
     container.removeEventListener('pointerdown', onPointerDown);
     document.removeEventListener('pointerup', onPointerUp);
+
+    container.removeEventListener('selectstart', onSelectStart);
+    document.removeEventListener('selectionchange', onSelectionChange);
+
   }
 
   return {

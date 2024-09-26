@@ -1,9 +1,10 @@
-import { createAnonymousGuest, createLifecycleObserver, createBaseAnnotator, Filter, createUndoStack } from '@annotorious/core';
+import { createAnonymousGuest, createLifecycleObserver, createBaseAnnotator, createUndoStack } from '@annotorious/core';
+import type { Filter } from '@annotorious/core';
 import type { Annotator, User, PresenceProvider } from '@annotorious/core';
 import { createCanvasRenderer, createHighlightsRenderer, createSpansRenderer, type HighlightStyleExpression } from './highlight';
 import { createPresencePainter } from './presence';
 import { scrollIntoView } from './api';
-import { TextAnnotationStore, TextAnnotatorState, createTextAnnotatorState } from './state';
+import { type TextAnnotationStore, type TextAnnotatorState, createTextAnnotatorState } from './state';
 import type { TextAnnotation } from './model';
 import { cancelSingleClickEvents } from './utils';
 import { fillDefaults, type RendererType, type TextAnnotatorOptions } from './TextAnnotatorOptions';
@@ -13,31 +14,33 @@ import './TextAnnotator.css';
 
 const USE_DEFAULT_RENDERER: RendererType = 'SPANS';
 
-export interface TextAnnotator<E extends unknown = TextAnnotation> extends Annotator<TextAnnotation, E> {
+export interface TextAnnotator<I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation> extends Annotator<I, E> {
 
   element: HTMLElement;
 
   setStyle(style: HighlightStyleExpression | undefined): void;
 
   // Returns true if successful (or false if the annotation is not currently rendered)
-  scrollIntoView(annotation: TextAnnotation): boolean;
+  scrollIntoView(annotationOrId: I | string): boolean;
 
-  state: TextAnnotatorState;
+  state: TextAnnotatorState<I, E>;
 
 }
 
 export const createTextAnnotator = <E extends unknown = TextAnnotation>(
   container: HTMLElement,
-  options: TextAnnotatorOptions<E> = {}
-): TextAnnotator<E> => {
+  options: TextAnnotatorOptions<TextAnnotation, E> = {}
+): TextAnnotator<TextAnnotation, E> => {
   // Prevent mobile browsers from triggering word selection on single click.
   cancelSingleClickEvents(container);
 
-  const opts = fillDefaults<E>(options, {
-    annotatingEnabled: true
+  const opts = fillDefaults<TextAnnotation, E>(options, {
+    annotatingEnabled: true,
+    user: createAnonymousGuest()
   });
 
-  const state: TextAnnotatorState = createTextAnnotatorState(container, opts.userAction);
+  const state: TextAnnotatorState<TextAnnotation, E> = 
+    createTextAnnotatorState<TextAnnotation, E>(container, opts.userSelectAction);
 
   const { selection, viewport } = state;
 
@@ -47,7 +50,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
 
   const lifecycle = createLifecycleObserver<TextAnnotation, E>(state, undoStack, opts.adapter);
 
-  let currentUser: User = createAnonymousGuest();
+  let currentUser: User = opts.user;
 
   // Use selected renderer, or fall back to default. If CSS_HIGHLIGHT is
   // requested, check if CSS Custom Highlights are supported, and fall
@@ -97,7 +100,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
 
   const setPresenceProvider = (provider: PresenceProvider) => {
     if (provider) {
-      highlightRenderer.setPainter(createPresencePainter(container, provider, opts.presence));
+      highlightRenderer.setPainter(createPresencePainter(provider, opts.presence));
       provider.on('selectionChange', () => highlightRenderer.redraw());
     }
   }
