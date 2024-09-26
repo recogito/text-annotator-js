@@ -1,8 +1,9 @@
-import { Filter, Origin, type Selection, type User } from '@annotorious/core';
+import { type Filter, Origin, type Selection, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import hotkeys from 'hotkeys-js';
+
 import type { TextAnnotatorState } from './state';
-import type { TextAnnotationTarget } from './model';
+import type { TextAnnotation, TextAnnotationTarget } from './model';
 import {
   clonePointerEvent,
   cloneKeyboardEvent,
@@ -18,7 +19,7 @@ const CLICK_TIMEOUT = 300;
 
 export const SelectionHandler = (
   container: HTMLElement,
-  state: TextAnnotatorState,
+  state: TextAnnotatorState<TextAnnotation, unknown>,
   annotatingEnabled: boolean,
   offsetReferenceSelector?: string
 ) => {
