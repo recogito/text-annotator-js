@@ -7,6 +7,7 @@ import type { ViewportBounds } from '../viewport';
 import { createBaseRenderer, type RendererImplementation } from '../baseRenderer';
 import type { Highlight } from '../Highlight';
 import { DEFAULT_STYLE, type HighlightStyleExpression } from '../HighlightStyle';
+import type { TextAnnotation } from 'src/model';
 
 import './spansRenderer.css';
 
@@ -127,8 +128,8 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
 
 }
 
-export const createSpansRenderer = <T extends TextAnnotatorState = TextAnnotatorState> (
+export const createSpansRenderer = (
   container: HTMLElement,
-  state: T,
+  state: TextAnnotatorState<TextAnnotation, unknown>,
   viewport: ViewportState
 ) => createBaseRenderer(container, state, viewport, createRenderer(container));

@@ -1,7 +1,7 @@
-import { Filter, Origin, type User } from '@annotorious/core';
+import { type Filter, Origin, type User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { TextAnnotatorState } from './state';
-import type { TextAnnotationTarget } from './model';
+import type { TextAnnotation, TextAnnotationTarget } from './model';
 import {
   debounce,
   splitAnnotatableRanges,
@@ -15,7 +15,7 @@ const CLICK_TIMEOUT = 300;
 
 export const SelectionHandler = (
   container: HTMLElement,
-  state: TextAnnotatorState,
+  state: TextAnnotatorState<TextAnnotation, unknown>,
   annotatingEnabled: boolean,
   offsetReferenceSelector?: string
 ) => {

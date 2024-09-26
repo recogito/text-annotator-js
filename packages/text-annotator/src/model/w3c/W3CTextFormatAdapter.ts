@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import {
   type FormatAdapter,
-  ParseResult,
+  type ParseResult,
   parseW3CBodies,
   parseW3CUser,
   serializeW3CBodies
