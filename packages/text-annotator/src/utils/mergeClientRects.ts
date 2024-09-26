@@ -107,7 +107,7 @@ export const mergeClientRects = (rects: DOMRect[]) => rects.reduce<DOMRect[]>((m
 export const toDomRectList = (rects: DOMRect[]): DOMRectList => ({
   length: rects.length,
   item: (index) => rects[index],
-  [Symbol.iterator]: function* (): IterableIterator<DOMRect> {
+  [Symbol.iterator]: function* (): ArrayIterator<DOMRect> {
     for (let i = 0; i < this.length; i++)
       yield this.item(i)!;
   }
