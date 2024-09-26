@@ -13,7 +13,7 @@ export interface TextAnnotatorOptions<I extends TextAnnotation = TextAnnotation,
 
   offsetReferenceSelector?: string;
 
-  userSelectAction?: UserSelectActionExpression<TextAnnotation>,
+  userSelectAction?: UserSelectActionExpression<E>,
 
   presence?: PresencePainterOptions;
 
