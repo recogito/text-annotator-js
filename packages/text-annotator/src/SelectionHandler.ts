@@ -92,13 +92,11 @@ export const SelectionHandler = (
 
         // Chrome/iOS does not reliably fire the 'selectstart' event!
         onSelectStart(lastDownEvent || evt);
-
       } else if (sel.isCollapsed && timeDifference < CLICK_TIMEOUT) {
 
         // Firefox doesn't fire the 'selectstart' when user clicks
         // over the text, which collapses the selection
         onSelectStart(lastDownEvent || evt);
-
       }
     }
 
@@ -209,17 +207,45 @@ export const SelectionHandler = (
         // Proper lifecycle management: clear selection first...
         selection.clear();
 
-        // ...then add annotation to store...
-        store.addAnnotation({
-          id: currentTarget.annotation,
-          bodies: [],
-          target: currentTarget
-        });
+        const exists = store.getAnnotation(currentTarget.annotation);
+        if (exists) {
+          // ...then add annotation to store...
+          store.updateTarget(currentTarget);
+        } else {
+          // ...then add annotation to store...
+          store.addAnnotation({
+            id: currentTarget.annotation,
+            bodies: [],
+            target: currentTarget
+          });
+        }
 
         // ...then make the new annotation the current selection
         selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));
       }
     });
+  }
+
+  const onContextMenu = (evt: PointerEvent) => {
+    const sel = document.getSelection();
+    if (sel?.isCollapsed) return;
+
+    // selection.clear();
+
+    const exists = store.getAnnotation(currentTarget.annotation);
+    if (exists) {
+      // ...then add annotation to store...
+      store.updateTarget(currentTarget);
+    } else {
+      // ...then add annotation to store...
+      store.addAnnotation({
+        id: currentTarget.annotation,
+        bodies: [],
+        target: currentTarget
+      });
+    }
+
+    selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));
   }
 
   const onKeyup = (evt: KeyboardEvent) => {
@@ -297,7 +323,7 @@ export const SelectionHandler = (
 
   container.addEventListener('pointerdown', onPointerDown);
   document.addEventListener('pointerup', onPointerUp);
-  document.addEventListener('contextmenu', onPointerUp);
+  document.addEventListener('contextmenu', onContextMenu);
 
   if (annotatingEnabled) {
     container.addEventListener('keyup', onKeyup);
@@ -308,7 +334,7 @@ export const SelectionHandler = (
   const destroy = () => {
     container.removeEventListener('pointerdown', onPointerDown);
     document.removeEventListener('pointerup', onPointerUp);
-    document.removeEventListener('contextmenu', onPointerUp);
+    document.removeEventListener('contextmenu', onContextMenu);
 
     container.removeEventListener('keyup', onKeyup);
     container.removeEventListener('selectstart', onSelectStart);

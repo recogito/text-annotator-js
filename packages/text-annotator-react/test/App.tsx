@@ -1,9 +1,9 @@
 import React, { FC, useCallback, useEffect } from 'react';
 import { AnnotationBody, Annotorious, useAnnotationStore, useAnnotator, useSelection } from '@annotorious/react';
-import { TextAnnotator, TextAnnotatorPopup, type TextAnnotationPopupContentProps } from '../src';
+import { TextAnnotator, TextAnnotatorPopup } from '../src';
 import { W3CTextFormat, type TextAnnotation, type TextAnnotator as RecogitoTextAnnotator } from '@recogito/text-annotator';
 
-const TestPopup: FC<TextAnnotationPopupContentProps> = (props) => {
+const TestPopup = (props) => {
 
   const { annotation } = props;
 
