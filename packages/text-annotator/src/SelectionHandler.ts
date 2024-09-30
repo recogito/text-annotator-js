@@ -16,6 +16,14 @@ import {
 
 const CLICK_TIMEOUT = 300;
 
+const ARROW_KEYS = ['up', 'down', 'left', 'right'];
+
+const SELECTION_KEYS = [
+  ...ARROW_KEYS.map(key => `shift+${key}`),
+  'ctrl+a',
+  '⌘+a'
+];
+
 export const SelectionHandler = (
   container: HTMLElement,
   state: TextAnnotatorState<TextAnnotation, unknown>,
@@ -191,7 +199,6 @@ export const SelectionHandler = (
       }
     };
 
-    const sel = document.getSelection();
     const timeDifference = evt.timeStamp - lastDownEvent.timeStamp;
 
       /**
@@ -216,51 +223,39 @@ export const SelectionHandler = (
     });
   }
 
+  hotkeys(SELECTION_KEYS.join(','), { element: container, keydown: true, keyup: false }, (evt) => {
+    if (!evt.repeat)
+      lastDownEvent = cloneKeyboardEvent(evt);
+  });
+
+  /**
+   * Free caret movement through the text resets the annotation selection.
+   *
+   * It should be handled only on:
+   * - the annotatable `container`, where the text is.
+   * - the `body`, where the focus goes when user closes the popup,
+   *   or clicks the button that gets unmounted, e.g. "Close"
+   */
+  const handleArrowKeyPress = (evt: KeyboardEvent) => {
+    if (
+      evt.repeat ||
+      evt.target !== container && evt.target !== document.body
+    ) {
+      return;
+    }
+
+    currentTarget = undefined;
+    selection.clear();
+  };
+
+  hotkeys(ARROW_KEYS.join(','), { keydown: true, keyup: false }, handleArrowKeyPress);
+
   container.addEventListener('pointerdown', onPointerDown);
   document.addEventListener('pointerup', onPointerUp);
 
   if (annotatingEnabled) {
     container.addEventListener('selectstart', onSelectStart);
     document.addEventListener('selectionchange', onSelectionChange);
-  }
-
-  const addHotkeys = (handler: KeyHandler) => {
-
-    const arrowKeys = ['up', 'down', 'left', 'right'];
-
-    const selectionKeys = [
-      ...arrowKeys.map(key => `shift+${key}`),
-      'ctrl+a',
-      '⌘+a'
-    ];
-
-    hotkeys(selectionKeys.join(','), { element: container, keydown: true, keyup: false }, (evt) => {
-      if (!evt.repeat) {
-        lastDownEvent = cloneKeyboardEvent(evt);
-      }
-    });
-
-    /**
-     * Free caret movement through the text resets the annotation selection.
-     *
-     * It should be handled only on:
-     * - the annotatable `container`, where the text is.
-     * - the `body`, where the focus goes when user closes the popup,
-     *   or clicks the button that gets unmounted, e.g. "Close"
-     */
-    const handleArrowKeyPress = (evt: KeyboardEvent) => {
-      if (
-        evt.repeat ||
-        evt.target !== container && evt.target !== document.body
-      ) {
-        return;
-      }
-
-      currentTarget = undefined;
-      selection.clear();
-    };
-    hotkeys(arrowKeys.join(','), { keydown: true, keyup: false }, handleArrowKeyPress);
-
   }
 
   const destroy = () => {
