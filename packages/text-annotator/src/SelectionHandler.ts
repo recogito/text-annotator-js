@@ -217,7 +217,7 @@ export const SelectionHandler = (
     });
   }
 
-  document.addEventListener('pointerdown', onPointerDown);
+  container.addEventListener('pointerdown', onPointerDown);
   document.addEventListener('pointerup', onPointerUp);
 
   container.addEventListener('selectstart', onSelectStart);
