@@ -236,6 +236,23 @@ export const SelectionHandler = (
     });
   }
 
+  const onKeyup = (evt: KeyboardEvent) => {
+    if (evt.key === 'Shift' && currentTarget) {
+      // Proper lifecycle management: clear selection first...
+      selection.clear();
+
+      // ...then add annotation to store...
+      store.addAnnotation({
+        id: currentTarget.annotation,
+        bodies: [],
+        target: currentTarget
+      });
+
+      // ...then make the new annotation the current selection
+      selection.userSelect(currentTarget.annotation, cloneKeyboardEvent(evt));
+    }
+  }
+
   hotkeys(SELECTION_KEYS.join(','), { element: container, keydown: true, keyup: false }, (evt) => {
     if (!evt.repeat)
       lastDownEvent = cloneKeyboardEvent(evt);
@@ -267,6 +284,7 @@ export const SelectionHandler = (
   document.addEventListener('pointerup', onPointerUp);
 
   if (annotatingEnabled) {
+    container.addEventListener('keyup', onKeyup);
     container.addEventListener('selectstart', onSelectStart);
     document.addEventListener('selectionchange', onSelectionChange);
   }
@@ -275,6 +293,7 @@ export const SelectionHandler = (
     container.removeEventListener('pointerdown', onPointerDown);
     document.removeEventListener('pointerup', onPointerUp);
 
+    container.removeEventListener('keyup', onKeyup);
     container.removeEventListener('selectstart', onSelectStart);
     document.removeEventListener('selectionchange', onSelectionChange);
 
