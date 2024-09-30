@@ -258,7 +258,7 @@ export const SelectionHandler = (
   hotkeys(arrowKeys.join(','), { keydown: true, keyup: false }, handleArrowKeyPress);
 
   const destroy = () => {
-    document.removeEventListener('pointerdown', onPointerDown);
+    container.removeEventListener('pointerdown', onPointerDown);
     document.removeEventListener('pointerup', onPointerUp);
 
     container.removeEventListener('selectstart', onSelectStart);
