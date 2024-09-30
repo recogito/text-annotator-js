@@ -1,35 +1,30 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 
 import { AnnotationBody, Annotorious, useAnnotationStore, useAnnotator } from '@annotorious/react';
 import { TextAnnotation, TextAnnotator as VanillaTextAnnotator } from '@recogito/text-annotator';
 
 import { TEIAnnotator, CETEIcean, TextAnnotatorPopup, type TextAnnotationPopupContentProps } from '../../src';
 
-const TestPopup = (props: TextAnnotationPopupContentProps) => {
+const TestPopup: FC<TextAnnotationPopupContentProps> = (props) => {
+
+  const { annotation } = props;
 
   const store = useAnnotationStore();
-  const anno = useAnnotator<VanillaTextAnnotator>();
+  const r = useAnnotator<VanillaTextAnnotator>();
 
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const body: AnnotationBody = {
     id: `${Math.random()}`,
-    annotation: props.annotation.id,
+    annotation: annotation.id,
     purpose: 'commenting',
     value: 'A Dummy Comment'
   };
 
   const onClick = () => {
     store.addBody(body);
-    anno.cancelSelected();
+    r.cancelSelected();
   };
-
-  useEffect(() => {
-    const { current: inputEl } = inputRef;
-    if (!inputEl) return;
-
-    setTimeout(() => inputEl.focus({ preventScroll: true }));
-  }, []);
 
   return (
     <div className="popup">
@@ -42,33 +37,33 @@ const TestPopup = (props: TextAnnotationPopupContentProps) => {
 
 const MockStorage = () => {
 
-  const anno = useAnnotator<VanillaTextAnnotator>();
+  const r = useAnnotator<VanillaTextAnnotator>();
 
   useEffect(() => {
-    if (anno) {
-      anno.on('createAnnotation', (annotation: TextAnnotation) => {
+    if (r) {
+      r.on('createAnnotation', (annotation: TextAnnotation) => {
         console.log('create', annotation);
       });
 
-      anno.on('deleteAnnotation', (annotation: TextAnnotation) => {
+      r.on('deleteAnnotation', (annotation: TextAnnotation) => {
         console.log('delete', annotation);
       });
 
-      anno.on('selectionChanged', (annotations: TextAnnotation[]) => {
+      r.on('selectionChanged', (annotations: TextAnnotation[]) => {
         console.log('selection changed', annotations);
       });
 
-      anno.on('updateAnnotation', (annotation: TextAnnotation, previous: TextAnnotation) => {
+      r.on('updateAnnotation', (annotation: TextAnnotation, previous: TextAnnotation) => {
         console.log('update', annotation, previous);
       });
     }
-  }, [anno]);
+  }, [r]);
 
   return null;
 
 };
 
-export const App = () => {
+export const App: FC = () => {
 
   const [tei, setTEI] = useState<string | undefined>(undefined);
 
