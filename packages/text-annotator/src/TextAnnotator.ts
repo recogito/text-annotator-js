@@ -17,7 +17,7 @@ import { createPresencePainter } from './presence';
 import { scrollIntoView } from './api';
 import { type TextAnnotationStore, type TextAnnotatorState, createTextAnnotatorState } from './state';
 import type { TextAnnotation } from './model';
-import { cancelSingleClickEvents } from './utils';
+import { cancelSingleClickEvents, programmaticallyFocusable } from './utils';
 import { fillDefaults, type RendererType, type TextAnnotatorOptions } from './TextAnnotatorOptions';
 import { createSelectionHandler } from './SelectionHandler';
 
@@ -46,6 +46,9 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
 ): TextAnnotator<TextAnnotation, E> => {
   // Prevent mobile browsers from triggering word selection on single click.
   cancelSingleClickEvents(container);
+
+  // Make sure that the container is focusable and can receive both pointer and keyboard events
+  programmaticallyFocusable(container);
 
   const opts = fillDefaults<TextAnnotation, E>(options, {
     annotatingEnabled: true,
