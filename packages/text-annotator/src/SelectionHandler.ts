@@ -297,6 +297,7 @@ export const SelectionHandler = (
 
   container.addEventListener('pointerdown', onPointerDown);
   document.addEventListener('pointerup', onPointerUp);
+  document.addEventListener('contextmenu', onPointerUp);
 
   if (annotatingEnabled) {
     container.addEventListener('keyup', onKeyup);
@@ -307,6 +308,7 @@ export const SelectionHandler = (
   const destroy = () => {
     container.removeEventListener('pointerdown', onPointerDown);
     document.removeEventListener('pointerup', onPointerUp);
+    document.removeEventListener('contextmenu', onPointerUp);
 
     container.removeEventListener('keyup', onKeyup);
     container.removeEventListener('selectstart', onSelectStart);
