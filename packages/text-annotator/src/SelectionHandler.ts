@@ -95,10 +95,8 @@ export const SelectionHandler = (
 
       } else if (sel.isCollapsed && timeDifference < CLICK_TIMEOUT) {
 
-        /*
-         Firefox doesn't fire the 'selectstart' when user clicks
-         over the text, which collapses the selection
-        */
+        // Firefox doesn't fire the 'selectstart' when user clicks
+        // over the text, which collapses the selection
         onSelectStart(lastDownEvent || evt);
 
       }
@@ -142,9 +140,11 @@ export const SelectionHandler = (
       updated: new Date()
     };
 
+    // On destkop, the annotation won't usually exist while the selection is
+    // being edited. But it will typcially be the case on mobile!
     if (store.getAnnotation(currentTarget.annotation)) {
       store.updateTarget(currentTarget, Origin.LOCAL);
-    } else {
+    } /* else {
       // Proper lifecycle management: clear selection first...
       selection.clear();
 
@@ -158,6 +158,7 @@ export const SelectionHandler = (
       // ...then make the new annotation the current selection
       selection.userSelect(currentTarget.annotation, lastDownEvent);
     }
+      */
   });
 
   /**
@@ -218,8 +219,19 @@ export const SelectionHandler = (
       if (sel?.isCollapsed && timeDifference < CLICK_TIMEOUT) {
         currentTarget = undefined;
         clickSelect();
-      } else if (currentTarget && store.getAnnotation(currentTarget.annotation)) {
-        selection.userSelect(currentTarget.annotation, evt);
+      } else if (currentTarget) {
+        // Proper lifecycle management: clear selection first...
+        selection.clear();
+
+        // ...then add annotation to store...
+        store.addAnnotation({
+          id: currentTarget.annotation,
+          bodies: [],
+          target: currentTarget
+        });
+
+        // ...then make the new annotation the current selection
+        selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));
       }
     });
   }
