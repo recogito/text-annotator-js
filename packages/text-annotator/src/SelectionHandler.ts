@@ -2,7 +2,7 @@ import debounce from 'debounce';
 import { v4 as uuidv4 } from 'uuid';
 import hotkeys from 'hotkeys-js';
 
-import { Origin, type Filter, type User } from '@annotorious/core';
+import { Origin, type Filter, type Selection, type User } from '@annotorious/core';
 
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotation, TextAnnotationTarget } from './model';
@@ -273,7 +273,7 @@ export const createSelectionHandler = (
 
   const destroy = () => {
     currentTarget = undefined;
-    lastPointerDown = undefined;
+    lastDownEvent = undefined;
 
     onSelectionChange.clear();
 
