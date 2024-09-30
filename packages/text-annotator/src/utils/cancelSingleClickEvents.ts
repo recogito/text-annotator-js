@@ -1,11 +1,11 @@
 import { NOT_ANNOTATABLE_SELECTOR } from './splitAnnotatableRanges';
 
-/** 
+/**
  * Calls .preventDefault() on click events in annotable areas, in order
  * to prevent problematic default browser behavior. (Specifically: keep
  * Chrome Android from triggering word selection on single click.)
  */
-export const cancelSingleClickEvents = (container: HTMLElement) => {
+export const cancelSingleClickEvents = (container: HTMLElement) =>
   container.addEventListener('click', event => {
     const targetElement = event.target as HTMLElement;
 
@@ -18,4 +18,3 @@ export const cancelSingleClickEvents = (container: HTMLElement) => {
     if (shouldPrevent)
       event.preventDefault();
   });
-}

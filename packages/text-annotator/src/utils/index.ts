@@ -1,4 +1,5 @@
 export * from './cancelSingleClickEvents';
+export * from './programmaticallyFocusable';
 export * from './debounce';
 export * from './getAnnotatableFragment';
 export * from './getQuoteContext';
@@ -11,4 +12,5 @@ export * from './reviveSelector';
 export * from './reviveTarget';
 export * from './splitAnnotatableRanges';
 export * from './trimRangeToContainer';
+export * from './cloneEvents';
 
