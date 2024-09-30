@@ -132,4 +132,4 @@ export const createSpansRenderer = (
   container: HTMLElement,
   state: TextAnnotatorState<TextAnnotation, unknown>,
   viewport: ViewportState
-) => createBaseRenderer(container, state, viewport, createRenderer(container))
+) => createBaseRenderer(container, state, viewport, createRenderer(container));
