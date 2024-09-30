@@ -73,12 +73,13 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
   const { getFloatingProps } = useInteractions([dismiss, role]);
 
   const selectedKey = selected.map(a => a.annotation.id).join('-');
+
   useEffect(() => {
     // Ignore all selection changes except those accompanied by a user event.
-    if (selected.length > 0 && event) {
-      setOpen(event.type === 'pointerup' || event.type === 'keydown');
+    if (selected.length > 0) { // && event) {
+      setOpen(true); // event.type === 'pointerup' || event.type === 'keydown');
     }
-  }, [selectedKey, event]);
+  }, [selectedKey /*, event */]);
 
   useEffect(() => {
     // Close the popup if the selection is cleared
