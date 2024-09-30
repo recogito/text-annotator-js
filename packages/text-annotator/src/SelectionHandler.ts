@@ -1,6 +1,7 @@
-import { type Filter, Origin, type Selection, type User } from '@annotorious/core';
+import { Origin } from '@annotorious/core';
+import type { Filter, Selection, User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
-import hotkeys, { type KeyHandler } from 'hotkeys-js';
+import hotkeys from 'hotkeys-js';
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotation, TextAnnotationTarget } from './model';
 import {
@@ -201,7 +202,7 @@ export const SelectionHandler = (
 
     const timeDifference = evt.timeStamp - lastDownEvent.timeStamp;
 
-      /**
+    /**
      * We must check the `isCollapsed` within the 0-timeout
      * to handle the annotation dismissal after a click properly.
      *
@@ -272,7 +273,7 @@ export const SelectionHandler = (
     destroy,
     setFilter,
     setUser
-  };
+  }
 
-};
+}
 
