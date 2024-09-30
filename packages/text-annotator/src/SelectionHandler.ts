@@ -117,6 +117,8 @@ export const SelectionHandler = (
         store.deleteAnnotation(currentTarget.annotation);
       }
 
+      currentTarget = undefined;
+
       return;
     }
 
@@ -144,21 +146,7 @@ export const SelectionHandler = (
     // being edited. But it will typcially be the case on mobile!
     if (store.getAnnotation(currentTarget.annotation)) {
       store.updateTarget(currentTarget, Origin.LOCAL);
-    } /* else {
-      // Proper lifecycle management: clear selection first...
-      selection.clear();
-
-      // ...then add annotation to store...
-      store.addAnnotation({
-        id: currentTarget.annotation,
-        bodies: [],
-        target: currentTarget
-      });
-
-      // ...then make the new annotation the current selection
-      selection.userSelect(currentTarget.annotation, lastDownEvent);
     }
-      */
   });
 
   /**
