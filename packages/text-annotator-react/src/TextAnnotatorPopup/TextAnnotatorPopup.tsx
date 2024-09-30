@@ -1,4 +1,6 @@
-import React, { PointerEvent, ReactNode, useCallback, useEffect, useState } from 'react';
+import { PointerEvent, ReactNode, useCallback, useEffect, useState } from 'react';
+import { useAnnotator, useSelection } from '@annotorious/react';
+import type { TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
 import {
   autoUpdate,
   flip,
@@ -12,9 +14,6 @@ import {
   useInteractions,
   useRole
 } from '@floating-ui/react';
-
-import { useAnnotator, useSelection } from '@annotorious/react';
-import type { TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
 
 import './TextAnnotatorPopup.css';
 
@@ -162,4 +161,4 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
     </FloatingPortal>
   ) : null;
 
-};
+}
