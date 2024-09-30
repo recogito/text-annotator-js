@@ -1,7 +1,7 @@
-import { type Filter, Origin, type Selection, type User } from '@annotorious/core';
+import { Origin } from '@annotorious/core';
+import type { Filter, Selection, User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import hotkeys from 'hotkeys-js';
-
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotation, TextAnnotationTarget } from './model';
 import {
@@ -16,6 +16,14 @@ import {
 } from './utils';
 
 const CLICK_TIMEOUT = 300;
+
+const ARROW_KEYS = ['up', 'down', 'left', 'right'];
+
+const SELECTION_KEYS = [
+  ...ARROW_KEYS.map(key => `shift+${key}`),
+  'ctrl+a',
+  '⌘+a'
+];
 
 export const SelectionHandler = (
   container: HTMLElement,
@@ -192,10 +200,9 @@ export const SelectionHandler = (
       }
     };
 
-    const sel = document.getSelection();
     const timeDifference = evt.timeStamp - lastDownEvent.timeStamp;
 
-      /**
+    /**
      * We must check the `isCollapsed` within the 0-timeout
      * to handle the annotation dismissal after a click properly.
      *
@@ -217,23 +224,9 @@ export const SelectionHandler = (
     });
   }
 
-  document.addEventListener('pointerdown', onPointerDown);
-  document.addEventListener('pointerup', onPointerUp);
-
-  container.addEventListener('selectstart', onSelectStart);
-  document.addEventListener('selectionchange', onSelectionChange);
-
-  const arrowKeys = ['up', 'down', 'left', 'right'];
-  const selectionKeys = [
-    ...arrowKeys.map(key => `shift+${key}`),
-    'ctrl+a',
-    '⌘+a'
-  ];
-
-  hotkeys(selectionKeys.join(','), { element: container, keydown: true, keyup: false }, (evt) => {
-    if (!evt.repeat) {
+  hotkeys(SELECTION_KEYS.join(','), { element: container, keydown: true, keyup: false }, (evt) => {
+    if (!evt.repeat)
       lastDownEvent = cloneKeyboardEvent(evt);
-    }
   });
 
   /**
@@ -255,10 +248,19 @@ export const SelectionHandler = (
     currentTarget = undefined;
     selection.clear();
   };
-  hotkeys(arrowKeys.join(','), { keydown: true, keyup: false }, handleArrowKeyPress);
+
+  hotkeys(ARROW_KEYS.join(','), { keydown: true, keyup: false }, handleArrowKeyPress);
+
+  container.addEventListener('pointerdown', onPointerDown);
+  document.addEventListener('pointerup', onPointerUp);
+
+  if (annotatingEnabled) {
+    container.addEventListener('selectstart', onSelectStart);
+    document.addEventListener('selectionchange', onSelectionChange);
+  }
 
   const destroy = () => {
-    document.removeEventListener('pointerdown', onPointerDown);
+    container.removeEventListener('pointerdown', onPointerDown);
     document.removeEventListener('pointerup', onPointerUp);
 
     container.removeEventListener('selectstart', onSelectStart);
@@ -271,7 +273,7 @@ export const SelectionHandler = (
     destroy,
     setFilter,
     setUser
-  };
+  }
 
-};
+}
 
