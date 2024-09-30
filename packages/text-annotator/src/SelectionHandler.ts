@@ -117,8 +117,6 @@ export const SelectionHandler = (
         store.deleteAnnotation(currentTarget.annotation);
       }
 
-      currentTarget = undefined;
-
       return;
     }
 
@@ -201,7 +199,7 @@ export const SelectionHandler = (
      * @see https://github.com/recogito/text-annotator-js/issues/136
      */
     setTimeout(() => {
-      const sel = document.getSelection()
+      const sel = document.getSelection();
 
       // Just a click, not a selection
       if (sel?.isCollapsed && timeDifference < CLICK_TIMEOUT) {
@@ -226,18 +224,22 @@ export const SelectionHandler = (
 
   const onKeyup = (evt: KeyboardEvent) => {
     if (evt.key === 'Shift' && currentTarget) {
-      // Proper lifecycle management: clear selection first...
-      selection.clear();
+      const sel = document.getSelection();
 
-      // ...then add annotation to store...
-      store.addAnnotation({
-        id: currentTarget.annotation,
-        bodies: [],
-        target: currentTarget
-      });
+      if (!sel.isCollapsed) {
+        // Proper lifecycle management: clear selection first...
+        selection.clear();
 
-      // ...then make the new annotation the current selection
-      selection.userSelect(currentTarget.annotation, cloneKeyboardEvent(evt));
+        // ...then add annotation to store...
+        store.addAnnotation({
+          id: currentTarget.annotation,
+          bodies: [],
+          target: currentTarget
+        });
+
+        // ...then make the new annotation the current selection
+        selection.userSelect(currentTarget.annotation, cloneKeyboardEvent(evt));
+      }
     }
   }
 
