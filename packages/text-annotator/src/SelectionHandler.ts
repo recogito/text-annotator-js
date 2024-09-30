@@ -19,10 +19,11 @@ const CLICK_TIMEOUT = 300;
 
 const ARROW_KEYS = ['up', 'down', 'left', 'right'];
 
+const SELECT_ALL = ['ctrl+a', '⌘+a'];
+
 const SELECTION_KEYS = [
   ...ARROW_KEYS.map(key => `shift+${key}`),
-  'ctrl+a',
-  '⌘+a'
+  ...SELECT_ALL
 ];
 
 export const SelectionHandler = (
@@ -59,7 +60,6 @@ export const SelectionHandler = (
      * Note that Chrome/iOS will sometimes return the root doc as target!
      */
     const annotatable = !(evt.target as Node).parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
-
     currentTarget = annotatable ? {
       annotation: uuidv4(),
       selector: [],
@@ -184,7 +184,7 @@ export const SelectionHandler = (
           selection.userSelect(hovered.id, evt);
       } else if (!selection.isEmpty()) {
         selection.clear();
-      }
+      } 
     };
 
     const timeDifference = evt.timeStamp - lastDownEvent.timeStamp;
@@ -249,9 +249,28 @@ export const SelectionHandler = (
     }
   }
 
-  hotkeys(SELECTION_KEYS.join(','), { element: container, keydown: true, keyup: false }, (evt) => {
+  const onSelectAll = (evt: KeyboardEvent) => {
+    onSelectStart(evt);
+
+    // Proper lifecycle management: clear selection first...
+    selection.clear();
+
+    // ...then add annotation to store...
+    store.addAnnotation({
+      id: currentTarget.annotation,
+      bodies: [],
+      target: currentTarget
+    });
+  }
+
+  hotkeys(SELECTION_KEYS.join(','), { element: container, keydown: true, keyup: false }, evt => {
     if (!evt.repeat)
       lastDownEvent = cloneKeyboardEvent(evt);
+  });
+
+  hotkeys(SELECT_ALL.join(','), { keydown: true, keyup: false}, evt => {
+    lastDownEvent = cloneKeyboardEvent(evt);
+    onSelectAll(evt);
   });
 
   /**
