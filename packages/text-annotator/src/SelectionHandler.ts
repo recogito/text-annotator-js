@@ -230,12 +230,18 @@ export const SelectionHandler = (
         // Proper lifecycle management: clear selection first...
         selection.clear();
 
-        // ...then add annotation to store...
-        store.addAnnotation({
-          id: currentTarget.annotation,
-          bodies: [],
-          target: currentTarget
-        });
+        const exists = store.getAnnotation(currentTarget.annotation);
+        if (exists) {
+          // ...then add annotation to store...
+          store.updateTarget(currentTarget);
+        } else {
+          // ...then add annotation to store...
+          store.addAnnotation({
+            id: currentTarget.annotation,
+            bodies: [],
+            target: currentTarget
+          });
+        }
 
         // ...then make the new annotation the current selection
         selection.userSelect(currentTarget.annotation, cloneKeyboardEvent(evt));
