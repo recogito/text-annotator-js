@@ -10,6 +10,7 @@ import {
   debounce,
   splitAnnotatableRanges,
   rangeToSelector,
+  isMac,
   isWhitespaceOrEmpty,
   trimRangeToContainer,
   NOT_ANNOTATABLE_SELECTOR
@@ -19,11 +20,11 @@ const CLICK_TIMEOUT = 300;
 
 const ARROW_KEYS = ['up', 'down', 'left', 'right'];
 
-const SELECT_ALL = ['ctrl+a', '⌘+a'];
+const SELECT_ALL = isMac ? '⌘+a' :  'ctrl+a';
 
 const SELECTION_KEYS = [
   ...ARROW_KEYS.map(key => `shift+${key}`),
-  ...SELECT_ALL
+  SELECT_ALL
 ];
 
 export const SelectionHandler = (
@@ -271,7 +272,7 @@ export const SelectionHandler = (
       lastDownEvent = cloneKeyboardEvent(evt);
   });
 
-  hotkeys(SELECT_ALL.join(','), { keydown: true, keyup: false}, evt => {
+  hotkeys(SELECT_ALL, { keydown: true, keyup: false}, evt => {
     lastDownEvent = cloneKeyboardEvent(evt);
     onSelectAll(evt);
   });
