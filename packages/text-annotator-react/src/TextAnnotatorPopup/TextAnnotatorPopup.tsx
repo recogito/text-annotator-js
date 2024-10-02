@@ -1,6 +1,7 @@
 import { PointerEvent, ReactNode, useCallback, useEffect, useState } from 'react';
 import { useAnnotator, useSelection } from '@annotorious/react';
 import type { TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
+import { isMobile } from './isMobile';
 import {
   autoUpdate,
   flip,
@@ -46,14 +47,12 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
   const [isOpen, setOpen] = useState(selected?.length > 0);
 
   const { refs, floatingStyles, update, context } = useFloating({
-    placement: 'top',
+    placement: isMobile() ? 'bottom' : 'top',
     open: isOpen,
     onOpenChange: (open, _event, reason) => {
-      setOpen(open);
-
-      if (!open) {
-        if (reason === 'escape-key' || reason === 'focus-out')
-          r?.cancelSelected();
+      if (!open && (reason === 'escape-key' || reason === 'focus-out')) {
+        setOpen(open);
+        r?.cancelSelected();
       }
     },
     middleware: [
@@ -77,6 +76,9 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
 
   useEffect(() => {
     if (isOpen && annotation) {
+      // Extra precaution - shouldn't normally happen
+      if (!annotation.target.selector || annotation.target.selector.length < 1) return;
+
       const {
         target: {
           selector: [{ range }]
@@ -120,8 +122,9 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
         closeOnFocusOut={true}
         returnFocus={false}
         initialFocus={
-          // Don't shift focus to the floating element when selected via keyboard
-          event?.type === 'keydown' ? -1 : 0
+          // Don't shift focus to the floating element if selected via keyboard
+          // or on iPad/Android.
+          (event?.type === 'keydown' || isMobile()) ? -1 : 0
         }>
         <div
           className="annotation-popup text-annotation-popup not-annotatable"

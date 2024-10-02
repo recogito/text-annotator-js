@@ -162,6 +162,20 @@ export const SelectionHandler = (
     isLeftClick = lastDownEvent.button === 0;
   };
 
+  // Helper
+  const upsertCurrentTarget = () => {
+    const exists = store.getAnnotation(currentTarget.annotation);
+    if (exists) {
+      store.updateTarget(currentTarget);
+    } else {
+      store.addAnnotation({
+        id: currentTarget.annotation,
+        bodies: [],
+        target: currentTarget
+      });
+    }
+  }
+
   const onPointerUp = (evt: PointerEvent) => {
     const annotatable = !(evt.target as Node).parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
     if (!annotatable || !isLeftClick) return;
@@ -204,23 +218,8 @@ export const SelectionHandler = (
         currentTarget = undefined;
         clickSelect();
       } else if (currentTarget) {
-        // Proper lifecycle management: clear selection first...
         selection.clear();
-
-        const exists = store.getAnnotation(currentTarget.annotation);
-        if (exists) {
-          // ...then add annotation to store...
-          store.updateTarget(currentTarget);
-        } else {
-          // ...then add annotation to store...
-          store.addAnnotation({
-            id: currentTarget.annotation,
-            bodies: [],
-            target: currentTarget
-          });
-        }
-
-        // ...then make the new annotation the current selection
+        upsertCurrentTarget();
         selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));
       }
     });
@@ -231,20 +230,12 @@ export const SelectionHandler = (
 
     if (sel?.isCollapsed) return;
 
-    const exists = store.getAnnotation(currentTarget.annotation);
-    if (exists) {
-      // ...then add annotation to store...
-      store.updateTarget(currentTarget);
-    } else {
-      selection.clear();
-      
-      // ...then add annotation to store...
-      store.addAnnotation({
-        id: currentTarget.annotation,
-        bodies: [],
-        target: currentTarget
-      });
-    }
+    // When selecting the initial word, Chrome Android fires `contextmenu` 
+    // before selectionChanged.
+    if (!currentTarget || currentTarget.selector.length === 0)
+      onSelectionChange(evt);
+    
+    upsertCurrentTarget();
 
     selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));
   }
@@ -254,23 +245,8 @@ export const SelectionHandler = (
       const sel = document.getSelection();
 
       if (!sel.isCollapsed) {
-        // Proper lifecycle management: clear selection first...
         selection.clear();
-
-        const exists = store.getAnnotation(currentTarget.annotation);
-        if (exists) {
-          // ...then add annotation to store...
-          store.updateTarget(currentTarget);
-        } else {
-          // ...then add annotation to store...
-          store.addAnnotation({
-            id: currentTarget.annotation,
-            bodies: [],
-            target: currentTarget
-          });
-        }
-
-        // ...then make the new annotation the current selection
+        upsertCurrentTarget();
         selection.userSelect(currentTarget.annotation, cloneKeyboardEvent(evt));
       }
     }
