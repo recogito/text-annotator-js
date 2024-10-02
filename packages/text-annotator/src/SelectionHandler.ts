@@ -228,15 +228,16 @@ export const SelectionHandler = (
 
   const onContextMenu = (evt: PointerEvent) => {
     const sel = document.getSelection();
-    if (sel?.isCollapsed) return;
 
-    // selection.clear();
+    if (sel?.isCollapsed) return;
 
     const exists = store.getAnnotation(currentTarget.annotation);
     if (exists) {
       // ...then add annotation to store...
       store.updateTarget(currentTarget);
     } else {
+      selection.clear();
+      
       // ...then add annotation to store...
       store.addAnnotation({
         id: currentTarget.annotation,
