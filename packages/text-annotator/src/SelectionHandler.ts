@@ -206,7 +206,7 @@ export const SelectionHandler = (
         }
       } else if (!selection.isEmpty()) {
         selection.clear();
-      } 
+      }
     };
 
     const timeDifference = evt.timeStamp - lastDownEvent.timeStamp;
