@@ -271,12 +271,19 @@ export const SelectionHandler = (
     // Proper lifecycle management: clear selection first...
     selection.clear();
 
-    // ...then add annotation to store...
-    store.addAnnotation({
-      id: currentTarget.annotation,
-      bodies: [],
-      target: currentTarget
-    });
+    setTimeout(() => {
+      // ...then add annotation to store...
+      store.addAnnotation({
+        id: currentTarget.annotation,
+        bodies: [],
+        target: currentTarget
+      });
+
+      selection.userSelect(currentTarget.annotation, cloneKeyboardEvent(evt));
+
+      // Sigh.. not sure there's a reliable timeout. Alternative would be
+      // to listen to the selectionchange event once?
+    }, 250);
   }
 
   hotkeys(SELECTION_KEYS.join(','), { element: container, keydown: true, keyup: false }, evt => {
