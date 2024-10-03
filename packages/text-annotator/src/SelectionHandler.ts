@@ -266,24 +266,30 @@ export const SelectionHandler = (
   }
 
   const onSelectAll = (evt: KeyboardEvent) => {
+
+    const onSelected = () => setTimeout(() => {
+      if (currentTarget?.selector.length > 0) {
+        selection.clear();
+
+        store.addAnnotation({
+          id: currentTarget.annotation,
+          bodies: [],
+          target: currentTarget
+        });
+
+        selection.userSelect(currentTarget.annotation, cloneKeyboardEvent(evt));
+      }
+      
+      document.removeEventListener('selectionchange', onSelected);
+
+      // Sigh... this needs a delay to work. But doesn't seem reliable.
+    }, 100);
+
+    // Listen to the change event that follows
+    document.addEventListener('selectionchange', onSelected);
+    
+    // Start selection!
     onSelectStart(evt);
-
-    // Proper lifecycle management: clear selection first...
-    selection.clear();
-
-    setTimeout(() => {
-      // ...then add annotation to store...
-      store.addAnnotation({
-        id: currentTarget.annotation,
-        bodies: [],
-        target: currentTarget
-      });
-
-      selection.userSelect(currentTarget.annotation, cloneKeyboardEvent(evt));
-
-      // Sigh.. not sure there's a reliable timeout. Alternative would be
-      // to listen to the selectionchange event once?
-    }, 250);
   }
 
   hotkeys(SELECTION_KEYS.join(','), { element: container, keydown: true, keyup: false }, evt => {
