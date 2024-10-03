@@ -10,6 +10,7 @@ import {
   debounce,
   splitAnnotatableRanges,
   rangeToSelector,
+  isMac,
   isWhitespaceOrEmpty,
   trimRangeToContainer,
   NOT_ANNOTATABLE_SELECTOR
@@ -19,10 +20,11 @@ const CLICK_TIMEOUT = 300;
 
 const ARROW_KEYS = ['up', 'down', 'left', 'right'];
 
+const SELECT_ALL = isMac ? '⌘+a' :  'ctrl+a';
+
 const SELECTION_KEYS = [
   ...ARROW_KEYS.map(key => `shift+${key}`),
-  'ctrl+a',
-  '⌘+a'
+  SELECT_ALL
 ];
 
 export const SelectionHandler = (
@@ -48,7 +50,11 @@ export const SelectionHandler = (
 
   let lastDownEvent: Selection['event'] | undefined;
 
+  let isContextMenuOpen = false;
+
   const onSelectStart = (evt: Event) => {
+    isContextMenuOpen = false;
+    
     if (isLeftClick === false)
       return;
 
@@ -59,7 +65,6 @@ export const SelectionHandler = (
      * Note that Chrome/iOS will sometimes return the root doc as target!
      */
     const annotatable = !(evt.target as Node).parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
-
     currentTarget = annotatable ? {
       annotation: uuidv4(),
       selector: [],
@@ -92,15 +97,11 @@ export const SelectionHandler = (
 
         // Chrome/iOS does not reliably fire the 'selectstart' event!
         onSelectStart(lastDownEvent || evt);
-
       } else if (sel.isCollapsed && timeDifference < CLICK_TIMEOUT) {
 
-        /*
-         Firefox doesn't fire the 'selectstart' when user clicks
-         over the text, which collapses the selection
-        */
+        // Firefox doesn't fire the 'selectstart' when user clicks
+        // over the text, which collapses the selection
         onSelectStart(lastDownEvent || evt);
-
       }
     }
 
@@ -142,21 +143,12 @@ export const SelectionHandler = (
       updated: new Date()
     };
 
+    /**
+     * During mouse selection on the desktop, annotation won't usually exist while the selection is being edited.
+     * But it will be typical during keyboard or mobile handlebars selection!
+     */
     if (store.getAnnotation(currentTarget.annotation)) {
       store.updateTarget(currentTarget, Origin.LOCAL);
-    } else {
-      // Proper lifecycle management: clear selection first...
-      selection.clear();
-
-      // ...then add annotation to store...
-      store.addAnnotation({
-        id: currentTarget.annotation,
-        bodies: [],
-        target: currentTarget
-      });
-
-      // ...then make the new annotation the current selection
-      selection.userSelect(currentTarget.annotation, lastDownEvent);
     }
   });
 
@@ -166,6 +158,8 @@ export const SelectionHandler = (
    * to the initial pointerdown event and remember the button
    */
   const onPointerDown = (evt: PointerEvent) => {
+    if (isContextMenuOpen) return;
+
     const annotatable = !(evt.target as Node).parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
     if (!annotatable) return;
 
@@ -177,7 +171,23 @@ export const SelectionHandler = (
     isLeftClick = lastDownEvent.button === 0;
   };
 
+  // Helper
+  const upsertCurrentTarget = () => {
+    const exists = store.getAnnotation(currentTarget.annotation);
+    if (exists) {
+      store.updateTarget(currentTarget);
+    } else {
+      store.addAnnotation({
+        id: currentTarget.annotation,
+        bodies: [],
+        target: currentTarget
+      });
+    }
+  }
+
   const onPointerUp = (evt: PointerEvent) => {
+    if (isContextMenuOpen) return;
+
     const annotatable = !(evt.target as Node).parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
     if (!annotatable || !isLeftClick) return;
 
@@ -193,8 +203,9 @@ export const SelectionHandler = (
       if (hovered) {
         const { selected } = selection;
 
-        if (selected.length !== 1 || selected[0].id !== hovered.id)
+        if (selected.length !== 1 || selected[0].id !== hovered.id) {
           selection.userSelect(hovered.id, evt);
+        }
       } else if (!selection.isEmpty()) {
         selection.clear();
       }
@@ -212,21 +223,85 @@ export const SelectionHandler = (
      * @see https://github.com/recogito/text-annotator-js/issues/136
      */
     setTimeout(() => {
-      const sel = document.getSelection()
+      const sel = document.getSelection();
 
       // Just a click, not a selection
       if (sel?.isCollapsed && timeDifference < CLICK_TIMEOUT) {
         currentTarget = undefined;
         clickSelect();
-      } else if (currentTarget && store.getAnnotation(currentTarget.annotation)) {
-        selection.userSelect(currentTarget.annotation, evt);
+      } else if (currentTarget && currentTarget.selector.length > 0) {
+        selection.clear();
+        upsertCurrentTarget();
+        selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));
       }
     });
   }
 
-  hotkeys(SELECTION_KEYS.join(','), { element: container, keydown: true, keyup: false }, (evt) => {
+  const onContextMenu = (evt: PointerEvent) => {
+    isContextMenuOpen = true;
+
+    const sel = document.getSelection();
+
+    if (sel?.isCollapsed) return;
+
+    // When selecting the initial word, Chrome Android fires `contextmenu` 
+    // before selectionChanged.
+    if (!currentTarget || currentTarget.selector.length === 0) {
+      onSelectionChange(evt);
+    }
+    
+    upsertCurrentTarget();
+
+    selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));
+  }
+
+  const onKeyup = (evt: KeyboardEvent) => {
+    if (evt.key === 'Shift' && currentTarget) {
+      const sel = document.getSelection();
+
+      if (!sel.isCollapsed) {
+        selection.clear();
+        upsertCurrentTarget();
+        selection.userSelect(currentTarget.annotation, cloneKeyboardEvent(evt));
+      }
+    }
+  }
+
+  const onSelectAll = (evt: KeyboardEvent) => {
+
+    const onSelected = () => setTimeout(() => {
+      if (currentTarget?.selector.length > 0) {
+        selection.clear();
+
+        store.addAnnotation({
+          id: currentTarget.annotation,
+          bodies: [],
+          target: currentTarget
+        });
+
+        selection.userSelect(currentTarget.annotation, cloneKeyboardEvent(evt));
+      }
+      
+      document.removeEventListener('selectionchange', onSelected);
+
+      // Sigh... this needs a delay to work. But doesn't seem reliable.
+    }, 100);
+
+    // Listen to the change event that follows
+    document.addEventListener('selectionchange', onSelected);
+    
+    // Start selection!
+    onSelectStart(evt);
+  }
+
+  hotkeys(SELECTION_KEYS.join(','), { element: container, keydown: true, keyup: false }, evt => {
     if (!evt.repeat)
       lastDownEvent = cloneKeyboardEvent(evt);
+  });
+
+  hotkeys(SELECT_ALL, { keydown: true, keyup: false}, evt => {
+    lastDownEvent = cloneKeyboardEvent(evt);
+    onSelectAll(evt);
   });
 
   /**
@@ -253,8 +328,10 @@ export const SelectionHandler = (
 
   container.addEventListener('pointerdown', onPointerDown);
   document.addEventListener('pointerup', onPointerUp);
+  document.addEventListener('contextmenu', onContextMenu);
 
   if (annotatingEnabled) {
+    container.addEventListener('keyup', onKeyup);
     container.addEventListener('selectstart', onSelectStart);
     document.addEventListener('selectionchange', onSelectionChange);
   }
@@ -262,7 +339,9 @@ export const SelectionHandler = (
   const destroy = () => {
     container.removeEventListener('pointerdown', onPointerDown);
     document.removeEventListener('pointerup', onPointerUp);
+    document.removeEventListener('contextmenu', onContextMenu);
 
+    container.removeEventListener('keyup', onKeyup);
     container.removeEventListener('selectstart', onSelectStart);
     document.removeEventListener('selectionchange', onSelectionChange);
 
