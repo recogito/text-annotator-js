@@ -143,8 +143,10 @@ export const SelectionHandler = (
       updated: new Date()
     };
 
-    // On destkop, the annotation won't usually exist while the selection is
-    // being edited. But it will typcially be the case on mobile!
+    /**
+     * During mouse selection on the desktop, annotation won't usually exist while the selection is being edited.
+     * But it will be typical during keyboard or mobile handlebars selection!
+     */
     if (store.getAnnotation(currentTarget.annotation)) {
       store.updateTarget(currentTarget, Origin.LOCAL);
     }
