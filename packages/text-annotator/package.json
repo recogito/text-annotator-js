@@ -1,6 +1,6 @@
 {
   "name": "@recogito/text-annotator",
-  "version": "3.0.0-rc.46",
+  "version": "3.0.0-rc.47",
   "description": "A JavaScript text annotation library",
   "author": "Rainer Simon",
   "license": "BSD-3-Clause",
@@ -34,7 +34,7 @@
     "typescript": "5.6.2",
     "vite": "^5.4.8",
     "vite-plugin-dts": "^4.2.3",
-    "vitest": "^2.1.1"
+    "vitest": "^2.1.2"
   },
   "dependencies": {
     "@annotorious/core": "^3.0.9",
