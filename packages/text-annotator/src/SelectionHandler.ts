@@ -201,8 +201,9 @@ export const SelectionHandler = (
       if (hovered) {
         const { selected } = selection;
 
-        if (selected.length !== 1 || selected[0].id !== hovered.id)
+        if (selected.length !== 1 || selected[0].id !== hovered.id) {
           selection.userSelect(hovered.id, evt);
+        }
       } else if (!selection.isEmpty()) {
         selection.clear();
       } 
@@ -226,7 +227,7 @@ export const SelectionHandler = (
       if (sel?.isCollapsed && timeDifference < CLICK_TIMEOUT) {
         currentTarget = undefined;
         clickSelect();
-      } else if (currentTarget) {
+      } else if (currentTarget && currentTarget.selector.length > 0) {
         selection.clear();
         upsertCurrentTarget();
         selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));

@@ -1,4 +1,4 @@
-import { PointerEvent, ReactNode, useCallback, useEffect, useState } from 'react';
+import { PointerEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useAnnotator, useSelection } from '@annotorious/react';
 import type { TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
 import { isMobile } from './isMobile';
@@ -114,6 +114,11 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
     };
   }, [update]);
 
+  // Don't shift focus to the floating element if selected via keyboard or on mobile.
+  const initialFocus = useMemo(() => {
+    return (event?.type === 'keyup' || event?.type === 'contextmenu' || isMobile()) ? -1 : 0;
+  }, [event]);
+
   return isOpen && selected.length > 0 ? (
     <FloatingPortal>
       <FloatingFocusManager
@@ -121,10 +126,7 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
         modal={false}
         closeOnFocusOut={true}
         returnFocus={false}
-        initialFocus={
-          // Don't shift focus to the floating element if selected via keyboard or on mobile.
-          (event?.type === 'keydown' || event?.type === 'contextmenu' || isMobile()) ? -1 : 0
-        }>
+        initialFocus={initialFocus}>
         <div
           className="annotation-popup text-annotation-popup not-annotatable"
           ref={refs.setFloating}
