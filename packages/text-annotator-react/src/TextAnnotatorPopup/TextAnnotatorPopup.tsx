@@ -122,9 +122,8 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
         closeOnFocusOut={true}
         returnFocus={false}
         initialFocus={
-          // Don't shift focus to the floating element if selected via keyboard
-          // or on iPad/Android.
-          (event?.type === 'keydown' || isMobile()) ? -1 : 0
+          // Don't shift focus to the floating element if selected via keyboard or on mobile.
+          (event?.type === 'keydown' || event?.type === 'contextmenu' || isMobile()) ? -1 : 0
         }>
         <div
           className="annotation-popup text-annotation-popup not-annotatable"
