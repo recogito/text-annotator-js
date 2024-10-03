@@ -94,12 +94,6 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
     }
   }, [isOpen, annotation, refs]);
 
-  // Prevent text-annotator from handling the irrelevant events triggered from the popup
-  const getStopEventsPropagationProps = useCallback(
-    () => ({ onPointerUp: (event: PointerEvent<HTMLDivElement>) => event.stopPropagation() }),
-    []
-  );
-
   useEffect(() => {
     const config: MutationObserverInit = { attributes: true, childList: true, subtree: true };
 
@@ -114,10 +108,18 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
     };
   }, [update]);
 
+  // Prevent text-annotator from handling the irrelevant events triggered from the popup
+  const getStopEventsPropagationProps = useCallback(
+    () => ({ onPointerUp: (event: PointerEvent<HTMLDivElement>) => event.stopPropagation() }),
+    []
+  );
+
   // Don't shift focus to the floating element if selected via keyboard or on mobile.
   const initialFocus = useMemo(() => {
     return (event?.type === 'keyup' || event?.type === 'contextmenu' || isMobile()) ? -1 : 0;
   }, [event]);
+
+  const onClose = () => r?.cancelSelected();
 
   return isOpen && selected.length > 0 ? (
     <FloatingPortal>
@@ -139,9 +141,9 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
             event
           })}
 
-          <span className="r6o-popup-sr-only" aria-live="assertive">
-            {props.ariaCloseWarning || 'This dialog will close when you leave it.'}
-          </span>
+          <button className="r6o-popup-sr-only" aria-live="assertive" onClick={onClose}>
+            {props.ariaCloseWarning || 'Click or leave this dialog to close it.'}
+          </button>
         </div>
       </FloatingFocusManager>
     </FloatingPortal>
