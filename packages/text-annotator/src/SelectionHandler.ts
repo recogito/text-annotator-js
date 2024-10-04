@@ -1,4 +1,4 @@
-import { Origin } from '@annotorious/core';
+import { Origin, UserSelectAction } from '@annotorious/core';
 import type { Filter, Selection, User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import hotkeys from 'hotkeys-js';
@@ -193,6 +193,10 @@ export const SelectionHandler = (
 
     // Logic for selecting an existing annotation
     const clickSelect = () => {
+      if (selection.userSelectAction === UserSelectAction.NONE) {
+        return;
+      }
+
       const { x, y } = container.getBoundingClientRect();
 
       const hovered =
