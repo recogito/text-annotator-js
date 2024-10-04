@@ -126,7 +126,7 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
 
   const onClose = () => r?.cancelSelected();
 
-  return isOpen && selected.length > 0 ? (
+  return isOpen && annotation ? (
     <FloatingPortal>
       <FloatingFocusManager
         context={context}
@@ -135,7 +135,7 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
         returnFocus={false}
         initialFocus={initialFocus}>
         <div
-          className="r6o-popup r6o-text-popup not-annotatable"
+          className="a9s-popup r6o-popup annotation-popup r6o-text-popup not-annotatable"
           ref={refs.setFloating}
           style={floatingStyles}
           {...getFloatingProps()}
