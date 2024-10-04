@@ -71,14 +71,17 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
   const { getFloatingProps } = useInteractions([dismiss, role]);
 
   useEffect(() => {
-    setOpen(selected.length > 0);
-  }, [selected.map(a => a.annotation.id).join('-')]);
+    setOpen(
+      // Selected annotation exists and has a selector
+      annotation?.target.selector && 
+      // The selector is not empty - use case: e.g. lazy loading PDF annotations,
+      // annotations created through plugins etc.
+      annotation.target.selector.length > 0
+    );
+  }, [annotation]);
 
   useEffect(() => {
     if (isOpen && annotation) {
-      // Extra precaution - shouldn't normally happen
-      if (!annotation.target.selector || annotation.target.selector.length < 1) return;
-
       const {
         target: {
           selector: [{ range }]
