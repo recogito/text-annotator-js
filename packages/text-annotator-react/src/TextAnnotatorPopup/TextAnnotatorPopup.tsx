@@ -72,11 +72,13 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
 
   useEffect(() => {
     setOpen(
-      // Selected annotation exists and has a selector
+      // Selected annotation exists and has a selector?
       annotation?.target.selector && 
-      // The selector is not empty - use case: e.g. lazy loading PDF annotations,
-      // annotations created through plugins etc.
-      annotation.target.selector.length > 0
+      // Selector not empty? (Annotations from plugins, general defensive programming)
+      annotation.target.selector.length > 0 && 
+      // Range not collapsed? (E.g. lazy loading PDFs. Note that this will have to 
+      // change if we switch from ranges to pre-computed bounds!)
+      !annotation.target.selector[0].range.collapsed
     );
   }, [annotation]);
 
@@ -133,7 +135,7 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
         returnFocus={false}
         initialFocus={initialFocus}>
         <div
-          className="annotation-popup text-annotation-popup not-annotatable"
+          className="r6o-popup r6o-text-popup not-annotatable"
           ref={refs.setFloating}
           style={floatingStyles}
           {...getFloatingProps()}
