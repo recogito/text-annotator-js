@@ -1,4 +1,5 @@
 export * from './cancelSingleClickEvents';
+export * from './device';
 export * from './programmaticallyFocusable';
 export * from './getAnnotatableFragment';
 export * from './getQuoteContext';
