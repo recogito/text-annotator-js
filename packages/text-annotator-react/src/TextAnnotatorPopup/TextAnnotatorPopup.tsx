@@ -1,6 +1,4 @@
-import { PointerEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
-import { useAnnotator, useSelection } from '@annotorious/react';
-import type { TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
+import { FC, PointerEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { isMobile } from './isMobile';
 import {
   autoUpdate,
@@ -16,9 +14,15 @@ import {
   useRole
 } from '@floating-ui/react';
 
+import { useAnnotator, useSelection } from '@annotorious/react';
+import type { TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
+
+import { useAnnouncePopupNavigation } from '../hooks';
 import './TextAnnotatorPopup.css';
 
 interface TextAnnotationPopupProps {
+
+  ariaNavigationMessage?: string;
 
   ariaCloseWarning?: string;
 
@@ -36,7 +40,9 @@ export interface TextAnnotationPopupContentProps {
 
 }
 
-export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
+export const TextAnnotatorPopup: FC<TextAnnotationPopupProps> = (props) => {
+
+  const { popup, ariaNavigationMessage } = props;
 
   const r = useAnnotator<TextAnnotator>();
 
@@ -45,6 +51,14 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
   const annotation = selected[0]?.annotation;
 
   const [isOpen, setOpen] = useState(selected?.length > 0);
+  const handleClose = () => r?.cancelSelected();
+
+  const [isFloatingFocused, setFloatingFocused] = useState(false);
+  const handleFloatingFocus = () => setFloatingFocused(true);
+  const handleFloatingBlur = () => setFloatingFocused(false);
+  useEffect(() => {
+    if (!isOpen) handleFloatingBlur();
+  }, [isOpen, handleFloatingBlur]);
 
   const { refs, floatingStyles, update, context } = useFloating({
     placement: isMobile() ? 'bottom' : 'top',
@@ -52,7 +66,7 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
     onOpenChange: (open, _event, reason) => {
       if (!open && (reason === 'escape-key' || reason === 'focus-out')) {
         setOpen(open);
-        r?.cancelSelected();
+        handleClose();
       }
     },
     middleware: [
@@ -73,10 +87,10 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
   useEffect(() => {
     setOpen(
       // Selected annotation exists and has a selector?
-      annotation?.target.selector && 
+      annotation?.target.selector &&
       // Selector not empty? (Annotations from plugins, general defensive programming)
-      annotation.target.selector.length > 0 && 
-      // Range not collapsed? (E.g. lazy loading PDFs. Note that this will have to 
+      annotation.target.selector.length > 0 &&
+      // Range not collapsed? (E.g. lazy loading PDFs. Note that this will have to
       // change if we switch from ranges to pre-computed bounds!)
       !annotation.target.selector[0].range.collapsed
     );
@@ -124,7 +138,15 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
     return (event?.type === 'keyup' || event?.type === 'contextmenu' || isMobile()) ? -1 : 0;
   }, [event]);
 
-  const onClose = () => r?.cancelSelected();
+  /**
+   * Announce the navigation hint only on the keyboard selection,
+   * because the focus isn't shifted to the popup automatically then
+   */
+  useAnnouncePopupNavigation({
+    disabled: isFloatingFocused,
+    floatingOpen: isOpen,
+    message: ariaNavigationMessage,
+  });
 
   return isOpen && annotation ? (
     <FloatingPortal>
@@ -138,15 +160,16 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
           className="a9s-popup r6o-popup annotation-popup r6o-text-popup not-annotatable"
           ref={refs.setFloating}
           style={floatingStyles}
+          onFocus={handleFloatingFocus}
+          onBlur={handleFloatingBlur}
           {...getFloatingProps()}
           {...getStopEventsPropagationProps()}>
-          {props.popup({
+          {popup({
             annotation: selected[0].annotation,
             editable: selected[0].editable,
             event
           })}
-
-          <button className="r6o-popup-sr-only" aria-live="assertive" onClick={onClose}>
+          <button className="r6o-popup-sr-only" aria-live="assertive" onClick={handleClose}>
             {props.ariaCloseWarning || 'Click or leave this dialog to close it.'}
           </button>
         </div>
