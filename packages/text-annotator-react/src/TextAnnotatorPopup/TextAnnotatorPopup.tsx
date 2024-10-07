@@ -1,4 +1,5 @@
-import React, { FC, PointerEvent, ReactNode, useCallback, useEffect, useState } from 'react';
+import { FC, PointerEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import { isMobile } from './isMobile';
 import {
   autoUpdate,
   flip,
@@ -23,6 +24,8 @@ interface TextAnnotationPopupProps {
 
   popupNavigationMessage?: string;
 
+  ariaCloseWarning?: string;
+
   popup(props: TextAnnotationPopupContentProps): ReactNode;
 
 }
@@ -44,6 +47,7 @@ export const TextAnnotatorPopup: FC<TextAnnotationPopupProps> = (props) => {
   const r = useAnnotator<TextAnnotator>();
 
   const { selected, event } = useSelection<TextAnnotation>();
+
   const annotation = selected[0]?.annotation;
 
   const [isOpen, setOpen] = useState(selected?.length > 0);
@@ -57,15 +61,12 @@ export const TextAnnotatorPopup: FC<TextAnnotationPopupProps> = (props) => {
   }, [isOpen, handleFloatingBlur]);
 
   const { refs, floatingStyles, update, context } = useFloating({
-    placement: 'top',
+    placement: isMobile() ? 'bottom' : 'top',
     open: isOpen,
     onOpenChange: (open, _event, reason) => {
-      setOpen(open);
-
-      if (!open) {
-        if (reason === 'escape-key' || reason === 'focus-out') {
-          handleClose();
-        }
+      if (!open && (reason === 'escape-key' || reason === 'focus-out')) {
+        setOpen(open);
+        handleClose();
       }
     },
     middleware: [
@@ -78,23 +79,22 @@ export const TextAnnotatorPopup: FC<TextAnnotationPopupProps> = (props) => {
   });
 
   const dismiss = useDismiss(context);
+
   const role = useRole(context, { role: 'dialog' });
+
   const { getFloatingProps } = useInteractions([dismiss, role]);
 
-  const selectedKey = selected.map(a => a.annotation.id).join('-');
   useEffect(() => {
-    // Ignore all selection changes except those accompanied by a user event.
-    if (selected.length > 0 && event) {
-      setOpen(event.type === 'pointerup' || event.type === 'keydown');
-    }
-  }, [selectedKey, event]);
-
-  useEffect(() => {
-    // Close the popup if the selection is cleared
-    if (selected.length === 0 && isOpen) {
-      setOpen(false);
-    }
-  }, [isOpen, selectedKey]);
+    setOpen(
+      // Selected annotation exists and has a selector?
+      annotation?.target.selector &&
+      // Selector not empty? (Annotations from plugins, general defensive programming)
+      annotation.target.selector.length > 0 &&
+      // Range not collapsed? (E.g. lazy loading PDFs. Note that this will have to
+      // change if we switch from ranges to pre-computed bounds!)
+      !annotation.target.selector[0].range.collapsed
+    );
+  }, [annotation]);
 
   useEffect(() => {
     if (isOpen && annotation) {
@@ -105,20 +105,13 @@ export const TextAnnotatorPopup: FC<TextAnnotationPopupProps> = (props) => {
       } = annotation;
 
       refs.setPositionReference({
-        getBoundingClientRect: range.getBoundingClientRect.bind(range),
-        getClientRects: range.getClientRects.bind(range)
+        getBoundingClientRect: () => range.getBoundingClientRect(),
+        getClientRects: () => range.getClientRects()
       });
     } else {
-      // Don't leave the reference depending on the previously selected annotation
       refs.setPositionReference(null);
     }
   }, [isOpen, annotation, refs]);
-
-  // Prevent text-annotator from handling the irrelevant events triggered from the popup
-  const getStopEventsPropagationProps = useCallback(
-    () => ({ onPointerUp: (event: PointerEvent<HTMLDivElement>) => event.stopPropagation() }),
-    []
-  );
 
   useEffect(() => {
     const config: MutationObserverInit = { attributes: true, childList: true, subtree: true };
@@ -134,6 +127,17 @@ export const TextAnnotatorPopup: FC<TextAnnotationPopupProps> = (props) => {
     };
   }, [update]);
 
+  // Prevent text-annotator from handling the irrelevant events triggered from the popup
+  const getStopEventsPropagationProps = useCallback(
+    () => ({ onPointerUp: (event: PointerEvent<HTMLDivElement>) => event.stopPropagation() }),
+    []
+  );
+
+  // Don't shift focus to the floating element if selected via keyboard or on mobile.
+  const initialFocus = useMemo(() => {
+    return (event?.type === 'keyup' || event?.type === 'contextmenu' || isMobile()) ? -1 : 0;
+  }, [event]);
+
   /**
    * Announce the navigation hint only on the keyboard selection,
    * because the focus isn't shifted to the popup automatically then
@@ -144,23 +148,16 @@ export const TextAnnotatorPopup: FC<TextAnnotationPopupProps> = (props) => {
     message: popupNavigationMessage,
   });
 
-  return isOpen && selected.length > 0 ? (
+  return isOpen && annotation ? (
     <FloatingPortal>
       <FloatingFocusManager
         context={context}
         modal={false}
         closeOnFocusOut={true}
-        initialFocus={
-          /**
-           * Don't shift focus to the floating element
-           * when the selection performed with the keyboard
-           */
-          event?.type === 'keydown' ? -1 : 0
-        }
         returnFocus={false}
-      >
+        initialFocus={initialFocus}>
         <div
-          className="annotation-popup text-annotation-popup not-annotatable"
+          className="a9s-popup r6o-popup annotation-popup r6o-text-popup not-annotatable"
           ref={refs.setFloating}
           style={floatingStyles}
           onFocus={handleFloatingFocus}
@@ -172,14 +169,12 @@ export const TextAnnotatorPopup: FC<TextAnnotationPopupProps> = (props) => {
             editable: selected[0].editable,
             event
           })}
-
-          {/* It lets keyboard/sr users to know that the dialog closes when they focus out of it */}
-          <button className="popup-close-message" onClick={handleClose}>
-            This dialog closes when you leave it.
+          <button className="r6o-popup-sr-only" aria-live="assertive" onClick={handleClose}>
+            {props.ariaCloseWarning || 'Click or leave this dialog to close it.'}
           </button>
         </div>
       </FloatingFocusManager>
     </FloatingPortal>
   ) : null;
 
-};
+}
