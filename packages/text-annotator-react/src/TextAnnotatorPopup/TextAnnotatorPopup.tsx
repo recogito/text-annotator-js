@@ -22,7 +22,7 @@ import './TextAnnotatorPopup.css';
 
 interface TextAnnotationPopupProps {
 
-  popupNavigationMessage?: string;
+  ariaNavigationMessage?: string;
 
   ariaCloseWarning?: string;
 
@@ -42,7 +42,7 @@ export interface TextAnnotationPopupContentProps {
 
 export const TextAnnotatorPopup: FC<TextAnnotationPopupProps> = (props) => {
 
-  const { popup, popupNavigationMessage } = props;
+  const { popup, ariaNavigationMessage } = props;
 
   const r = useAnnotator<TextAnnotator>();
 
@@ -145,7 +145,7 @@ export const TextAnnotatorPopup: FC<TextAnnotationPopupProps> = (props) => {
   useAnnouncePopupNavigation({
     disabled: isFloatingFocused,
     floatingOpen: isOpen,
-    message: popupNavigationMessage,
+    message: ariaNavigationMessage,
   });
 
   return isOpen && annotation ? (
