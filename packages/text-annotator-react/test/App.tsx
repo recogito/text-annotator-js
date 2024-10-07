@@ -1,75 +1,68 @@
-import React, { useCallback, useEffect, useRef } from 'react';
-import { AnnotationBody, Annotorious, useAnnotationStore, useAnnotator } from '@annotorious/react';
-import { TextAnnotator, TextAnnotatorPopup, TextAnnotatorPopupProps } from '../src';
-import { TextAnnotation, TextAnnotator as RecogitoTextAnnotator, W3CTextFormat } from '@recogito/text-annotator';
+import React, { FC, useCallback, useEffect } from 'react';
+import { AnnotationBody, Annotorious, useAnnotationStore, useAnnotator, useSelection } from '@annotorious/react';
+import { TextAnnotator, TextAnnotatorPopup, type TextAnnotationPopupContentProps } from '../src';
+import { W3CTextFormat, type TextAnnotation, type TextAnnotator as RecogitoTextAnnotator } from '@recogito/text-annotator';
 
-const TestPopup = (props: TextAnnotatorPopupProps) => {
+const TestPopup: FC<TextAnnotationPopupContentProps> = (props) => {
+
+  const { annotation } = props;
 
   const store = useAnnotationStore();
-  const anno = useAnnotator<RecogitoTextAnnotator>();
-
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const r = useAnnotator<RecogitoTextAnnotator>();
 
   const body: AnnotationBody = {
     id: `${Math.random()}`,
-    annotation: props.selected[0].annotation.id,
+    annotation: annotation.id,
     purpose: 'commenting',
     value: 'A Dummy Comment'
   };
 
   const onClick = () => {
-    store.addBody(body);
-    anno.cancelSelected();
+    store!.addBody(body);
+    r.cancelSelected();
   };
-
-  useEffect(() => {
-    const { current: inputEl } = inputRef;
-    if (!inputEl) return;
-
-    setTimeout(() => inputEl.focus({ preventScroll: true }));
-  }, []);
 
   return (
     <div className="popup">
-      <input ref={inputRef} type="text" />
+      <input type="text" />
       <button onClick={onClick}>Close</button>
     </div>
   );
 
-};
+}
 
-const MockStorage = () => {
+const MockStorage: FC = () => {
 
-  const anno = useAnnotator<RecogitoTextAnnotator>();
+  const r = useAnnotator<RecogitoTextAnnotator>();
 
   useEffect(() => {
-    if (!anno) return;
+    if (!r) return;
 
     const handleCreateAnnotation = (annotation: TextAnnotation) => console.log('create', annotation);
-    anno.on('createAnnotation', handleCreateAnnotation);
+    r.on('createAnnotation', handleCreateAnnotation);
 
     const handleDeleteAnnotation = (annotation: TextAnnotation) => console.log('delete', annotation);
-    anno.on('deleteAnnotation', handleDeleteAnnotation);
+    r.on('deleteAnnotation', handleDeleteAnnotation);
 
     const handleSelectionChanged = (annotations: TextAnnotation[]) => console.log('selection changed', annotations);
-    anno.on('selectionChanged', handleSelectionChanged);
+    r.on('selectionChanged', handleSelectionChanged);
 
     const handleUpdateAnnotation = (annotation: TextAnnotation, previous: TextAnnotation) => console.log('update', annotation, previous);
-    anno.on('updateAnnotation', handleUpdateAnnotation);
+    r.on('updateAnnotation', handleUpdateAnnotation);
 
     return () => {
-      anno.off('createAnnotation', handleCreateAnnotation);
-      anno.off('deleteAnnotation', handleDeleteAnnotation);
-      anno.off('selectionChanged', handleSelectionChanged);
-      anno.off('updateAnnotation', handleUpdateAnnotation);
+      r.off('createAnnotation', handleCreateAnnotation);
+      r.off('deleteAnnotation', handleDeleteAnnotation);
+      r.off('selectionChanged', handleSelectionChanged);
+      r.off('updateAnnotation', handleUpdateAnnotation);
     };
-  }, [anno]);
+  }, [r]);
 
   return null;
 
 };
 
-export const App = () => {
+export const App: FC = () => {
   const w3cAdapter = useCallback((container: HTMLElement) => W3CTextFormat('https://www.gutenberg.org', container), []);
 
   return (

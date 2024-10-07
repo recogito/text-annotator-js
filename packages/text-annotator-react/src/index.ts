@@ -21,6 +21,7 @@ export type {
   StoreObserver,
   ParseResult,
   User,
+  UserSelectActionExpression,
   W3CAnnotation,
   W3CAnnotationBody,
   W3CAnnotationTarget
@@ -29,7 +30,7 @@ export type {
 export {
   createBody,
   Origin,
-  PointerSelectAction
+  UserSelectAction
 } from '@annotorious/core';
 
 // Essential re-exports from @annotorious/react

@@ -1,48 +1,52 @@
-import type { Filter, PointerSelectAction, Store, ViewportState } from '@annotorious/core';
+import type { Filter, Store, ViewportState, UserSelectActionExpression, Annotation } from '@annotorious/core';
 import { 
   createHoverState, 
   createSelectionState, 
   createStore, 
+  Origin,
+  createViewportState
+} from '@annotorious/core';
+import type { 
   AnnotatorState, 
   SelectionState, 
   HoverState, 
-  Origin,
-  createViewportState
 } from '@annotorious/core';
 import { createSpatialTree } from './spatialTree';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
 import type { TextAnnotationStore } from './TextAnnotationStore';
 import { isRevived, reviveAnnotation, reviveTarget } from '../utils';
 
-export interface TextAnnotatorState extends AnnotatorState<TextAnnotation> {
+export interface TextAnnotatorState<I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation> extends AnnotatorState<I, E> {
 
-  store: TextAnnotationStore;
+  store: TextAnnotationStore<I>;
 
-  selection: SelectionState<TextAnnotation>;
+  selection: SelectionState<I, E>;
 
-  hover: HoverState<TextAnnotation>;
+  hover: HoverState<I>;
 
   viewport: ViewportState;
 
 }
 
-export const createTextAnnotatorState = (
+export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation>(
   container: HTMLElement,
-  defaultPointerAction?: PointerSelectAction | ((annotation: TextAnnotation) => PointerSelectAction)
-): TextAnnotatorState => {
+  defaultUserSelectAction?: UserSelectActionExpression<E>
+): TextAnnotatorState<I, E> => {
 
-  const store: Store<TextAnnotation> = createStore<TextAnnotation>();
+  const store: Store<I> = createStore<I>();
 
   const tree = createSpatialTree(store, container);
 
-  const selection = createSelectionState<TextAnnotation>(store, defaultPointerAction);
+  // Temporary
+  const selection = createSelectionState<I, E>(store)
+  selection.setUserSelectAction(defaultUserSelectAction);
 
   const hover = createHoverState(store);
 
   const viewport = createViewportState();
 
   // Wrap store interface to intercept annotations and revive DOM ranges, if needed
-  const addAnnotation = (annotation: TextAnnotation, origin = Origin.LOCAL): boolean => {
+  const addAnnotation = (annotation: I, origin = Origin.LOCAL): boolean => {
     const revived = reviveAnnotation(annotation, container);
 
     const isValid = isRevived(revived.target.selector);
@@ -53,11 +57,11 @@ export const createTextAnnotatorState = (
   }
 
   const bulkAddAnnotation = (
-    annotations: TextAnnotation[], 
+    annotations: I[], 
     replace = true, 
     origin = Origin.LOCAL
-  ): TextAnnotation[] => {
-    const revived = annotations.map(a => reviveAnnotation(a, container));
+  ): I[] => {
+    const revived = annotations.map(a => reviveAnnotation<I>(a, container));
 
     // Initial page load might take some time. Retry for more robustness.
     const couldNotRevive = revived.filter(a => !isRevived(a.target.selector));
@@ -77,9 +81,9 @@ export const createTextAnnotatorState = (
   }
   
   const bulkUpsertAnnotations = (
-    annotations: TextAnnotation[], 
+    annotations: I[], 
     origin = Origin.LOCAL
-  ): TextAnnotation[] => {
+  ): I[] => {
     const revived = annotations.map(a => reviveAnnotation(a, container));
 
     // Initial page load might take some time. Retry for more robustness.
@@ -107,7 +111,7 @@ export const createTextAnnotatorState = (
     store.bulkUpdateTargets(revived, origin);
   }
 
-  const getAt = (x: number, y: number, filter?: Filter): TextAnnotation | undefined => {
+  const getAt = (x: number, y: number, filter?: Filter): I | undefined => {
     const annotations = tree.getAt(x, y, Boolean(filter)).map(id => store.getAnnotation(id));
     const filtered = filter ? annotations.filter(filter) : annotations;
     return filtered.length > 0 ? filtered[0] : undefined;
@@ -127,6 +131,8 @@ export const createTextAnnotatorState = (
 
     return tree.getAnnotationBounds(id);
   }
+
+  const getAnnotationRects = (id: string): DOMRect[] => tree.getAnnotationRects(id);
 
   const recalculatePositions = () => tree.recalculate();
 
@@ -153,6 +159,7 @@ export const createTextAnnotatorState = (
       bulkUpdateTargets,
       bulkUpsertAnnotations,
       getAnnotationBounds,
+      getAnnotationRects,
       getAt,
       getIntersecting: tree.getIntersecting,
       recalculatePositions,

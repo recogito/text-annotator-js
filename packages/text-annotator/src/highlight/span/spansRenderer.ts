@@ -7,20 +7,24 @@ import type { ViewportBounds } from '../viewport';
 import { createBaseRenderer, type RendererImplementation } from '../baseRenderer';
 import type { Highlight } from '../Highlight';
 import { DEFAULT_STYLE, type HighlightStyleExpression } from '../HighlightStyle';
+import type { TextAnnotation } from 'src/model';
 
 import './spansRenderer.css';
 
-const computeZIndex = (rect: Rect, all: Rect[]): number => {
+const computeZIndex = (rect: Rect, all: Highlight[]): number => {
   const intersects = (a: Rect, b: Rect): boolean => (
     a.x <= b.x + b.width && a.x + a.width >= b.x &&
     a.y <= b.y + b.height && a.y + a.height >= b.y
-  );
+  )
 
-  return all.filter(other => (
-    rect !== other &&
-    intersects(rect, other) &&
-    other.width > rect.width
-  )).length;
+  const getLength = (h: Highlight) => 
+    h.rects.reduce((total, rect) => total + rect.width, 0);
+
+  // Any highlights that intersect this rect, sorted by total length
+  const intersecting = all.filter(({ rects }) => rects.some(r => intersects(rect, r)));
+  intersecting.sort((a, b) => getLength(b) - getLength(a));
+
+  return intersecting.findIndex(h => h.rects.includes(rect));
 }
 
 const createRenderer = (container: HTMLElement): RendererImplementation => {
@@ -53,12 +57,22 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
     if (shouldRedraw)
       highlightLayer.innerHTML = '';
 
-    // Rects from all visible annotations, for z-index computation
-    const allRects = highlights.reduce<Rect[]>((all, { rects }) => ([...all, ...rects]), []);
+    /**
+     * Highlights rendering in the span highlight layer is an order-sensitive operation.
+     * The later the highlight is rendered, the higher it will be in the visual stack.
+     *
+     * By default, we should expect that the newer highlight
+     * will be rendered over the older one
+     */
+    const sorted = [...highlights].sort((highlightA, highlightB) => {
+      const { annotation: { target: { created: createdA } } } = highlightA;
+      const { annotation: { target: { created: createdB } } } = highlightB;
+      return createdA && createdB ? createdA.getTime() - createdB.getTime() : 0;
+    });
 
-    highlights.forEach(highlight => {
+    sorted.forEach(highlight => {
       highlight.rects.map(rect => {
-        const zIndex = computeZIndex(rect, allRects);
+        const zIndex = computeZIndex(rect, highlights);
         const style = paint(highlight, viewportBounds, currentStyle, painter, zIndex);
 
         if (shouldRedraw) {
@@ -116,6 +130,6 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
 
 export const createSpansRenderer = (
   container: HTMLElement,
-  state: TextAnnotatorState,
+  state: TextAnnotatorState<TextAnnotation, unknown>,
   viewport: ViewportState
 ) => createBaseRenderer(container, state, viewport, createRenderer(container));

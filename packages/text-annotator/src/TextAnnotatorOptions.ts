@@ -1,36 +1,39 @@
-import type { FormatAdapter, PointerSelectAction } from '@annotorious/core';
+import type { FormatAdapter, UserSelectActionExpression, User, Annotation } from '@annotorious/core';
 import type { PresencePainterOptions } from './presence';
 import type { TextAnnotation } from './model';
 import type { HighlightStyleExpression } from './highlight';
 
-export interface TextAnnotatorOptions<T extends unknown = TextAnnotation> {
+export interface TextAnnotatorOptions<I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation> {
 
-  adapter?: FormatAdapter<TextAnnotation, T> | null;
+  adapter?: FormatAdapter<I, E> | null;
 
-  annotationEnabled?: boolean;
+  annotatingEnabled?: boolean;
 
   renderer?: RendererType;
 
   offsetReferenceSelector?: string;
 
-  pointerAction?: PointerSelectAction | ((annotation: TextAnnotation) => PointerSelectAction);
+  userSelectAction?: UserSelectActionExpression<E>,
 
   presence?: PresencePainterOptions;
 
   style?: HighlightStyleExpression;
-    
+
+  user?: User;
+  
 }
 
 export type RendererType = 'SPANS' | 'CANVAS' | 'CSS_HIGHLIGHTS';
 
-export const fillDefaults = <T extends unknown = TextAnnotation>  (
-  opts: TextAnnotatorOptions<T>,
-  defaults: TextAnnotatorOptions<T>
-): TextAnnotatorOptions<T> => {
+export const fillDefaults = <I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation>(
+  opts: TextAnnotatorOptions<I, E>,
+  defaults: TextAnnotatorOptions<I, E>
+): TextAnnotatorOptions<I, E> => {
 
   return {
     ...opts,
-    annotationEnabled: opts.annotationEnabled === undefined ? defaults.annotationEnabled : opts.annotationEnabled
+    annotatingEnabled: opts.annotatingEnabled ?? defaults.annotatingEnabled,
+    user: opts.user || defaults.user
   };
 
 };
