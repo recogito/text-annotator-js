@@ -1,6 +1,5 @@
 import { PointerEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
-import { useAnnotator, useSelection } from '@annotorious/react';
-import type { TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
+
 import { isMobile } from './isMobile';
 import {
   autoUpdate,
