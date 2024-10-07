@@ -2,25 +2,29 @@ import type { ViewportState } from '@annotorious/core';
 import { colord } from 'colord';
 import { dequal } from 'dequal/lite';
 import type { Rect, TextAnnotatorState } from '../../state';
-import { paint, type HighlightPainter } from '../HighlightPainter';
+import { type HighlightPainter, paint } from '../HighlightPainter';
 import type { ViewportBounds } from '../viewport';
 import { createBaseRenderer, type RendererImplementation } from '../baseRenderer';
 import type { Highlight } from '../Highlight';
 import { DEFAULT_STYLE, type HighlightStyleExpression } from '../HighlightStyle';
+import type { TextAnnotation } from 'src/model';
 
 import './spansRenderer.css';
 
-const computeZIndex = (rect: Rect, all: Rect[]): number => {
+const computeZIndex = (rect: Rect, all: Highlight[]): number => {
   const intersects = (a: Rect, b: Rect): boolean => (
     a.x <= b.x + b.width && a.x + a.width >= b.x &&
     a.y <= b.y + b.height && a.y + a.height >= b.y
-  );
+  )
 
-  return all.filter(other => (
-    rect !== other &&
-    intersects(rect, other) &&
-    other.width > rect.width
-  )).length;
+  const getLength = (h: Highlight) => 
+    h.rects.reduce((total, rect) => total + rect.width, 0);
+
+  // Any highlights that intersect this rect, sorted by total length
+  const intersecting = all.filter(({ rects }) => rects.some(r => intersects(rect, r)));
+  intersecting.sort((a, b) => getLength(b) - getLength(a));
+
+  return intersecting.findIndex(h => h.rects.includes(rect));
 }
 
 const createRenderer = (container: HTMLElement): RendererImplementation => {
@@ -32,69 +36,74 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
 
   container.insertBefore(highlightLayer, container.firstChild);
 
-  let customPainter: HighlightPainter;
-
   // Currently rendered highlights
   let currentRendered: Highlight[] = [];
 
   const redraw = (
-    highlights: Highlight[], 
+    highlights: Highlight[],
     viewportBounds: ViewportBounds,
     currentStyle?: HighlightStyleExpression,
     painter?: HighlightPainter,
     lazy?: boolean
-  ) => {    
-    // Only redraw if annotations or annotation states changed
+  ) => {
     const noChanges = dequal(currentRendered, highlights);
-    if (noChanges && lazy) return;
 
-    highlightLayer.innerHTML = '';
+    // If there are no changes and rendering is set to lazy
+    // Don't redraw the SPANs - but redraw the painter, if any!
+    const shouldRedraw = !(noChanges && lazy);
 
-    if (customPainter)
-      customPainter.clear();
+    if (!painter && !shouldRedraw) return;
 
-    // Rects from all visible annotations, for z-index computation
-    const allRects = highlights.reduce<Rect[]>((all, { rects }) => ([...all, ...rects]), []);
+    if (shouldRedraw)
+      highlightLayer.innerHTML = '';
 
-    highlights.forEach(highlight => {
-      const spans = highlight.rects.map(rect => {
-        const span = document.createElement('span');
-        span.className = 'r6o-annotation';
-        span.dataset.annotation = highlight.annotation.id;
+    /**
+     * Highlights rendering in the span highlight layer is an order-sensitive operation.
+     * The later the highlight is rendered, the higher it will be in the visual stack.
+     *
+     * By default, we should expect that the newer highlight
+     * will be rendered over the older one
+     */
+    const sorted = [...highlights].sort((highlightA, highlightB) => {
+      const { annotation: { target: { created: createdA } } } = highlightA;
+      const { annotation: { target: { created: createdB } } } = highlightB;
+      return createdA && createdB ? createdA.getTime() - createdB.getTime() : 0;
+    });
 
-        span.style.left = `${rect.x}px`;
-        span.style.top = `${rect.y}px`;
-        span.style.width = `${rect.width}px`;
-        span.style.height = `${rect.height}px`;
-
-        const zIndex = computeZIndex(rect, allRects);
-
+    sorted.forEach(highlight => {
+      highlight.rects.map(rect => {
+        const zIndex = computeZIndex(rect, highlights);
         const style = paint(highlight, viewportBounds, currentStyle, painter, zIndex);
 
-        const backgroundColor = colord(style?.fill || DEFAULT_STYLE.fill)
-          .alpha(style?.fillOpacity === undefined ? DEFAULT_STYLE.fillOpacity : style.fillOpacity)
-          .toHex();
+        if (shouldRedraw) {
+          const span = document.createElement('span');
+          span.className = 'r6o-annotation';
+          span.dataset.annotation = highlight.annotation.id;
 
-        span.style.backgroundColor = backgroundColor;
+          span.style.left = `${rect.x}px`;
+          span.style.top = `${rect.y}px`;
+          span.style.width = `${rect.width}px`;
+          span.style.height = `${rect.height}px`;
 
-        if (style.underlineStyle)
-          span.style.borderStyle = style.underlineStyle;
+          span.style.backgroundColor = colord(style?.fill || DEFAULT_STYLE.fill)
+            .alpha(style?.fillOpacity === undefined ? DEFAULT_STYLE.fillOpacity : style.fillOpacity)
+            .toHex();
 
-        if (style.underlineColor)
-          span.style.borderColor = style.underlineColor;
+          if (style.underlineStyle)
+            span.style.borderStyle = style.underlineStyle;
 
-        if (style.underlineThickness)
-          span.style.borderBottomWidth = `${style.underlineThickness}px`;
+          if (style.underlineColor)
+            span.style.borderColor = style.underlineColor;
 
-        if (style.underlineOffset)
-          span.style.paddingBottom = `${style.underlineOffset}px`;
+          if (style.underlineThickness)
+            span.style.borderBottomWidth = `${style.underlineThickness}px`;
 
-        highlightLayer.appendChild(span);
+          if (style.underlineOffset)
+            span.style.paddingBottom = `${style.underlineOffset}px`;
 
-        return span;
+          highlightLayer.appendChild(span);
+        }
       });
-
-      return { id: highlight.annotation.id, spans };
     });
 
     currentRendered = highlights;
@@ -115,12 +124,12 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
     destroy,
     redraw,
     setVisible
-  }
+  };
 
 }
 
 export const createSpansRenderer = (
-  container: HTMLElement, 
-  state: TextAnnotatorState,
+  container: HTMLElement,
+  state: TextAnnotatorState<TextAnnotation, unknown>,
   viewport: ViewportState
 ) => createBaseRenderer(container, state, viewport, createRenderer(container));

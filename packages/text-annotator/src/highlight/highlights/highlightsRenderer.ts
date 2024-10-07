@@ -3,9 +3,11 @@ import { colord } from 'colord';
 import type { HighlightPainter } from '../HighlightPainter';
 import type { TextAnnotatorState } from 'src/state';
 import type { ViewportBounds } from '../viewport';
-import { DEFAULT_SELECTED_STYLE, DEFAULT_STYLE, HighlightStyle, HighlightStyleExpression } from '../HighlightStyle';
-import { RendererImplementation, createBaseRenderer } from '../baseRenderer';
+import { DEFAULT_SELECTED_STYLE, DEFAULT_STYLE } from '../HighlightStyle';
+import type { HighlightStyle, HighlightStyleExpression } from '../HighlightStyle';
+import { type RendererImplementation, createBaseRenderer } from '../baseRenderer';
 import type { Highlight } from '../Highlight';
+import type { TextAnnotation } from 'src/model';
 
 const toCSS = (s?: HighlightStyle) => {
   const backgroundColor = colord(s?.fill || DEFAULT_STYLE.fill)
@@ -30,7 +32,7 @@ export const createRenderer = (): RendererImplementation => {
   let currentRendered = new Set<string>();
 
   const redraw = (
-    highlights: Highlight[], 
+    highlights: Highlight[],
     viewportBounds: ViewportBounds,
     currentStyle?: HighlightStyleExpression,
     painter?: HighlightPainter
@@ -46,10 +48,10 @@ export const createRenderer = (): RendererImplementation => {
 
     // For simplicity, re-generate the whole stylesheet
     const updatedCSS = highlights.map(h => {
-      const base = currentStyle 
-        ? typeof currentStyle === 'function' 
-          ? currentStyle(h.annotation, h.state) 
-          : currentStyle 
+      const base = currentStyle
+        ? typeof currentStyle === 'function'
+          ? currentStyle(h.annotation, h.state)
+          : currentStyle
         : h.state?.selected ? DEFAULT_SELECTED_STYLE : DEFAULT_STYLE;
 
       // Trigger the custom painter (if any) as a side-effect
@@ -70,7 +72,7 @@ export const createRenderer = (): RendererImplementation => {
 
     // Could be improved further by (re-)setting only annotations that
     // have changes.
-    highlights.forEach(({ annotation }) => { 
+    highlights.forEach(({ annotation }) => {
       const ranges = annotation.target.selector.map(s => s.range);
 
       // @ts-ignore
@@ -100,12 +102,12 @@ export const createRenderer = (): RendererImplementation => {
     destroy,
     setVisible,
     redraw
-  }
+  };
 
 }
 
 export const createHighlightsRenderer = (
-  container: HTMLElement, 
-  state: TextAnnotatorState,
+  container: HTMLElement,
+  state: TextAnnotatorState<TextAnnotation, unknown>,
   viewport: ViewportState
 ) => createBaseRenderer(container, state, viewport, createRenderer());

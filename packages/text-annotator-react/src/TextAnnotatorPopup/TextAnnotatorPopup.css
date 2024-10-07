@@ -1,0 +1,30 @@
+/*
+ * Close message should be visible only to the keyboard
+ * or the screen reader users as the popup behavior hint
+ * Inspired by https://gist.github.com/ffoodd/000b59f431e3e64e4ce1a24d5bb36034
+ */
+.popup-close-message {
+  border: 0 !important;
+  clip: rect(1px, 1px, 1px, 1px);
+  -webkit-clip-path: inset(50%);
+  clip-path: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+  white-space: nowrap;
+}
+
+.popup-close-message:focus,
+.popup-close-message:active {
+  clip: auto;
+  -webkit-clip-path: none;
+  clip-path: none;
+  height: auto;
+  margin: auto;
+  overflow: visible;
+  width: auto;
+  white-space: normal;
+}

@@ -2,32 +2,25 @@ html, body {
   overscroll-behavior-y: none;
 }
 
-/* https://stackoverflow.com/questions/42507623/blue-highlight-on-onclick-on-buttons-in-chrome-mobile */
 .r6o-annotatable {
+  position: relative;
+
+  /* https://stackoverflow.com/questions/42507623/blue-highlight-on-onclick-on-buttons-in-chrome-mobile */
   -webkit-tap-highlight-color: transparent;
 }
 
-.r6o-annotatable, .r6o-annotatable * {
-  position: relative;
+.r6o-annotatable.no-focus-outline {
+  outline: none
 }
 
 .hovered * {
   cursor: pointer;
 }
 
-.r6o-highlight-layer {
-  left: 0;
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  width: 100vw;
-  pointer-events: none;
-}
-
 *::selection, ::selection {
   background: rgba(0, 128, 255, 0.18);
 }
 
-::-moz-selection, ::-moz-selection{
+::-moz-selection, ::-moz-selection {
   background: rgba(0, 128, 255, 0.18);
 }

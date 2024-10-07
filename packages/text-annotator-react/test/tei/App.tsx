@@ -1,65 +1,69 @@
-import React, { useEffect, useState } from 'react';
-import { AnnotationBody, Annotorious, useAnnotationStore, useAnnotator } from '@annotorious/react';
-import { CETEIcean, TextAnnotatorPopup, TextAnnotatorPopupProps } from '../../src';
-import { TextAnnotation, TextAnnotator as VanillaTextAnnotator } from '@recogito/text-annotator';
-import { TEIAnnotator } from '../../src';
+import React, { FC, useEffect, useRef, useState } from 'react';
 
-const TestPopup = (props: TextAnnotatorPopupProps) => {
+import { AnnotationBody, Annotorious, useAnnotationStore, useAnnotator } from '@annotorious/react';
+import { TextAnnotation, TextAnnotator as VanillaTextAnnotator } from '@recogito/text-annotator';
+
+import { TEIAnnotator, CETEIcean, TextAnnotatorPopup, type TextAnnotationPopupContentProps } from '../../src';
+
+const TestPopup: FC<TextAnnotationPopupContentProps> = (props) => {
+
+  const { annotation } = props;
 
   const store = useAnnotationStore();
+  const r = useAnnotator<VanillaTextAnnotator>();
 
-  const anno = useAnnotator<VanillaTextAnnotator>();
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const body: AnnotationBody = {
     id: `${Math.random()}`,
-    annotation: props.selected[0].annotation.id,
+    annotation: annotation.id,
     purpose: 'commenting',
     value: 'A Dummy Comment'
-  }
+  };
 
   const onClick = () => {
     store.addBody(body);
-    anno.state.selection.clear();
-  }
+    r.cancelSelected();
+  };
 
   return (
     <div className="popup">
-      <input type="text" />
+      <input ref={inputRef} type="text" />
       <button onClick={onClick}>Close</button>
     </div>
-  )
+  );
 
-}
+};
 
 const MockStorage = () => {
 
-  const anno = useAnnotator<VanillaTextAnnotator>();
+  const r = useAnnotator<VanillaTextAnnotator>();
 
   useEffect(() => {
-    if (anno) {
-      anno.on('createAnnotation', (annotation: TextAnnotation) => {
+    if (r) {
+      r.on('createAnnotation', (annotation: TextAnnotation) => {
         console.log('create', annotation);
       });
 
-      anno.on('deleteAnnotation', (annotation: TextAnnotation) => {
+      r.on('deleteAnnotation', (annotation: TextAnnotation) => {
         console.log('delete', annotation);
       });
-    
-      anno.on('selectionChanged', (annotations: TextAnnotation[]) => {
+
+      r.on('selectionChanged', (annotations: TextAnnotation[]) => {
         console.log('selection changed', annotations);
       });
-    
-      anno.on('updateAnnotation', (annotation: TextAnnotation, previous: TextAnnotation) => {
+
+      r.on('updateAnnotation', (annotation: TextAnnotation, previous: TextAnnotation) => {
         console.log('update', annotation, previous);
       });
     }
-  }, [anno]);
+  }, [r]);
 
   return null;
 
-}
+};
 
-export const App = () => {
+export const App: FC = () => {
 
   const [tei, setTEI] = useState<string | undefined>(undefined);
 
@@ -74,14 +78,15 @@ export const App = () => {
       <TEIAnnotator>
         <CETEIcean tei={tei} />
 
-        <TextAnnotatorPopup 
+        <TextAnnotatorPopup
           popup={props => (
             <TestPopup {...props} />
-          )} />
+          )}
+        />
 
         <MockStorage />
       </TEIAnnotator>
     </Annotorious>
-  )
+  );
 
-}
+};

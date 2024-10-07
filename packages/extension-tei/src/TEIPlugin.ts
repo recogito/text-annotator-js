@@ -47,7 +47,7 @@ export const TEIPlugin = (anno: TextAnnotator): RecogitoTEIAnnotator => {
   const _addAnnotation = store.addAnnotation;
   store.addAnnotation = (annotation: TEIAnnotation | TextAnnotation, origin: Origin) => {
     const { selector } = annotation.target;
-    return ('startSelector' in selector) ?
+    return ('startSelector' in selector && 'start' in selector) ?
       _addAnnotation(annotation, origin) :
       _addAnnotation(toTEI(annotation), origin);
   }
@@ -56,7 +56,7 @@ export const TEIPlugin = (anno: TextAnnotator): RecogitoTEIAnnotator => {
   store.bulkAddAnnotation = (annotations: Array<TEIAnnotation | TextAnnotation>, replace = true, origin: Origin) => {
     const teiAnnotations = annotations.map(a => {
       const { selector } = a.target;
-      return 'startSelector' in selector ? a : toTEI(a);
+      return ('startSelector' in selector && 'start' in selector) ? a : toTEI(a);
     });
     
     return _bulkAddAnnotation(teiAnnotations, replace, origin);

@@ -26,7 +26,9 @@ export const paint = (
 ) => {
   const base: HighlightStyle = style 
     ? typeof style === 'function' 
-      ? style(highlight.annotation, highlight.state, zIndex) 
+      ? style(highlight.annotation, highlight.state, zIndex) || (
+        highlight.state?.selected ? DEFAULT_SELECTED_STYLE : DEFAULT_STYLE
+      )
       : style 
     : highlight.state?.selected 
       ? DEFAULT_SELECTED_STYLE 

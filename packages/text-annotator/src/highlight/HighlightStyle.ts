@@ -14,17 +14,14 @@ export interface HighlightStyle extends Pick<DrawingStyle, 'fill' | 'fillOpacity
 }
 
 export type HighlightStyleExpression = HighlightStyle 
-  | ((annotation: TextAnnotation, state: AnnotationState, zIndex?: number) => HighlightStyle)
+  | ((annotation: TextAnnotation, state: AnnotationState, zIndex?: number) => HighlightStyle | undefined);
 
 export const DEFAULT_STYLE: HighlightStyle = { 
   fill: 'rgb(0, 128, 255)', 
-  fillOpacity: 0.18 
+  fillOpacity: 0.18
 };
 
 export const DEFAULT_SELECTED_STYLE: HighlightStyle = { 
   fill: 'rgb(0, 128, 255)', 
   fillOpacity: 0.45 
 };
-  
-
-
