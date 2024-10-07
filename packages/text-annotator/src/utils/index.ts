@@ -14,4 +14,5 @@ export * from './reviveTarget';
 export * from './splitAnnotatableRanges';
 export * from './trimRangeToContainer';
 export * from './cloneEvents';
+export * from './normalizeRects';
 

@@ -65,7 +65,7 @@ const union = (a: DOMRect, b: DOMRect): DOMRect => {
   return new DOMRect(left, top, right - left, bottom - top);
 }
 
-export const mergeClientRects = (rects: DOMRect[]) => rects.reduce((merged, rectA) => {
+export const mergeClientRects = (rects: DOMRect[]) => rects.reduce<DOMRect[]>((merged, rectA) => {
   // Some browser report empty rects - discard
   if (rectA.width === 0 || rectA.height === 0)
     return merged;
@@ -102,7 +102,16 @@ export const mergeClientRects = (rects: DOMRect[]) => rects.reduce((merged, rect
   }
 
   return wasMerged ? next : [ ...next, rectA ];
-}, [] as DOMRect[]);
+}, []);
+
+export const toDomRectList = (rects: DOMRect[]): DOMRectList => ({
+  length: rects.length,
+  item: (index) => rects[index],
+  [Symbol.iterator]: function* (): ArrayIterator<DOMRect> {
+    for (let i = 0; i < this.length; i++)
+      yield this.item(i)!;
+  }
+})
 
 /* Pixels that rects can be apart vertically while still
 // being considered to be on the same line.
@@ -142,7 +151,7 @@ export const mergeClientRects = (rects: DOMRect[]) => {
   }).filter(r => r.height > 0 && r.width > 0);
 
   // Checks if the given rect contains any other rects
-  const containsOthers = (rect: DOMRect) => mergedRects.some(other => 
+  const containsOthers = (rect: DOMRect) => mergedRects.some(other =>
     other !== rect &&
     other.left >= rect.left &&
     other.right <= rect.right &&
