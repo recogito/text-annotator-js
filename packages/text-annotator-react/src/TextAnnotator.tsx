@@ -25,8 +25,8 @@ export const TextAnnotator = <E extends unknown>(props: TextAnnotatorProps<E>) =
   const el = useRef<HTMLDivElement>(null);
 
   const { className, children, ...opts } = props;
-  
-  const { style, filter, user } = opts;
+
+  const { style, filter, user, annotatingEnabled } = opts;
 
   const { anno, setAnno } = useContext(AnnotoriousContext);
 
@@ -47,10 +47,12 @@ export const TextAnnotator = <E extends unknown>(props: TextAnnotatorProps<E>) =
 
   useEffect(() => anno?.setUser(user), [anno, user]);
 
+  useEffect(() => anno?.setAnnotatingEnabled(annotatingEnabled), [anno, annotatingEnabled]);
+
   return (
     <div ref={el} className={className}>
       {children}
     </div>
-  )
+  );
 
 }

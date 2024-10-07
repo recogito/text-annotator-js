@@ -1,13 +1,14 @@
-import { Origin } from '@annotorious/core';
-import type { Filter, Selection, User } from '@annotorious/core';
+import debounce from 'debounce';
 import { v4 as uuidv4 } from 'uuid';
 import hotkeys from 'hotkeys-js';
+
+import { Origin, type Filter, type Selection, type User } from '@annotorious/core';
+
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotation, TextAnnotationTarget } from './model';
 import {
   clonePointerEvent,
   cloneKeyboardEvent,
-  debounce,
   splitAnnotatableRanges,
   rangeToSelector,
   isMac,
@@ -27,12 +28,13 @@ const SELECTION_KEYS = [
   SELECT_ALL
 ];
 
-export const SelectionHandler = (
+export const createSelectionHandler = (
   container: HTMLElement,
   state: TextAnnotatorState<TextAnnotation, unknown>,
-  annotatingEnabled: boolean,
   offsetReferenceSelector?: string
 ) => {
+
+  const { store, selection } = state;
 
   let currentUser: User | undefined;
 
@@ -42,8 +44,6 @@ export const SelectionHandler = (
 
   const setFilter = (filter?: Filter) => currentFilter = filter;
 
-  const { store, selection } = state;
-
   let currentTarget: TextAnnotationTarget | undefined;
 
   let isLeftClick: boolean | undefined;
@@ -52,11 +52,25 @@ export const SelectionHandler = (
 
   let isContextMenuOpen = false;
 
+  let currentAnnotatingEnabled = true;
+
+  const setAnnotatingEnabled = (enabled: boolean) => {
+    currentAnnotatingEnabled = enabled;
+    onSelectionChange.clear();
+
+    if (!enabled) {
+      currentTarget = undefined;
+      lastDownEvent = undefined;
+      isContextMenuOpen = false;
+    }
+  };
+
   const onSelectStart = (evt: Event) => {
+    if (!currentAnnotatingEnabled) return;
+
     isContextMenuOpen = false;
-    
-    if (isLeftClick === false)
-      return;
+
+    if (isLeftClick === false) return;
 
     /**
      * Make sure we don't listen to selection changes that were
@@ -74,6 +88,8 @@ export const SelectionHandler = (
   };
 
   const onSelectionChange = debounce((evt: Event) => {
+    if (!currentAnnotatingEnabled) return;
+
     const sel = document.getSelection();
 
     // This is to handle cases where the selection is "hijacked" by another element
@@ -125,7 +141,7 @@ export const SelectionHandler = (
 
     const selectionRange = sel.getRangeAt(0);
 
-    // The selection should be captured only within the annotatable container
+// The selection should be captured only within the annotatable container
     const containedRange = trimRangeToContainer(selectionRange, container);
     if (isWhitespaceOrEmpty(containedRange)) return;
 
@@ -150,7 +166,7 @@ export const SelectionHandler = (
     if (store.getAnnotation(currentTarget.annotation)) {
       store.updateTarget(currentTarget, Origin.LOCAL);
     }
-  });
+  }, 10);
 
   /**
    * Select events don't carry information about the mouse button
@@ -244,18 +260,20 @@ export const SelectionHandler = (
 
     if (sel?.isCollapsed) return;
 
-    // When selecting the initial word, Chrome Android fires `contextmenu` 
+    // When selecting the initial word, Chrome Android fires `contextmenu`
     // before selectionChanged.
     if (!currentTarget || currentTarget.selector.length === 0) {
       onSelectionChange(evt);
     }
-    
+
     upsertCurrentTarget();
 
     selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));
   }
 
   const onKeyup = (evt: KeyboardEvent) => {
+    if (!currentAnnotatingEnabled) return;
+
     if (evt.key === 'Shift' && currentTarget) {
       const sel = document.getSelection();
 
@@ -281,7 +299,7 @@ export const SelectionHandler = (
 
         selection.userSelect(currentTarget.annotation, cloneKeyboardEvent(evt));
       }
-      
+
       document.removeEventListener('selectionchange', onSelected);
 
       // Sigh... this needs a delay to work. But doesn't seem reliable.
@@ -289,7 +307,7 @@ export const SelectionHandler = (
 
     // Listen to the change event that follows
     document.addEventListener('selectionchange', onSelected);
-    
+
     // Start selection!
     onSelectStart(evt);
   }
@@ -330,13 +348,17 @@ export const SelectionHandler = (
   document.addEventListener('pointerup', onPointerUp);
   document.addEventListener('contextmenu', onContextMenu);
 
-  if (annotatingEnabled) {
-    container.addEventListener('keyup', onKeyup);
-    container.addEventListener('selectstart', onSelectStart);
-    document.addEventListener('selectionchange', onSelectionChange);
-  }
+  container.addEventListener('keyup', onKeyup);
+  container.addEventListener('selectstart', onSelectStart);
+  document.addEventListener('selectionchange', onSelectionChange);
 
   const destroy = () => {
+    currentTarget = undefined;
+    lastDownEvent = undefined;
+    isContextMenuOpen = false;
+
+    onSelectionChange.clear();
+
     container.removeEventListener('pointerdown', onPointerDown);
     document.removeEventListener('pointerup', onPointerUp);
     document.removeEventListener('contextmenu', onContextMenu);
@@ -351,7 +373,8 @@ export const SelectionHandler = (
   return {
     destroy,
     setFilter,
-    setUser
+    setUser,
+    setAnnotatingEnabled
   }
 
 }

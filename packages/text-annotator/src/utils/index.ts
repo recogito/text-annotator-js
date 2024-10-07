@@ -1,7 +1,6 @@
 export * from './cancelSingleClickEvents';
 export * from './device';
 export * from './programmaticallyFocusable';
-export * from './debounce';
 export * from './getAnnotatableFragment';
 export * from './getQuoteContext';
 export * from './isWhitespaceOrEmpty';
