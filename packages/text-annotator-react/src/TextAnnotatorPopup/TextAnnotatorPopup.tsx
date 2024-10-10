@@ -53,12 +53,12 @@ export const TextAnnotatorPopup: FC<TextAnnotationPopupProps> = (props) => {
   const [isOpen, setOpen] = useState(selected?.length > 0);
   const handleClose = () => r?.cancelSelected();
 
-  const [isFloatingFocused, setFloatingFocused] = useState(false);
-  const handleFloatingFocus = () => setFloatingFocused(true);
-  const handleFloatingBlur = () => setFloatingFocused(false);
+  const [isFocused, setFocused] = useState(false);
+  const handleFocus = useCallback(() => setFocused(true), []);
+  const handleBlur = useCallback(() => setFocused(false), []);
   useEffect(() => {
-    if (!isOpen) handleFloatingBlur();
-  }, [isOpen, handleFloatingBlur]);
+    if (!isOpen) handleBlur();
+  }, [isOpen, handleBlur]);
 
   const { refs, floatingStyles, update, context } = useFloating({
     placement: isMobile() ? 'bottom' : 'top',
@@ -143,7 +143,7 @@ export const TextAnnotatorPopup: FC<TextAnnotationPopupProps> = (props) => {
    * because the focus isn't shifted to the popup automatically then
    */
   useAnnouncePopupNavigation({
-    disabled: isFloatingFocused,
+    disabled: isFocused,
     floatingOpen: isOpen,
     message: ariaNavigationMessage,
   });
@@ -160,8 +160,8 @@ export const TextAnnotatorPopup: FC<TextAnnotationPopupProps> = (props) => {
           className="a9s-popup r6o-popup annotation-popup r6o-text-popup not-annotatable"
           ref={refs.setFloating}
           style={floatingStyles}
-          onFocus={handleFloatingFocus}
-          onBlur={handleFloatingBlur}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           {...getFloatingProps()}
           {...getStopEventsPropagationProps()}>
           {popup({
