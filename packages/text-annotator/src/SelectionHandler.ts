@@ -149,6 +149,9 @@ export const SelectionHandler = (
      */
     if (store.getAnnotation(currentTarget.annotation)) {
       store.updateTarget(currentTarget, Origin.LOCAL);
+    } else {
+      // Proper lifecycle management: clear the previous selection first...
+      selection.clear();
     }
   });
 
