@@ -209,7 +209,7 @@ export const SelectionHandler = (
         if (selected.length !== 1 || selected[0].id !== hovered.id) {
           selection.userSelect(hovered.id, evt);
         }
-      } else if (!selection.isEmpty()) {
+      } else {
         selection.clear();
       }
     };
