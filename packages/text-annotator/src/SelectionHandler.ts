@@ -149,6 +149,9 @@ export const SelectionHandler = (
      */
     if (store.getAnnotation(currentTarget.annotation)) {
       store.updateTarget(currentTarget, Origin.LOCAL);
+    } else {
+      // Proper lifecycle management: clear the previous selection first...
+      selection.clear();
     }
   });
 
@@ -206,7 +209,7 @@ export const SelectionHandler = (
         if (selected.length !== 1 || selected[0].id !== hovered.id) {
           selection.userSelect(hovered.id, evt);
         }
-      } else if (!selection.isEmpty()) {
+      } else {
         selection.clear();
       }
     };
