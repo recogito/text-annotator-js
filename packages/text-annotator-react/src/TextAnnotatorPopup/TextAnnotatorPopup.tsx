@@ -49,9 +49,10 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
   const { refs, floatingStyles, update, context } = useFloating({
     placement: isMobile() ? 'bottom' : 'top',
     open: isOpen,
-    onOpenChange: (open, _event, reason) => {
-      if (!open && (reason === 'escape-key' || reason === 'focus-out')) {
-        setOpen(open);
+    onOpenChange: (open) => {
+      setOpen(open);
+
+      if (!open) {
         r?.cancelSelected();
       }
     },
