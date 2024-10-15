@@ -80,7 +80,7 @@ export const SelectionHandler = (
     // This is to handle cases where the selection is "hijacked" by another element
     // in a not-annotatable area. A rare case in theory. But rich text editors
     // will like Quill do it...
-    if (isNotAnnotatable(sel.anchorNode)) {
+    if (!sel?.isCollapsed && isNotAnnotatable(sel.anchorNode)) {
       currentTarget = undefined;
       return;
     }
