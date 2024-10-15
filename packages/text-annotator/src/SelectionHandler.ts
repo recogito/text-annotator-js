@@ -256,7 +256,7 @@ export const SelectionHandler = (
     const stopPollingInMs = 50;
     setTimeout(() => stopPolling = true, stopPollingInMs);
 
-    await poll(() => isCollapsed = sel?.isCollapsed, pollingDelayMs, shouldStopPolling);
+    return poll(() => isCollapsed = sel?.isCollapsed, pollingDelayMs, shouldStopPolling);
   }
 
   const onContextMenu = (evt: PointerEvent) => {
