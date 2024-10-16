@@ -55,7 +55,7 @@ export const SelectionHandler = (
 
   const onSelectStart = (evt: Event) => {
     isContextMenuOpen = false;
-    
+
     if (isLeftClick === false)
       return;
 
@@ -250,7 +250,7 @@ export const SelectionHandler = (
     let isCollapsed = sel?.isCollapsed;
     const shouldStopPolling = () => isCollapsed || stopPolling;
 
-    const pollingDelayMs = 2;
+    const pollingDelayMs = 1;
     const stopPollingInMs = 50;
     setTimeout(() => stopPolling = true, stopPollingInMs);
 
@@ -264,12 +264,12 @@ export const SelectionHandler = (
 
     if (sel?.isCollapsed) return;
 
-    // When selecting the initial word, Chrome Android fires `contextmenu` 
+    // When selecting the initial word, Chrome Android fires `contextmenu`
     // before selectionChanged.
     if (!currentTarget || currentTarget.selector.length === 0) {
       onSelectionChange(evt);
     }
-    
+
     upsertCurrentTarget();
 
     selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));
@@ -301,7 +301,7 @@ export const SelectionHandler = (
 
         selection.userSelect(currentTarget.annotation, cloneKeyboardEvent(evt));
       }
-      
+
       document.removeEventListener('selectionchange', onSelected);
 
       // Sigh... this needs a delay to work. But doesn't seem reliable.
@@ -309,7 +309,7 @@ export const SelectionHandler = (
 
     // Listen to the change event that follows
     document.addEventListener('selectionchange', onSelected);
-    
+
     // Start selection!
     onSelectStart(evt);
   }
