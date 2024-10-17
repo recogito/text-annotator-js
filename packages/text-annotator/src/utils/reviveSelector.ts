@@ -1,5 +1,5 @@
 import type { TextSelector } from '../model';
-import { NOT_ANNOTATABLE_SELECTOR } from './splitAnnotatableRanges';
+import { NOT_ANNOTATABLE_SELECTOR } from './isNotAnnotatable';
 
 /**
  * Creates a new selector object with the revived DOM range from the given text annotation position

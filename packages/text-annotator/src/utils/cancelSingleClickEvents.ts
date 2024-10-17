@@ -1,4 +1,4 @@
-import { NOT_ANNOTATABLE_SELECTOR } from './splitAnnotatableRanges';
+import { NOT_ANNOTATABLE_SELECTOR } from './isNotAnnotatable';
 
 /**
  * Calls .preventDefault() on click events in annotable areas, in order
