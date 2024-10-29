@@ -28,8 +28,8 @@ export const textAnnotation: W3CTextAnnotation = {
         },
         {
           type: 'TextPositionSelector',
-          start: 986,
-          end: 998
+          start: 958,
+          end: 970
         },
       ]
     }
