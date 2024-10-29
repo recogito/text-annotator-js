@@ -1,6 +1,5 @@
 import { PointerEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
-import { useAnnotator, useSelection } from '@annotorious/react';
-import { isRevived, TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
+
 import { isMobile } from './isMobile';
 import {
   autoUpdate,
@@ -15,6 +14,15 @@ import {
   useInteractions,
   useRole
 } from '@floating-ui/react';
+
+import { useAnnotator, useSelection } from '@annotorious/react';
+import {
+  isRevived,
+  denormalizeRectWithOffset,
+  toDomRectList,
+  type TextAnnotation,
+  type TextAnnotator,
+} from '@recogito/text-annotator';
 
 import './TextAnnotatorPopup.css';
 
@@ -72,27 +80,34 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
 
   useEffect(() => {
     const annotationSelector = annotation?.target.selector;
-    if (!annotationSelector) return;
+      if (!annotationSelector) return;
 
     setOpen(isRevived(annotationSelector));
   }, [annotation]);
 
   useEffect(() => {
-    if (isOpen && annotation) {
-      const {
-        target: {
-          selector: [{ range }]
-        }
-      } = annotation;
+    if (!r) return;
 
+    if (isOpen && annotation?.id) {
       refs.setPositionReference({
-        getBoundingClientRect: () => range.getBoundingClientRect(),
-        getClientRects: () => range.getClientRects()
+        getBoundingClientRect: () => {
+          const bounds = r.state.store.getAnnotationBounds(annotation.id);
+          return bounds
+            ? denormalizeRectWithOffset(bounds, r.element.getBoundingClientRect())
+            : new DOMRect();
+        },
+        getClientRects: () => {
+          const rects = r.state.store.getAnnotationRects(annotation.id);
+          const denormalizedRects = rects.map((rect) =>
+            denormalizeRectWithOffset(rect, r.element.getBoundingClientRect())
+          );
+          return toDomRectList(denormalizedRects);
+        }
       });
     } else {
       refs.setPositionReference(null);
     }
-  }, [isOpen, annotation, refs]);
+  }, [isOpen, annotation?.id, annotation?.target, r]);
 
   useEffect(() => {
     const config: MutationObserverInit = { attributes: true, childList: true, subtree: true };
