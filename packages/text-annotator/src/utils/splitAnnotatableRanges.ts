@@ -1,13 +1,4 @@
-export const NOT_ANNOTATABLE_CLASS = 'not-annotatable';
-
-export const NOT_ANNOTATABLE_SELECTOR = `.${NOT_ANNOTATABLE_CLASS}`;
-
-const isRangeAnnotatable = (range: Range): boolean => {
-  const ancestor = range.commonAncestorContainer;
-  return ancestor instanceof HTMLElement
-    ? !ancestor.closest(NOT_ANNOTATABLE_SELECTOR)
-    : !ancestor.parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
-}
+import { isRangeAnnotatable, NOT_ANNOTATABLE_CLASS, NOT_ANNOTATABLE_SELECTOR } from './isNotAnnotatable';
 
 const iterateNotAnnotatableElements = function*(range: Range): Generator<HTMLElement> {
   const notAnnotatableIterator = document.createNodeIterator(
