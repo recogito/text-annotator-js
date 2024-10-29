@@ -90,14 +90,16 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
 
     if (isOpen && annotation?.id) {
       refs.setPositionReference({
-        getBoundingClientRect: () => denormalizeRectWithOffset(
-          r.state.store.getAnnotationBounds(annotation.id),
-          r.element.getBoundingClientRect()
-        ),
+        getBoundingClientRect: () => {
+          const bounds = r.state.store.getAnnotationBounds(annotation.id);
+          return bounds
+            ? denormalizeRectWithOffset(bounds, r.element.getBoundingClientRect())
+            : new DOMRect();
+        },
         getClientRects: () => {
           const rects = r.state.store.getAnnotationRects(annotation.id);
-          const denormalizedRects = rects.map(
-            rect => denormalizeRectWithOffset(rect, r.element.getBoundingClientRect())
+          const denormalizedRects = rects.map((rect) =>
+            denormalizeRectWithOffset(rect, r.element.getBoundingClientRect())
           );
           return toDomRectList(denormalizedRects);
         }
