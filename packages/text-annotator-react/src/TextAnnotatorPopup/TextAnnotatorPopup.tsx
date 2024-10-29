@@ -155,10 +155,11 @@ export const TextAnnotatorPopup: FC<TextAnnotationPopupProps> = (props) => {
           className="a9s-popup r6o-popup annotation-popup r6o-text-popup not-annotatable"
           ref={refs.setFloating}
           style={floatingStyles}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          {...getFloatingProps()}
-          {...getStopEventsPropagationProps()}>
+          {...getFloatingProps({
+            onFocus: handleFocus,
+            onBlur: handleBlur,
+            ...getStopEventsPropagationProps()
+          })}>
           {popup({
             annotation: selected[0].annotation,
             editable: selected[0].editable,
