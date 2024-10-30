@@ -149,7 +149,7 @@ export const createSpatialTree = <T extends TextAnnotation>(store: Store<T>, con
 
   const getAnnotationRects = (id: string): DOMRect[] => {
     const indexed = index.get(id);
-    if (indexed) {
+    if (indexed[0]) {
       // Reminder: *each* IndexedHighlightRect stores *all*
       // DOMRects for the annotation for convenience
       return indexed[0].annotation.rects;
