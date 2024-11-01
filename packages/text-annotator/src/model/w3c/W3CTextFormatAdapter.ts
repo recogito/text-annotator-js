@@ -64,7 +64,11 @@ const parseW3CTextTargets = (annotation: W3CTextAnnotation) => {
     }, {});
 
     if (isTextSelector(selector)) {
-      parsed.selector.push({ id: w3cTarget.id, ...selector });
+      parsed.selector.push({
+        ...selector,
+        id: w3cTarget.id,
+        scope: w3cTarget.scope
+      });
     } else {
       const missingTypes = [
         !selector.start ? 'TextPositionSelector' : undefined,
@@ -123,7 +127,7 @@ export const serializeW3CTextAnnotation = (
   } = target;
 
   const w3cTargets = selector.map((s) => {
-    const { quote, start, end, range } = s;
+    const { id, scope, quote, start, end, range } = s;
 
     const { prefix, suffix } = getQuoteContext(range, container);
 
@@ -140,7 +144,8 @@ export const serializeW3CTextAnnotation = (
 
     return {
       ...targetRest,
-      id: s.id,
+      id,
+      scope,
       source,
       selector: w3cSelectors
     };
