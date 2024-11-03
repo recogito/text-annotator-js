@@ -28,7 +28,6 @@
   "devDependencies": {
     "@types/jsdom": "^21.1.7",
     "@types/rbush": "^4.0.0",
-    "@types/uuid": "^10.0.0",
     "jsdom": "^25.0.1",
     "typescript": "5.6.3",
     "vite": "^5.4.10",
