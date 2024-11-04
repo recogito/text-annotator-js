@@ -344,8 +344,8 @@ export const createSelectionHandler = (
 
   const destroy = () => {
     currentTarget = undefined;
+    isLeftClick = undefined;
     lastDownEvent = undefined;
-    isContextMenuOpen = false;
 
     onSelectionChange.clear();
 
