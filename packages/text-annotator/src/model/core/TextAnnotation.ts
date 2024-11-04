@@ -10,8 +10,6 @@ export interface TextAnnotationTarget extends AnnotationTarget {
 
   selector: TextSelector[];
 
-  styleClass?: string;
-
 }
 
 export interface TextSelector {
