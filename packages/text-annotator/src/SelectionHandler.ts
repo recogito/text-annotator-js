@@ -50,11 +50,7 @@ export const SelectionHandler = (
 
   let lastDownEvent: Selection['event'] | undefined;
 
-  let isContextMenuOpen = false;
-
   const onSelectStart = (evt: Event) => {
-    isContextMenuOpen = false;
-    
     if (isLeftClick === false)
       return;
 
@@ -176,8 +172,6 @@ export const SelectionHandler = (
    * to the initial pointerdown event and remember the button
    */
   const onPointerDown = (evt: PointerEvent) => {
-    if (isContextMenuOpen) return;
-
     if (isNotAnnotatable(evt.target as Node)) return;
 
     /**
@@ -203,8 +197,6 @@ export const SelectionHandler = (
   }
 
   const onPointerUp = (evt: PointerEvent) => {
-    if (isContextMenuOpen) return;
-
     if (isNotAnnotatable(evt.target as Node) || !isLeftClick) return;
 
     // Logic for selecting an existing annotation
@@ -254,8 +246,6 @@ export const SelectionHandler = (
   }
 
   const onContextMenu = (evt: PointerEvent) => {
-    isContextMenuOpen = true;
-
     const sel = document.getSelection();
 
     if (sel?.isCollapsed) return;
@@ -297,7 +287,7 @@ export const SelectionHandler = (
 
         selection.userSelect(currentTarget.annotation, cloneKeyboardEvent(evt));
       }
-      
+
       document.removeEventListener('selectionchange', onSelected);
 
       // Sigh... this needs a delay to work. But doesn't seem reliable.
@@ -305,7 +295,7 @@ export const SelectionHandler = (
 
     // Listen to the change event that follows
     document.addEventListener('selectionchange', onSelected);
-    
+
     // Start selection!
     onSelectStart(evt);
   }
