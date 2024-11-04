@@ -13,7 +13,7 @@ import {
   isMac,
   isWhitespaceOrEmpty,
   trimRangeToContainer,
-  NOT_ANNOTATABLE_SELECTOR
+  isNotAnnotatable
 } from './utils';
 
 const CLICK_TIMEOUT = 300;
@@ -64,13 +64,14 @@ export const SelectionHandler = (
      * be annotatable (like a component popup).
      * Note that Chrome/iOS will sometimes return the root doc as target!
      */
-    const annotatable = !(evt.target as Node).parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
-    currentTarget = annotatable ? {
-      annotation: uuidv4(),
-      selector: [],
-      creator: currentUser,
-      created: new Date()
-    } : undefined;
+    currentTarget = isNotAnnotatable(evt.target as Node)
+      ? undefined
+      : {
+        annotation: uuidv4(),
+        selector: [],
+        creator: currentUser,
+        created: new Date()
+      };
   };
 
   const onSelectionChange = debounce((evt: Event) => {
@@ -79,8 +80,7 @@ export const SelectionHandler = (
     // This is to handle cases where the selection is "hijacked" by another element
     // in a not-annotatable area. A rare case in theory. But rich text editors
     // will like Quill do it...
-    const annotatable = !sel.anchorNode?.parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
-    if (!annotatable) {
+    if (isNotAnnotatable(sel.anchorNode)) {
       currentTarget = undefined;
       return;
     }
@@ -149,6 +149,9 @@ export const SelectionHandler = (
      */
     if (store.getAnnotation(currentTarget.annotation)) {
       store.updateTarget(currentTarget, Origin.LOCAL);
+    } else {
+      // Proper lifecycle management: clear the previous selection first...
+      selection.clear();
     }
   });
 
@@ -160,8 +163,7 @@ export const SelectionHandler = (
   const onPointerDown = (evt: PointerEvent) => {
     if (isContextMenuOpen) return;
 
-    const annotatable = !(evt.target as Node).parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
-    if (!annotatable) return;
+    if (isNotAnnotatable(evt.target as Node)) return;
 
     /**
      * Cloning the event to prevent it from accidentally being `undefined`
@@ -188,8 +190,7 @@ export const SelectionHandler = (
   const onPointerUp = (evt: PointerEvent) => {
     if (isContextMenuOpen) return;
 
-    const annotatable = !(evt.target as Node).parentElement?.closest(NOT_ANNOTATABLE_SELECTOR);
-    if (!annotatable || !isLeftClick) return;
+    if (isNotAnnotatable(evt.target as Node) || !isLeftClick) return;
 
     // Logic for selecting an existing annotation
     const clickSelect = () => {
@@ -206,7 +207,7 @@ export const SelectionHandler = (
         if (selected.length !== 1 || selected[0].id !== hovered.id) {
           selection.userSelect(hovered.id, evt);
         }
-      } else if (!selection.isEmpty()) {
+      } else {
         selection.clear();
       }
     };
