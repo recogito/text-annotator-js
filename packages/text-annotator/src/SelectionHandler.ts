@@ -44,6 +44,8 @@ export const SelectionHandler = (
 
   const { store, selection } = state;
 
+  let isIdling: boolean | undefined;
+
   let currentTarget: TextAnnotationTarget | undefined;
 
   let isLeftClick: boolean | undefined;
@@ -51,31 +53,38 @@ export const SelectionHandler = (
   let lastDownEvent: Selection['event'] | undefined;
 
   const onSelectStart = (evt: Event) => {
-    if (isLeftClick === false)
-      return;
+    if (isLeftClick === false) return;
 
     /**
-     * Make sure we don't listen to selection changes that were
-     * not started on the container, or which are not supposed to
+     * Make sure to not listen to selection changes that weren't
+     * started on the container, or which aren't supposed to
      * be annotatable (like a component popup).
-     * Note that Chrome/iOS will sometimes return the root doc as target!
+     * Note that Chrome/iOS will sometimes return the root doc as a target!
      */
-    currentTarget = isNotAnnotatable(evt.target as Node)
-      ? undefined
-      : {
-        annotation: uuidv4(),
-        selector: [],
-        creator: currentUser,
-        created: new Date()
-      };
+    if (isNotAnnotatable(evt.target as Node)) {
+      currentTarget = undefined;
+      return;
+    }
+
+    isIdling = false;
+
+    currentTarget = {
+      annotation: uuidv4(),
+      creator: currentUser,
+      created: new Date(),
+      selector: []
+    };
   };
 
   const onSelectionChange = debounce((evt: Event) => {
     const sel = document.getSelection();
 
-    // This is to handle cases where the selection is "hijacked" by another element
-    // in a not-annotatable area. A rare case in theory. But rich text editors
-    // will like Quill do it...
+    /**
+     * This is to handle cases where the selection is "hijacked"
+     * by another element in a not-annotatable area.
+     * A rare case in theory.
+     * But rich text editors will, like the Quill does it.
+     */
     if (isNotAnnotatable(sel.anchorNode)) {
       currentTarget = undefined;
       return;
@@ -133,6 +142,8 @@ export const SelectionHandler = (
 
     if (!hasChanged) return;
 
+    isIdling = false;
+
     currentTarget = {
       ...currentTarget,
       selector: annotatableRanges.map(r => rangeToSelector(r, container, offsetReferenceSelector)),
@@ -140,8 +151,8 @@ export const SelectionHandler = (
     };
 
     /**
-     * During mouse selection on the desktop, annotation won't usually exist while the selection is being edited.
-     * But it will be typical during keyboard or mobile handlebars selection!
+     * During mouse selection on the desktop, the annotation won't usually exist while the selection is being edited.
+     * But it'll be typical during keyboard or mobile handlebars' selection.
      */
     if (store.getAnnotation(currentTarget.annotation)) {
       store.updateTarget(currentTarget, Origin.LOCAL);
@@ -152,7 +163,7 @@ export const SelectionHandler = (
   });
 
   /**
-   * Select events don't carry information about the mouse button
+   * Select events don't carry information about the mouse button.
    * Therefore, to prevent right-click selection, we need to listen
    * to the initial pointerdown event and remember the button
    */
@@ -224,15 +235,17 @@ export const SelectionHandler = (
         clickSelect();
       } else if (currentTarget && currentTarget.selector.length > 0) {
         selection.clear();
+
         upsertCurrentTarget();
         selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));
       }
+
+      isIdling = true;
     });
   }
 
   const onContextMenu = (evt: PointerEvent) => {
     const sel = document.getSelection();
-
     if (sel?.isCollapsed) return;
 
     // When selecting the initial word, Chrome Android fires `contextmenu` 
@@ -242,8 +255,9 @@ export const SelectionHandler = (
     }
     
     upsertCurrentTarget();
-
     selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));
+
+    isIdling = true;
   }
 
   const onKeyup = (evt: KeyboardEvent) => {
@@ -252,8 +266,11 @@ export const SelectionHandler = (
 
       if (!sel.isCollapsed) {
         selection.clear();
+
         upsertCurrentTarget();
         selection.userSelect(currentTarget.annotation, cloneKeyboardEvent(evt));
+
+        isIdling = true;
       }
     }
   }
@@ -275,7 +292,9 @@ export const SelectionHandler = (
 
       document.removeEventListener('selectionchange', onSelected);
 
-      // Sigh... this needs a delay to work. But doesn't seem reliable.
+      isIdling = true;
+
+      // This needs a delay to work. But doesn't seem reliable.
     }, 100);
 
     // Listen to the change event that follows
@@ -300,8 +319,8 @@ export const SelectionHandler = (
    *
    * It should be handled only on:
    * - the annotatable `container`, where the text is.
-   * - the `body`, where the focus goes when user closes the popup,
-   *   or clicks the button that gets unmounted, e.g. "Close"
+   * - the `body`, where the focus goes when the user closes the popup,
+   *   or clicks the button that gets unmounted, for example, "Close"
    */
   const handleArrowKeyPress = (evt: KeyboardEvent) => {
     if (
@@ -311,7 +330,9 @@ export const SelectionHandler = (
       return;
     }
 
+    isIdling = true;
     currentTarget = undefined;
+
     selection.clear();
   };
 
@@ -328,6 +349,11 @@ export const SelectionHandler = (
   }
 
   const destroy = () => {
+    isIdling = undefined;
+    currentTarget = undefined;
+    lastDownEvent = undefined;
+    isLeftClick = undefined;
+
     container.removeEventListener('pointerdown', onPointerDown);
     document.removeEventListener('pointerup', onPointerUp);
     document.removeEventListener('contextmenu', onContextMenu);
