@@ -14,6 +14,8 @@ export interface W3CTextAnnotationTarget extends W3CAnnotationTarget {
 
   styleClass?: string;
 
+  scope?: string;
+
 }
 
 /**
