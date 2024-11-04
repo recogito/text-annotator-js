@@ -153,7 +153,7 @@ export const serializeW3CTextAnnotation = (
     return {
       ...targetRest,
       id,
-      // @ts-expect-error: `scope` is not part of the core `TextAnnotationTarget` type
+      // @ts-expect-error: `scope` is not part of the core `TextSelector` type
       scope: 'scope' in s ? s.scope : undefined,
       source,
       selector: w3cSelectors
