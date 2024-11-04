@@ -1,10 +1,11 @@
 import { rangeToSelector, reviveTarget as reviveTextOffsetTarget } from '@recogito/text-annotator';
+import type { TEIAnnotation, TEIAnnotationTarget, TEIRangeSelector } from '../TEIAnnotation';
+import { reanchor } from './utils';
 import type { 
   TextAnnotation, 
   TextAnnotationTarget, 
   TextSelector
 } from '@recogito/text-annotator';
-import type { TEIAnnotation, TEIAnnotationTarget, TEIRangeSelector } from '../TEIAnnotation';
 
 /**
  * Helper: Returns the given XPath for a DOM node, in the form of 
@@ -145,8 +146,21 @@ export const reviveTarget = (t: TextAnnotationTarget, container: HTMLElement) =>
     const [endNode, endOffset] = evaluateSelector(endExpression);
 
     const range = document.createRange();
-    range.setStart(startNode.firstChild, startOffset);
-    range.setEnd(endNode.firstChild, endOffset);
+
+    // Helper
+    const reanchorIfNeeded = (parent: Node, offset: number) => {
+      if (parent.firstChild.toString().length >= offset) {
+        return { node: parent.firstChild, offset };
+      } else {
+        return reanchor(parent.firstChild, parent, offset);
+      } 
+    }
+
+    const reanchoredStart = reanchorIfNeeded(startNode, startOffset);
+    const reanchoredEnd = reanchorIfNeeded(endNode, endOffset);
+
+    range.setStart(reanchoredStart.node, reanchoredStart.offset);
+    range.setEnd(reanchoredEnd.node, reanchoredEnd.offset);
 
     const textSelector = rangeToSelector(range, container);
 
