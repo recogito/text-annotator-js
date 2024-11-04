@@ -1,6 +1,6 @@
 import { PointerEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useAnnotator, useSelection } from '@annotorious/react';
-import { isRevived, TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
+import { isRevived, NOT_ANNOTATABLE_CLASS, TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
 import { isMobile } from './isMobile';
 import {
   autoUpdate,
@@ -128,7 +128,7 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
         returnFocus={false}
         initialFocus={initialFocus}>
         <div
-          className="a9s-popup r6o-popup annotation-popup r6o-text-popup not-annotatable"
+          className={`a9s-popup r6o-popup annotation-popup r6o-text-popup ${NOT_ANNOTATABLE_CLASS}`}
           ref={refs.setFloating}
           style={floatingStyles}
           {...getFloatingProps()}
