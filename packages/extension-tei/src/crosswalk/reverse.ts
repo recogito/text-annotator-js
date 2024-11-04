@@ -1,5 +1,6 @@
 import type { TextAnnotation, TextAnnotationTarget } from '@recogito/text-annotator';
 import type { TEIAnnotation, TEIAnnotationTarget, TEIRangeSelector } from '../TEIAnnotation';
+import { reanchor } from './utils';
 
 /**
  * Helper: converts the given XPath string and DOM container element
@@ -24,35 +25,8 @@ const xpathToDOMPosition = (path: string, container: Element) => {
 
   const offset = parseInt(path.substring(offsetIdx + 2));
 
-  const reanchor = (originalNode: Node, originalOffset: number) => {
-    let node = originalNode;
-
-    let offset = originalOffset;
-
-    const it = document.createNodeIterator(parentNode, NodeFilter.SHOW_TEXT);
-
-    let currentNode = it.nextNode();
-
-    let run = true;
-
-    do {
-      if (currentNode instanceof Text) {
-        if (currentNode.length < offset) {
-          offset -= currentNode.length;
-        } else {
-          node = currentNode;
-          run = false;
-        }
-      }
-
-      currentNode = it.nextNode();
-    } while (currentNode && run);
-
-    return { node, offset };
-  };
-
   if (!(node instanceof Text) || offset > node.length) {
-    return reanchor(node, offset);
+    return reanchor(node, parentNode, offset);
   } else {
     return { node, offset };
   }
