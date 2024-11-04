@@ -62,7 +62,7 @@
       window.onload = async function () {
         var CETEIcean = new CETEI();
 
-        CETEIcean.getHTML5('macbeth.xml', data => {
+        CETEIcean.getHTML5('paradise-lost.xml', data => {
           document.getElementById('content').appendChild(data);
 
           var anno = TEIPlugin(createTextAnnotator(document.getElementById('content')));

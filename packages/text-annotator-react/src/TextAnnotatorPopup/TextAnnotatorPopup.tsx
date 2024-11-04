@@ -1,5 +1,8 @@
 import { FC, PointerEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
-import { isMobile } from './isMobile';
+
+import { useAnnotator, useSelection } from '@annotorious/react';
+import { isRevived, type TextAnnotation, type TextAnnotator } from '@recogito/text-annotator';
+
 import {
   autoUpdate,
   flip,
@@ -14,9 +17,7 @@ import {
   useRole
 } from '@floating-ui/react';
 
-import { useAnnotator, useSelection } from '@annotorious/react';
-import { isRevived, type TextAnnotation, type TextAnnotator } from '@recogito/text-annotator';
-
+import { isMobile } from './isMobile';
 import { useAnnouncePopupNavigation } from '../hooks';
 import './TextAnnotatorPopup.css';
 
@@ -86,9 +87,7 @@ export const TextAnnotatorPopup: FC<TextAnnotationPopupProps> = (props) => {
 
   useEffect(() => {
     const annotationSelector = annotation?.target.selector;
-      if (!annotationSelector) return;
-
-    setOpen(isRevived(annotationSelector));
+    setOpen(annotationSelector?.length > 0 ? isRevived(annotationSelector) : false);
   }, [annotation]);
 
   useEffect(() => {
