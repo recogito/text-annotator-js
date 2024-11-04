@@ -1,72 +1,40 @@
 [{
-  "id": "5430edac-706b-4943-9b87-fd6e8f281b39",
-  "bodies": [],
+  "id": "uid-5be9c1d9-a92f-47b9-aa95-acdc05cd6268",
+  "layer_id": "tei_standoff",
   "target": {
-    "annotation": "5430edac-706b-4943-9b87-fd6e8f281b39",
-    "selector": [{
-      "startSelector": {
-        "type": "XPathSelector",
-        "value": "//castItem[@xml:id='WITCHES_Mac']::13"
+      "annotation": "uid-5be9c1d9-a92f-47b9-aa95-acdc05cd6268",
+      "creator": {
+          "id": "uid-af5d65e0-a46f-4eb9-80f6-11ba5e907485",
+          "name": "\n            Professor\n          "
       },
-      "endSelector": {
-        "type": "XPathSelector",
-        "value": "//castItem[@xml:id='Ross_Mac']/role[1]/name[1]::4"
+      "created": "2024-10-30T17:48:12.149Z",
+      "updatedBy": {
+          "id": "uid-af5d65e0-a46f-4eb9-80f6-11ba5e907485",
+          "name": "\n            Professor\n          "
+      },
+      "updated": "2024-10-30T17:48:08.235Z",
+      "selector": [
+          {
+              "startSelector": {
+                  "type": "XPathSelector",
+                  "value": "//text[@xml:id='text-1']/body[1]/div[1]/p[4]/hi[1]::0"
+              },
+              "endSelector": {
+                  "type": "XPathSelector",
+                  "value": "//text[@xml:id='text-1']/body[1]/div[1]/p[4]::383"
+              }
+          }
+      ]
+  },
+  "bodies": [
+      {
+          "id": "479229dc-fc78-4a6d-8179-0ab58ffe89be",
+          "annotation": "uid-5be9c1d9-a92f-47b9-aa95-acdc05cd6268",
+          "value": "Very cool comment",
+          "creator": {
+              "id": "uid-af5d65e0-a46f-4eb9-80f6-11ba5e907485",
+              "name": "\n            Professor\n          "
+          }
       }
-    }],
-    "creator": {
-      "isGuest": true,
-      "id": "DwQPXeG3uLHfsSLnvTV8"
-    },
-    "created": "2023-09-21T05:47:51.594Z"
-  }
-}, {
-  "id": "fa049492-020b-4eaf-ba93-3d595e9d624f",
-  "bodies": [],
-  "target": {
-    "annotation": "fa049492-020b-4eaf-ba93-3d595e9d624f",
-    "selector": [{
-      "start": 6464,
-      "startSelector": {
-        "type": "XPathSelector",
-        "value": "//w[@xml:id='fs-mac-0000010']::0"
-      },
-      "end": 6828,
-      "endSelector": {
-        "type": "XPathSelector",
-        "value": "//pc[@xml:id='fs-mac-0000190']::1"
-      },
-      "quote": "ACT 1 Scene 1 Thunder and Lightning . Enter three Witches .",
-      "range": {}
-    }],
-    "creator": {
-      "isGuest": true,
-      "id": "jzgy0s50ZDZBGakEHfTU"
-    },
-    "created": "2023-09-21T05:29:04.847Z"
-  }
-},{
-  "id": "091078e1-4073-4efc-a82a-bee79774dbf0",
-  "bodies": [],
-  "target": {
-    "annotation": "091078e1-4073-4efc-a82a-bee79774dbf0",
-    "selector": [{
-      "start": 3671,
-      "startSelector": {
-        "type": "XPathSelector",
-        "value": "//castItem[@xml:id='Malcolm_Mac']/role[1]/name[1]::4"
-      },
-      "end": 4578,
-      "endSelector": {
-        "type": "XPathSelector",
-        "value": "//castItem[@xml:id='Banquo_Mac']/roleDesc[1]::39"
-      },
-      "quote": "olm his elder son Donalbain Duncan’s younger son Macbeth thane of Glamis Lady Macbeth Seyton attendant to Macbeth Three Murderers in Macbeth’s service both attending upon Lady Macbeth A Doctor A Gentlewoman A Porter Banquo commander, with Macbeth, of Duncan’s ar",
-      "range": {}
-    }],
-    "creator": {
-      "isGuest": true,
-      "id": "2G7YULxo_qVPC2wCYxfW"
-    },
-    "created": "2023-09-21T05:47:24.687Z"
-  }
+  ]
 }]
