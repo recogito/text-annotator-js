@@ -65,19 +65,9 @@ export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotati
 
     // Initial page load might take some time. Retry for more robustness.
     const couldNotRevive = revived.filter(a => !isRevived(a.target.selector));
-    if (couldNotRevive.length > 0) {
-      console.warn('Could not revive all targets for these annotations:', couldNotRevive);
+    store.bulkAddAnnotation(revived, replace, origin);
 
-      // Note: we want to keep ALL annotations in the store, even those that
-      // were not revived - even if the highlighter won't be able to render
-      // the un-revived ones to the screen.
-      store.bulkAddAnnotation(revived, replace, origin);
-
-      return couldNotRevive;
-    } else {
-      store.bulkAddAnnotation(revived, replace, origin);
-      return [];
-    }
+    return couldNotRevive;
   }
   
   const bulkUpsertAnnotations = (
@@ -88,9 +78,7 @@ export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotati
 
     // Initial page load might take some time. Retry for more robustness.
     const couldNotRevive = revived.filter(a => !isRevived(a.target.selector));
-    if (couldNotRevive.length > 0)
-      console.warn('Could not revive all targets for these annotations:', couldNotRevive);
-
+    
     revived.forEach(a => {
       if (store.getAnnotation(a.id))
         store.updateAnnotation(a, origin);
