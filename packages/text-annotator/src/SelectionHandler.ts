@@ -73,9 +73,12 @@ export const SelectionHandler = (
   const onSelectionChange = debounce((evt: Event) => {
     const sel = document.getSelection();
 
-    // This is to handle cases where the selection is "hijacked" by another element
-    // in a not-annotatable area. A rare case in theory. But rich text editors
-    // will like Quill do it...
+    /**
+     * This is to handle cases where the selection is "hijacked"
+     * by another element in a not-annotatable area.
+     * A rare case in theory.
+     * But rich text editors will like Quill do it.
+     */
     if (isNotAnnotatable(sel.anchorNode)) {
       currentTarget = undefined;
       return;
@@ -130,7 +133,6 @@ export const SelectionHandler = (
     const hasChanged =
       annotatableRanges.length !== currentTarget.selector.length ||
       annotatableRanges.some((r, i) => r.toString() !== currentTarget.selector[i]?.quote);
-
     if (!hasChanged) return;
 
     currentTarget = {
@@ -140,8 +142,8 @@ export const SelectionHandler = (
     };
 
     /**
-     * During mouse selection on the desktop, annotation won't usually exist while the selection is being edited.
-     * But it will be typical during keyboard or mobile handlebars selection!
+     * During mouse selection on the desktop, the annotation won't usually exist while the selection is being edited.
+     * But it'll be typical during selection via the keyboard or mobile's handlebars.
      */
     if (store.getAnnotation(currentTarget.annotation)) {
       store.updateTarget(currentTarget, Origin.LOCAL);
@@ -152,7 +154,7 @@ export const SelectionHandler = (
   });
 
   /**
-   * Select events don't carry information about the mouse button
+   * Select events don't carry information about the mouse button.
    * Therefore, to prevent right-click selection, we need to listen
    * to the initial pointerdown event and remember the button
    */
