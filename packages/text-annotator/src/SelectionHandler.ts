@@ -169,20 +169,6 @@ export const SelectionHandler = (
     isLeftClick = lastDownEvent.button === 0;
   };
 
-  // Helper
-  const upsertCurrentTarget = () => {
-    const exists = store.getAnnotation(currentTarget.annotation);
-    if (exists) {
-      store.updateTarget(currentTarget);
-    } else {
-      store.addAnnotation({
-        id: currentTarget.annotation,
-        bodies: [],
-        target: currentTarget
-      });
-    }
-  }
-
   const onPointerUp = (evt: PointerEvent) => {
     if (isNotAnnotatable(evt.target as Node) || !isLeftClick) return;
 
@@ -318,6 +304,29 @@ export const SelectionHandler = (
   };
 
   hotkeys(ARROW_KEYS.join(','), { keydown: true, keyup: false }, handleArrowKeyPress);
+
+  // Helper
+  const upsertCurrentTarget = () => {
+    const existingAnnotation = store.getAnnotation(currentTarget.annotation);
+    if (!existingAnnotation) {
+      store.addAnnotation({
+        id: currentTarget.annotation,
+        bodies: [],
+        target: currentTarget
+      });
+      return;
+    }
+
+    const { target: { updated: existingTargetUpdated } } = existingAnnotation;
+    const { updated: currentTargetUpdated } = currentTarget;
+    if (
+      !existingAnnotation ||
+      !currentTargetUpdated ||
+      existingTargetUpdated < currentTargetUpdated
+    ) {
+      store.updateTarget(currentTarget);
+    }
+  };
 
   container.addEventListener('pointerdown', onPointerDown);
   document.addEventListener('pointerup', onPointerUp);
