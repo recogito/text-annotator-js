@@ -1,7 +1,8 @@
 import { PointerEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+
 import { useAnnotator, useSelection } from '@annotorious/react';
 import { isRevived, NOT_ANNOTATABLE_CLASS, TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
-import { isMobile } from './isMobile';
+
 import {
   autoUpdate,
   flip,
@@ -16,6 +17,8 @@ import {
   useRole
 } from '@floating-ui/react';
 
+import { useAnnotationTargetIdling } from '../hooks';
+import { isMobile } from './isMobile';
 import './TextAnnotatorPopup.css';
 
 interface TextAnnotationPopupProps {
@@ -41,8 +44,9 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
   const r = useAnnotator<TextAnnotator>();
 
   const { selected, event } = useSelection<TextAnnotation>();
-
   const annotation = selected[0]?.annotation;
+
+  const isAnnotationIdling = useAnnotationTargetIdling(annotation?.id);
 
   const [isOpen, setOpen] = useState(selected?.length > 0);
 
@@ -72,8 +76,8 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
 
   useEffect(() => {
     const annotationSelector = annotation?.target.selector;
-    setOpen(annotationSelector?.length > 0 ? isRevived(annotationSelector) : false);
-  }, [annotation]);
+    setOpen(isAnnotationIdling && annotationSelector?.length > 0 ? isRevived(annotationSelector) : false);
+  }, [annotation?.target?.selector, isAnnotationIdling]);
 
   useEffect(() => {
     if (isOpen && annotation) {
@@ -147,4 +151,4 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
     </FloatingPortal>
   ) : null;
 
-}
+};
