@@ -69,7 +69,7 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
       offset(10),
       flip({ crossAxis: true }),
       shift({ crossAxis: true, padding: 10 }),
-      arrow(() => ({ element: arrowRef }), [props.arrow])
+      arrow({ element: arrowRef })
     ],
     whileElementsMounted: autoUpdate
   });
