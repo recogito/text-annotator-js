@@ -1,8 +1,7 @@
-import { PointerEvent, ReactNode, useEffect, useMemo, useState } from 'react';
-
+import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { useAnnotator, useSelection } from '@annotorious/react';
 import { isRevived, NOT_ANNOTATABLE_CLASS, TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
-
+import { isMobile } from './isMobile';
 import {
   autoUpdate,
   flip,
@@ -16,8 +15,6 @@ import {
   useInteractions,
   useRole
 } from '@floating-ui/react';
-
-import { isMobile } from './isMobile';
 
 import './TextAnnotatorPopup.css';
 
@@ -150,8 +147,8 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
  * triggered from the popup/toolbar/dialog
  */
 const getStopEventsPropagationProps = <T extends HTMLElement = HTMLElement>() => ({
-  onPointerUp: (event: PointerEvent<T>) => event.stopPropagation(),
-  onPointerDown: (event: PointerEvent<T>) => event.stopPropagation(),
-  onMouseDown: (event: MouseEvent<T>) => event.stopPropagation(),
-  onMouseUp: (event: MouseEvent<T>) => event.stopPropagation()
+  onPointerUp: (event: React.PointerEvent<T>) => event.stopPropagation(),
+  onPointerDown: (event: React.PointerEvent<T>) => event.stopPropagation(),
+  onMouseDown: (event: React.MouseEvent<T>) => event.stopPropagation(),
+  onMouseUp: (event: React.MouseEvent<T>) => event.stopPropagation()
 });
