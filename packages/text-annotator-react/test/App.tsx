@@ -190,6 +190,10 @@ export const App: FC = () => {
       </TextAnnotator>
 
       <TextAnnotatorPopup
+        arrow
+        arrowProps={{
+          fill: '#000000'
+        }}
         popup={
           props => (<TestPopup {...props} />)
         }

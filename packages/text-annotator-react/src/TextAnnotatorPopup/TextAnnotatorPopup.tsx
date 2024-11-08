@@ -1,10 +1,13 @@
-import { ReactNode, useEffect, useMemo, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { useAnnotator, useSelection } from '@annotorious/react';
 import { isRevived, NOT_ANNOTATABLE_CLASS, TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
 import { isMobile } from './isMobile';
 import {
+  arrow,
   autoUpdate,
   flip,
+  FloatingArrow,
+  FloatingArrowProps,
   FloatingFocusManager,
   FloatingPortal,
   inline,
@@ -21,6 +24,10 @@ import './TextAnnotatorPopup.css';
 interface TextAnnotationPopupProps {
 
   ariaCloseWarning?: string;
+
+  arrow?: boolean;
+
+  arrowProps?: Omit<FloatingArrowProps, 'context' | 'ref'>;
 
   popup(props: TextAnnotationPopupContentProps): ReactNode;
 
@@ -46,6 +53,22 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
 
   const [isOpen, setOpen] = useState(selected?.length > 0);
 
+  const arrowRef = useRef(null);
+
+  // Conditional floating-ui middleware
+  const middleware = useMemo(() => {
+    const m = [
+      inline(),
+      offset(10),
+      flip({ crossAxis: true }),
+      shift({ crossAxis: true, padding: 10 })
+    ];
+
+    return props.arrow 
+      ? [...m, arrow({ element: arrowRef }) ] 
+      : m;
+  }, [props.arrow]);
+
   const { refs, floatingStyles, update, context } = useFloating({
     placement: isMobile() ? 'bottom' : 'top',
     open: isOpen,
@@ -55,12 +78,7 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
         r?.cancelSelected();
       }
     },
-    middleware: [
-      offset(10),
-      inline(),
-      flip(),
-      shift({ mainAxis: false, crossAxis: true, padding: 10 })
-    ],
+    middleware,
     whileElementsMounted: autoUpdate
   });
 
@@ -131,6 +149,13 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
             editable: selected[0].editable,
             event
           })}
+
+          {props.arrow && (
+            <FloatingArrow 
+              ref={arrowRef}
+              context={context} 
+              {...(props.arrowProps || {})} />
+          )}
 
           <button className="r6o-popup-sr-only" aria-live="assertive" onClick={onClose}>
             {props.ariaCloseWarning || 'Click or leave this dialog to close it.'}
