@@ -1,7 +1,8 @@
-import { PointerEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import { PointerEvent, ReactNode, useEffect, useMemo, useState } from 'react';
+
 import { useAnnotator, useSelection } from '@annotorious/react';
-import { isRevived, TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
-import { isMobile } from './isMobile';
+import { isRevived, NOT_ANNOTATABLE_CLASS, TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
+
 import {
   autoUpdate,
   flip,
@@ -15,6 +16,8 @@ import {
   useInteractions,
   useRole
 } from '@floating-ui/react';
+
+import { isMobile } from './isMobile';
 
 import './TextAnnotatorPopup.css';
 
@@ -106,12 +109,6 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
     };
   }, [update]);
 
-  // Prevent text-annotator from handling the irrelevant events triggered from the popup
-  const getStopEventsPropagationProps = useCallback(
-    () => ({ onPointerUp: (event: PointerEvent<HTMLDivElement>) => event.stopPropagation() }),
-    []
-  );
-
   // Don't shift focus to the floating element if selected via keyboard or on mobile.
   const initialFocus = useMemo(() => {
     return (event?.type === 'keyup' || event?.type === 'contextmenu' || isMobile()) ? -1 : 0;
@@ -128,11 +125,10 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
         returnFocus={false}
         initialFocus={initialFocus}>
         <div
-          className="a9s-popup r6o-popup annotation-popup r6o-text-popup not-annotatable"
+          className={`a9s-popup r6o-popup annotation-popup r6o-text-popup ${NOT_ANNOTATABLE_CLASS}`}
           ref={refs.setFloating}
           style={floatingStyles}
-          {...getFloatingProps()}
-          {...getStopEventsPropagationProps()}>
+          {...getFloatingProps(getStopEventsPropagationProps())}>
           {props.popup({
             annotation: selected[0].annotation,
             editable: selected[0].editable,
@@ -148,3 +144,14 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
   ) : null;
 
 }
+
+/**
+ * Prevent text-annotator from handling the irrelevant events
+ * triggered from the popup/toolbar/dialog
+ */
+const getStopEventsPropagationProps = <T extends HTMLElement = HTMLElement>() => ({
+  onPointerUp: (event: PointerEvent<T>) => event.stopPropagation(),
+  onPointerDown: (event: PointerEvent<T>) => event.stopPropagation(),
+  onMouseDown: (event: MouseEvent<T>) => event.stopPropagation(),
+  onMouseUp: (event: MouseEvent<T>) => event.stopPropagation()
+});
