@@ -320,7 +320,7 @@ export const SelectionHandler = (
     const { target: { updated: existingTargetUpdated } } = existingAnnotation;
     const { updated: currentTargetUpdated } = currentTarget;
     if (
-      !existingAnnotation ||
+      !existingTargetUpdated ||
       !currentTargetUpdated ||
       existingTargetUpdated < currentTargetUpdated
     ) {
