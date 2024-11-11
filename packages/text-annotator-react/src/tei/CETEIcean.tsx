@@ -71,7 +71,11 @@ export const CETEIcean = (props: CETEIceanProps) => {
         props.onLoad(el.current);
       });
     }
-  }, [props.tei]);
+
+    return () => {
+      el.current.innerHTML = '';
+    }
+  }, [props.tei, props.onLoad]);
 
   return (
     <div 
