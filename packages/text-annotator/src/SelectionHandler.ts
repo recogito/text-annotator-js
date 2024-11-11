@@ -219,7 +219,6 @@ export const SelectionHandler = (
         currentTarget = undefined;
         clickSelect();
       } else if (currentTarget && currentTarget.selector.length > 0) {
-        selection.clear();
         upsertCurrentTarget();
         selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));
       }
@@ -247,7 +246,6 @@ export const SelectionHandler = (
       const sel = document.getSelection();
 
       if (!sel.isCollapsed) {
-        selection.clear();
         upsertCurrentTarget();
         selection.userSelect(currentTarget.annotation, cloneKeyboardEvent(evt));
       }
