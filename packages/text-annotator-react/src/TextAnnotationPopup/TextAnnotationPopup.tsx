@@ -1,4 +1,4 @@
-import { FC, PointerEvent, ReactNode, useCallback, useRef, useEffect, useMemo, useState } from 'react';
+import { FC, ReactNode, useCallback, useRef, useEffect, useMemo, useState } from 'react';
 
 import { useAnnotator, useSelection } from '@annotorious/react';
 import { isRevived, NOT_ANNOTATABLE_CLASS, type TextAnnotation, type TextAnnotator } from '@recogito/text-annotator';
