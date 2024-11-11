@@ -65,7 +65,7 @@ export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorS
   const onPointerMove = (event: PointerEvent) => {
     const {x, y} = container.getBoundingClientRect();
 
-    const hit = store.getAt(event.clientX - x, event.clientY - y, currentFilter);
+    const hit = store.getAt(event.clientX - x, event.clientY - y, false, currentFilter);
     if (hit) {
       if (hover.current !== hit.id) {
         container.classList.add('hovered');
