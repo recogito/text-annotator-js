@@ -17,7 +17,9 @@ export interface TextAnnotationStore<T extends TextAnnotation = TextAnnotation> 
 
   getAnnotationRects(id: string): DOMRect[];
 
-  getAt(x: number, y: number, filter?: Filter): T | undefined;
+  getAt(x: number, y: number, all: true, filter?: Filter): T[] | undefined;
+  getAt(x: number, y: number, all: false, filter?: Filter): T | undefined;
+  getAt(x: number, y: number, all?: boolean, filter?: Filter): T | T[] | undefined;
 
   getIntersecting(minX: number, minY: number, maxX: number, maxY: number): AnnotationRects<T>[];
 
