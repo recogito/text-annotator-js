@@ -19,7 +19,7 @@ import {
   useRole
 } from '@floating-ui/react';
 
-import './TextAnnotatorPopup.css';
+import './TextAnnotationPopup.css';
 
 interface TextAnnotationPopupProps {
 
@@ -39,11 +39,11 @@ export interface TextAnnotationPopupContentProps {
 
   editable?: boolean;
 
-  event?: PointerEvent;
+  event?: PointerEvent | KeyboardEvent;
 
 }
 
-export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
+export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
 
   const r = useAnnotator<TextAnnotator>();
 
@@ -169,3 +169,14 @@ const getStopEventsPropagationProps = <T extends HTMLElement = HTMLElement>() =>
   onMouseDown: (event: React.MouseEvent<T>) => event.stopPropagation(),
   onMouseUp: (event: React.MouseEvent<T>) => event.stopPropagation()
 });
+
+/** For backwards compatibility **/
+/** @deprecated Use TextAnnotationPopup instead */
+export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
+
+  useEffect(() => {
+    console.warn('TextAnnotatorPopup is deprecated and will be removed in a future version. Please use TextAnnotationPopup instead.');
+  }, []);
+
+  return <TextAnnotationPopup {...props} />;
+};

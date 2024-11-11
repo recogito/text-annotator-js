@@ -1,6 +1,6 @@
 import React, { FC, useCallback, useEffect } from 'react';
 import { AnnotationBody, Annotorious, useAnnotationStore, useAnnotator } from '@annotorious/react';
-import { TextAnnotationPopupContentProps, TextAnnotator, TextAnnotatorPopup } from '../src';
+import { TextAnnotationPopup, TextAnnotationPopupContentProps, TextAnnotator } from '../src';
 import { W3CTextFormat, type TextAnnotation, type TextAnnotator as RecogitoTextAnnotator } from '@recogito/text-annotator';
 
 const TestPopup: FC<TextAnnotationPopupContentProps> = (props) => {
@@ -67,7 +67,8 @@ export const App: FC = () => {
 
   return (
     <Annotorious>
-      <TextAnnotator adapter={w3cAdapter}>
+      <TextAnnotator
+        adapter={w3cAdapter}>
         <p>
           Tell me, O muse, of that ingenious hero who travelled far and wide
           after he had sacked the famous town of Troy. Many cities did he
@@ -189,7 +190,7 @@ export const App: FC = () => {
         </p>
       </TextAnnotator>
 
-      <TextAnnotatorPopup
+      <TextAnnotationPopup
         arrow
         arrowProps={{
           fill: '#000000'
