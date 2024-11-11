@@ -17,7 +17,7 @@ export interface TextAnnotatorOptions<I extends TextAnnotation = TextAnnotation,
 
   presence?: PresencePainterOptions;
 
-  selectionMode?: 'shortest' | 'all';
+  selectionMode?: 'single' | 'all';
 
   style?: HighlightStyleExpression;
 
