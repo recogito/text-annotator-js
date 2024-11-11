@@ -1,11 +1,14 @@
-import { PointerEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useAnnotator, useSelection } from '@annotorious/react';
 import { isRevived, NOT_ANNOTATABLE_CLASS, TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
 
 import {
+  arrow,
   autoUpdate,
   flip,
+  FloatingArrow,
+  FloatingArrowProps,
   FloatingFocusManager,
   FloatingPortal,
   inline,
@@ -19,11 +22,15 @@ import {
 
 import { useAnnotationTargetIdling } from '../hooks';
 import { isMobile } from './isMobile';
-import './TextAnnotatorPopup.css';
+import './TextAnnotationPopup.css';
 
 interface TextAnnotationPopupProps {
 
   ariaCloseWarning?: string;
+
+  arrow?: boolean;
+
+  arrowProps?: Omit<FloatingArrowProps, 'context' | 'ref'>;
 
   popup(props: TextAnnotationPopupContentProps): ReactNode;
 
@@ -35,11 +42,11 @@ export interface TextAnnotationPopupContentProps {
 
   editable?: boolean;
 
-  event?: PointerEvent;
+  event?: PointerEvent | KeyboardEvent;
 
 }
 
-export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
+export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
 
   const r = useAnnotator<TextAnnotator>();
 
@@ -50,6 +57,22 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
 
   const [isOpen, setOpen] = useState(selected?.length > 0);
 
+  const arrowRef = useRef(null);
+
+  // Conditional floating-ui middleware
+  const middleware = useMemo(() => {
+    const m = [
+      inline(),
+      offset(10),
+      flip({ crossAxis: true }),
+      shift({ crossAxis: true, padding: 10 })
+    ];
+
+    return props.arrow
+      ? [...m, arrow({ element: arrowRef }) ]
+      : m;
+  }, [props.arrow]);
+
   const { refs, floatingStyles, update, context } = useFloating({
     placement: isMobile() ? 'bottom' : 'top',
     open: isOpen,
@@ -59,12 +82,7 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
         r?.cancelSelected();
       }
     },
-    middleware: [
-      offset(10),
-      inline(),
-      flip(),
-      shift({ mainAxis: false, crossAxis: true, padding: 10 })
-    ],
+    middleware,
     whileElementsMounted: autoUpdate
   });
 
@@ -110,12 +128,6 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
     };
   }, [update]);
 
-  // Prevent text-annotator from handling the irrelevant events triggered from the popup
-  const getStopEventsPropagationProps = useCallback(
-    () => ({ onPointerUp: (event: PointerEvent<HTMLDivElement>) => event.stopPropagation() }),
-    []
-  );
-
   // Don't shift focus to the floating element if selected via keyboard or on mobile.
   const initialFocus = useMemo(() => {
     return (event?.type === 'keyup' || event?.type === 'contextmenu' || isMobile()) ? -1 : 0;
@@ -135,13 +147,19 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
           className={`a9s-popup r6o-popup annotation-popup r6o-text-popup ${NOT_ANNOTATABLE_CLASS}`}
           ref={refs.setFloating}
           style={floatingStyles}
-          {...getFloatingProps()}
-          {...getStopEventsPropagationProps()}>
+          {...getFloatingProps(getStopEventsPropagationProps())}>
           {props.popup({
             annotation: selected[0].annotation,
             editable: selected[0].editable,
             event
           })}
+
+          {props.arrow && (
+            <FloatingArrow
+              ref={arrowRef}
+              context={context}
+              {...(props.arrowProps || {})} />
+          )}
 
           <button className="r6o-popup-sr-only" aria-live="assertive" onClick={onClose}>
             {props.ariaCloseWarning || 'Click or leave this dialog to close it.'}
@@ -151,4 +169,26 @@ export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
     </FloatingPortal>
   ) : null;
 
+};
+
+/**
+ * Prevent text-annotator from handling the irrelevant events
+ * triggered from the popup/toolbar/dialog
+ */
+const getStopEventsPropagationProps = <T extends HTMLElement = HTMLElement>() => ({
+  onPointerUp: (event: React.PointerEvent<T>) => event.stopPropagation(),
+  onPointerDown: (event: React.PointerEvent<T>) => event.stopPropagation(),
+  onMouseDown: (event: React.MouseEvent<T>) => event.stopPropagation(),
+  onMouseUp: (event: React.MouseEvent<T>) => event.stopPropagation()
+});
+
+/** For backwards compatibility **/
+/** @deprecated Use TextAnnotationPopup instead */
+export const TextAnnotatorPopup = (props: TextAnnotationPopupProps) => {
+
+  useEffect(() => {
+    console.warn('TextAnnotatorPopup is deprecated and will be removed in a future version. Please use TextAnnotationPopup instead.');
+  }, []);
+
+  return <TextAnnotationPopup {...props} />;
 };
