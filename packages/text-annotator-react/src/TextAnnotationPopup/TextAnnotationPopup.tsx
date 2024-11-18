@@ -20,7 +20,7 @@ import {
   useRole
 } from '@floating-ui/react';
 
-import { useAnnotationTargetIdling } from '../hooks';
+import { useAnnotationQuoteIdling } from '../hooks';
 import { isMobile } from './isMobile';
 import './TextAnnotationPopup.css';
 
@@ -53,7 +53,7 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
   const { selected, event } = useSelection<TextAnnotation>();
   const annotation = selected[0]?.annotation;
 
-  const isAnnotationIdling = useAnnotationTargetIdling(annotation?.id);
+  const isAnnotationQuoteIdling = useAnnotationQuoteIdling(annotation?.id);
 
   const [isOpen, setOpen] = useState(selected?.length > 0);
 
@@ -94,8 +94,8 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
 
   useEffect(() => {
     const annotationSelector = annotation?.target.selector;
-    setOpen(isAnnotationIdling && annotationSelector?.length > 0 ? isRevived(annotationSelector) : false);
-  }, [annotation?.target?.selector, isAnnotationIdling]);
+    setOpen(isAnnotationQuoteIdling && annotationSelector?.length > 0 ? isRevived(annotationSelector) : false);
+  }, [annotation?.target?.selector, isAnnotationQuoteIdling]);
 
   useEffect(() => {
     if (isOpen && annotation) {

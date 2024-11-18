@@ -1,1 +1,1 @@
-export { useAnnotationTargetIdling } from './useAnnotationTargetIdling';
+export { useAnnotationQuoteIdling } from './useAnnotationQuoteIdling';
