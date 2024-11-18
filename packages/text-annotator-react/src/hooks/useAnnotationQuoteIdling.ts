@@ -30,7 +30,11 @@ export const useAnnotationQuoteIdling = (
           newTarget: { selector: newSelector }
         } = targetUpdated;
 
+        // The generic type support in the `Update` was added in https://github.com/annotorious/annotorious/pull/476
+
+        // @ts-expect-error: requires generic `TextSelector` type support
         const oldQuotes = oldSelector.map(({ quote }) => quote);
+        // @ts-expect-error: requires generic `TextSelector` type support
         const newQuotes = newSelector.map(({ quote }) => quote);
 
         return dequal(oldQuotes, newQuotes);
