@@ -1,7 +1,6 @@
 import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { useAnnotator, useSelection } from '@annotorious/react';
 import {
-  isRevived,
   NOT_ANNOTATABLE_CLASS,
   denormalizeRectWithOffset,
   toDomRectList,
@@ -97,9 +96,13 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
   const { getFloatingProps } = useInteractions([dismiss, role]);
 
   useEffect(() => {
-    const annotationSelector = annotation?.target.selector;
-      setOpen(annotationSelector?.length > 0 ? isRevived(annotationSelector) : false);
-  }, [annotation]);
+    if (annotation?.id) {
+      const bounds = r?.state.store.getAnnotationBounds(annotation.id);
+      setOpen(Boolean(bounds));
+    } else {
+      setOpen(false);
+    }
+  }, [annotation?.id, r?.state.store]);
 
   useEffect(() => {
     if (!r) return;
