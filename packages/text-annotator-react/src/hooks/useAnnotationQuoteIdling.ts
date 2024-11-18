@@ -3,7 +3,7 @@ import { dequal } from 'dequal/lite';
 
 import { Origin, useAnnotationStore } from '@annotorious/react';
 import { Ignore, type StoreChangeEvent } from '@annotorious/core';
-import type { TextAnnotation, TextAnnotationStore } from '@recogito/text-annotator';
+import type { TextAnnotation, TextAnnotationStore, TextAnnotationTarget } from '@recogito/text-annotator';
 
 export const useAnnotationQuoteIdling = (
   annotationId: string | undefined,
@@ -23,29 +23,21 @@ export const useAnnotationQuoteIdling = (
 
       const hasChanged = updated?.some((update) => {
         const { targetUpdated } = update;
-        if (!targetUpdated) return false;
+        if (targetUpdated) {
+          const { oldTarget, newTarget } = targetUpdated;
 
-        const {
-          oldTarget: { selector: oldSelector },
-          newTarget: { selector: newSelector }
-        } = targetUpdated;
-
-        // The generic type support in the `Update` was added in https://github.com/annotorious/annotorious/pull/476
-
-        // @ts-expect-error: requires generic `TextSelector` type support
-        const oldQuotes = oldSelector.map(({ quote }) => quote);
-        // @ts-expect-error: requires generic `TextSelector` type support
-        const newQuotes = newSelector.map(({ quote }) => quote);
-
-        return dequal(oldQuotes, newQuotes);
+          // The generic type support in the `Update` was added in https://github.com/annotorious/annotorious/pull/476
+          // @ts-expect-error: requires generic `TextAnnotationTarget` type support
+          return hasTargetQuoteChanged(oldTarget, newTarget);
+        }
       });
 
-      if (!hasChanged) return;
+      if (hasChanged) {
+        setIdling(false);
 
-      setIdling(false);
-
-      clearTimeout(idlingTimeout);
-      idlingTimeout = setTimeout(() => setIdling(true), options.timeout);
+        clearTimeout(idlingTimeout);
+        idlingTimeout = setTimeout(() => setIdling(true), options.timeout);
+      }
     };
 
     store.observe(scheduleSetIdling, {
@@ -61,4 +53,14 @@ export const useAnnotationQuoteIdling = (
   }, [store, annotationId, options.timeout]);
 
   return isIdling;
+};
+
+const hasTargetQuoteChanged = (oldValue: TextAnnotationTarget, newValue: TextAnnotationTarget) => {
+  const { selector: oldSelector } = oldValue;
+  const oldQuotes = oldSelector.map(({ quote }) => quote);
+
+  const { selector: newSelector } = newValue;
+  const newQuotes = newSelector.map(({ quote }) => quote);
+
+  return !dequal(oldQuotes, newQuotes);
 };
