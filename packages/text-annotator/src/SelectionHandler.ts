@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import hotkeys from 'hotkeys-js';
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotation, TextAnnotationTarget } from './model';
+import type { TextAnnotatorOptions } from './TextAnnotatorOptions';
 import {
   clonePointerEvent,
   cloneKeyboardEvent,
@@ -15,7 +16,6 @@ import {
   trimRangeToContainer,
   isNotAnnotatable
 } from './utils';
-import type { TextAnnotatorOptions } from './TextAnnotatorOptions';
 
 const CLICK_TIMEOUT = 300;
 
