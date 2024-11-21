@@ -188,17 +188,18 @@ export const App: FC = () => {
           to pity him except Neptune, who still persecuted him without ceasing
           and would not let him get home.
         </p>
-      </TextAnnotator>
 
-      <TextAnnotationPopup
-        arrow
-        arrowProps={{
-          fill: '#000000'
-        }}
-        popup={
-          props => (<TestPopup {...props} />)
-        }
-      />
+        <TextAnnotationPopup
+          arrow
+          arrowProps={{
+            fill: '#000000'
+          }}
+          popup={
+            props => (<TestPopup {...props} />)
+          }
+        />
+
+      </TextAnnotator>
 
       <MockStorage />
     </Annotorious>
