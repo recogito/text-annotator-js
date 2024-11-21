@@ -2,6 +2,8 @@ import { Origin } from '@annotorious/core';
 import type { Filter, Selection, User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import hotkeys from 'hotkeys-js';
+import { poll } from 'poll';
+
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotation, TextAnnotationTarget } from './model';
 import type { TextAnnotatorOptions } from './TextAnnotatorOptions';
@@ -184,7 +186,7 @@ export const SelectionHandler = (
     isLeftClick = lastDownEvent.button === 0;
   };
 
-  const onPointerUp = (evt: PointerEvent) => {
+  const onPointerUp = async (evt: PointerEvent) => {
     if (isNotAnnotatable(evt.target as Node) || !isLeftClick) return;
 
     // Logic for selecting an existing annotation
@@ -213,29 +215,48 @@ export const SelectionHandler = (
       }
     };
 
+
     const timeDifference = evt.timeStamp - lastDownEvent.timeStamp;
+    if (timeDifference < CLICK_TIMEOUT) {
+      await pollSelectionCollapsed();
 
-    /**
-     * We must check the `isCollapsed` within the 0-timeout
-     * to handle the annotation dismissal after a click properly.
-     *
-     * Otherwise, the `isCollapsed` will return an obsolete `false` value,
-     * click won't be processed, and the annotation will get falsely re-selected.
-     *
-     * @see https://github.com/recogito/text-annotator-js/issues/136
-     */
-    setTimeout(() => {
       const sel = document.getSelection();
-
-      // Just a click, not a selection
-      if (sel?.isCollapsed && timeDifference < CLICK_TIMEOUT) {
+      if (sel?.isCollapsed) {
         currentTarget = undefined;
         clickSelect();
-      } else if (currentTarget && currentTarget.selector.length > 0) {
-        upsertCurrentTarget();
-        selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));
+        return;
       }
-    });
+    }
+
+    if (currentTarget && currentTarget.selector.length > 0) {
+
+      upsertCurrentTarget();
+      selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));
+    }
+  }
+
+  /**
+   * We must check the `isCollapsed` after an unspecified timeout
+   * to handle the annotation dismissal after a click properly.
+   *
+   * Otherwise, the `isCollapsed` will return an obsolete `false` value,
+   * click won't be processed, and the annotation will get falsely re-selected.
+   *
+   * @see https://github.com/recogito/text-annotator-js/issues/136#issue-2465915707
+   * @see https://github.com/recogito/text-annotator-js/issues/136#issuecomment-2413773804
+   */
+  const pollSelectionCollapsed = async () => {
+    const sel = document.getSelection();
+
+    let stopPolling = false;
+    let isCollapsed = sel?.isCollapsed;
+    const shouldStopPolling = () => isCollapsed || stopPolling;
+
+    const pollingDelayMs = 1;
+    const stopPollingInMs = 50;
+    setTimeout(() => stopPolling = true, stopPollingInMs);
+
+    return poll(() => isCollapsed = sel?.isCollapsed, pollingDelayMs, shouldStopPolling);
   }
 
   const onContextMenu = (evt: PointerEvent) => {
@@ -243,12 +264,12 @@ export const SelectionHandler = (
 
     if (sel?.isCollapsed) return;
 
-    // When selecting the initial word, Chrome Android fires `contextmenu` 
+    // When selecting the initial word, Chrome Android fires `contextmenu`
     // before selectionChanged.
     if (!currentTarget || currentTarget.selector.length === 0) {
       onSelectionChange(evt);
     }
-    
+
     upsertCurrentTarget();
 
     selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));
