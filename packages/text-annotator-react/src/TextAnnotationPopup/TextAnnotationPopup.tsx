@@ -1,6 +1,12 @@
 import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { useAnnotator, useSelection } from '@annotorious/react';
-import { isRevived, NOT_ANNOTATABLE_CLASS, TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
+import {
+  NOT_ANNOTATABLE_CLASS,
+  toDomRectList,
+  type TextAnnotation,
+  type TextAnnotator,
+} from '@recogito/text-annotator';
+
 import { isMobile } from './isMobile';
 import {
   arrow,
@@ -43,6 +49,12 @@ export interface TextAnnotationPopupContentProps {
 
 }
 
+const toViewportBounds = (annotationBounds: DOMRect, container: HTMLElement): DOMRect => {
+  const { left, top, right, bottom } = annotationBounds;
+  const containerBounds = container.getBoundingClientRect();
+  return new DOMRect(left + containerBounds.left, top + containerBounds.top, right - left, bottom - top);
+}
+
 export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
 
   const r = useAnnotator<TextAnnotator>();
@@ -55,20 +67,6 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
 
   const arrowRef = useRef(null);
 
-  // Conditional floating-ui middleware
-  const middleware = useMemo(() => {
-    const m = [
-      inline(),
-      offset(10),
-      flip({ crossAxis: true }),
-      shift({ crossAxis: true, padding: 10 })
-    ];
-
-    return props.arrow 
-      ? [...m, arrow({ element: arrowRef }) ] 
-      : m;
-  }, [props.arrow]);
-
   const { refs, floatingStyles, update, context } = useFloating({
     placement: isMobile() ? 'bottom' : 'top',
     open: isOpen,
@@ -78,7 +76,13 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
         r?.cancelSelected();
       }
     },
-    middleware,
+    middleware: [
+      inline(),
+      offset(10),
+      flip({ crossAxis: true }),
+      shift({ crossAxis: true, padding: 10 }),
+      arrow({ element: arrowRef })
+    ],
     whileElementsMounted: autoUpdate
   });
 
@@ -89,26 +93,36 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
   const { getFloatingProps } = useInteractions([dismiss, role]);
 
   useEffect(() => {
-    const annotationSelector = annotation?.target.selector;
-    setOpen(annotationSelector?.length > 0 ? isRevived(annotationSelector) : false);
-  }, [annotation]);
+    if (annotation?.id) {
+      const bounds = r?.state.store.getAnnotationBounds(annotation.id);
+      setOpen(Boolean(bounds));
+    } else {
+      setOpen(false);
+    }
+  }, [annotation?.id, r?.state.store]);
 
   useEffect(() => {
-    if (isOpen && annotation) {
-      const {
-        target: {
-          selector: [{ range }]
-        }
-      } = annotation;
+    if (!r) return;
 
+    if (isOpen && annotation?.id) {
       refs.setPositionReference({
-        getBoundingClientRect: () => range.getBoundingClientRect(),
-        getClientRects: () => range.getClientRects()
+        getBoundingClientRect: () => {
+          // Annotation bounds are relative to the document element
+          const bounds = r.state.store.getAnnotationBounds(annotation.id);
+          return bounds
+            ? toViewportBounds(bounds, r.element)
+            : new DOMRect();
+        },
+        getClientRects: () => {
+          const rects = r.state.store.getAnnotationRects(annotation.id);
+          const viewportRects = rects.map(rect => toViewportBounds(rect, r.element));
+          return toDomRectList(viewportRects);
+        }
       });
     } else {
       refs.setPositionReference(null);
     }
-  }, [isOpen, annotation, refs]);
+  }, [isOpen, annotation?.id, annotation?.target, r]);
 
   useEffect(() => {
     const config: MutationObserverInit = { attributes: true, childList: true, subtree: true };
@@ -151,9 +165,9 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
           })}
 
           {props.arrow && (
-            <FloatingArrow 
+            <FloatingArrow
               ref={arrowRef}
-              context={context} 
+              context={context}
               {...(props.arrowProps || {})} />
           )}
 

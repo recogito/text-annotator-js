@@ -78,6 +78,19 @@ export const SelectionHandler = (
     const sel = document.getSelection();
 
     /**
+     * In iOS when a user clicks on a button, the `selectionchange` event is fired.
+     * However, the generated selection is empty and the `anchorNode` is `null`.
+     * That doesn't give us information about whether the selection is in the annotatable area
+     * or whether the previously selected text was dismissed.
+     * Therefore - we should bail out from such a range processing.
+     *
+     * @see https://github.com/recogito/text-annotator-js/pull/164#issuecomment-2416961473
+     */
+    if (!sel?.anchorNode) {
+      return;
+    }
+
+    /**
      * This is to handle cases where the selection is "hijacked"
      * by another element in a not-annotatable area.
      * A rare case in theory.
@@ -216,7 +229,7 @@ export const SelectionHandler = (
     }
 
     if (currentTarget && currentTarget.selector.length > 0) {
-      selection.clear();
+
       upsertCurrentTarget();
       selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));
     }
@@ -267,7 +280,6 @@ export const SelectionHandler = (
       const sel = document.getSelection();
 
       if (!sel.isCollapsed) {
-        selection.clear();
         upsertCurrentTarget();
         selection.userSelect(currentTarget.annotation, cloneKeyboardEvent(evt));
       }
