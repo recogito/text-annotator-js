@@ -62,8 +62,6 @@ const toViewportBounds = (annotationBounds: DOMRect, container: HTMLElement): DO
 
 export const TextAnnotationPopup: FC<TextAnnotationPopupProps> = (props) => {
 
-  const { popup, ariaNavigationMessage } = props;
-
   const r = useAnnotator<TextAnnotator>();
 
   const { selected, event } = useSelection<TextAnnotation>();
@@ -165,7 +163,7 @@ export const TextAnnotationPopup: FC<TextAnnotationPopupProps> = (props) => {
   useAnnouncePopupNavigation({
     disabled: isFocused,
     floatingOpen: isOpen,
-    message: ariaNavigationMessage,
+    message: props.ariaNavigationMessage,
   });
 
   return isOpen && annotation ? (
@@ -185,12 +183,12 @@ export const TextAnnotationPopup: FC<TextAnnotationPopupProps> = (props) => {
             onBlur: handleBlur,
             ...getStopEventsPropagationProps()
           })}>
-          {popup({
+          {props.popup({
             annotation: selected[0].annotation,
             editable: selected[0].editable,
             event
           })}
-{props.arrow && (
+          {props.arrow && (
             <FloatingArrow
               ref={arrowRef}
               context={context}
