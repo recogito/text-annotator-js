@@ -114,9 +114,18 @@ export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotati
     return all ? filtered : filtered[0];
   }
 
-  const getAnnotationBounds = (id: string): DOMRect | undefined => {
+  const getAnnotationBounds = (id: string, x?: number, y?: number, buffer = 5): DOMRect | undefined => {
     const rects = tree.getAnnotationRects(id);
     if (rects.length === 0) return;
+
+    if (x && y) {
+      const match = rects.find(({ top, right, bottom, left }) =>
+        x >= left - buffer && x <= right + buffer && y >= top - buffer && y <= bottom + buffer);
+
+      // Preferred bounds: the rectangle
+      if (match) return match;
+    }
+
     return tree.getAnnotationBounds(id);
   }
 

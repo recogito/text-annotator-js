@@ -13,7 +13,7 @@ export interface TextAnnotationStore<T extends TextAnnotation = TextAnnotation> 
 
   getAnnotationRects(id: string): DOMRect[];
 
-  getAnnotationBounds(id: string): DOMRect | undefined;
+  getAnnotationBounds(id: string, hintX?: number, hintY?: number, buffer?: number): DOMRect | undefined;
 
   getAnnotationRects(id: string): DOMRect[];
 
