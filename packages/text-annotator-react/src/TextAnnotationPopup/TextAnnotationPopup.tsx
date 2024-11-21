@@ -1,6 +1,13 @@
 import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { useAnnotator, useSelection } from '@annotorious/react';
-import { isRevived, NOT_ANNOTATABLE_CLASS, TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
+import {
+  NOT_ANNOTATABLE_CLASS,
+  denormalizeRectWithOffset,
+  toDomRectList,
+  type TextAnnotation,
+  type TextAnnotator,
+} from '@recogito/text-annotator';
+
 import { isMobile } from './isMobile';
 import {
   arrow,
@@ -64,8 +71,8 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
       shift({ crossAxis: true, padding: 10 })
     ];
 
-    return props.arrow 
-      ? [...m, arrow({ element: arrowRef }) ] 
+    return props.arrow
+      ? [...m, arrow({ element: arrowRef }) ]
       : m;
   }, [props.arrow]);
 
@@ -89,26 +96,37 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
   const { getFloatingProps } = useInteractions([dismiss, role]);
 
   useEffect(() => {
-    const annotationSelector = annotation?.target.selector;
-    setOpen(annotationSelector?.length > 0 ? isRevived(annotationSelector) : false);
-  }, [annotation]);
+    if (annotation?.id) {
+      const bounds = r?.state.store.getAnnotationBounds(annotation.id);
+      setOpen(Boolean(bounds));
+    } else {
+      setOpen(false);
+    }
+  }, [annotation?.id, r?.state.store]);
 
   useEffect(() => {
-    if (isOpen && annotation) {
-      const {
-        target: {
-          selector: [{ range }]
-        }
-      } = annotation;
+    if (!r) return;
 
+    if (isOpen && annotation?.id) {
       refs.setPositionReference({
-        getBoundingClientRect: () => range.getBoundingClientRect(),
-        getClientRects: () => range.getClientRects()
+        getBoundingClientRect: () => {
+          const bounds = r.state.store.getAnnotationBounds(annotation.id);
+          return bounds
+            ? denormalizeRectWithOffset(bounds, r.element.getBoundingClientRect())
+            : new DOMRect();
+        },
+        getClientRects: () => {
+          const rects = r.state.store.getAnnotationRects(annotation.id);
+          const denormalizedRects = rects.map((rect) =>
+            denormalizeRectWithOffset(rect, r.element.getBoundingClientRect())
+          );
+          return toDomRectList(denormalizedRects);
+        }
       });
     } else {
       refs.setPositionReference(null);
     }
-  }, [isOpen, annotation, refs]);
+  }, [isOpen, annotation?.id, annotation?.target, r]);
 
   useEffect(() => {
     const config: MutationObserverInit = { attributes: true, childList: true, subtree: true };
@@ -151,9 +169,9 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
           })}
 
           {props.arrow && (
-            <FloatingArrow 
+            <FloatingArrow
               ref={arrowRef}
-              context={context} 
+              context={context}
               {...(props.arrowProps || {})} />
           )}
 
