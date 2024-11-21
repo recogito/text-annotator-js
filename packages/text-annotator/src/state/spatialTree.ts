@@ -5,7 +5,7 @@ import {
   isRevived,
   reviveSelector,
   mergeClientRects,
-  normalizeRectWithOffset
+  toParentBounds
 } from '../utils';
 import type { AnnotationRects } from './TextAnnotationStore';
 
@@ -46,7 +46,7 @@ export const createSpatialTree = <T extends TextAnnotation>(store: Store<T>, con
      * Offset the merged client rects so that coords
      * are relative to the parent container
      */
-    const merged = mergeClientRects(rects).map(rect => normalizeRectWithOffset(rect, offset));
+    const merged = mergeClientRects(rects).map(rect => toParentBounds(rect, offset));
 
     return merged.map(rect => {
       const { x, y, width, height } = rect;

@@ -2,7 +2,7 @@ import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { useAnnotator, useSelection } from '@annotorious/react';
 import {
   NOT_ANNOTATABLE_CLASS,
-  denormalizeRectWithOffset,
+  toViewportBounds,
   toDomRectList,
   type TextAnnotation,
   type TextAnnotator,
@@ -104,13 +104,13 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
         getBoundingClientRect: () => {
           const bounds = r.state.store.getAnnotationBounds(annotation.id);
           return bounds
-            ? denormalizeRectWithOffset(bounds, r.element.getBoundingClientRect())
+            ? toViewportBounds(bounds, r.element.getBoundingClientRect())
             : new DOMRect();
         },
         getClientRects: () => {
           const rects = r.state.store.getAnnotationRects(annotation.id);
           const denormalizedRects = rects.map((rect) =>
-            denormalizeRectWithOffset(rect, r.element.getBoundingClientRect())
+            toViewportBounds(rect, r.element.getBoundingClientRect())
           );
           return toDomRectList(denormalizedRects);
         }
