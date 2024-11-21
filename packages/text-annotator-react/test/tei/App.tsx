@@ -1,9 +1,12 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
-
 import { AnnotationBody, Annotorious, useAnnotationStore, useAnnotator } from '@annotorious/react';
 import { TextAnnotation, TextAnnotator as VanillaTextAnnotator } from '@recogito/text-annotator';
-
-import { TEIAnnotator, CETEIcean, TextAnnotatorPopup, type TextAnnotationPopupContentProps } from '../../src';
+import { 
+  TEIAnnotator, 
+  CETEIcean, 
+  type TextAnnotationPopupContentProps, 
+  TextAnnotationPopup 
+} from '../../src';
 
 const TestPopup: FC<TextAnnotationPopupContentProps> = (props) => {
 
@@ -22,7 +25,7 @@ const TestPopup: FC<TextAnnotationPopupContentProps> = (props) => {
   };
 
   const onClick = () => {
-    store.addBody(body);
+    store?.addBody(body);
     r.cancelSelected();
   };
 
@@ -78,7 +81,7 @@ export const App: FC = () => {
       <TEIAnnotator>
         <CETEIcean tei={tei} />
 
-        <TextAnnotatorPopup
+        <TextAnnotationPopup
           popup={props => (
             <TestPopup {...props} />
           )}
