@@ -2,7 +2,6 @@ import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { useAnnotator, useSelection } from '@annotorious/react';
 import {
   NOT_ANNOTATABLE_CLASS,
-  denormalizeRectWithOffset,
   toDomRectList,
   type TextAnnotation,
   type TextAnnotator,
@@ -48,6 +47,12 @@ export interface TextAnnotationPopupContentProps {
 
   event?: PointerEvent | KeyboardEvent;
 
+}
+
+const toViewportBounds = (annotationBounds: DOMRect, container: HTMLElement): DOMRect => {
+  const { left, top, right, bottom } = annotationBounds;
+  const containerBounds = container.getBoundingClientRect();
+  return new DOMRect(left + containerBounds.left, top + containerBounds.top, right - left, bottom - top);
 }
 
 export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
@@ -102,17 +107,16 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
     if (isOpen && annotation?.id) {
       refs.setPositionReference({
         getBoundingClientRect: () => {
+          // Annotation bounds are relative to the document element
           const bounds = r.state.store.getAnnotationBounds(annotation.id);
           return bounds
-            ? denormalizeRectWithOffset(bounds, r.element.getBoundingClientRect())
+            ? toViewportBounds(bounds, r.element)
             : new DOMRect();
         },
         getClientRects: () => {
           const rects = r.state.store.getAnnotationRects(annotation.id);
-          const denormalizedRects = rects.map((rect) =>
-            denormalizeRectWithOffset(rect, r.element.getBoundingClientRect())
-          );
-          return toDomRectList(denormalizedRects);
+          const viewportRects = rects.map(rect => toViewportBounds(rect, r.element));
+          return toDomRectList(viewportRects);
         }
       });
     } else {
