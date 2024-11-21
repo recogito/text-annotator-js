@@ -25,9 +25,6 @@ export const useAnnotationQuoteIdling = (
         const { targetUpdated } = update;
         if (targetUpdated) {
           const { oldTarget, newTarget } = targetUpdated;
-
-          // The generic type support in the `Update` was added in https://github.com/annotorious/annotorious/pull/476
-          // @ts-expect-error: requires generic `TextAnnotationTarget` type support
           return hasTargetQuoteChanged(oldTarget, newTarget);
         }
       });
