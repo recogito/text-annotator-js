@@ -1,5 +1,9 @@
+import type { Unsubscribe } from 'nanoevents';
 import type { Filter, Origin, Store } from '@annotorious/core';
+
 import type { TextAnnotation } from '../model';
+import type { SpatialTreeEvents } from './spatialTree';
+
 
 export interface TextAnnotationStore<T extends TextAnnotation = TextAnnotation> extends Omit<Store<T>, 'addAnnotation' | 'bulkAddAnnotation'> {
 
@@ -24,6 +28,8 @@ export interface TextAnnotationStore<T extends TextAnnotation = TextAnnotation> 
   getIntersecting(minX: number, minY: number, maxX: number, maxY: number): AnnotationRects<T>[];
 
   recalculatePositions(): void;
+
+  onRecalculatePositions(callback: SpatialTreeEvents['recalculate']): Unsubscribe;
 
 }
 
