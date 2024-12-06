@@ -12,7 +12,7 @@ export interface TextAnnotatorProps<E extends unknown> extends Omit<TextAnnotato
 
   adapter?: FormatAdapter<TextAnnotation, E> | ((container: HTMLElement) => FormatAdapter<TextAnnotation, E>) | null;
 
-  filter?: Filter;
+  filter?: Filter<TextAnnotation>;
 
   style?: HighlightStyleExpression;
 
