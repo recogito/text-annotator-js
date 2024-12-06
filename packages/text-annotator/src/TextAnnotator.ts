@@ -27,23 +27,23 @@ export interface TextAnnotator<I extends TextAnnotation = TextAnnotation, E exte
 
 }
 
-export const createTextAnnotator = <E extends unknown = TextAnnotation>(
+export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation>(
   container: HTMLElement,
-  options: TextAnnotatorOptions<TextAnnotation, E> = {}
-): TextAnnotator<TextAnnotation, E> => {
+  options: TextAnnotatorOptions<I, E> = {}
+): TextAnnotator<I, E> => {
   // Prevent mobile browsers from triggering word selection on single click.
   cancelSingleClickEvents(container);
 
   // Make sure that the container is focusable and can receive both pointer and keyboard events
   programmaticallyFocusable(container);
 
-  const opts = fillDefaults<TextAnnotation, E>(options, {
+  const opts = fillDefaults<I, E>(options, {
     annotatingEnabled: true,
     user: createAnonymousGuest()
   });
 
-  const state: TextAnnotatorState<TextAnnotation, E> = 
-    createTextAnnotatorState<TextAnnotation, E>(container, opts.userSelectAction);
+  const state: TextAnnotatorState<I, E> =
+    createTextAnnotatorState<I, E>(container, opts.userSelectAction);
 
   const { selection, viewport } = state;
 
@@ -51,7 +51,7 @@ export const createTextAnnotator = <E extends unknown = TextAnnotation>(
 
   const undoStack = createUndoStack(store);
 
-  const lifecycle = createLifecycleObserver<TextAnnotation, E>(state, undoStack, opts.adapter);
+  const lifecycle = createLifecycleObserver<I, E>(state, undoStack, opts.adapter);
 
   let currentUser: User = opts.user;
 
