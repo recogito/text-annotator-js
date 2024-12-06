@@ -14,7 +14,7 @@ export interface HighlightStyle extends Pick<DrawingStyle, 'fill' | 'fillOpacity
 }
 
 export type HighlightStyleExpression = HighlightStyle 
-  | ((annotation: TextAnnotation, state: AnnotationState, zIndex?: number) => HighlightStyle | undefined);
+  | (<I extends TextAnnotation = TextAnnotation>(annotation: I, state: AnnotationState, zIndex?: number) => HighlightStyle | undefined);
 
 export const DEFAULT_STYLE: HighlightStyle = { 
   fill: 'rgb(0, 128, 255)', 

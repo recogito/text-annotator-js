@@ -6,13 +6,13 @@ import { createTextAnnotator } from '@recogito/text-annotator';
 
 import '@recogito/text-annotator/dist/text-annotator.css';
 
-export interface TextAnnotatorProps<E extends unknown> extends Omit<TextAnnotatorOptions<TextAnnotation, E>, 'adapter'> {
+export interface TextAnnotatorProps<I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation> extends Omit<TextAnnotatorOptions<I, E>, 'adapter'> {
 
   children?: ReactNode | JSX.Element;
 
-  adapter?: FormatAdapter<TextAnnotation, E> | ((container: HTMLElement) => FormatAdapter<TextAnnotation, E>) | null;
+  adapter?: FormatAdapter<I, E> | ((container: HTMLElement) => FormatAdapter<I, E>) | null;
 
-  filter?: Filter;
+  filter?: Filter<I>;
 
   style?: HighlightStyleExpression;
 
@@ -20,7 +20,9 @@ export interface TextAnnotatorProps<E extends unknown> extends Omit<TextAnnotato
 
 }
 
-export const TextAnnotator = <E extends unknown>(props: TextAnnotatorProps<E>) => {
+export const TextAnnotator = <I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation>(
+  props: TextAnnotatorProps<I, E>
+) => {
 
   const el = useRef<HTMLDivElement>(null);
 
