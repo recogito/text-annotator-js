@@ -84,11 +84,11 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
   /******++++++*************/
 
   // Most of the external API functions are covered in the base annotator
-  const base = createBaseAnnotator<TextAnnotation, E>(state, undoStack, opts.adapter);
+  const base = createBaseAnnotator<I, E>(state, undoStack, opts.adapter);
 
   const getUser = () => currentUser;
 
-  const setFilter = (filter?: Filter) => {
+  const setFilter = (filter?: Filter<I>) => {
     highlightRenderer.setFilter(filter);
     selectionHandler.setFilter(filter);
   }
