@@ -156,7 +156,7 @@ export const createSelectionHandler = (
 
     const selectionRange = sel.getRangeAt(0);
 
-// The selection should be captured only within the annotatable container
+    // The selection should be captured only within the annotatable container
     const containedRange = trimRangeToContainer(selectionRange, container);
     if (isWhitespaceOrEmpty(containedRange)) return;
 
