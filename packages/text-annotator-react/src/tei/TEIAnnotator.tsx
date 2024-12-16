@@ -1,4 +1,4 @@
-import { Children, ReactElement, ReactNode, cloneElement, useContext, useEffect } from 'react';
+import { Children, ReactElement, ReactNode, cloneElement, useCallback, useContext, useEffect } from 'react';
 import { AnnotoriousContext, Filter } from '@annotorious/react';
 import { TEIPlugin } from '@recogito/text-annotator-tei';
 import { createTextAnnotator, HighlightStyleExpression } from '@recogito/text-annotator';
@@ -22,10 +22,10 @@ export const TEIAnnotator = (props: TEIAnnotatorProps) => {
 
   const { anno, setAnno } = useContext(AnnotoriousContext);
 
-  const onLoad = (element: HTMLElement) => {
+  const onLoad = useCallback((element: HTMLElement) => {
     const anno = TEIPlugin(createTextAnnotator(element, opts));
     setAnno(anno);
-  }
+  }, []);
 
   useEffect(() => {
     if (!anno)

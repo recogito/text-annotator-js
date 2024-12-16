@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import hotkeys from 'hotkeys-js';
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotation, TextAnnotationTarget } from './model';
+import type { TextAnnotatorOptions } from './TextAnnotatorOptions';
 import {
   clonePointerEvent,
   cloneKeyboardEvent,
@@ -30,11 +31,12 @@ const SELECTION_KEYS = [
 export const SelectionHandler = (
   container: HTMLElement,
   state: TextAnnotatorState<TextAnnotation, unknown>,
-  annotatingEnabled: boolean,
-  offsetReferenceSelector?: string
+  options: TextAnnotatorOptions<TextAnnotation, unknown>
 ) => {
 
   let currentUser: User | undefined;
+
+  const { annotatingEnabled, offsetReferenceSelector, selectionMode } = options;
 
   const setUser = (user?: User) => currentUser = user;
 
@@ -73,9 +75,25 @@ export const SelectionHandler = (
   const onSelectionChange = debounce((evt: Event) => {
     const sel = document.getSelection();
 
-    // This is to handle cases where the selection is "hijacked" by another element
-    // in a not-annotatable area. A rare case in theory. But rich text editors
-    // will like Quill do it...
+    /**
+     * In iOS when a user clicks on a button, the `selectionchange` event is fired.
+     * However, the generated selection is empty and the `anchorNode` is `null`.
+     * That doesn't give us information about whether the selection is in the annotatable area
+     * or whether the previously selected text was dismissed.
+     * Therefore - we should bail out from such a range processing.
+     *
+     * @see https://github.com/recogito/text-annotator-js/pull/164#issuecomment-2416961473
+     */
+    if (!sel?.anchorNode) {
+      return;
+    }
+
+    /**
+     * This is to handle cases where the selection is "hijacked"
+     * by another element in a not-annotatable area.
+     * A rare case in theory.
+     * But rich text editors will like Quill do it.
+     */
     if (isNotAnnotatable(sel.anchorNode)) {
       currentTarget = undefined;
       return;
@@ -130,7 +148,6 @@ export const SelectionHandler = (
     const hasChanged =
       annotatableRanges.length !== currentTarget.selector.length ||
       annotatableRanges.some((r, i) => r.toString() !== currentTarget.selector[i]?.quote);
-
     if (!hasChanged) return;
 
     currentTarget = {
@@ -140,8 +157,8 @@ export const SelectionHandler = (
     };
 
     /**
-     * During mouse selection on the desktop, annotation won't usually exist while the selection is being edited.
-     * But it will be typical during keyboard or mobile handlebars selection!
+     * During mouse selection on the desktop, the annotation won't usually exist while the selection is being edited.
+     * But it'll be typical during selection via the keyboard or mobile's handlebars.
      */
     if (store.getAnnotation(currentTarget.annotation)) {
       store.updateTarget(currentTarget, Origin.LOCAL);
@@ -152,7 +169,7 @@ export const SelectionHandler = (
   });
 
   /**
-   * Select events don't carry information about the mouse button
+   * Select events don't carry information about the mouse button.
    * Therefore, to prevent right-click selection, we need to listen
    * to the initial pointerdown event and remember the button
    */
@@ -167,20 +184,6 @@ export const SelectionHandler = (
     isLeftClick = lastDownEvent.button === 0;
   };
 
-  // Helper
-  const upsertCurrentTarget = () => {
-    const exists = store.getAnnotation(currentTarget.annotation);
-    if (exists) {
-      store.updateTarget(currentTarget);
-    } else {
-      store.addAnnotation({
-        id: currentTarget.annotation,
-        bodies: [],
-        target: currentTarget
-      });
-    }
-  }
-
   const onPointerUp = (evt: PointerEvent) => {
     if (isNotAnnotatable(evt.target as Node) || !isLeftClick) return;
 
@@ -191,14 +194,20 @@ export const SelectionHandler = (
       const hovered =
         evt.target instanceof Node &&
         container.contains(evt.target) &&
-        store.getAt(evt.clientX - x, evt.clientY - y, currentFilter);
+        store.getAt(evt.clientX - x, evt.clientY - y, selectionMode === 'all', currentFilter);
 
       if (hovered) {
         const { selected } = selection;
 
-        if (selected.length !== 1 || selected[0].id !== hovered.id) {
-          selection.userSelect(hovered.id, evt);
-        }
+        const currentIds = new Set(selected.map(s => s.id));
+        const nextIds = Array.isArray(hovered) ? hovered.map(a => a.id) : [hovered.id];
+
+        const hasChanged =
+          currentIds.size !== nextIds.length ||
+          !nextIds.every(id => currentIds.has(id));
+
+        if (hasChanged)
+          selection.userSelect(nextIds, evt);
       } else {
         selection.clear();
       }
@@ -223,7 +232,6 @@ export const SelectionHandler = (
         currentTarget = undefined;
         clickSelect();
       } else if (currentTarget && currentTarget.selector.length > 0) {
-        selection.clear();
         upsertCurrentTarget();
         selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));
       }
@@ -251,7 +259,6 @@ export const SelectionHandler = (
       const sel = document.getSelection();
 
       if (!sel.isCollapsed) {
-        selection.clear();
         upsertCurrentTarget();
         selection.userSelect(currentTarget.annotation, cloneKeyboardEvent(evt));
       }
@@ -316,6 +323,29 @@ export const SelectionHandler = (
   };
 
   hotkeys(ARROW_KEYS.join(','), { keydown: true, keyup: false }, handleArrowKeyPress);
+
+  // Helper
+  const upsertCurrentTarget = () => {
+    const existingAnnotation = store.getAnnotation(currentTarget.annotation);
+    if (!existingAnnotation) {
+      store.addAnnotation({
+        id: currentTarget.annotation,
+        bodies: [],
+        target: currentTarget
+      });
+      return;
+    }
+
+    const { target: { updated: existingTargetUpdated } } = existingAnnotation;
+    const { updated: currentTargetUpdated } = currentTarget;
+    if (
+      !existingTargetUpdated ||
+      !currentTargetUpdated ||
+      existingTargetUpdated < currentTargetUpdated
+    ) {
+      store.updateTarget(currentTarget);
+    }
+  };
 
   container.addEventListener('pointerdown', onPointerDown);
   document.addEventListener('pointerup', onPointerUp);

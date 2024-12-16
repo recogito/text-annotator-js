@@ -10,17 +10,17 @@ import type { TextAnnotation, TextAnnotationTarget, TextSelector } from '../core
 import type { W3CTextAnnotation, W3CTextAnnotationTarget, W3CTextSelector } from '../w3c';
 import { getQuoteContext } from '../../utils';
 
-export type W3CTextFormatAdapter = FormatAdapter<TextAnnotation, W3CTextAnnotation>;
+export type W3CTextFormatAdapter<I extends TextAnnotation = TextAnnotation, E extends W3CTextAnnotation = W3CTextAnnotation> = FormatAdapter<I, E>;
 
 /**
  * @param source - the IRI of the annotated content
  * @param container - the HTML container of the annotated content,
  *                    Required to locate the content's `range` within the DOM
  */
-export const W3CTextFormat = (
+export const W3CTextFormat =<I extends TextAnnotation = TextAnnotation, E extends W3CTextAnnotation = W3CTextAnnotation>(
   source: string,
   container: HTMLElement
-): W3CTextFormatAdapter => ({
+): W3CTextFormatAdapter<I, E> => ({
   parse: (serialized) => parseW3CTextAnnotation(serialized),
   serialize: (annotation) => serializeW3CTextAnnotation(annotation, source, container)
 });
@@ -38,13 +38,18 @@ const parseW3CTextTargets = (annotation: W3CTextAnnotation) => {
   } = annotation;
 
   const w3cTargets = Array.isArray(target) ? target : [target];
+  if (w3cTargets.length === 0) {
+    return { error: Error(`No targets found for annotation: ${annotation.id}`) };
+  }
 
   const parsed: TextAnnotationTarget = {
     creator: parseW3CUser(creator),
     created: created ? new Date(created) : undefined,
     updated: modified ? new Date(modified) : undefined,
     annotation: annotationId,
-    selector: []
+    selector: [],
+    // @ts-expect-error: `styleClass` is not part of the core `TextAnnotationTarget` type
+    styleClass: 'styleClass' in w3cTargets[0] ? w3cTargets[0].styleClass : undefined
   };
 
   for (const w3cTarget of w3cTargets) {
@@ -64,12 +69,14 @@ const parseW3CTextTargets = (annotation: W3CTextAnnotation) => {
     }, {});
 
     if (isTextSelector(selector)) {
-      parsed.selector.push({
-        ...selector,
-        id: w3cTarget.id,
-        // @ts-ignore
-        scope: w3cTarget.scope
-      });
+      parsed.selector.push(
+        {
+          ...selector,
+          id: w3cTarget.id,
+          // @ts-expect-error: `scope` is not part of the core `TextSelector` type
+          scope: w3cTarget.scope
+        }
+      );
     } else {
       const missingTypes = [
         !selector.start ? 'TextPositionSelector' : undefined,
@@ -83,9 +90,9 @@ const parseW3CTextTargets = (annotation: W3CTextAnnotation) => {
   return { parsed };
 };
 
-export const parseW3CTextAnnotation = (
-  annotation: W3CTextAnnotation
-): ParseResult<TextAnnotation> => {
+export const parseW3CTextAnnotation = <I extends TextAnnotation = TextAnnotation, E extends W3CTextAnnotation = W3CTextAnnotation>(
+  annotation: E
+): ParseResult<I> => {
   const annotationId = annotation.id || uuidv4();
 
   const {
@@ -99,7 +106,7 @@ export const parseW3CTextAnnotation = (
   const bodies = parseW3CBodies(body, annotationId);
   const target = parseW3CTextTargets(annotation);
 
-  return 'error' in target
+  const parseResult = 'error' in target
     ? { error: target.error }
     : {
       parsed: {
@@ -110,13 +117,15 @@ export const parseW3CTextAnnotation = (
       }
     };
 
+  return parseResult as ParseResult<I>;
+
 };
 
-export const serializeW3CTextAnnotation = (
-  annotation: TextAnnotation,
+export const serializeW3CTextAnnotation = <I extends TextAnnotation = TextAnnotation, E extends W3CTextAnnotation = W3CTextAnnotation>(
+  annotation: I,
   source: string,
   container: HTMLElement
-): W3CTextAnnotation => {
+): E => {
   const { bodies, target, ...rest } = annotation;
 
   const {
@@ -127,7 +136,7 @@ export const serializeW3CTextAnnotation = (
     ...targetRest
   } = target;
 
-  const w3cTargets = selector.map((s) => {
+  const w3cTargets = selector.map((s): W3CTextAnnotationTarget => {
     const { id, quote, start, end, range } = s;
 
     const { prefix, suffix } = getQuoteContext(range, container);
@@ -146,10 +155,11 @@ export const serializeW3CTextAnnotation = (
     return {
       ...targetRest,
       id,
+      // @ts-expect-error: `scope` is not part of the core `TextSelector` type
       scope: 'scope' in s ? s.scope : undefined,
       source,
       selector: w3cSelectors
-    } as W3CTextAnnotationTarget;
+    };
   });
 
 
@@ -163,6 +173,6 @@ export const serializeW3CTextAnnotation = (
     created: created?.toISOString(),
     modified: updated?.toISOString(),
     target: w3cTargets
-  };
+  } as unknown as E;
 
 };
