@@ -29,16 +29,16 @@
     "@types/jsdom": "^21.1.7",
     "@types/rbush": "^4.0.0",
     "jsdom": "^25.0.1",
-    "typescript": "5.6.3",
-    "vite": "^5.4.11",
+    "typescript": "5.7.2",
+    "vite": "^6.0.3",
     "vite-plugin-dts": "^4.3.0",
-    "vitest": "^2.1.5"
+    "vitest": "^2.1.8"
   },
   "dependencies": {
-    "@annotorious/core": "^3.0.12",
+    "@annotorious/core": "^3.0.14",
     "colord": "^2.9.3",
     "dequal": "^2.0.3",
-    "hotkeys-js": "^3.13.7",
+    "hotkeys-js": "^3.13.9",
     "rbush": "^4.0.1",
     "uuid": "^11.0.3"
   }
