@@ -13,7 +13,7 @@ import type {
 } from '@annotorious/core';
 import { createSpatialTree, type SpatialTreeEvents } from './spatialTree';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
-import type { TextAnnotationStore } from './TextAnnotationStore';
+import type { AnnotationRects, TextAnnotationStore } from './TextAnnotationStore';
 import { isRevived, reviveAnnotation, reviveTarget } from '../utils';
 
 export interface TextAnnotatorState<I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation> extends AnnotatorState<I, E> {
@@ -114,20 +114,18 @@ export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotati
     return all ? filtered : filtered[0];
   }
 
-  const getAnnotationBounds = (id: string, x?: number, y?: number, buffer = 5): DOMRect => {
+  const getAnnotationBounds = (id: string): DOMRect | undefined => {
     const rects = tree.getAnnotationRects(id);
     if (rects.length === 0) return;
-
-    if (x && y) {
-      const match = rects.find(({ top, right, bottom, left }) =>
-        x >= left - buffer && x <= right + buffer && y >= top - buffer && y <= bottom + buffer);
-
-      // Preferred bounds: the rectangle
-      if (match) return match;
-    }
-
     return tree.getAnnotationBounds(id);
   }
+
+  const getIntersecting = (
+    minX: number,
+    minY: number,
+    maxX: number,
+    maxY: number,
+  ): AnnotationRects<I>[] => tree.getIntersecting(minX, minY, maxX, maxY);
 
   const getAnnotationRects = (id: string): DOMRect[] => tree.getAnnotationRects(id);
 
@@ -158,8 +156,8 @@ export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotati
       bulkUpsertAnnotations,
       getAnnotationBounds,
       getAnnotationRects,
+      getIntersecting,
       getAt,
-      getIntersecting: tree.getIntersecting,
       recalculatePositions,
       onRecalculatePositions,
       updateTarget

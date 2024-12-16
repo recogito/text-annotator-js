@@ -3,8 +3,7 @@ import type { Store } from '@annotorious/core';
 import { createNanoEvents, type Unsubscribe } from 'nanoevents';
 
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
-import { isRevived, mergeClientRects } from '../utils';
-import { reviveSelector } from '../utils';
+import { isRevived, reviveSelector, mergeClientRects } from '../utils';
 import type { AnnotationRects } from './TextAnnotationStore';
 
 interface IndexedHighlightRect {
@@ -79,6 +78,8 @@ export const createSpatialTree = <T extends TextAnnotation>(store: Store<T>, con
 
   const insert = (target: TextAnnotationTarget) => {
     const rects = toItems(target, container.getBoundingClientRect());
+    if (rects.length === 0) return;
+
     rects.forEach(rect => tree.insert(rect));
     index.set(target.annotation, rects);
   }
@@ -103,7 +104,10 @@ export const createSpatialTree = <T extends TextAnnotation>(store: Store<T>, con
     const offset = container.getBoundingClientRect();
 
     const rectsByTarget = targets.map(target => ({ target, rects: toItems(target, offset) }));
-    rectsByTarget.forEach(({ target, rects }) => index.set(target.annotation, rects));
+    rectsByTarget.forEach(({ target, rects }) => {
+      if (rects.length > 0)
+        index.set(target.annotation, rects)
+    });
 
     const allRects = rectsByTarget.flatMap(({ rects }) => rects);
     tree.load(allRects);

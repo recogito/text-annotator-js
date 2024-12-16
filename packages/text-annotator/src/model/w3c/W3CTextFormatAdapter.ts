@@ -10,17 +10,17 @@ import type { TextAnnotation, TextAnnotationTarget, TextSelector } from '../core
 import type { W3CTextAnnotation, W3CTextAnnotationTarget, W3CTextSelector } from '../w3c';
 import { getQuoteContext } from '../../utils';
 
-export type W3CTextFormatAdapter = FormatAdapter<TextAnnotation, W3CTextAnnotation>;
+export type W3CTextFormatAdapter<I extends TextAnnotation = TextAnnotation, E extends W3CTextAnnotation = W3CTextAnnotation> = FormatAdapter<I, E>;
 
 /**
  * @param source - the IRI of the annotated content
  * @param container - the HTML container of the annotated content,
  *                    Required to locate the content's `range` within the DOM
  */
-export const W3CTextFormat = (
+export const W3CTextFormat =<I extends TextAnnotation = TextAnnotation, E extends W3CTextAnnotation = W3CTextAnnotation>(
   source: string,
   container: HTMLElement
-): W3CTextFormatAdapter => ({
+): W3CTextFormatAdapter<I, E> => ({
   parse: (serialized) => parseW3CTextAnnotation(serialized),
   serialize: (annotation) => serializeW3CTextAnnotation(annotation, source, container)
 });
@@ -90,9 +90,9 @@ const parseW3CTextTargets = (annotation: W3CTextAnnotation) => {
   return { parsed };
 };
 
-export const parseW3CTextAnnotation = (
-  annotation: W3CTextAnnotation
-): ParseResult<TextAnnotation> => {
+export const parseW3CTextAnnotation = <I extends TextAnnotation = TextAnnotation, E extends W3CTextAnnotation = W3CTextAnnotation>(
+  annotation: E
+): ParseResult<I> => {
   const annotationId = annotation.id || uuidv4();
 
   const {
@@ -106,7 +106,7 @@ export const parseW3CTextAnnotation = (
   const bodies = parseW3CBodies(body, annotationId);
   const target = parseW3CTextTargets(annotation);
 
-  return 'error' in target
+  const parseResult = 'error' in target
     ? { error: target.error }
     : {
       parsed: {
@@ -117,13 +117,15 @@ export const parseW3CTextAnnotation = (
       }
     };
 
+  return parseResult as ParseResult<I>;
+
 };
 
-export const serializeW3CTextAnnotation = (
-  annotation: TextAnnotation,
+export const serializeW3CTextAnnotation = <I extends TextAnnotation = TextAnnotation, E extends W3CTextAnnotation = W3CTextAnnotation>(
+  annotation: I,
   source: string,
   container: HTMLElement
-): W3CTextAnnotation => {
+): E => {
   const { bodies, target, ...rest } = annotation;
 
   const {
@@ -171,6 +173,6 @@ export const serializeW3CTextAnnotation = (
     created: created?.toISOString(),
     modified: updated?.toISOString(),
     target: w3cTargets
-  };
+  } as unknown as E;
 
 };

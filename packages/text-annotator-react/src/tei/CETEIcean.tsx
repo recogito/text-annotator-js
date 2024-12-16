@@ -3,6 +3,8 @@ import CETEI from 'CETEIcean';
 
 interface CETEIceanProps {
 
+  initArgs?: any;
+
   tei?: string;
 
   onLoad?(element: Element): void;
@@ -55,7 +57,7 @@ export const CETEIcean = (props: CETEIceanProps) => {
 
   useEffect(() => {
     if (props.tei) {
-      const ceteicean = new CETEI();
+      const ceteicean = new CETEI(props.initArgs);
 
       ceteicean.addBehaviors({
         ...PRESET_BEHAVIORS,
@@ -71,7 +73,11 @@ export const CETEIcean = (props: CETEIceanProps) => {
         props.onLoad(el.current);
       });
     }
-  }, [props.tei]);
+
+    return () => {
+      el.current.innerHTML = '';
+    }
+  }, [props.tei, JSON.stringify(props.initArgs), props.onLoad]);
 
   return (
     <div 
