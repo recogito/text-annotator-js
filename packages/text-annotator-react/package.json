@@ -47,8 +47,10 @@
     "@annotorious/core": "^3.0.14",
     "@annotorious/react": "^3.0.14",
     "@floating-ui/react": "^0.27.1",
+    "@react-aria/live-announcer": "^3.3.4",
     "@recogito/text-annotator": "3.0.0-rc.53",
     "@recogito/text-annotator-tei": "3.0.0-rc.53",
-    "CETEIcean": "^1.9.3"
+    "CETEIcean": "^1.9.3",
+    "unique-random": "^4.0.0"
   }
 }
