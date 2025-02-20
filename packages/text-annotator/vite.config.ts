@@ -1,5 +1,4 @@
 import { defineConfig } from 'vite';
-
 import dts from 'vite-plugin-dts';
 import { externalizeDeps } from 'vite-plugin-externalize-deps';
 
