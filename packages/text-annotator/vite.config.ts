@@ -11,7 +11,6 @@ export default defineConfig({
     open: '/test/index.html'
   },
   build: {
-    minify: false,
     sourcemap: true,
     lib: {
       entry: './src/index.ts',
