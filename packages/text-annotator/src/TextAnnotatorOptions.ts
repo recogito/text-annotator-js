@@ -22,7 +22,12 @@ export interface TextAnnotatorOptions<I extends TextAnnotation = TextAnnotation,
   style?: HighlightStyleExpression;
 
   user?: User;
-  
+
+  /**
+   * Report annotation updates immediately
+   * both when the bodies were updated or not.
+   */
+  immediateUpdatesEmit?: boolean;
 }
 
 export type RendererType = 'SPANS' | 'CANVAS' | 'CSS_HIGHLIGHTS';
@@ -30,12 +35,8 @@ export type RendererType = 'SPANS' | 'CANVAS' | 'CSS_HIGHLIGHTS';
 export const fillDefaults = <I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation>(
   opts: TextAnnotatorOptions<I, E>,
   defaults: TextAnnotatorOptions<I, E>
-): TextAnnotatorOptions<I, E> => {
-
-  return {
-    ...opts,
-    annotatingEnabled: opts.annotatingEnabled ?? defaults.annotatingEnabled,
-    user: opts.user || defaults.user
-  };
-
-};
+): TextAnnotatorOptions<I, E> => ({
+  ...opts,
+  annotatingEnabled: opts.annotatingEnabled ?? defaults.annotatingEnabled,
+  user: opts.user || defaults.user
+});

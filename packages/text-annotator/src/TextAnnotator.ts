@@ -51,7 +51,12 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
 
   const undoStack = createUndoStack<I>(store);
 
-  const lifecycle = createLifecycleObserver<I, E>(state, undoStack, opts.adapter);
+  const lifecycle = createLifecycleObserver<I, E>(
+    state,
+    undoStack,
+    opts.adapter,
+    { immediateUpdatesEmit: opts.immediateUpdatesEmit }
+  );
 
   let currentUser: User = opts.user;
 
