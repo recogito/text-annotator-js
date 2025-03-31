@@ -65,7 +65,7 @@ export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotati
 
     // Initial page load might take some time. Retry for more robustness.
     const couldNotRevive = revived.filter(a => !isRevived(a.target.selector));
-    store.bulkAddAnnotation(revived, replace, origin);
+    store.bulkAddAnnotations(revived, replace, origin);
 
     return couldNotRevive;
   }

@@ -1,4 +1,4 @@
-import { Children, ReactElement, ReactNode, cloneElement, useCallback, useContext, useEffect } from 'react';
+import { Children, JSX, ReactElement, ReactNode, cloneElement, useCallback, useContext, useEffect } from 'react';
 import { AnnotoriousContext, Filter } from '@annotorious/react';
 import { TEIPlugin } from '@recogito/text-annotator-tei';
 import { createTextAnnotator, HighlightStyleExpression } from '@recogito/text-annotator';
@@ -44,7 +44,7 @@ export const TEIAnnotator = (props: TEIAnnotatorProps) => {
   return props.children ? (
     <>
       {Children.toArray(props.children).map(child => 
-        cloneElement(child as ReactElement, { onLoad }))}
+        cloneElement(child as ReactElement, { onLoad } as any))}
     </>
   ) : null;
 

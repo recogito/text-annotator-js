@@ -1,4 +1,4 @@
-import { ReactNode, useContext, useEffect, useRef } from 'react';
+import { JSX, ReactNode, useContext, useEffect, useRef } from 'react';
 import { AnnotoriousContext, Filter } from '@annotorious/react';
 import type { FormatAdapter } from '@annotorious/core';
 import type { HighlightStyleExpression, TextAnnotation, TextAnnotatorOptions } from '@recogito/text-annotator';
