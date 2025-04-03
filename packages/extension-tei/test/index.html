@@ -46,6 +46,20 @@
         line-height: 160%;
       }
     </style>
+
+    <style>
+      tei-tei * {
+        box-sizing: border-box;
+      }
+
+      .highlight-element {
+        background-color: rgba(0, 0, 0, 0.25);
+        border-radius: 2px;
+        box-shadow: 0 0 0 1px #F00 !important;
+        box-decoration-break: clone !important;
+        -webkit-box-decoration-break: clone !important; 
+      }
+    </style>
   </head>
 
   <body>
@@ -54,7 +68,7 @@
 
     <script type="module">
       import CETEI from 'CETEIcean';
-      import { createTextAnnotator } from '@recogito/text-annotator';
+      import { createTextAnnotator, rangeToSelector } from '@recogito/text-annotator';
       import { TEIPlugin } from '../src/index.ts';
 
       import '@recogito/text-annotator/dist/text-annotator.css';
@@ -62,10 +76,14 @@
       window.onload = async function () {
         var CETEIcean = new CETEI();
 
-        CETEIcean.getHTML5('paradise-lost.xml', data => {
-          document.getElementById('content').appendChild(data);
+        const container = document.getElementById('content');
 
-          var anno = TEIPlugin(createTextAnnotator(document.getElementById('content')));
+        CETEIcean.getHTML5('paradise-lost.xml', data => {
+          container.appendChild(data);
+
+          var anno = TEIPlugin(createTextAnnotator(container, {
+            annotatingEnabled: false
+          }));
 
           anno.loadAnnotations('annotations.json');
 
@@ -88,8 +106,67 @@
           anno.on('viewportIntersect', (annotations) => {
             console.log('viewport', annotations);
           });
+
+
+          let currentHighlighted = null;
+
+          let isHovering = false;
+          
+          // Function to handle mouseover
+          document.addEventListener('mouseover', function(e) {
+            isHovering = true;
+            
+            // Remove highlight from previously highlighted element
+            if (currentHighlighted) {
+              currentHighlighted.classList.remove('highlight-element');
+            }
+            
+            // Add highlight to the current target
+            currentHighlighted = e.target;
+            currentHighlighted.classList.add('highlight-element');
+          });
+          
+          // Function to handle mouseout (when mouse leaves the document)
+          document.addEventListener('mouseout', function(e) {
+            if (e.relatedTarget === null) {
+              isHovering = false;
+              
+              // Remove highlight when mouse leaves the document
+              if (currentHighlighted) {
+                currentHighlighted.classList.remove('highlight-element');
+                currentHighlighted = null;
+              }
+            }
+          });
+
+          document.addEventListener('click', function(e) {
+            if (!currentHighlighted) return;
+
+            const range = document.createRange();
+            range.selectNode(currentHighlighted);
+
+            const selector = rangeToSelector(range, container);
+            console.log(selector);
+
+            const id = 'foobar'; // TODO
+
+            anno.state.store.addAnnotation({
+              id,
+              bodies: [],
+              target: {
+                annotation: id,
+                selector: [selector],
+                created: new Date()
+              }
+            });
+          });
+    
         });
       };
+    </script>
+
+    <script>
+      
     </script>
   </body>
 </html>
