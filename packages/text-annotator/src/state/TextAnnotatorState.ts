@@ -56,7 +56,7 @@ export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotati
     return isValid;
   }
 
-  const bulkAddAnnotation = (
+  const bulkAddAnnotations = (
     annotations: I[], 
     replace = true, 
     origin = Origin.LOCAL
@@ -150,7 +150,7 @@ export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotati
     store: {
       ...store,
       addAnnotation,
-      bulkAddAnnotation,
+      bulkAddAnnotations,
       bulkUpdateTargets,
       bulkUpsertAnnotations,
       getAnnotationBounds,

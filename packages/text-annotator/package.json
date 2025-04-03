@@ -30,7 +30,7 @@
     "@types/rbush": "^4.0.0",
     "jsdom": "^26.0.0",
     "typescript": "5.8.2",
-    "vite": "^5.4.17",
+    "vite": "^6.2.5",
     "vite-plugin-dts": "^4.5.3",
     "vitest": "^3.1.1"
   },
