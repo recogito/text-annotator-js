@@ -52,9 +52,7 @@ export const SelectionHandler = (
 
   let lastDownEvent: Selection['event'] | undefined;
 
-  const onSelectStart = (evt: Event) => {
-    console.log('select start!', isNotAnnotatable(evt.target as Node));
-    
+  const onSelectStart = (evt: Event) => {    
     if (isLeftClick === false)
       return;
 
@@ -176,8 +174,6 @@ export const SelectionHandler = (
    * to the initial pointerdown event and remember the button
    */
   const onPointerDown = (evt: PointerEvent) => {
-    console.log('down!', isNotAnnotatable(evt.target as Node));
-
     if (isNotAnnotatable(evt.target as Node)) return;
 
     /**
@@ -189,8 +185,6 @@ export const SelectionHandler = (
   };
 
   const onPointerUp = (evt: PointerEvent) => {
-    console.log('up!', isNotAnnotatable(evt.target as Node));
-
     if (isNotAnnotatable(evt.target as Node) || !isLeftClick) return;
 
     // Logic for selecting an existing annotation
