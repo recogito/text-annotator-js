@@ -11,7 +11,7 @@ import type {
   SelectionState, 
   HoverState, 
 } from '@annotorious/core';
-import { createSpatialTree } from './spatialTree';
+import { createSpatialTree, type SpatialTreeEvents } from './spatialTree';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
 import type { AnnotationRects, TextAnnotationStore } from './TextAnnotationStore';
 import { isRevived, reviveAnnotation, reviveTarget } from '../utils';
@@ -130,6 +130,7 @@ export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotati
   const getAnnotationRects = (id: string): DOMRect[] => tree.getAnnotationRects(id);
 
   const recalculatePositions = () => tree.recalculate();
+  const onRecalculatePositions = (callback: SpatialTreeEvents['recalculate']) => tree.on('recalculate', callback);
 
   store.observe(({ changes }) => {
     const deleted = (changes.deleted || []).filter(a => isRevived(a.target.selector));
@@ -158,6 +159,7 @@ export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotati
       getIntersecting,
       getAt,
       recalculatePositions,
+      onRecalculatePositions,
       updateTarget
     },
     selection,
