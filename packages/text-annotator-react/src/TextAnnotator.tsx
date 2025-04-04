@@ -27,8 +27,8 @@ export const TextAnnotator = <I extends TextAnnotation = TextAnnotation, E exten
   const el = useRef<HTMLDivElement>(null);
 
   const { className, children, ...opts } = props;
-  
-  const { style, filter, user } = opts;
+
+  const { style, filter, user, annotatingEnabled } = opts;
 
   const { anno, setAnno } = useContext(AnnotoriousContext);
 
@@ -49,10 +49,12 @@ export const TextAnnotator = <I extends TextAnnotation = TextAnnotation, E exten
 
   useEffect(() => anno?.setUser(user), [anno, user]);
 
+  useEffect(() => anno?.setAnnotatingEnabled(annotatingEnabled), [anno, annotatingEnabled]);
+
   return (
     <div ref={el} className={`r6o-annotatable no-focus-outline ${className}`}>
       {children}
     </div>
-  )
+  );
 
 }
