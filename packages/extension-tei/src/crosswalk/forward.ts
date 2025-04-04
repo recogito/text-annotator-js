@@ -149,7 +149,7 @@ export const reviveTarget = (t: TextAnnotationTarget, container: HTMLElement) =>
 
     // Helper
     const reanchorIfNeeded = (parent: Node, offset: number) => {
-      if (parent.firstChild.toString().length >= offset) {
+      if (parent.firstChild instanceof Text && parent.firstChild.length >= offset) {
         return { node: parent.firstChild, offset };
       } else {
         return reanchor(parent.firstChild, parent, offset);
@@ -157,9 +157,9 @@ export const reviveTarget = (t: TextAnnotationTarget, container: HTMLElement) =>
     }
 
     const reanchoredStart = reanchorIfNeeded(startNode, startOffset);
-    const reanchoredEnd = reanchorIfNeeded(endNode, endOffset);
-
     range.setStart(reanchoredStart.node, reanchoredStart.offset);
+
+    const reanchoredEnd = reanchorIfNeeded(endNode, endOffset);
     range.setEnd(reanchoredEnd.node, reanchoredEnd.offset);
 
     const textSelector = rangeToSelector(range, container);
