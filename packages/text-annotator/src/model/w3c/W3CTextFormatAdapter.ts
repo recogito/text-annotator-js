@@ -19,7 +19,7 @@ export type W3CTextFormatAdapter<I extends TextAnnotation = TextAnnotation, E ex
  */
 export const W3CTextFormat =<I extends TextAnnotation = TextAnnotation, E extends W3CTextAnnotation = W3CTextAnnotation>(
   source: string,
-  container: HTMLElement
+  container?: HTMLElement
 ): W3CTextFormatAdapter<I, E> => ({
   parse: (serialized) => parseW3CTextAnnotation(serialized),
   serialize: (annotation) => serializeW3CTextAnnotation(annotation, source, container)
@@ -124,7 +124,7 @@ export const parseW3CTextAnnotation = <I extends TextAnnotation = TextAnnotation
 export const serializeW3CTextAnnotation = <I extends TextAnnotation = TextAnnotation, E extends W3CTextAnnotation = W3CTextAnnotation>(
   annotation: I,
   source: string,
-  container: HTMLElement
+  container?: HTMLElement
 ): E => {
   const { bodies, target, ...rest } = annotation;
 
@@ -139,18 +139,22 @@ export const serializeW3CTextAnnotation = <I extends TextAnnotation = TextAnnota
   const w3cTargets = selector.map((s): W3CTextAnnotationTarget => {
     const { id, quote, start, end, range } = s;
 
-    const { prefix, suffix } = getQuoteContext(range, container);
-
-    const w3cSelectors: W3CTextSelector[] = [{
+    const quoteSelector: W3CTextSelector = {
       type: 'TextQuoteSelector',
-      exact: quote,
-      prefix,
-      suffix
-    }, {
+      exact: quote
+    }
+
+    if (container) {
+      const { prefix, suffix } = getQuoteContext(range, container);
+      quoteSelector.prefix = prefix;
+      quoteSelector.suffix = suffix;
+    }
+
+    const positionSelector: W3CTextSelector = {
       type: 'TextPositionSelector',
       start,
       end
-    }];
+    }
 
     return {
       ...targetRest,
@@ -158,10 +162,9 @@ export const serializeW3CTextAnnotation = <I extends TextAnnotation = TextAnnota
       // @ts-expect-error: `scope` is not part of the core `TextSelector` type
       scope: 'scope' in s ? s.scope : undefined,
       source,
-      selector: w3cSelectors
+      selector: [quoteSelector, positionSelector]
     };
   });
-
 
   return {
     ...rest,
