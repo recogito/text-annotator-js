@@ -50,7 +50,7 @@ export const TextAnnotator = <I extends TextAnnotation = TextAnnotation, E exten
   useEffect(() => anno?.setUser(user), [anno, user]);
 
   return (
-    <div ref={el} className={className}>
+    <div ref={el} className={`r6o-annotatable no-focus-outline ${className}`}>
       {children}
     </div>
   )
