@@ -52,7 +52,7 @@ export const SelectionHandler = (
 
   let lastDownEvent: Selection['event'] | undefined;
 
-  const onSelectStart = (evt: Event) => {
+  const onSelectStart = (evt: Event) => {    
     if (isLeftClick === false)
       return;
 

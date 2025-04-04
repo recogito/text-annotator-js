@@ -1,4 +1,4 @@
-import { ReactNode, useContext, useEffect, useRef } from 'react';
+import { JSX, ReactNode, useContext, useEffect, useRef } from 'react';
 import { AnnotoriousContext, Filter } from '@annotorious/react';
 import type { FormatAdapter } from '@annotorious/core';
 import type { HighlightStyleExpression, TextAnnotation, TextAnnotatorOptions } from '@recogito/text-annotator';
@@ -50,7 +50,7 @@ export const TextAnnotator = <I extends TextAnnotation = TextAnnotation, E exten
   useEffect(() => anno?.setUser(user), [anno, user]);
 
   return (
-    <div ref={el} className={className}>
+    <div ref={el} className={`r6o-annotatable no-focus-outline ${className}`}>
       {children}
     </div>
   )
