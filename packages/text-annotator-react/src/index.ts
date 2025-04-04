@@ -49,13 +49,13 @@ export type {
   W3CTextSelector,
   W3CAnnotationStylesheet,
   TextAnnotator as RecogitoTextAnnotator,
-  TextAnnotationStore,
-  parseW3CTextAnnotation,
-  serializeW3CTextAnnotation
+  TextAnnotationStore
 } from '@recogito/text-annotator';
 
 export {
-  W3CTextFormat
+  W3CTextFormat,
+  parseW3CTextAnnotation,
+  serializeW3CTextAnnotation
 } from '@recogito/text-annotator';
 
 export type {
@@ -65,6 +65,9 @@ export type {
   TEIRangeSelector,
   W3CTEIAnnotation,
   W3CTEIAnnotationTarget,
-  W3CTEIRangeSelector,
+  W3CTEIRangeSelector
+} from '@recogito/text-annotator-tei';
+
+export {
   serializeW3CTEIAnnotation
 } from '@recogito/text-annotator-tei';
