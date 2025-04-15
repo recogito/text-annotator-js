@@ -53,7 +53,7 @@ const scroll = <I extends TextAnnotation = TextAnnotation>(
 
 export const scrollIntoView = <I extends TextAnnotation = TextAnnotation>(
   container: HTMLElement, store: TextAnnotationStore<I>
-) => <E extends HTMLElement = HTMLElement>(
+) => <E extends Element = Element>(
   annotationOrId: string | I, scrollParentOrId?: string | E
 ) => {
   const id =
