@@ -102,7 +102,7 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
     } else {
       setOpen(false);
     }
-  }, [annotation?.id, isAnnotationQuoteIdling, r?.state.store]);
+  }, [annotation?.id, annotation?.target.selector, isAnnotationQuoteIdling, r?.state.store]);
 
   useEffect(() => {
     if (!r) return;
