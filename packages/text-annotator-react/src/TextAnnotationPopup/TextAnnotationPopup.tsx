@@ -1,4 +1,5 @@
 import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+
 import { useAnnotator, useSelection } from '@annotorious/react';
 import {
   NOT_ANNOTATABLE_CLASS,
@@ -7,7 +8,6 @@ import {
   type TextAnnotator,
 } from '@recogito/text-annotator';
 
-import { isMobile } from './isMobile';
 import {
   arrow,
   autoUpdate,
@@ -25,6 +25,8 @@ import {
   useRole
 } from '@floating-ui/react';
 
+import { useAnnotationQuoteIdling } from '../hooks';
+import { isMobile } from './isMobile';
 import './TextAnnotationPopup.css';
 
 interface TextAnnotationPopupProps {
@@ -60,8 +62,9 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
   const r = useAnnotator<TextAnnotator>();
 
   const { selected, event } = useSelection<TextAnnotation>();
-
   const annotation = selected[0]?.annotation;
+
+  const isAnnotationQuoteIdling = useAnnotationQuoteIdling(annotation?.id);
 
   const [isOpen, setOpen] = useState(selected?.length > 0);
 
@@ -93,18 +96,13 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
   const { getFloatingProps } = useInteractions([dismiss, role]);
 
   useEffect(() => {
-    if (!r) return;
-
-    const annotationId = annotation?.id;
-    const annotationSelectorsLength = annotation?.target.selector.length;
-
-    if (annotationId && annotationSelectorsLength > 0) {
+    if (annotation?.id && isAnnotationQuoteIdling) {
       const bounds = r?.state.store.getAnnotationBounds(annotation.id);
       setOpen(Boolean(bounds));
     } else {
       setOpen(false);
     }
-  }, [annotation?.id, annotation?.target.selector, r?.state.store]);
+  }, [annotation?.id, annotation?.target.selector, isAnnotationQuoteIdling, r?.state.store]);
 
   useEffect(() => {
     if (!r) return;
@@ -183,7 +181,7 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
     </FloatingPortal>
   ) : null;
 
-}
+};
 
 /**
  * Prevent text-annotator from handling the irrelevant events
