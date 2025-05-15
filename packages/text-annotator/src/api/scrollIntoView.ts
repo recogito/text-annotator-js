@@ -19,7 +19,7 @@ const getScrollParent = (el: Element) => {
 export const scrollIntoView = (
   container: HTMLElement, store: TextAnnotationStore
 ) => (annotationOrId: string | TextAnnotation) => {
-  const id = 
+  const id =
     typeof annotationOrId === 'string' ? annotationOrId : annotationOrId.id;
 
   // Executes scroll on an annotation with a valid DOM range selector
@@ -54,24 +54,32 @@ export const scrollIntoView = (
 
   // Get closest scrollable parent
   const scrollParent: Element = getScrollParent(container);
-  if (scrollParent) {
-    // Get curren version of the annotation from the store
-    const current = store.getAnnotation(id);
 
-    // The 1st selector is the topmost one as well
-    const { range } = current.target.selector[0];
-    if (range && !range.collapsed) {
-      scroll(current.target);
-      return true;
-    } else {
-      // Try reviving to account for lazy rendering
-      const revived = reviveTarget(current.target, container);
-      const { range } = revived.selector[0];
-      if (range && !range.collapsed) {
-        scroll(revived);
-        return true;
-      }
-    }
+  if (!scrollParent) {
+    console.warn(`The scroll parent is missing for the annotation: ${id}`, { container });
+    return false;
+  }
+
+  // Get curren version of the annotation from the store
+  const current = store.getAnnotation(id);
+  if (!current) {
+    console.warn(`The annotation is missing in the store: ${id}`);
+    return false;
+  }
+
+  // The 1st selector is the topmost one as well
+  const { range: annoRange } = current.target.selector[0];
+  if (annoRange && !annoRange.collapsed) {
+    scroll(current.target);
+    return true;
+  }
+
+  // Try reviving to account for lazy rendering
+  const revived = reviveTarget(current.target, container);
+  const { range: revivedAnnoRange } = revived.selector[0];
+  if (revivedAnnoRange && !revivedAnnoRange.collapsed) {
+    scroll(revived);
+    return true;
   }
 
   return false;
