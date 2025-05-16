@@ -1,9 +1,9 @@
 import type { TextAnnotationStore } from '../state';
-import type { TextAnnotation, TextAnnotationTarget } from '../model';
+import type { TextAnnotation } from '../model';
 import { reviveTarget } from '../utils';
 
 const getScrollParent = (el: Element) => {
-  if (el === null)
+  if (!el)
     return document.scrollingElement;
 
   const { overflowY } = window.getComputedStyle(el);
@@ -16,44 +16,53 @@ const getScrollParent = (el: Element) => {
     return getScrollParent(el.parentElement);
 };
 
-export const scrollIntoView = (
-  container: HTMLElement, store: TextAnnotationStore
-) => (annotationOrId: string | TextAnnotation) => {
+// Executes scroll on an annotation with a valid DOM range selector
+const scroll = <I extends TextAnnotation = TextAnnotation>(
+  store: TextAnnotationStore<I>,
+  target: I['target'],
+  scrollParent: Element
+) => {
+  // Parent bounds and client (= visible) height
+  const parentBounds = scrollParent.getBoundingClientRect();
+  const parentHeight = scrollParent.clientHeight;
+  const parentWidth = scrollParent.clientWidth;
+
+  // Position of the annotation relative to viewport
+  const annotationBounds = target.selector[0].range.getBoundingClientRect();
+
+  /*
+   Note: `getBoundingClientRect` seems to return the wrong height!
+   (Includes block elements?)
+   Instead, the normalized height is used from the spatial index!
+  */
+  const { width, height } = store.getAnnotationBounds(target.annotation);
+
+  // Position of the annotation relative to scrollParent
+  const offsetTop = annotationBounds.top - parentBounds.top;
+  const offsetLeft = annotationBounds.left - parentBounds.left;
+
+  const scrollTop = scrollParent.parentElement ? scrollParent.scrollTop : 0;
+  const scrollLeft = scrollParent.parentElement ? scrollParent.scrollLeft : 0;
+
+  // Scroll the annotation to the center of the viewport
+  const top = offsetTop + scrollTop - (parentHeight - height) / 2;
+  const left = offsetLeft + scrollLeft - (parentWidth - width) / 2;
+
+  scrollParent.scroll({ top, left, behavior: 'smooth' });
+};
+
+export const scrollIntoView = <I extends TextAnnotation = TextAnnotation>(
+  container: HTMLElement, store: TextAnnotationStore<I>
+) => <E extends Element = Element>(
+  annotationOrId: string | I, scrollParentOrId?: string | E
+) => {
   const id =
     typeof annotationOrId === 'string' ? annotationOrId : annotationOrId.id;
 
-  // Executes scroll on an annotation with a valid DOM range selector
-  const scroll = (target: TextAnnotationTarget) => {
-    // Parent bounds and client (= visible) height
-    const parentBounds = scrollParent.getBoundingClientRect();
-    const parentHeight = scrollParent.clientHeight;
-    const parentWidth = scrollParent.clientWidth;
+  const scrollParent = scrollParentOrId
+    ? typeof scrollParentOrId === 'string' ? document.getElementById(scrollParentOrId) : scrollParentOrId
+    : getScrollParent(container);
 
-    // Position of the annotation relative to viewport
-    // Note: first selector is not necessarily top one...
-    const annotationBounds = target.selector[0].range.getBoundingClientRect();
-
-    // Note: getBoundingClientRect seems to return wrong height! 
-    // (Includes block elements?) We'll therefore use the normalized height
-    // from the spatial index!
-    const { width, height } = store.getAnnotationBounds(id);
-
-    // Position of the annotation relative to scrollParent
-    const offsetTop = annotationBounds.top - parentBounds.top;
-    const offsetLeft = annotationBounds.left - parentBounds.left;
-
-    const scrollTop = scrollParent.parentElement ? scrollParent.scrollTop : 0;
-    const scrollLeft = scrollParent.parentElement ? scrollParent.scrollLeft : 0;
-
-    // Scroll the annotation to the center of the viewport
-    const top = offsetTop + scrollTop - (parentHeight - height) / 2;
-    const left = offsetLeft + scrollLeft - (parentWidth - width) / 2;
-
-    scrollParent.scroll({ top, left, behavior: 'smooth' });
-  };
-
-  // Get closest scrollable parent
-  const scrollParent: Element = getScrollParent(container);
 
   if (!scrollParent) {
     console.warn(`The scroll parent is missing for the annotation: ${id}`, { container });
@@ -67,10 +76,10 @@ export const scrollIntoView = (
     return false;
   }
 
-  // The 1st selector is the topmost one as well
+  // The first selector is the topmost one as well
   const { range: annoRange } = current.target.selector[0];
   if (annoRange && !annoRange.collapsed) {
-    scroll(current.target);
+    scroll(store, current.target, scrollParent);
     return true;
   }
 
@@ -78,7 +87,7 @@ export const scrollIntoView = (
   const revived = reviveTarget(current.target, container);
   const { range: revivedAnnoRange } = revived.selector[0];
   if (revivedAnnoRange && !revivedAnnoRange.collapsed) {
-    scroll(revived);
+    scroll(store, revived, scrollParent);
     return true;
   }
 
