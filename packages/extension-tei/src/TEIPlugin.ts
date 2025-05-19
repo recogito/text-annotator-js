@@ -52,14 +52,14 @@ export const TEIPlugin = (anno: TextAnnotator): RecogitoTEIAnnotator => {
       _addAnnotation(toTEI(annotation), origin);
   }
 
-  const _bulkAddAnnotation = store.bulkAddAnnotation;
-  store.bulkAddAnnotation = (annotations: Array<TEIAnnotation | TextAnnotation>, replace = true, origin: Origin) => {
+  const _bulkAddAnnotations = store.bulkAddAnnotations;
+  store.bulkAddAnnotations = (annotations: Array<TEIAnnotation | TextAnnotation>, replace = true, origin: Origin) => {
     const teiAnnotations = annotations.map(a => {
       const { selector } = a.target;
       return ('startSelector' in selector && 'start' in selector) ? a : toTEI(a);
     });
     
-    return _bulkAddAnnotation(teiAnnotations, replace, origin);
+    return _bulkAddAnnotations(teiAnnotations, replace, origin);
   }
 
   const _updateAnnotation = store.updateAnnotation;
