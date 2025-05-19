@@ -243,12 +243,20 @@ export const SelectionHandler = (
 
     if (sel?.isCollapsed) return;
 
-    // When selecting the initial word, Chrome Android fires `contextmenu` 
-    // before selectionChanged.
+    /**
+     * When selecting the initial word, Chrome Android
+     * fires the `contextmenu` before the `selectionchange`
+     */
     if (!currentTarget || currentTarget.selector.length === 0) {
       onSelectionChange(evt);
     }
-    
+
+    /**
+     * The selection couldn't be initiated,
+     * as it might span over a not-annotatable element.
+     */
+    if (!currentTarget) return;
+
     upsertCurrentTarget();
 
     selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));
