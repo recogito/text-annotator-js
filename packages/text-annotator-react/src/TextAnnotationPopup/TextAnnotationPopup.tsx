@@ -6,8 +6,6 @@ import {
   type TextAnnotation,
   type TextAnnotator,
 } from '@recogito/text-annotator';
-
-import { isMobile } from './isMobile';
 import {
   arrow,
   autoUpdate,
@@ -24,6 +22,8 @@ import {
   useInteractions,
   useRole
 } from '@floating-ui/react';
+import { isMobile } from './isMobile';
+import { useAnnotationQuoteIdle } from './useAnnotationQuoteIdle';
 
 import './TextAnnotationPopup.css';
 
@@ -60,8 +60,9 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
   const r = useAnnotator<TextAnnotator>();
 
   const { selected, event } = useSelection<TextAnnotation>();
-
   const annotation = selected[0]?.annotation;
+
+  const isAnnotationQuoteIdle = useAnnotationQuoteIdle(annotation?.id);
 
   const [isOpen, setOpen] = useState(selected?.length > 0);
 
@@ -93,13 +94,13 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
   const { getFloatingProps } = useInteractions([dismiss, role]);
 
   useEffect(() => {
-    if (annotation?.id) {
+    if (annotation?.id && isAnnotationQuoteIdle) {
       const bounds = r?.state.store.getAnnotationBounds(annotation.id);
       setOpen(Boolean(bounds));
     } else {
       setOpen(false);
     }
-  }, [annotation?.id, r?.state.store]);
+  }, [annotation?.id, annotation?.target.selector, isAnnotationQuoteIdle, r?.state.store]);
 
   useEffect(() => {
     if (!r) return;
@@ -178,7 +179,7 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
     </FloatingPortal>
   ) : null;
 
-}
+};
 
 /**
  * Prevent text-annotator from handling the irrelevant events
