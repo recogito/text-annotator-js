@@ -11,7 +11,7 @@ export interface TextAnnotationStore<T extends TextAnnotation = TextAnnotation> 
   // on annotations that failed to render, to support lazy document loading scenarios
   addAnnotation(annotation: T, origin?: Origin): boolean;
 
-  bulkAddAnnotation(annotations: T[], replace: boolean, origin?: Origin): T[];
+  bulkAddAnnotations(annotations: T[], replace: boolean, origin?: Origin): T[];
 
   bulkUpsertAnnotations(annotations: T[], origin?: Origin): T[];
 

@@ -33,7 +33,7 @@ export const reviveSelector = <T extends TextSelector>(selector: T, container: H
   // If there's no offset reference, start immediately
   let startCounting = !offsetReference;
   while (n !== null) {
-    startCounting ||= offsetReference?.contains(n);
+    startCounting ||= (typeof offsetReference?.contains === 'function') ? offsetReference.contains(n) : false;
 
     if (startCounting) {
       const len = n.textContent?.length || 0;
