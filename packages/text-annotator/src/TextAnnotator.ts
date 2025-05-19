@@ -44,8 +44,7 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
     user: createAnonymousGuest()
   });
 
-  const state: TextAnnotatorState<I, E> =
-    createTextAnnotatorState<I, E>(container, opts.userSelectAction);
+  const state: TextAnnotatorState<I, E> = createTextAnnotatorState<I, E>(container, opts);
 
   const { selection, viewport } = state;
 
