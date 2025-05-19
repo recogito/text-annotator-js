@@ -6,6 +6,7 @@
   height: 100%;
   mix-blend-mode: multiply;
   pointer-events: none;
+  overflow: hidden;
   z-index: 1;
 }
 
