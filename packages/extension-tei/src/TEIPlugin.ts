@@ -47,19 +47,37 @@ export const TEIPlugin = (anno: TextAnnotator): RecogitoTEIAnnotator => {
   const _addAnnotation = store.addAnnotation;
   store.addAnnotation = (annotation: TEIAnnotation | TextAnnotation, origin: Origin) => {
     const { selector } = annotation.target;
-    return ('startSelector' in selector && 'start' in selector) ?
-      _addAnnotation(annotation, origin) :
-      _addAnnotation(toTEI(annotation), origin);
+    try {
+      return ('startSelector' in selector && 'start' in selector) ?
+        _addAnnotation(annotation, origin) :
+        _addAnnotation(toTEI(annotation), origin);
+    } catch (error) {
+      console.warn(error);
+      console.warn(`Failed to render annotation`, annotation);
+    }
   }
 
   const _bulkAddAnnotations = store.bulkAddAnnotations;
   store.bulkAddAnnotations = (annotations: Array<TEIAnnotation | TextAnnotation>, replace = true, origin: Origin) => {
     const teiAnnotations = annotations.map(a => {
       const { selector } = a.target;
-      return ('startSelector' in selector && 'start' in selector) ? a : toTEI(a);
+      try {
+        return ('startSelector' in selector && 'start' in selector) ? a : toTEI(a);
+      } catch (error) {
+        console.warn(error);
+      }
     });
+
+    const valid = teiAnnotations.filter(Boolean);
+
+    if (teiAnnotations.length !== valid.length) {
+      console.warn(`Failed to render ${teiAnnotations.length - valid.length} annotations.`);
+      teiAnnotations.forEach((a, idx) => {
+        if (!a) console.warn(annotations[idx]);
+      })
+    }
     
-    return _bulkAddAnnotations(teiAnnotations, replace, origin);
+    return _bulkAddAnnotations(valid, replace, origin);
   }
 
   const _updateAnnotation = store.updateAnnotation;
