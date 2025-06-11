@@ -97,7 +97,11 @@ export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorS
       const selected = selectedIds.includes(annotation.id);
       const hovered = annotation.id === hover.current;
 
-      return { annotation, rects, state: { selected, hover: hovered }};
+      return {
+        annotation,
+        rects,
+        state: { selected, hovered }
+      };
     });
 
     renderer.redraw(highlights, bounds, currentStyle, currentPainter, lazy);
