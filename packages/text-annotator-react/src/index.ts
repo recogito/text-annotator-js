@@ -1,4 +1,5 @@
 export * from './tei';
+export * from './hooks';
 export * from './TextAnnotator';
 export * from './TextAnnotationPopup';
 export * from './TextAnnotatorPlugin';
