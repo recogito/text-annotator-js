@@ -131,6 +131,9 @@ export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorS
   // Refresh on selection change
   const unsubscribeSelection = selection.subscribe(() => redraw());
 
+  // Refresh on hover change
+  const unsubscribeHover = hover.subscribe(() => redraw());
+
   // Refresh on scroll
   const onScroll = () => redraw(true);
   document.addEventListener('scroll', onScroll, { capture: true, passive: true });
@@ -170,6 +173,7 @@ export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorS
     store.unobserve(onStoreChange);
 
     unsubscribeSelection();
+    unsubscribeHover();
 
     document.removeEventListener('scroll', onScroll);
 
