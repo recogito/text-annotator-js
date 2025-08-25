@@ -14,7 +14,8 @@ import {
   isMac,
   isWhitespaceOrEmpty,
   trimRangeToContainer,
-  isNotAnnotatable
+  isNotAnnotatable,
+  isOutsideContainer
 } from './utils';
 
 const CLICK_TIMEOUT = 300;
@@ -27,6 +28,7 @@ const SELECTION_KEYS = [
   ...ARROW_KEYS.map(key => `shift+${key}`),
   SELECT_ALL
 ];
+
 
 export const SelectionHandler = (
   container: HTMLElement,
@@ -52,7 +54,7 @@ export const SelectionHandler = (
 
   let lastDownEvent: Selection['event'] | undefined;
 
-  const onSelectStart = (evt: Event) => {    
+  const onSelectStart = (evt: Event) => {
     if (isLeftClick === false)
       return;
 
@@ -62,7 +64,7 @@ export const SelectionHandler = (
      * be annotatable (like a component popup).
      * Note that Chrome/iOS will sometimes return the root doc as target!
      */
-    currentTarget = isNotAnnotatable(evt.target as Node)
+    currentTarget = (isNotAnnotatable(evt.target as Node) || isOutsideContainer(container, evt.target as Node))
       ? undefined
       : {
         annotation: uuidv4(),
@@ -90,11 +92,11 @@ export const SelectionHandler = (
 
     /**
      * This is to handle cases where the selection is "hijacked"
-     * by another element in a not-annotatable area.
+     * by another element in a not-annotatable area or outside the container.
      * A rare case in theory.
-     * But rich text editors will like Quill do it.
+     * But rich text editors like Quill will do it.
      */
-    if (isNotAnnotatable(sel.anchorNode)) {
+    if (isNotAnnotatable(sel.anchorNode) || isOutsideContainer(container, sel.anchorNode)) {
       currentTarget = undefined;
       return;
     }
@@ -174,7 +176,7 @@ export const SelectionHandler = (
    * to the initial pointerdown event and remember the button
    */
   const onPointerDown = (evt: PointerEvent) => {
-    if (isNotAnnotatable(evt.target as Node)) return;
+    if (isNotAnnotatable(evt.target as Node) || isOutsideContainer(container, evt.target as Node)) return;
 
     /**
      * Cloning the event to prevent it from accidentally being `undefined`
@@ -185,7 +187,7 @@ export const SelectionHandler = (
   };
 
   const onPointerUp = (evt: PointerEvent) => {
-    if (isNotAnnotatable(evt.target as Node) || !isLeftClick) return;
+    if (isNotAnnotatable(evt.target as Node) || isOutsideContainer(container, evt.target as Node) || !isLeftClick) return;
 
     // Logic for selecting an existing annotation
     const clickSelect = () => {
@@ -213,7 +215,7 @@ export const SelectionHandler = (
       }
     };
 
-    const timeDifference = evt.timeStamp - lastDownEvent.timeStamp;
+    const timeDifference = evt.timeStamp - (lastDownEvent?.timeStamp || evt.timeStamp);
 
     /**
      * We must check the `isCollapsed` within the 0-timeout
@@ -236,6 +238,8 @@ export const SelectionHandler = (
         selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));
       }
     });
+
+    lastDownEvent = undefined;
   }
 
   const onContextMenu = (evt: PointerEvent) => {
@@ -355,7 +359,7 @@ export const SelectionHandler = (
     }
   };
 
-  container.addEventListener('pointerdown', onPointerDown);
+  document.addEventListener('pointerdown', onPointerDown);
   document.addEventListener('pointerup', onPointerUp);
   document.addEventListener('contextmenu', onContextMenu);
 
@@ -366,7 +370,7 @@ export const SelectionHandler = (
   }
 
   const destroy = () => {
-    container.removeEventListener('pointerdown', onPointerDown);
+    document.removeEventListener('pointerdown', onPointerDown);
     document.removeEventListener('pointerup', onPointerUp);
     document.removeEventListener('contextmenu', onContextMenu);
 
