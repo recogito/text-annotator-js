@@ -18,6 +18,19 @@
         justify-content: center;
       }
 
+      html {
+        flex-direction: row;
+      }
+      body {
+        flex-direction: column;
+      }
+
+      .header,
+      .footer {
+        padding: 20px 40px;
+        margin: 20px 0;
+      }
+
       #content {
         max-width: 800px;
         background-color: #fff;
@@ -25,6 +38,7 @@
         border-style: solid;
         border-color: #cfcfcf;
         border-width: 0 1px;
+        margin: 20px 0;
       }
 
       #content .not-annotatable {
@@ -43,10 +57,16 @@
       }
 
       #buttons {
+        display: flex;
+        flex-direction: column;
         position: fixed;
         top: 10px;
         left: 10px;
         z-index: 1;
+      }
+
+      #buttons > * {
+        margin: .5rem;
       }
 
       #debug {
@@ -71,6 +91,11 @@
   <div id="buttons">
     <button id="filter">Toggle Filter</button>
     <button id="fake-presence">Fake Presence</button>
+    <button id="delete-current-annotation">Delete</button>
+  </div>
+
+  <div class="header">
+      Text outside the content
   </div>
 
   <div id="content">
@@ -285,6 +310,9 @@
       anything about the return of his dear father- for this will make people speak well of him."
     </p>
   </div>
+  <div class="footer">
+    This is the footer.
+  </div>
 
   <script type="module">
 		import { createTextAnnotator, W3CTextFormat } from '../src/index.ts';
@@ -396,6 +424,14 @@
 					});
 				}
 			});
+
+
+          var deleteCurrentAnnotationButton = document.getElementById('delete-current-annotation');
+
+          deleteCurrentAnnotationButton.addEventListener('click', function () {
+            r.getSelected().forEach(a => r.removeAnnotation(a));
+            window.getSelection().removeAllRanges();
+          });
 
 			// Make global so we can manipulate from the console
 			window.r = r;

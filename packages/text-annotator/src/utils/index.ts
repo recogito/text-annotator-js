@@ -5,6 +5,7 @@ export * from './programmaticallyFocusable';
 export * from './debounce';
 export * from './getQuoteContext';
 export * from './isNotAnnotatable';
+export * from './isOutsideContainer';
 export * from './isRevived';
 export * from './isWhitespaceOrEmpty';
 export * from './mergeClientRects';
