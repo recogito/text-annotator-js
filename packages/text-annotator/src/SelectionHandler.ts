@@ -58,6 +58,7 @@ export const SelectionHandler = (
   }
 
   const onSelectStart = (evt: Event) => {    
+    console.log('start', evt);
     if (isLeftClick === false)
       return;
 
@@ -72,7 +73,7 @@ export const SelectionHandler = (
     } else {
       const { selected } = selection;
 
-      if (isModifySelected(evt) && selected.length === 1 && selected[0].editable) {
+      if (isModifySelected({...evt, ...lastDownEvent}) && selected.length === 1 && selected[0].editable) {
         // Add to currently selected
         const current = store.getAnnotation(selected[0].id);
         currentTarget = {
@@ -190,7 +191,7 @@ export const SelectionHandler = (
       store.updateTarget(currentTarget, Origin.LOCAL);
     } else {
       // Proper lifecycle management: clear the previous selection first...
-      if (!isModifySelected(evt))
+      if (!isModifySelected(lastDownEvent))
         selection.clear();
     }
   });
@@ -235,7 +236,7 @@ export const SelectionHandler = (
 
         if (hasChanged)
           selection.userSelect(nextIds, evt);
-      } else {
+      } else if (!isModifySelected(evt)) {
         selection.clear();
       }
     };
