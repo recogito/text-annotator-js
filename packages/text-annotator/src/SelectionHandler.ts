@@ -52,6 +52,11 @@ export const SelectionHandler = (
 
   let lastDownEvent: Selection['event'] | undefined;
 
+  const isModifySelected = (evt: Event) => {
+    const asPtr = evt as PointerEvent;
+    return (asPtr.ctrlKey || asPtr.metaKey);
+  }
+
   const onSelectStart = (evt: Event) => {    
     if (isLeftClick === false)
       return;
@@ -62,17 +67,35 @@ export const SelectionHandler = (
      * be annotatable (like a component popup).
      * Note that Chrome/iOS will sometimes return the root doc as target!
      */
-    currentTarget = isNotAnnotatable(evt.target as Node)
-      ? undefined
-      : {
-        annotation: uuidv4(),
-        selector: [],
-        creator: currentUser,
-        created: new Date()
-      };
+    if (isNotAnnotatable(evt.target as Node)) {
+      currentTarget = undefined;
+    } else {
+      const { selected } = selection;
+
+      if (isModifySelected(evt) && selected.length === 1 && selected[0].editable) {
+        // Add to currently selected
+        const current = store.getAnnotation(selected[0].id);
+        currentTarget = {
+          annotation: current.id,
+          selector: [...current.target.selector],
+          created: current.target.created,
+          creator: current.target.creator,
+          updated: new Date(),
+          updatedBy: currentUser
+        }
+      } else {  
+        // Start new annotation    
+        currentTarget = {
+          annotation: uuidv4(),
+          selector: [],
+          created: new Date(),
+          creator: currentUser
+        }
+      }
+    }
   };
 
-  const onSelectionChange = debounce((evt: Event) => {
+  const onSelectionChange = debounce((evt: PointerEvent) => {
     const sel = document.getSelection();
 
     /**
@@ -129,7 +152,7 @@ export const SelectionHandler = (
        *
        * @see https://github.com/recogito/text-annotator-js/issues/139
        */
-      if (store.getAnnotation(currentTarget.annotation)) {
+      if (store.getAnnotation(currentTarget.annotation) && !isModifySelected(lastDownEvent)) {
         selection.clear();
         store.deleteAnnotation(currentTarget.annotation);
       }
@@ -152,7 +175,10 @@ export const SelectionHandler = (
 
     currentTarget = {
       ...currentTarget,
-      selector: annotatableRanges.map(r => rangeToSelector(r, container, offsetReferenceSelector)),
+      selector: [
+        ...currentTarget.selector,
+        ...annotatableRanges.map(r => rangeToSelector(r, container, offsetReferenceSelector))
+      ],
       updated: new Date()
     };
 
@@ -164,7 +190,8 @@ export const SelectionHandler = (
       store.updateTarget(currentTarget, Origin.LOCAL);
     } else {
       // Proper lifecycle management: clear the previous selection first...
-      selection.clear();
+      if (!isModifySelected(evt))
+        selection.clear();
     }
   });
 
