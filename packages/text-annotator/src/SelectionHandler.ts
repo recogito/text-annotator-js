@@ -46,11 +46,19 @@ export const SelectionHandler = (
 
   const { store, selection } = state;
 
-  let currentTarget: TextAnnotationTarget | undefined;
+  let currentTarget: {
+    previous?: TextAnnotationTarget,
+    next: TextAnnotationTarget
+  } | undefined;
 
   let isLeftClick: boolean | undefined;
 
   let lastDownEvent: Selection['event'] | undefined;
+
+  const isModifySelected = (evt: Event) => {
+    const asPtr = evt as PointerEvent;
+    return (asPtr.ctrlKey || asPtr.metaKey);
+  }
 
   const onSelectStart = (evt: Event) => {    
     if (isLeftClick === false)
@@ -62,17 +70,42 @@ export const SelectionHandler = (
      * be annotatable (like a component popup).
      * Note that Chrome/iOS will sometimes return the root doc as target!
      */
-    currentTarget = isNotAnnotatable(evt.target as Node)
-      ? undefined
-      : {
-        annotation: uuidv4(),
-        selector: [],
-        creator: currentUser,
-        created: new Date()
-      };
+    if (isNotAnnotatable(evt.target as Node)) {
+      currentTarget = undefined;
+    } else {
+      const { selected } = selection;
+
+      if (isModifySelected({...evt, ...lastDownEvent}) && selected.length === 1 && selected[0].editable) {
+        // Add to currently selected
+        const current = store.getAnnotation(selected[0].id);
+        currentTarget = {
+          previous: {
+            ...current.target
+          },
+          next: {
+            annotation: current.id,
+            selector: [],
+            created: current.target.created,
+            creator: current.target.creator,
+            updated: new Date(),
+            updatedBy: currentUser
+          }
+        }
+      } else {  
+        // Start new annotation    
+        currentTarget = {
+          next: {
+            annotation: uuidv4(),
+            selector: [],
+            created: new Date(),
+            creator: currentUser
+          }
+        }
+      }
+    }
   };
 
-  const onSelectionChange = debounce((evt: Event) => {
+  const onSelectionChange = debounce((evt: PointerEvent) => {
     const sel = document.getSelection();
 
     /**
@@ -129,42 +162,49 @@ export const SelectionHandler = (
        *
        * @see https://github.com/recogito/text-annotator-js/issues/139
        */
-      if (store.getAnnotation(currentTarget.annotation)) {
+      if (store.getAnnotation(currentTarget.next.annotation) && !isModifySelected(lastDownEvent)) {
         selection.clear();
-        store.deleteAnnotation(currentTarget.annotation);
+        store.deleteAnnotation(currentTarget.next.annotation);
       }
 
       return;
     }
 
-    const selectionRange = sel.getRangeAt(0);
+    const selectionRanges = Array.from(Array(sel.rangeCount).keys()).map(idx => sel.getRangeAt(idx));
 
     // The selection should be captured only within the annotatable container
-    const containedRange = trimRangeToContainer(selectionRange, container);
-    if (isWhitespaceOrEmpty(containedRange)) return;
+    const containedRanges = selectionRanges.map(r => trimRangeToContainer(r, container));
+    if (containedRanges.every(r => isWhitespaceOrEmpty(r))) return;
 
-    const annotatableRanges = splitAnnotatableRanges(containedRange.cloneRange());
+    const annotatableRanges = containedRanges.flatMap(r => splitAnnotatableRanges(r.cloneRange()));
 
     const hasChanged =
-      annotatableRanges.length !== currentTarget.selector.length ||
-      annotatableRanges.some((r, i) => r.toString() !== currentTarget.selector[i]?.quote);
+      annotatableRanges.length !== currentTarget.next.selector.length ||
+      annotatableRanges.some((r, i) => r.toString() !== currentTarget.next.selector[i]?.quote);
     if (!hasChanged) return;
 
     currentTarget = {
       ...currentTarget,
-      selector: annotatableRanges.map(r => rangeToSelector(r, container, offsetReferenceSelector)),
-      updated: new Date()
+      next: {
+        ...currentTarget.next,
+        selector: [
+          ...(currentTarget.previous ? currentTarget.previous.selector : []),
+          ...annotatableRanges.map(r => rangeToSelector(r, container, offsetReferenceSelector))
+        ],
+        updated: new Date()
+      }
     };
 
     /**
      * During mouse selection on the desktop, the annotation won't usually exist while the selection is being edited.
      * But it'll be typical during selection via the keyboard or mobile's handlebars.
      */
-    if (store.getAnnotation(currentTarget.annotation)) {
-      store.updateTarget(currentTarget, Origin.LOCAL);
+    if (store.getAnnotation(currentTarget.next.annotation)) {
+      store.updateTarget(currentTarget.next, Origin.LOCAL);
     } else {
       // Proper lifecycle management: clear the previous selection first...
-      selection.clear();
+      if (!isModifySelected(lastDownEvent))
+        selection.clear();
     }
   });
 
@@ -208,7 +248,7 @@ export const SelectionHandler = (
 
         if (hasChanged)
           selection.userSelect(nextIds, evt);
-      } else {
+      } else if (!isModifySelected(evt)) {
         selection.clear();
       }
     };
@@ -231,9 +271,9 @@ export const SelectionHandler = (
       if (sel?.isCollapsed && timeDifference < CLICK_TIMEOUT) {
         currentTarget = undefined;
         clickSelect();
-      } else if (currentTarget && currentTarget.selector.length > 0) {
+      } else if (currentTarget && currentTarget.next.selector.length > 0) {
         upsertCurrentTarget();
-        selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));
+        selection.userSelect(currentTarget.next.annotation, clonePointerEvent(evt));
       }
     });
   }
@@ -247,7 +287,7 @@ export const SelectionHandler = (
      * When selecting the initial word, Chrome Android
      * fires the `contextmenu` before the `selectionchange`
      */
-    if (!currentTarget || currentTarget.selector.length === 0) {
+    if (!currentTarget || currentTarget.next.selector.length === 0) {
       onSelectionChange(evt);
     }
 
@@ -259,7 +299,7 @@ export const SelectionHandler = (
 
     upsertCurrentTarget();
 
-    selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));
+    selection.userSelect(currentTarget.next.annotation, clonePointerEvent(evt));
   }
 
   const onKeyup = (evt: KeyboardEvent) => {
@@ -268,7 +308,7 @@ export const SelectionHandler = (
 
       if (!sel.isCollapsed) {
         upsertCurrentTarget();
-        selection.userSelect(currentTarget.annotation, cloneKeyboardEvent(evt));
+        selection.userSelect(currentTarget.next.annotation, cloneKeyboardEvent(evt));
       }
     }
   }
@@ -276,16 +316,16 @@ export const SelectionHandler = (
   const onSelectAll = (evt: KeyboardEvent) => {
 
     const onSelected = () => setTimeout(() => {
-      if (currentTarget?.selector.length > 0) {
+      if (currentTarget?.next.selector.length > 0) {
         selection.clear();
 
         store.addAnnotation({
-          id: currentTarget.annotation,
+          id: currentTarget.next.annotation,
           bodies: [],
-          target: currentTarget
+          target: currentTarget.next
         });
 
-        selection.userSelect(currentTarget.annotation, cloneKeyboardEvent(evt));
+        selection.userSelect(currentTarget.next.annotation, cloneKeyboardEvent(evt));
       }
 
       document.removeEventListener('selectionchange', onSelected);
@@ -334,24 +374,24 @@ export const SelectionHandler = (
 
   // Helper
   const upsertCurrentTarget = () => {
-    const existingAnnotation = store.getAnnotation(currentTarget.annotation);
+    const existingAnnotation = store.getAnnotation(currentTarget.next.annotation);
     if (!existingAnnotation) {
       store.addAnnotation({
-        id: currentTarget.annotation,
+        id: currentTarget.next.annotation,
         bodies: [],
-        target: currentTarget
+        target: currentTarget.next
       });
       return;
     }
 
     const { target: { updated: existingTargetUpdated } } = existingAnnotation;
-    const { updated: currentTargetUpdated } = currentTarget;
+    const { updated: currentTargetUpdated } = currentTarget.next;
     if (
       !existingTargetUpdated ||
       !currentTargetUpdated ||
       existingTargetUpdated < currentTargetUpdated
     ) {
-      store.updateTarget(currentTarget);
+      store.updateTarget(currentTarget.next);
     }
   };
 
