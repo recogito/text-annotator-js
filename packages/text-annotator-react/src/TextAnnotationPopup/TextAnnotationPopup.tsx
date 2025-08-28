@@ -17,10 +17,7 @@ import {
   inline,
   offset,
   shift,
-  useDismiss,
   useFloating,
-  useInteractions,
-  useRole
 } from '@floating-ui/react';
 import { isMobile } from './isMobile';
 import { useAnnotationQuoteIdle } from './useAnnotationQuoteIdle';
@@ -86,12 +83,6 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
     ],
     whileElementsMounted: autoUpdate
   });
-
-  const dismiss = useDismiss(context);
-
-  const role = useRole(context, { role: 'dialog' });
-
-  const { getFloatingProps } = useInteractions([dismiss, role]);
 
   useEffect(() => {
     if (annotation?.id && isAnnotationQuoteIdle) {
