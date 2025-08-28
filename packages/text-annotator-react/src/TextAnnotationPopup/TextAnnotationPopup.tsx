@@ -16,6 +16,7 @@ import {
   FloatingPortal,
   inline,
   offset,
+  Placement,
   shift,
   useFloating,
 } from '@floating-ui/react';
@@ -32,7 +33,11 @@ interface TextAnnotationPopupProps {
 
   arrowProps?: Omit<FloatingArrowProps, 'context' | 'ref'>;
 
+  placement?: Placement;
+
   popup(props: TextAnnotationPopupContentProps): ReactNode;
+
+  onClose?(): void;
 
 }
 
@@ -66,13 +71,16 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
   const arrowRef = useRef(null);
 
   const { refs, floatingStyles, update, context } = useFloating({
-    placement: isMobile() ? 'bottom' : 'top',
+    placement: isMobile() ? 'bottom' : props.placement || 'top',
     open: isOpen,
     onOpenChange: (open, _event, reason) => {
       if (!open && (reason === 'escape-key' || reason === 'focus-out')) {
         setOpen(open);
         r?.cancelSelected();
       }
+
+      if (!open)
+        props.onClose();
     },
     middleware: [
       inline(),
@@ -92,6 +100,11 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
       setOpen(false);
     }
   }, [annotation?.id, annotation?.target.selector, isAnnotationQuoteIdle, r?.state.store]);
+
+  useEffect(() => {
+    if (!props.onClose) return;
+    if (!isOpen) props.onClose();
+  }, [props.onClose, isOpen]);
 
   useEffect(() => {
     if (!r) return;
