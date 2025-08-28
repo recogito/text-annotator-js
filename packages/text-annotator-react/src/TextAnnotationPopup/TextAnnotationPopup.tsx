@@ -68,6 +68,9 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
 
   const [isOpen, setOpen] = useState(selected?.length > 0);
 
+  // So we can reliably trigger the onClose callback
+  const wasOpenRef = useRef(false);
+
   const arrowRef = useRef(null);
 
   const { refs, floatingStyles, update, context } = useFloating({
@@ -78,9 +81,6 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
         setOpen(open);
         r?.cancelSelected();
       }
-
-      if (!open)
-        props.onClose();
     },
     middleware: [
       inline(),
@@ -103,7 +103,13 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
 
   useEffect(() => {
     if (!props.onClose) return;
-    if (!isOpen) props.onClose();
+
+    if (isOpen) {
+      wasOpenRef.current = true;
+    } else if (wasOpenRef.current) {
+      wasOpenRef.current = false;
+      props.onClose();
+    }
   }, [props.onClose, isOpen]);
 
   useEffect(() => {
