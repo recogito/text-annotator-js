@@ -62,6 +62,7 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
   const r = useAnnotator<TextAnnotator>();
 
   const { selected, event } = useSelection<TextAnnotation>();
+  
   const annotation = selected[0]?.annotation;
 
   const isAnnotationQuoteIdle = useAnnotationQuoteIdle(annotation?.id);
