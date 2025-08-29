@@ -41,9 +41,9 @@ interface TextAnnotationPopupProps {
 
 }
 
-export interface TextAnnotationPopupContentProps {
+export interface TextAnnotationPopupContentProps<T extends TextAnnotation = TextAnnotation> {
 
-  annotation: TextAnnotation;
+  annotation: T;
 
   editable?: boolean;
 
