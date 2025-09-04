@@ -1,7 +1,9 @@
 import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { useAnnotator, useSelection } from '@annotorious/react';
 import {
+  debounce,
   NOT_ANNOTATABLE_CLASS,
+  TextAnnotationStore,
   toDomRectList,
   type TextAnnotation,
   type TextAnnotator,
@@ -56,11 +58,21 @@ export interface TextAnnotationPopupContentProps<T extends TextAnnotation = Text
 
 }
 
+let cachedBounds = null;
+
 const toViewportBounds = (annotationBounds: DOMRect, container: HTMLElement): DOMRect => {
   const { left, top, right, bottom } = annotationBounds;
   const containerBounds = container.getBoundingClientRect();
   return new DOMRect(left + containerBounds.left, top + containerBounds.top, right - left, bottom - top);
 }
+
+const updateViewportBounds = debounce((annotationId: string, store: TextAnnotationStore, container: HTMLElement) => {
+  requestAnimationFrame(() => {
+    const bounds = store.getAnnotationBounds(annotationId);
+    if (!bounds) return;
+    cachedBounds = toViewportBounds(bounds, container);
+  });
+}, 250);
 
 export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
 
@@ -131,11 +143,9 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
     if (isOpen && annotation?.id) {
       refs.setPositionReference({
         getBoundingClientRect: () => {
-          // Annotation bounds are relative to the document element
-          const bounds = r.state.store.getAnnotationBounds(annotation.id);
-          return bounds
-            ? toViewportBounds(bounds, r.element)
-            : new DOMRect();
+          // Debounced!
+          updateViewportBounds(annotation.id, r.state.store, r.element);
+          return cachedBounds ? cachedBounds : new DOMRect();
         },
         getClientRects: () => {
           const rects = r.state.store.getAnnotationRects(annotation.id);
