@@ -25,8 +25,8 @@ const iterateNotAnnotatableElements = function*(range: Range): Generator<HTMLEle
 /**
  * Splits a DOM Range into one or more ranges that span annotatable content only.
  */
-export const splitAnnotatableRanges = (range: Range): Range[] => {
-  if (!isRangeAnnotatable(range)) return [];
+export const splitAnnotatableRanges = (container: Node, range: Range): Range[] => {
+  if (!isRangeAnnotatable(container, range)) return [];
 
   const annotatableRanges: Range[] = [];
 
