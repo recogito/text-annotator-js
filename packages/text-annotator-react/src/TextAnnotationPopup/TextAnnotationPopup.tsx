@@ -81,6 +81,7 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
 
   const { refs, floatingStyles, update, context } = useFloating({
     placement: isMobile() ? 'bottom' : props.placement || 'top',
+    strategy: 'absolute',
     open: isOpen,
     onOpenChange: (open, _event, reason) => {
       if (!open && (reason === 'escape-key' || reason === 'focus-out')) {
@@ -92,7 +93,7 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
       inline(),
       offset(10),
       flip({ crossAxis: true }),
-      shift({ crossAxis: true, padding: 10 }),
+      shift({ crossAxis: true, padding: 10,  }),
       arrow({ element: arrowRef })
     ],
     whileElementsMounted: autoUpdate
@@ -146,20 +147,6 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
       refs.setPositionReference(null);
     }
   }, [isOpen, annotation?.id, annotation?.target, r]);
-
-  useEffect(() => {
-    const config: MutationObserverInit = { attributes: true, childList: true, subtree: true };
-
-    const mutationObserver = new MutationObserver(() => update());
-    mutationObserver.observe(document.body, config);
-
-    window.document.addEventListener('scroll', update, true);
-
-    return () => {
-      mutationObserver.disconnect();
-      window.document.removeEventListener('scroll', update, true);
-    };
-  }, [update]);
 
   // Don't shift focus to the floating element if selected via keyboard or on mobile.
   const initialFocus = useMemo(() => {
