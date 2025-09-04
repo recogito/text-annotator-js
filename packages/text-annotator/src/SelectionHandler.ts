@@ -185,7 +185,14 @@ export const SelectionHandler = (
   };
 
   const onPointerUp = (evt: PointerEvent) => {
-    if (isNotAnnotatable(container, evt.target as Node) || !isLeftClick) return;
+    if (!isLeftClick) return;
+
+    if (isNotAnnotatable(container, evt.target as Node)) {
+      if (options.dismissOnClickOutside)
+        selection.clear();
+      
+      return;
+    } 
 
     // Logic for selecting an existing annotation
     const clickSelect = () => {
