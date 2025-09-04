@@ -16,6 +16,7 @@ import {
   FloatingPortal,
   inline,
   offset,
+  Placement,
   shift,
   useDismiss,
   useFloating,
@@ -35,13 +36,19 @@ interface TextAnnotationPopupProps {
 
   arrowProps?: Omit<FloatingArrowProps, 'context' | 'ref'>;
 
+  asPortal?: boolean;
+
+  placement?: Placement;
+
   popup(props: TextAnnotationPopupContentProps): ReactNode;
+
+  onClose?(): void;
 
 }
 
-export interface TextAnnotationPopupContentProps {
+export interface TextAnnotationPopupContentProps<T extends TextAnnotation = TextAnnotation> {
 
-  annotation: TextAnnotation;
+  annotation: T;
 
   editable?: boolean;
 
@@ -60,16 +67,20 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
   const r = useAnnotator<TextAnnotator>();
 
   const { selected, event } = useSelection<TextAnnotation>();
+
   const annotation = selected[0]?.annotation;
 
   const isAnnotationQuoteIdle = useAnnotationQuoteIdle(annotation?.id);
 
   const [isOpen, setOpen] = useState(selected?.length > 0);
 
+  // So we can reliably trigger the onClose callback
+  const wasOpenRef = useRef(false);
+
   const arrowRef = useRef(null);
 
   const { refs, floatingStyles, update, context } = useFloating({
-    placement: isMobile() ? 'bottom' : 'top',
+    placement: isMobile() ? 'bottom' : props.placement || 'top',
     open: isOpen,
     onOpenChange: (open, _event, reason) => {
       if (!open && (reason === 'escape-key' || reason === 'focus-out')) {
@@ -101,6 +112,17 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
       setOpen(false);
     }
   }, [annotation?.id, annotation?.target.selector, isAnnotationQuoteIdle, r?.state.store]);
+
+  useEffect(() => {
+    if (!props.onClose) return;
+
+    if (isOpen) {
+      wasOpenRef.current = true;
+    } else if (wasOpenRef.current) {
+      wasOpenRef.current = false;
+      props.onClose();
+    }
+  }, [props.onClose, isOpen]);
 
   useEffect(() => {
     if (!r) return;
@@ -147,7 +169,8 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
   const onClose = () => r?.cancelSelected();
 
   return isOpen && annotation ? (
-    <FloatingPortal>
+    <FloatingPortal 
+      root={props.asPortal ? null : r.element}>
       <FloatingFocusManager
         context={context}
         modal={false}
