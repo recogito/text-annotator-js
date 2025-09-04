@@ -107,11 +107,9 @@ export const SelectionHandler = (
      */
     if (lastDownEvent?.type === 'pointerdown') {
       if (timeDifference < 1000 && !currentTarget) {
-
         // Chrome/iOS does not reliably fire the 'selectstart' event!
         onSelectStart(lastDownEvent || evt);
       } else if (sel.isCollapsed && timeDifference < CLICK_TIMEOUT) {
-
         // Firefox doesn't fire the 'selectstart' when user clicks
         // over the text, which collapses the selection
         onSelectStart(lastDownEvent || evt);
@@ -136,13 +134,16 @@ export const SelectionHandler = (
       return;
     }
     
-    const selectionRange = sel.getRangeAt(0);
+    const selectionRanges =
+      Array.from(Array(sel.rangeCount).keys()).map(idx => sel.getRangeAt(idx));
+
+    const containedRanges = 
+      selectionRanges.map(r => trimRangeToContainer(r, container));
 
     // The selection should be captured only within the annotatable container
-    const containedRange = trimRangeToContainer(selectionRange, container);
-    if (isWhitespaceOrEmpty(containedRange)) return;
+    if (containedRanges.every(r => isWhitespaceOrEmpty(r))) return;
 
-    const annotatableRanges = splitAnnotatableRanges(container, containedRange.cloneRange());
+    const annotatableRanges = containedRanges.flatMap(r => splitAnnotatableRanges(container, r.cloneRange()));
 
     const hasChanged =
       annotatableRanges.length !== currentTarget.selector.length ||
