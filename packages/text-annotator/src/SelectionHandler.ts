@@ -2,6 +2,8 @@ import { Origin } from '@annotorious/core';
 import type { Filter, Selection, User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import hotkeys from 'hotkeys-js';
+import { poll } from 'poll';
+
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotation, TextAnnotationTarget } from './model';
 import type { TextAnnotatorOptions } from './TextAnnotatorOptions';
@@ -52,7 +54,7 @@ export const SelectionHandler = (
 
   let lastDownEvent: Selection['event'] | undefined;
 
-  const onSelectStart = (evt: Event) => {    
+  const onSelectStart = (evt: Event) => {
     if (isLeftClick === false)
       return;
 
@@ -77,9 +79,9 @@ export const SelectionHandler = (
 
     /**
      * In iOS when a user clicks on a button, the `selectionchange` event is fired.
-     * However, the generated selection is empty and the `anchorNode` is `null`. That 
+     * However, the generated selection is empty and the `anchorNode` is `null`. That
      * doesn't give us information about whether the selection is in the annotatable area
-     * or whether the previously selected text was dismissed. Therefore we should bail 
+     * or whether the previously selected text was dismissed. Therefore we should bail
      * out from such a range processing.
      *
      * @see https://github.com/recogito/text-annotator-js/pull/164#issuecomment-2416961473
@@ -90,7 +92,7 @@ export const SelectionHandler = (
 
     /**
      * This is to handle cases where the selection is "hijacked" by
-     * another element in a not-annotatable area. A rare case in practice. 
+     * another element in a not-annotatable area. A rare case in practice.
      * But rich text editors like Quill will do it!
      */
     if (isNotAnnotatable(container, sel.anchorNode)) {
@@ -133,11 +135,11 @@ export const SelectionHandler = (
 
       return;
     }
-    
+
     const selectionRanges =
       Array.from(Array(sel.rangeCount).keys()).map(idx => sel.getRangeAt(idx));
 
-    const containedRanges = 
+    const containedRanges =
       selectionRanges.map(r => trimRangeToContainer(r, container));
 
     // The selection should be captured only within the annotatable container
@@ -185,15 +187,15 @@ export const SelectionHandler = (
     isLeftClick = lastDownEvent.button === 0;
   };
 
-  const onPointerUp = (evt: PointerEvent) => {
+  const onPointerUp = async (evt: PointerEvent) => {
     if (!isLeftClick) return;
 
     if (isNotAnnotatable(container, evt.target as Node)) {
       if (options.dismissOnClickOutside)
         selection.clear();
-      
+
       return;
-    } 
+    }
 
     // Logic for selecting an existing annotation
     const clickSelect = () => {
@@ -221,29 +223,48 @@ export const SelectionHandler = (
       }
     };
 
+
     const timeDifference = evt.timeStamp - lastDownEvent.timeStamp;
+    if (timeDifference < CLICK_TIMEOUT) {
+      await pollSelectionCollapsed();
 
-    /**
-     * We must check the `isCollapsed` within the 0-timeout
-     * to handle the annotation dismissal after a click properly.
-     *
-     * Otherwise, the `isCollapsed` will return an obsolete `false` value,
-     * click won't be processed, and the annotation will get falsely re-selected.
-     *
-     * @see https://github.com/recogito/text-annotator-js/issues/136
-     */
-    setTimeout(() => {
       const sel = document.getSelection();
-
-      // Just a click, not a selection
-      if (sel?.isCollapsed && timeDifference < CLICK_TIMEOUT) {
+      if (sel?.isCollapsed) {
         currentTarget = undefined;
         clickSelect();
-      } else if (currentTarget && currentTarget.selector.length > 0) {
-        upsertCurrentTarget();
-        selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));
+        return;
       }
-    });
+    }
+
+    if (currentTarget && currentTarget.selector.length > 0) {
+
+      upsertCurrentTarget();
+      selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));
+    }
+  }
+
+  /**
+   * We must check the `isCollapsed` after an unspecified timeout
+   * to handle the annotation dismissal after a click properly.
+   *
+   * Otherwise, the `isCollapsed` will return an obsolete `false` value,
+   * click won't be processed, and the annotation will get falsely re-selected.
+   *
+   * @see https://github.com/recogito/text-annotator-js/issues/136#issue-2465915707
+   * @see https://github.com/recogito/text-annotator-js/issues/136#issuecomment-2413773804
+   */
+  const pollSelectionCollapsed = async () => {
+    const sel = document.getSelection();
+
+    let stopPolling = false;
+    let isCollapsed = sel?.isCollapsed;
+    const shouldStopPolling = () => isCollapsed || stopPolling;
+
+    const pollingDelayMs = 1;
+    const stopPollingInMs = 50;
+    setTimeout(() => stopPolling = true, stopPollingInMs);
+
+    return poll(() => isCollapsed = sel?.isCollapsed, pollingDelayMs, shouldStopPolling);
   }
 
   const onContextMenu = (evt: PointerEvent) => {
@@ -253,17 +274,15 @@ export const SelectionHandler = (
 
     /**
      * When selecting the initial word, Chrome Android
-     * fires `contextmenu` before `selectionchange`
+     * fires `contextmenu`before `selectionchange`
      */
     if (!currentTarget || currentTarget.selector.length === 0) {
       onSelectionChange(evt);
     }
-
-    /**
+/**
      * The selection couldn't be initiated - might span over a not-annotatable element.
      */
     if (!currentTarget) return;
-
     upsertCurrentTarget();
 
     selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));
