@@ -97,7 +97,11 @@ export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorS
       const selected = selectedIds.includes(annotation.id);
       const hovered = annotation.id === hover.current;
 
-      return { annotation, rects, state: { selected, hover: hovered }};
+      return {
+        annotation,
+        rects,
+        state: { selected, hovered }
+      };
     });
 
     renderer.redraw(highlights, bounds, currentStyle, currentPainter, lazy);
@@ -126,6 +130,9 @@ export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorS
 
   // Refresh on selection change
   const unsubscribeSelection = selection.subscribe(() => redraw());
+
+  // Refresh on hover change
+  const unsubscribeHover = hover.subscribe(() => redraw());
 
   // Refresh on scroll
   const onScroll = () => redraw(true);
@@ -166,6 +173,7 @@ export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorS
     store.unobserve(onStoreChange);
 
     unsubscribeSelection();
+    unsubscribeHover();
 
     document.removeEventListener('scroll', onScroll);
 
