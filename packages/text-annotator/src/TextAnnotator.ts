@@ -21,7 +21,7 @@ export interface TextAnnotator<I extends TextAnnotation = TextAnnotation, E exte
   setStyle(style: HighlightStyleExpression | undefined): void;
 
   // Returns true if successful (or false if the annotation is not currently rendered)
-  scrollIntoView(annotationOrId: I | string): boolean;
+  scrollIntoView(annotationOrId: I | string, scrollParentOrId?: string | Element): boolean;
 
   state: TextAnnotatorState<I, E>;
 
