@@ -9,6 +9,8 @@ export interface TextAnnotatorOptions<I extends TextAnnotation = TextAnnotation,
 
   annotatingEnabled?: boolean;
 
+  dismissOnClickOutside?: boolean;
+
   renderer?: RendererType;
 
   offsetReferenceSelector?: string;
