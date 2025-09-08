@@ -19,17 +19,16 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "resolveJsonModule": true,
-    "skipLibCheck": false,
+    "skipLibCheck": true,
     "verbatimModuleSyntax": true,
     /* Declarations */
-    "outDir": "dist",
-    "emitDeclarationOnly": true,
+    "noEmit": true,
     /* Aliases */
     "baseUrl": "."
   },
   "include": [
-    "./src/**/*",
-    "./test/**/*"
+    "src",
+    "test"
   ],
   "exclude": [
     "node_modules",
