@@ -3,7 +3,6 @@ import type { Filter, Selection, User } from '@annotorious/core';
 import { v4 as uuidv4 } from 'uuid';
 import hotkeys from 'hotkeys-js';
 import { poll } from 'poll';
-
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotation, TextAnnotationTarget } from './model';
 import type { TextAnnotatorOptions } from './TextAnnotatorOptions';
@@ -223,7 +222,6 @@ export const SelectionHandler = (
       }
     };
 
-
     const timeDifference = evt.timeStamp - lastDownEvent.timeStamp;
     if (timeDifference < CLICK_TIMEOUT) {
       await pollSelectionCollapsed();
@@ -237,7 +235,6 @@ export const SelectionHandler = (
     }
 
     if (currentTarget && currentTarget.selector.length > 0) {
-
       upsertCurrentTarget();
       selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));
     }
