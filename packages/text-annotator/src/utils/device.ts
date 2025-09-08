@@ -1,3 +1,5 @@
-export const isMac = typeof navigator !== 'undefined' &&
-  // @ts-ignore
-  /mac/i.test(navigator.userAgentData ? navigator.userAgentData.platform : navigator.platform);
+import { UAParser } from 'ua-parser-js';
+import { OS } from 'ua-parser-js/enums';
+
+const ua = UAParser();
+export const isMac = ua.os.is(OS.MACOS);
