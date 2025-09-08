@@ -1,23 +1,43 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
+    "target": "ESNext",
+    "lib": [
+      "DOM",
+      "ESNext"
+    ],
+    /*
+    `bundler` allows resolving the new `exports`/`imports` syntax in the `package.json`
+    But it doesn't enforce specifying files extensions for imports.
+    @see https://www.typescriptlang.org/docs/handbook/modules/theory.html#module-resolution-is-host-defined
+    */
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    /* Linting */
     "allowJs": true,
     "checkJs": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "ignoreDeprecations": "5.0",
-    "incremental": false,
     "isolatedModules": true,
-    "module": "ESNext",
-    "moduleResolution": "Node",
-    "outDir": "dist",
     "resolveJsonModule": true,
     "skipLibCheck": false,
-    "sourceMap": true,
-    "target": "ESNext",
-    "verbatimModuleSyntax": true
+    "verbatimModuleSyntax": true,
+    /* Declarations */
+    "outDir": "dist",
+    "emitDeclarationOnly": true,
+    /* Aliases */
+    "baseUrl": "."
   },
-  "include": ["./src/**/*", "./test/**/*"],
-  "exclude": ["node_modules", "dist"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": [
+    "./src/**/*",
+    "./test/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
 }
