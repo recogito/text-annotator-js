@@ -1,4 +1,4 @@
-import type { Filter, Store, ViewportState, UserSelectActionExpression } from '@annotorious/core';
+import type { Filter, Store, ViewportState } from '@annotorious/core';
 import { 
   createHoverState, 
   createSelectionState, 
@@ -11,10 +11,12 @@ import type {
   SelectionState, 
   HoverState, 
 } from '@annotorious/core';
+
 import { createSpatialTree } from './spatialTree';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
 import type { AnnotationRects, TextAnnotationStore } from './TextAnnotationStore';
 import { isRevived, reviveAnnotation, reviveTarget } from '../utils';
+import type { TextAnnotatorOptions } from '../TextAnnotatorOptions';
 
 export interface TextAnnotatorState<I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation> extends AnnotatorState<I, E> {
 
@@ -30,16 +32,14 @@ export interface TextAnnotatorState<I extends TextAnnotation = TextAnnotation, E
 
 export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation>(
   container: HTMLElement,
-  defaultUserSelectAction?: UserSelectActionExpression<E>
+  opts: TextAnnotatorOptions<I, E>
 ): TextAnnotatorState<I, E> => {
 
   const store: Store<I> = createStore<I>();
 
   const tree = createSpatialTree(store, container);
 
-  // Temporary
-  const selection = createSelectionState<I, E>(store)
-  selection.setUserSelectAction(defaultUserSelectAction);
+  const selection = createSelectionState<I, E>(store, opts.userSelectAction, opts.adapter);
 
   const hover = createHoverState(store);
 
@@ -56,7 +56,7 @@ export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotati
     return isValid;
   }
 
-  const bulkAddAnnotation = (
+  const bulkAddAnnotations = (
     annotations: I[], 
     replace = true, 
     origin = Origin.LOCAL
@@ -65,7 +65,7 @@ export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotati
 
     // Initial page load might take some time. Retry for more robustness.
     const couldNotRevive = revived.filter(a => !isRevived(a.target.selector));
-    store.bulkAddAnnotation(revived, replace, origin);
+    store.bulkAddAnnotations(revived, replace, origin);
 
     return couldNotRevive;
   }
@@ -149,7 +149,7 @@ export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotati
     store: {
       ...store,
       addAnnotation,
-      bulkAddAnnotation,
+      bulkAddAnnotations,
       bulkUpdateTargets,
       bulkUpsertAnnotations,
       getAnnotationBounds,

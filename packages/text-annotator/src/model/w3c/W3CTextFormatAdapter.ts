@@ -17,10 +17,10 @@ export type W3CTextFormatAdapter<I extends TextAnnotation = TextAnnotation, E ex
  * @param container - the HTML container of the annotated content,
  *                    Required to locate the content's `range` within the DOM
  */
-export const W3CTextFormat = <E extends W3CTextAnnotation = W3CTextAnnotation>(
+export const W3CTextFormat =<I extends TextAnnotation = TextAnnotation, E extends W3CTextAnnotation = W3CTextAnnotation>(
   source: string,
-  container: HTMLElement
-): W3CTextFormatAdapter<TextAnnotation, E> => ({
+  container?: HTMLElement
+): W3CTextFormatAdapter<I, E> => ({
   parse: (serialized) => parseW3CTextAnnotation(serialized),
   serialize: (annotation) => serializeW3CTextAnnotation(annotation, source, container)
 });
@@ -90,9 +90,9 @@ const parseW3CTextTargets = (annotation: W3CTextAnnotation) => {
   return { parsed };
 };
 
-export const parseW3CTextAnnotation = (
-  annotation: W3CTextAnnotation
-): ParseResult<TextAnnotation> => {
+export const parseW3CTextAnnotation = <I extends TextAnnotation = TextAnnotation, E extends W3CTextAnnotation = W3CTextAnnotation>(
+  annotation: E
+): ParseResult<I> => {
   const annotationId = annotation.id || uuidv4();
 
   const {
@@ -106,7 +106,7 @@ export const parseW3CTextAnnotation = (
   const bodies = parseW3CBodies(body, annotationId);
   const target = parseW3CTextTargets(annotation);
 
-  return 'error' in target
+  const parseResult = 'error' in target
     ? { error: target.error }
     : {
       parsed: {
@@ -117,12 +117,14 @@ export const parseW3CTextAnnotation = (
       }
     };
 
+  return parseResult as ParseResult<I>;
+
 };
 
-export const serializeW3CTextAnnotation = <E extends W3CTextAnnotation = W3CTextAnnotation>(
-  annotation: TextAnnotation,
+export const serializeW3CTextAnnotation = <I extends TextAnnotation = TextAnnotation, E extends W3CTextAnnotation = W3CTextAnnotation>(
+  annotation: I,
   source: string,
-  container: HTMLElement
+  container?: HTMLElement
 ): E => {
   const { bodies, target, ...rest } = annotation;
 
@@ -137,18 +139,22 @@ export const serializeW3CTextAnnotation = <E extends W3CTextAnnotation = W3CText
   const w3cTargets = selector.map((s): W3CTextAnnotationTarget => {
     const { id, quote, start, end, range } = s;
 
-    const { prefix, suffix } = getQuoteContext(range, container);
-
-    const w3cSelectors: W3CTextSelector[] = [{
+    const quoteSelector: W3CTextSelector = {
       type: 'TextQuoteSelector',
-      exact: quote,
-      prefix,
-      suffix
-    }, {
+      exact: quote
+    }
+
+    if (container) {
+      const { prefix, suffix } = getQuoteContext(range, container);
+      quoteSelector.prefix = prefix;
+      quoteSelector.suffix = suffix;
+    }
+
+    const positionSelector: W3CTextSelector = {
       type: 'TextPositionSelector',
       start,
       end
-    }];
+    }
 
     return {
       ...targetRest,
@@ -156,10 +162,9 @@ export const serializeW3CTextAnnotation = <E extends W3CTextAnnotation = W3CText
       // @ts-expect-error: `scope` is not part of the core `TextSelector` type
       scope: 'scope' in s ? s.scope : undefined,
       source,
-      selector: w3cSelectors
+      selector: [quoteSelector, positionSelector]
     };
   });
-
 
   return {
     ...rest,
@@ -171,6 +176,6 @@ export const serializeW3CTextAnnotation = <E extends W3CTextAnnotation = W3CText
     created: created?.toISOString(),
     modified: updated?.toISOString(),
     target: w3cTargets
-  } as E;
+  } as unknown as E;
 
 };

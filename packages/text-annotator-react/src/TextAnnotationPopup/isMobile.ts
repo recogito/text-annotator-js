@@ -1,7 +1,9 @@
 // https://stackoverflow.com/questions/21741841/detecting-ios-android-operating-system
 export const isMobile = () => {
+  if (typeof navigator === 'undefined') return false;
+
   // @ts-ignore
-  var userAgent: string = navigator.userAgent || navigator.vendor || window.opera;
+  var userAgent: string = navigator.userAgent || navigator.vendor || window?.opera;
 
   if (/android/i.test(userAgent)) 
     return true;

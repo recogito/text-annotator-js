@@ -1,14 +1,14 @@
 import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { useAnnotator, useSelection } from '@annotorious/react';
 import {
+  debounce,
   NOT_ANNOTATABLE_CLASS,
+  TextAnnotationStore,
   toViewportBounds,
   toDomRectList,
   type TextAnnotation,
   type TextAnnotator,
 } from '@recogito/text-annotator';
-
-import { isMobile } from './isMobile';
 import {
   arrow,
   autoUpdate,
@@ -19,12 +19,15 @@ import {
   FloatingPortal,
   inline,
   offset,
+  Placement,
   shift,
   useDismiss,
   useFloating,
   useInteractions,
   useRole
 } from '@floating-ui/react';
+import { isMobile } from './isMobile';
+import { useAnnotationQuoteIdle } from './useAnnotationQuoteIdle';
 
 import './TextAnnotationPopup.css';
 
@@ -36,19 +39,35 @@ interface TextAnnotationPopupProps {
 
   arrowProps?: Omit<FloatingArrowProps, 'context' | 'ref'>;
 
+  asPortal?: boolean;
+
+  placement?: Placement;
+
   popup(props: TextAnnotationPopupContentProps): ReactNode;
+
+  onClose?(): void;
 
 }
 
-export interface TextAnnotationPopupContentProps {
+export interface TextAnnotationPopupContentProps<T extends TextAnnotation = TextAnnotation> {
 
-  annotation: TextAnnotation;
+  annotation: T;
 
   editable?: boolean;
 
   event?: PointerEvent | KeyboardEvent;
 
 }
+
+let cachedBounds = null;
+
+const updateViewportBounds = debounce((annotationId: string, store: TextAnnotationStore, container: HTMLElement) => {
+  requestAnimationFrame(() => {
+    const bounds = store.getAnnotationBounds(annotationId);
+    if (!bounds) return;
+    cachedBounds = toViewportBounds(bounds, container);
+  });
+}, 250);
 
 export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
 
@@ -58,12 +77,18 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
 
   const annotation = selected[0]?.annotation;
 
+  const isAnnotationQuoteIdle = useAnnotationQuoteIdle(annotation?.id);
+
   const [isOpen, setOpen] = useState(selected?.length > 0);
+
+  // So we can reliably trigger the onClose callback
+  const wasOpenRef = useRef(false);
 
   const arrowRef = useRef(null);
 
   const { refs, floatingStyles, update, context } = useFloating({
-    placement: isMobile() ? 'bottom' : 'top',
+    placement: isMobile() ? 'bottom' : props.placement || 'top',
+    strategy: 'absolute',
     open: isOpen,
     onOpenChange: (open, _event, reason) => {
       if (!open && (reason === 'escape-key' || reason === 'focus-out')) {
@@ -75,7 +100,7 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
       inline(),
       offset(10),
       flip({ crossAxis: true }),
-      shift({ crossAxis: true, padding: 10 }),
+      shift({ crossAxis: true, padding: 10,  }),
       arrow({ element: arrowRef })
     ],
     whileElementsMounted: autoUpdate
@@ -88,13 +113,24 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
   const { getFloatingProps } = useInteractions([dismiss, role]);
 
   useEffect(() => {
-    if (annotation?.id) {
+    if (annotation?.id && isAnnotationQuoteIdle) {
       const bounds = r?.state.store.getAnnotationBounds(annotation.id);
       setOpen(Boolean(bounds));
     } else {
       setOpen(false);
     }
-  }, [annotation?.id, r?.state.store]);
+  }, [annotation?.id, annotation?.target.selector, isAnnotationQuoteIdle, r?.state.store]);
+
+  useEffect(() => {
+    if (!props.onClose) return;
+
+    if (isOpen) {
+      wasOpenRef.current = true;
+    } else if (wasOpenRef.current) {
+      wasOpenRef.current = false;
+      props.onClose();
+    }
+  }, [props.onClose, isOpen]);
 
   useEffect(() => {
     if (!r) return;
@@ -102,10 +138,9 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
     if (isOpen && annotation?.id) {
       refs.setPositionReference({
         getBoundingClientRect: () => {
-          const bounds = r.state.store.getAnnotationBounds(annotation.id);
-          return bounds
-            ? toViewportBounds(bounds, r.element.getBoundingClientRect())
-            : new DOMRect();
+          // Debounced!
+          updateViewportBounds(annotation.id, r.state.store, r.element);
+          return cachedBounds ? cachedBounds : new DOMRect();
         },
         getClientRects: () => {
           const rects = r.state.store.getAnnotationRects(annotation.id);
@@ -120,20 +155,6 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
     }
   }, [isOpen, annotation?.id, annotation?.target, r]);
 
-  useEffect(() => {
-    const config: MutationObserverInit = { attributes: true, childList: true, subtree: true };
-
-    const mutationObserver = new MutationObserver(() => update());
-    mutationObserver.observe(document.body, config);
-
-    window.document.addEventListener('scroll', update, true);
-
-    return () => {
-      mutationObserver.disconnect();
-      window.document.removeEventListener('scroll', update, true);
-    };
-  }, [update]);
-
   // Don't shift focus to the floating element if selected via keyboard or on mobile.
   const initialFocus = useMemo(() => {
     return (event?.type === 'keyup' || event?.type === 'contextmenu' || isMobile()) ? -1 : 0;
@@ -142,7 +163,8 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
   const onClose = () => r?.cancelSelected();
 
   return isOpen && annotation ? (
-    <FloatingPortal>
+    <FloatingPortal
+      root={props.asPortal ? null : r.element}>
       <FloatingFocusManager
         context={context}
         modal={false}
@@ -152,8 +174,7 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
         <div
           className={`a9s-popup r6o-popup annotation-popup r6o-text-popup ${NOT_ANNOTATABLE_CLASS}`}
           ref={refs.setFloating}
-          style={floatingStyles}
-          {...getFloatingProps(getStopEventsPropagationProps())}>
+          style={floatingStyles}>
           {props.popup({
             annotation: selected[0].annotation,
             editable: selected[0].editable,
@@ -175,18 +196,19 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
     </FloatingPortal>
   ) : null;
 
-}
+};
 
 /**
  * Prevent text-annotator from handling the irrelevant events
  * triggered from the popup/toolbar/dialog
- */
+ *
 const getStopEventsPropagationProps = <T extends HTMLElement = HTMLElement>() => ({
   onPointerUp: (event: React.PointerEvent<T>) => event.stopPropagation(),
   onPointerDown: (event: React.PointerEvent<T>) => event.stopPropagation(),
   onMouseDown: (event: React.MouseEvent<T>) => event.stopPropagation(),
   onMouseUp: (event: React.MouseEvent<T>) => event.stopPropagation()
 });
+*/
 
 /** For backwards compatibility **/
 /** @deprecated Use TextAnnotationPopup instead */
