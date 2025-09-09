@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="style.css">
+    <title>TEI Example</title>
+    <style>
+      *,
+      *:before,
+      *:after {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        background: #e2e2e2;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+      }
+
+      #content {
+        max-width: 800px;
+        background-color: #fff;
+        padding: 40px;
+        border-style: solid;
+        border-color: #cfcfcf;
+        border-width: 0 1px;
+        position: relative;
+      }
+
+      #content img {
+        max-width: 100%;
+      }
+
+      h1 {
+        margin: 0;
+        padding: 0 0 20px 0;
+      }
+
+      p {
+        font-size: 17px;
+        line-height: 160%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="content">
+    </div>
+
+    <script type="module">
+      import CETEI from 'CETEIcean';
+      import { createTextAnnotator } from '@recogito/text-annotator';
+      import { TEIPlugin } from '../../src/index.ts';
+
+      import '@recogito/text-annotator/dist/text-annotator.css';
+
+      window.onload = async function () {
+        var CETEIcean = new CETEI();
+
+        CETEIcean.getHTML5('chapter_BCar_incl_sandhi.xml', data => {
+          document.getElementById('content').appendChild(data);
+
+          var anno = TEIPlugin(createTextAnnotator(document.getElementById('content')));
+
+          anno.on('createAnnotation', annotation => {
+            console.log('createAnnotation', annotation);
+          });
+
+          anno.on('updateAnnotation', (annotation, previous) => {
+            console.log('updateAnnotation', annotation);
+          });
+
+          anno.on('deleteAnnotation', (annotation) => {
+            console.log('deleteAnnotation', annotation);
+          });
+
+          anno.on('selectionChanged', (annotations) => {
+            console.log('selectionChanged', annotations);
+          });
+
+          anno.on('viewportIntersect', (annotations) => {
+            console.log('viewport', annotations);
+          });
+        });
+      };
+    </script>
+  </body>
+</html>
