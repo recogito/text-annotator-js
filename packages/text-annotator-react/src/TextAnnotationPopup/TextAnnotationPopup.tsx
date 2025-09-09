@@ -4,6 +4,7 @@ import {
   debounce,
   NOT_ANNOTATABLE_CLASS,
   TextAnnotationStore,
+  toViewportBounds,
   toDomRectList,
   type TextAnnotation,
   type TextAnnotator,
@@ -60,17 +61,11 @@ export interface TextAnnotationPopupContentProps<T extends TextAnnotation = Text
 
 let cachedBounds = null;
 
-const toViewportBounds = (annotationBounds: DOMRect, container: HTMLElement): DOMRect => {
-  const { left, top, right, bottom } = annotationBounds;
-  const containerBounds = container.getBoundingClientRect();
-  return new DOMRect(left + containerBounds.left, top + containerBounds.top, right - left, bottom - top);
-}
-
 const updateViewportBounds = debounce((annotationId: string, store: TextAnnotationStore, container: HTMLElement) => {
   requestAnimationFrame(() => {
     const bounds = store.getAnnotationBounds(annotationId);
     if (!bounds) return;
-    cachedBounds = toViewportBounds(bounds, container);
+    cachedBounds = toViewportBounds(bounds, container.getBoundingClientRect());
   });
 }, 250);
 
@@ -149,8 +144,10 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
         },
         getClientRects: () => {
           const rects = r.state.store.getAnnotationRects(annotation.id);
-          const viewportRects = rects.map(rect => toViewportBounds(rect, r.element));
-          return toDomRectList(viewportRects);
+          const denormalizedRects = rects.map((rect) =>
+            toViewportBounds(rect, r.element.getBoundingClientRect())
+          );
+          return toDomRectList(denormalizedRects);
         }
       });
     } else {
@@ -166,7 +163,7 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
   const onClose = () => r?.cancelSelected();
 
   return isOpen && annotation ? (
-    <FloatingPortal 
+    <FloatingPortal
       root={props.asPortal ? null : r.element}>
       <FloatingFocusManager
         context={context}
