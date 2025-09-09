@@ -22,7 +22,7 @@ const CLICK_TIMEOUT = 300;
 
 const ARROW_KEYS = ['up', 'down', 'left', 'right'];
 
-const SELECT_ALL = isMac ? '⌘+a' :  'ctrl+a';
+const SELECT_ALL = isMac ? '⌘+a' : 'ctrl+a';
 
 const SELECTION_KEYS = [
   ...ARROW_KEYS.map(key => `shift+${key}`),
@@ -37,7 +37,12 @@ export const SelectionHandler = (
 
   let currentUser: User | undefined;
 
-  const { annotatingEnabled, offsetReferenceSelector, selectionMode } = options;
+  const {
+    annotatingEnabled,
+    offsetReferenceSelector,
+    selectionMode,
+    dismissOnNotAnnotatable = 'NEVER'
+  } = options;
 
   const setUser = (user?: User) => currentUser = user;
 
@@ -190,9 +195,12 @@ export const SelectionHandler = (
     if (!isLeftClick) return;
 
     if (isNotAnnotatable(container, evt.target as Node)) {
-      if (options.dismissOnClickOutside)
+      const shouldDismissSelection = typeof dismissOnNotAnnotatable === 'function'
+        ? dismissOnNotAnnotatable(evt, container)
+        : dismissOnNotAnnotatable === 'ALWAYS';
+      if (shouldDismissSelection) {
         selection.clear();
-
+      }
       return;
     }
 
@@ -276,7 +284,7 @@ export const SelectionHandler = (
     if (!currentTarget || currentTarget.selector.length === 0) {
       onSelectionChange(evt);
     }
-/**
+    /**
      * The selection couldn't be initiated - might span over a not-annotatable element.
      */
     if (!currentTarget) return;
@@ -328,7 +336,7 @@ export const SelectionHandler = (
       lastDownEvent = cloneKeyboardEvent(evt);
   });
 
-  hotkeys(SELECT_ALL, { keydown: true, keyup: false}, evt => {
+  hotkeys(SELECT_ALL, { keydown: true, keyup: false }, evt => {
     lastDownEvent = cloneKeyboardEvent(evt);
     onSelectAll(evt);
   });
