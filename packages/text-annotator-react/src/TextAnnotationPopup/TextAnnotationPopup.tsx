@@ -111,12 +111,6 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
     whileElementsMounted: autoUpdate
   });
 
-  const dismiss = useDismiss(context);
-
-  const role = useRole(context, { role: 'dialog' });
-
-  const { getFloatingProps } = useInteractions([dismiss, role]);
-
   useEffect(() => {
     if (annotation?.id && isAnnotationQuoteIdle) {
       const bounds = r?.state.store.getAnnotationBounds(annotation.id);
@@ -158,6 +152,22 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
     }
   }, [isOpen, annotation?.id, annotation?.target, r]);
 
+  useEffect(() => {
+    if (!props.asPortal) return;
+    
+    const config: MutationObserverInit = { attributes: true, childList: true, subtree: true };
+
+    const mutationObserver = new MutationObserver(() => update());
+    mutationObserver.observe(document.body, config);
+
+    window.document.addEventListener('scroll', update, true);
+
+    return () => {
+      mutationObserver.disconnect();
+      window.document.removeEventListener('scroll', update, true);
+    };
+  }, [update, props.asPortal]);
+
   // Don't shift focus to the floating element if selected via keyboard or on mobile.
   const initialFocus = useMemo(() => {
     return (event?.type === 'keyup' || event?.type === 'contextmenu' || isMobile()) ? -1 : 0;
@@ -167,7 +177,7 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
 
   return isOpen && annotation ? (
     <FloatingPortal 
-      root={props.asPortal ? null : r.element}>
+      root={props.asPortal ? undefined : r.element}>
       <FloatingFocusManager
         context={context}
         modal={false}
@@ -200,18 +210,6 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
   ) : null;
 
 };
-
-/**
- * Prevent text-annotator from handling the irrelevant events
- * triggered from the popup/toolbar/dialog
- *
-const getStopEventsPropagationProps = <T extends HTMLElement = HTMLElement>() => ({
-  onPointerUp: (event: React.PointerEvent<T>) => event.stopPropagation(),
-  onPointerDown: (event: React.PointerEvent<T>) => event.stopPropagation(),
-  onMouseDown: (event: React.MouseEvent<T>) => event.stopPropagation(),
-  onMouseUp: (event: React.MouseEvent<T>) => event.stopPropagation()
-});
-*/
 
 /** For backwards compatibility **/
 /** @deprecated Use TextAnnotationPopup instead */
