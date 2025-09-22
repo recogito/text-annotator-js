@@ -190,6 +190,7 @@ export const App: FC = () => {
         </p>
 
         <TextAnnotationPopup
+          asPortal
           arrow
           arrowProps={{
             fill: '#000000'

@@ -1,0 +1,89 @@
+tei-text {
+  font-family: 'Source Serif 4';
+}
+
+tei-div {
+  display: block;
+}
+
+tei-div[type="chapter"]::before {
+  display: block;
+  content: attr(type) " " attr(n);
+  font-size: 1.25rem;
+  text-transform: capitalize;
+  padding-bottom: 2.5rem;
+}
+
+tei-div[type="chapter"] + tei-div[type="chapter"]::before {
+  padding-top: 2rem;
+}
+
+tei-div[type="replies"] {
+  padding-top: 1rem;
+  padding-left: 1rem;
+}
+
+:is(tei-div[type="thread"], tei-post) + :is(tei-div[type="thread"], tei-post) {
+  margin-top: 1rem;
+}
+
+tei-head {
+  display: block;
+  font-weight: 700;
+}
+
+tei-post {
+  display: block;
+  position: relative;
+}
+
+tei-lg {
+  position: relative;
+}
+
+tei-lg + tei-lg {
+  display: block;
+  margin-top: 4rem;
+}
+
+tei-lg::before {
+  content: attr(n);
+  border-right: 1px solid #c0c0c0;
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 2rem;
+}
+
+tei-l {
+  padding-left: 3.5rem;
+  display: flex;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+tei-l + tei-l,
+tei-head + tei-l {
+  margin-top: 1.5rem;
+}
+
+tei-choice {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+tei-orig {
+  color: #cc5454;
+  user-select: none;
+}
+
+
+tei-l tei-orig tei-w {
+  font-style: normal;
+}
+
+tei-l tei-w {
+  font-style: italic;
+}

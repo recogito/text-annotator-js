@@ -97,7 +97,11 @@ export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorS
       const selected = selectedIds.includes(annotation.id);
       const hovered = annotation.id === hover.current;
 
-      return { annotation, rects, state: { selected, hover: hovered }};
+      return {
+        annotation,
+        rects,
+        state: { selected, hovered }
+      };
     });
 
     renderer.redraw(highlights, bounds, currentStyle, currentPainter, lazy);
@@ -127,8 +131,12 @@ export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorS
   // Refresh on selection change
   const unsubscribeSelection = selection.subscribe(() => redraw());
 
+  // Refresh on hover change
+  const unsubscribeHover = hover.subscribe(() => redraw());
+
   // Refresh on scroll
   const onScroll = () => redraw(true);
+
   document.addEventListener('scroll', onScroll, { capture: true, passive: true });
 
   // Refresh on resize
@@ -151,10 +159,13 @@ export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorS
   // in the DOM. (This happens in Recogito for example)
   const config: MutationObserverInit = { attributes: true, childList: true, subtree: true };
 
-  const mutationObserver = new MutationObserver((records: MutationRecord[]) => {
-    const isInternal = records.every(record => record.target === container || container.contains(record.target));
-    if (!isInternal) redraw(true);
-  });
+  const mutationObserver = new MutationObserver(debounce((records: MutationRecord[]) => {
+    const isInternal = records
+      .every(record => record.target === container || container.contains(record.target));
+
+    if (!isInternal)
+      redraw(true);
+  }, 150));
 
   mutationObserver.observe(document.body, config);
 
@@ -166,6 +177,7 @@ export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorS
     store.unobserve(onStoreChange);
 
     unsubscribeSelection();
+    unsubscribeHover();
 
     document.removeEventListener('scroll', onScroll);
 
