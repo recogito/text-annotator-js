@@ -1,6 +1,6 @@
 {
   "name": "@recogito/react-text-annotator",
-  "version": "3.1.3",
+  "version": "3.1.6",
   "description": "Recogito Text Annotator React bindings",
   "author": "Rainer Simon",
   "license": "BSD-3-Clause",
@@ -24,21 +24,21 @@
   "module": "./dist/react-text-annotator.es.js",
   "types": "./dist/index.d.ts",
   "devDependencies": {
-    "@types/react": "^19.1.12",
+    "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^4.7.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "typescript": "5.9.2",
-    "vite": "^6.3.5",
+    "vite": "^6.3.6",
     "vite-plugin-dts": "^4.5.4",
     "vite-plugin-externalize-deps": "^0.9.0",
     "vite-tsconfig-paths": "^5.1.4"
   },
   "peerDependencies": {
     "openseadragon": "^3.0.0 || ^4.0.0 || ^5.0.0",
-    "react": ">=19.x",
-    "react-dom": ">=19.x"
+    "react": ">=18.x || >=19.x",
+    "react-dom": ">=18.x || >=19.x"
   },
   "peerDependenciesMeta": {
     "openseadragon": {
@@ -46,11 +46,11 @@
     }
   },
   "dependencies": {
-    "@annotorious/core": "^3.7.4",
-    "@annotorious/react": "^3.7.4",
+    "@annotorious/core": "^3.7.7",
+    "@annotorious/react": "^3.7.7",
     "@floating-ui/react": "^0.27.16",
-    "@recogito/text-annotator": "3.1.3",
-    "@recogito/text-annotator-tei": "3.1.3",
+    "@recogito/text-annotator": "3.1.6",
+    "@recogito/text-annotator-tei": "3.1.6",
     "CETEIcean": "^1.9.5"
   }
 }
