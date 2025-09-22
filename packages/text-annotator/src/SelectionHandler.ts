@@ -200,8 +200,8 @@ export const SelectionHandler = (
         : dismissOnNotAnnotatable === 'ALWAYS';
       if (shouldDismissSelection) {
         selection.clear();
+        return;
       }
-      return;
     }
 
     // Logic for selecting an existing annotation
