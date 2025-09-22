@@ -192,19 +192,19 @@ export const SelectionHandler = (
   const onPointerUp = async (evt: PointerEvent) => {
     if (!isLeftClick) return;
 
-    if (isNotAnnotatable(container, evt.target as Node)) {
-      const shouldDismissSelection = typeof dismissOnNotAnnotatable === 'function'
-        ? dismissOnNotAnnotatable(evt, container)
-        : dismissOnNotAnnotatable === 'ALWAYS';
-      if (shouldDismissSelection) {
-        selection.clear();
-        return;
-      }
-    }
-
     // Logic for selecting an existing annotation
     const clickSelect = () => {
       const { x, y } = container.getBoundingClientRect();
+
+      if (isNotAnnotatable(container, evt.target as Node)) {
+        const shouldDismissSelection = typeof dismissOnNotAnnotatable === 'function'
+          ? dismissOnNotAnnotatable(evt, container)
+          : dismissOnNotAnnotatable === 'ALWAYS';
+        if (shouldDismissSelection) {
+          selection.clear();
+        }
+        return;
+      }
 
       const hovered =
         evt.target instanceof Node &&
