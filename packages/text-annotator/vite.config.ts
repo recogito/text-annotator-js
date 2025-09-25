@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 import { externalizeDeps } from 'vite-plugin-externalize-deps';
 
-export default defineConfig({
+const config = defineConfig({
   plugins: [
     dts({ insertTypesEntry: true, entryRoot: '.' }),
     externalizeDeps(),
@@ -14,22 +14,10 @@ export default defineConfig({
     sourcemap: true,
     lib: {
       entry: './src/index.ts',
-      name: 'RecogitoJS',
-      formats: ['es', 'umd'],
+      formats: ['es'],
       fileName: (format) => `text-annotator.${format}.js`
-    },
-    rollupOptions: {
-      output: {
-        assetFileNames: 'text-annotator.[ext]',
-        globals: {
-          'colord': 'Colord',
-          'uuid': 'UUID',
-          'dequal/lite': 'DequalLite',
-          '@annotorious/core': 'AnnotoriousCore',
-          'rbush': "RBush",
-          'hotkeys-js': 'HotkeysJs',
-        }
-      }
     }
   }
 });
+
+export default config;
