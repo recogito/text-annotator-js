@@ -1,6 +1,8 @@
+import debounce from 'debounce';
+
 import type { ViewportState } from '@annotorious/core';
+
 import type { TextAnnotatorState } from '../../state';
-import { debounce } from '../../utils';
 import type { ViewportBounds } from '../viewport';
 import type { HighlightStyle } from '../HighlightStyle';
 import { DEFAULT_SELECTED_STYLE, DEFAULT_STYLE, type HighlightStyleExpression } from '../HighlightStyle';
@@ -117,9 +119,7 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
     });
   });
 
-  const onResize = debounce(() => {
-    resetCanvas(canvas);
-  });
+  const onResize = debounce(() => resetCanvas(canvas), 10);
 
   window.addEventListener('resize', onResize);
 
@@ -130,6 +130,7 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
   const destroy = () => {
     canvas.remove();
 
+    onResize.clear();
     window.removeEventListener('resize', onResize);
   }
 
