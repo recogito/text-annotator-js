@@ -24,7 +24,12 @@ interface IndexedHighlightRect {
 
 }
 
-export const createSpatialTree = <T extends TextAnnotation>(store: Store<T>, container: HTMLElement) => {
+export const createSpatialTree = <T extends TextAnnotation>(
+  store: Store<T>, 
+  container: HTMLElement,
+  hMergeTolerance?: number,
+  vMergeTolerance?: number
+) => {
 
   const tree = new RBush<IndexedHighlightRect>();
 
@@ -41,7 +46,7 @@ export const createSpatialTree = <T extends TextAnnotation>(store: Store<T>, con
 
     // console.log(`Highlights took ${performance.now() - start}ms`);
 
-    const merged = mergeClientRects(rects)
+    const merged = mergeClientRects(rects, hMergeTolerance, vMergeTolerance)
       // Offset the merged client rects so that coords
       // are relative to the parent container
       .map(({ left, top, right, bottom }) =>  

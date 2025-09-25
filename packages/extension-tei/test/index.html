@@ -71,7 +71,7 @@
 
           var anno = TEIPlugin(createTextAnnotator(document.getElementById('content')));
 
-          // anno.loadAnnotations('annotations.json');
+          anno.loadAnnotations('annotations.json');
 
           anno.on('createAnnotation', annotation => {
             console.log('createAnnotation', annotation);

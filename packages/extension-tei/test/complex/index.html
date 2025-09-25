@@ -74,7 +74,12 @@
           // Apply not-annotatable
           Array.from(document.querySelectorAll('tei-orig')).forEach(el => el.setAttribute('class', 'not-annotatable'));
 
-          var anno = TEIPlugin(createTextAnnotator(document.getElementById('content'), { style }));
+          var anno = TEIPlugin(createTextAnnotator(document.getElementById('content'), { 
+            style,
+            mergeHighlights: {
+              horizontalTolerance: 10
+            } 
+          }));
 
           anno.on('createAnnotation', annotation => {
             console.log('createAnnotation', annotation);
