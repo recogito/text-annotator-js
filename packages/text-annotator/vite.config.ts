@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 import { externalizeDeps } from 'vite-plugin-externalize-deps';
 
-const config = defineConfig({
+export default defineConfig({
   plugins: [
     dts({ insertTypesEntry: true, entryRoot: '.' }),
     externalizeDeps(),
@@ -19,5 +19,3 @@ const config = defineConfig({
     }
   }
 });
-
-export default config;

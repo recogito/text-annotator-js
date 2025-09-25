@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 
-const config = defineConfig(({
+export default defineConfig(({
   build: {
     // Prevent emptying the dist folder after the previous ES build
     emptyOutDir: false,
@@ -13,5 +13,3 @@ const config = defineConfig(({
     }
   }
 }));
-
-export default config;
