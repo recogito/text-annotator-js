@@ -45,6 +45,10 @@
         font-size: 17px;
         line-height: 160%;
       }
+
+      tei-p[rend="h5"] {
+        text-indent: -1rem;
+      }
     </style>
   </head>
 
@@ -67,7 +71,7 @@
 
           var anno = TEIPlugin(createTextAnnotator(document.getElementById('content')));
 
-          anno.loadAnnotations('annotations.json');
+          // anno.loadAnnotations('annotations.json');
 
           anno.on('createAnnotation', annotation => {
             console.log('createAnnotation', annotation);
