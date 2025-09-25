@@ -42,6 +42,35 @@
         line-height: 160%;
       }
 
+      .footnote-ref-tail {
+        white-space: nowrap;
+      }
+
+      .footnote-ref {
+        display: inline-block;
+        min-width: 20px;
+        background-clip: content-box;
+        vertical-align: super;
+        color: #5f01df;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: bold;
+        line-height: 17px;
+        text-align: center;
+        text-decoration: none;
+        cursor: pointer;
+        position: relative;
+        top: 5px;
+      }
+
+      .footnote-ref::before {
+        content: '[';
+      }
+
+      .footnote-ref::after {
+        content: ']';
+      }
+
       #buttons {
         position: fixed;
         top: 10px;
@@ -77,7 +106,12 @@
     <h1>Homer: The Odyssey</h1>
 
     <p>
-      Tell me, O muse, of that ingenious hero who travelled far and wide after he had sacked the famous town of Troy.
+      Tell me, O muse, of that ingenious
+      <span class="footnote-ref-tail">hero.<a
+        class="footnote-ref"
+        name="footnote-ref-1"
+        href="#footnote-1"
+        >1</a></span> who travelled far and wide after he had sacked the famous town of Troy.
       Many cities did he visit, and many were the nations with whose manners and customs he was acquainted; moreover
       he suffered much by sea while trying to save his own life and bring his men safely home; but do what he might he
       could not save his men, for they perished through their own sheer folly in eating the cattle of the Sun-god
