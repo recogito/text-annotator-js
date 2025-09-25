@@ -58,13 +58,28 @@
 
       import '@recogito/text-annotator/dist/text-annotator.css';
 
+      const style= (annotation, _, z) => ({
+        fillOpacity: 0.25,
+        underlineColor: '#1a1a1a',
+        underlineThickness: 1.5,
+        underlineOffset: 3 * (2 * z || 1)
+      });
+
       window.onload = async function () {
         var CETEIcean = new CETEI();
 
         CETEIcean.getHTML5('chapter_BCar_incl_sandhi.xml', data => {
           document.getElementById('content').appendChild(data);
 
-          var anno = TEIPlugin(createTextAnnotator(document.getElementById('content')));
+          // Apply not-annotatable
+          Array.from(document.querySelectorAll('tei-orig')).forEach(el => el.setAttribute('class', 'not-annotatable'));
+
+          var anno = TEIPlugin(createTextAnnotator(document.getElementById('content'), { 
+            style,
+            mergeHighlights: {
+              horizontalTolerance: 10
+            } 
+          }));
 
           anno.on('createAnnotation', annotation => {
             console.log('createAnnotation', annotation);

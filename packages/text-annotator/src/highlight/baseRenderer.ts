@@ -60,7 +60,7 @@ export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorS
 
   const onDraw = trackViewport(viewport);
 
-  const onPointerMove = (event: PointerEvent) => {
+  const onPointerMove = debounce((event: PointerEvent) => {
     const {x, y} = container.getBoundingClientRect();
 
     const hit = store.getAt(event.clientX - x, event.clientY - y, false, currentFilter);
@@ -75,11 +75,11 @@ export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorS
         hover.set(null);
       }
     }
-  }
+  }, 10);
 
   container.addEventListener('pointermove', onPointerMove);
 
-  const redraw = (lazy: boolean = false) => {
+  const redraw = debounce((lazy: boolean = false) => requestAnimationFrame(() => {
     if (currentPainter)
       currentPainter.clear();
 
@@ -107,7 +107,7 @@ export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorS
     renderer.redraw(highlights, bounds, currentStyle, currentPainter, lazy);
 
     setTimeout(() => onDraw(annotationsInView.map(({ annotation }) => annotation)), 1);
-  }
+  }), 10);
 
   const setPainter = (painter: HighlightPainter) => { 
     currentPainter = painter;
