@@ -8,7 +8,7 @@
     "incremental": false,
     "isolatedModules": true,
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "outDir": "dist",
     "resolveJsonModule": true,
     "skipLibCheck": false,

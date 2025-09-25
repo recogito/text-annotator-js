@@ -198,8 +198,6 @@ export const createSelectionHandler = (
    * to the initial pointerdown event and remember the button
    */
   const onPointerDown = (evt: PointerEvent) => {
-    if (isNotAnnotatable(container, evt.target as Node)) return;
-
     /**
      * Cloning the event to prevent it from accidentally being `undefined`
      * @see https://github.com/recogito/text-annotator-js/commit/65d13f3108c429311cf8c2523f6babbbc946013d#r144033948
@@ -211,24 +209,31 @@ export const createSelectionHandler = (
   const onPointerUp = async (evt: PointerEvent) => {
     if (!isLeftClick) return;
 
-    if (isNotAnnotatable(container, evt.target as Node)) {
-      const shouldDismissSelection = typeof dismissOnNotAnnotatable === 'function'
-        ? dismissOnNotAnnotatable(evt, container)
-        : dismissOnNotAnnotatable === 'ALWAYS';
-      if (shouldDismissSelection) {
-        selection.clear();
-      }
-      return;
-    }
+    const lastUpEvent = clonePointerEvent(evt);
 
     // Logic for selecting an existing annotation
     const clickSelect = () => {
       const { x, y } = container.getBoundingClientRect();
 
+      if (isNotAnnotatable(container, lastUpEvent.target as Node)) {
+        const shouldDismissSelection = typeof dismissOnNotAnnotatable === 'function'
+          ? dismissOnNotAnnotatable(lastUpEvent, container)
+          : dismissOnNotAnnotatable === 'ALWAYS';
+        if (shouldDismissSelection) {
+          selection.clear();
+        }
+        return;
+      }
+
       const hovered =
-        evt.target instanceof Node &&
-        container.contains(evt.target) &&
-        store.getAt(evt.clientX - x, evt.clientY - y, selectionMode === 'all', currentFilter);
+        lastUpEvent.target instanceof Node &&
+        container.contains(lastUpEvent.target) &&
+        store.getAt(
+          lastUpEvent.clientX - x,
+          lastUpEvent.clientY - y,
+          selectionMode === 'all',
+          currentFilter
+        );
 
       if (hovered) {
         const { selected } = selection;
@@ -241,13 +246,13 @@ export const createSelectionHandler = (
           !nextIds.every(id => currentIds.has(id));
 
         if (hasChanged)
-          selection.userSelect(nextIds, evt);
+          selection.userSelect(nextIds, lastUpEvent);
       } else {
         selection.clear();
       }
     };
 
-    const timeDifference = evt.timeStamp - lastDownEvent.timeStamp;
+    const timeDifference = lastUpEvent.timeStamp - lastDownEvent.timeStamp;
     if (timeDifference < CLICK_TIMEOUT) {
       await pollSelectionCollapsed();
 
@@ -261,7 +266,7 @@ export const createSelectionHandler = (
 
     if (currentTarget && currentTarget.selector.length > 0) {
       upsertCurrentTarget();
-      selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));
+      selection.userSelect(currentTarget.annotation, lastUpEvent);
     }
   }
 
@@ -405,7 +410,7 @@ export const createSelectionHandler = (
     }
   };
 
-  container.addEventListener('pointerdown', onPointerDown);
+  document.addEventListener('pointerdown', onPointerDown);
   document.addEventListener('pointerup', onPointerUp);
   document.addEventListener('contextmenu', onContextMenu);
 
@@ -420,7 +425,7 @@ export const createSelectionHandler = (
 
     onSelectionChange.clear();
 
-    container.removeEventListener('pointerdown', onPointerDown);
+    document.removeEventListener('pointerdown', onPointerDown);
     document.removeEventListener('pointerup', onPointerUp);
     document.removeEventListener('contextmenu', onContextMenu);
 

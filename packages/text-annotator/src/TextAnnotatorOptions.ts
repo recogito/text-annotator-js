@@ -22,20 +22,28 @@ export interface TextAnnotatorOptions<I extends TextAnnotation = TextAnnotation,
    */
   dismissOnNotAnnotatable?: DismissOnNotAnnotatableExpression;
 
-  renderer?: RendererType;
+  mergeHighlights?: {
+
+    horizontalTolerance?: number;
+
+    verticalTolerance?: number;
+
+  }
 
   offsetReferenceSelector?: string;
 
-  userSelectAction?: UserSelectActionExpression<E>,
-
   presence?: PresencePainterOptions;
+  
+  renderer?: RendererType;
 
   selectionMode?: 'shortest' | 'all';
 
   style?: HighlightStyleExpression;
 
   user?: User;
-  
+
+  userSelectAction?: UserSelectActionExpression<E>,
+
 }
 
 export type RendererType = 'SPANS' | 'CANVAS' | 'CSS_HIGHLIGHTS';
