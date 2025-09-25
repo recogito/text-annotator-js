@@ -23,13 +23,13 @@ export const textAnnotation: W3CTextAnnotation = {
         {
           type: 'TextQuoteSelector',
           exact: 'But as years',
-          prefix: 'n the gods',
-          suffix: 'of Saturn,'
+          prefix: ' time when',
+          suffix: ' Then Mine'
         },
         {
           type: 'TextPositionSelector',
-          start: 1049,
-          end: 1968
+          start: 1070,
+          end: 2001
         },
       ]
     }
