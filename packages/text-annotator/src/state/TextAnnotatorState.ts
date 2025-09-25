@@ -37,7 +37,7 @@ export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotati
 
   const store: Store<I> = createStore<I>();
 
-  const tree = createSpatialTree(store, container);
+  const tree = createSpatialTree(store, container, opts.mergeHighlights?.horizontalTolerance, opts.mergeHighlights?.verticalTolerance);
 
   const selection = createSelectionState<I, E>(store, opts.userSelectAction, opts.adapter);
 

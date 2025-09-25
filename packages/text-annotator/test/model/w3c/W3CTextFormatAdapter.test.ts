@@ -30,7 +30,7 @@ describe('parseW3CTextAnnotation', () => {
     expect(parsed.bodies[0].value).toBe(fixtureBody.value);
 
     const { selector, created, creator } = parsed.target;
-    const { quote, start, range } = selector[0];
+    const { quote, start } = selector[0];
 
     expect(quote).toStrictEqual(fixtureTarget.selector[0].exact);
     expect(start).toStrictEqual(fixtureTarget.selector[1].start);
