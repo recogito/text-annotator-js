@@ -2,6 +2,8 @@
 
 A JavaScript library for adding interactive text annotation functionality to web applications.
 
+See also: [React](packages/text-annotator-react) | [TEI/XML Extension](packages/extension-tei) | [Recogito PDF Annotator](https://github.com/recogito/pdf-annotator-js) 
+
 ![Animated screenshot of the Recogito Text Annotator](/animated-screenshot.gif "Animated screenshot of the Recogito Text Annotator")
 
 ## Installation
