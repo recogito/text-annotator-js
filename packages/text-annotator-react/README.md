@@ -66,28 +66,28 @@ export const App = () => {
 
 The Recogito Text Annotator leverages the [Annotorious](https://annotorious.dev) framework underneath the hood. All of the [Annotorious hooks](https://annotorious.dev/react/hooks-reference/) are available:
 
-**useAnnotator** 
+#### useAnnotator
 Provides access to the Text Annotator instance.
 
 ```js
 const anno = useAnnotator();
 ```
 
-**useAnnotatorUser**
+#### useAnnotatorUser
 Provides the current annotator user set via the anno.setUser() method, if any.
 
 ```js
 const user: User = useAnnotatorUser();
 ```
 
-**useSelection** 
+#### useSelection
 Provides the current selection state object and, optionally, the associated pointer event.
 
 ```js
 const { selected, event } = useSelection();
 ```
 
-**useViewportState**
+#### useViewportState
 Provides the annotations currently visible in the viewport. This hook will respond to scrolling and resizing the annotation area. You can optionally debounce this hook, to limit re-rendering.
 
 ```js
