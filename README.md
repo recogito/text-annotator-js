@@ -235,6 +235,35 @@ anno.on('createAnnotation', handler);
 anno.off('createAnnotation', handler);
 ```
 
+## Annotation Format
+
+The Text Annotator data model aligns closely with the [W3C Web Annotation Data Model](https://www.w3.org/TR/annotation-model/), but with a few key differences to optimize for performance and ease of use. Every annotation in Annotorious is represented by a JavaScript object with the following structure:
+
+```json
+{
+  "id": "67a427d7-afc3-474a-bdab-1e2ea8dc78f6",
+  "bodies": [],
+  "target": {
+    "selector": [{
+      "quote": "Tell me, O muse",
+      "start": 48,
+      "end": 63
+    }],
+    "creator": {
+        "id": "zD62eVrpvJgMEEWuPpPS"
+    },
+    "created": "2025-09-30T07:28:54.973Z",
+    "updated": "2025-09-30T07:28:56.158Z"
+  }
+}
+```
+
+* `id` - a unique identifier for the annotation. The ID can be any alphanumeric string. Annotations created by users will receive a globally unique UUID automatically.
+
+* `target` - the target represents the text range that the annotation is associated with. The `selector` provides the selected `quote` and character offsets for `start` and `end`.
+
+* `bodies` are designed to carry application-specific payload, such as comments, tags, or other metadata associated with the annotation.
+
 ## License
 
 The Recogito Text Annotator is licensed under the [BSD 3-Clause](LICENSE) license. 

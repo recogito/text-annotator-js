@@ -342,7 +342,7 @@
           }));
 
         var r = createTextAnnotator(contentContainer, {
-          adapter: W3CTextFormat('https://www.gutenberg.org', contentContainer),
+          // adapter: W3CTextFormat('https://www.gutenberg.org', contentContainer),
           renderer: 'SPANS',
           // annotatingEnabled: false,
           // selectionMode: 'all',
@@ -351,7 +351,7 @@
 
         var annotations;
 
-        r.loadAnnotations('annotations.w3c.json').then(a => annotations = a);
+        // r.loadAnnotations('annotations.w3c.json').then(a => annotations = a);
 
         r.on('createAnnotation', annotation => {
           console.log('createAnnotation', annotation);
