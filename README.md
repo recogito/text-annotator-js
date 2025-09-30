@@ -38,6 +38,8 @@ const anno = createTextAnnotator(element, options);
 
 ## Annotator API
 
+### Methods
+
 #### `getAnnotations(): TextAnnotation[]`
 Returns all annotations.
 
@@ -184,6 +186,53 @@ Destroys the annotator instance and cleans up all event listeners.
 
 ```js
 anno.destroy();
+```
+
+### Events
+
+Listen to annotation lifecycle events using `on()` and remove listeners with `off()`.
+
+#### `createAnnotation`
+Fired when a the user creates a new annotation.
+
+```js
+anno.on('createAnnotation', annotation => {
+  console.log('Created:', annotation);
+});
+```
+
+#### `updateAnnotation`
+Fired when the user updates an annotation. Receives the updated annotation and the previous version.
+
+```js
+anno.on('updateAnnotation', (annotation, previous) => {
+  console.log('Updated:', annotation, 'was:', previous);
+});
+```
+
+#### `deleteAnnotation`
+Fired when the user deletes an annotation.
+
+```js
+anno.on('deleteAnnotation', annotation => {
+  console.log('Deleted:', annotation);
+});
+```
+
+#### `selectionChanged`
+Fired when an the selection was changed by the user.
+
+```js
+anno.on('selectionChanged', annotations => {
+  console.log('Selected:', annotations);
+});
+```
+
+**Remove event listeners:**
+```js
+const handler = annotation => console.log(annotation);
+anno.on('createAnnotation', handler);
+anno.off('createAnnotation', handler);
 ```
 
 ## License
