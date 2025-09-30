@@ -55,7 +55,7 @@ const annotation = anno.getAnnotationById('annotation-id');
 ```
 
 #### `setAnnotations(annotations: TextAnnotation[], replace = true): void`
-Bulk-adds the annotations with the given array. If `replace` is set to `true` (default), previous annotations will be deleted. Otherwise, the annotations will be appended.
+Bulk-adds annotations. If `replace` is `true` (default), all existing annotations are removed first. If `false`, the new annotations are appended to existing ones.
 
 ```js
 anno.setAnnotations(annotations);
@@ -104,7 +104,7 @@ const selected = anno.getSelected();
 ```
 
 #### `setSelected(annotationOrId?: string | string[]): void`
-Programmatically select annotation(s). Passing `undefined` or no argument will clear selection. You can
+Programmatically select annotation(s). Passing `undefined` or no argument will clear selection.
 
 ```js
 anno.setSelected('annotation-id');
@@ -193,11 +193,17 @@ anno.destroy();
 Listen to annotation lifecycle events using `on()` and remove listeners with `off()`.
 
 #### `createAnnotation`
-Fired when a the user creates a new annotation.
+Fired when the user creates a new annotation.
 
 ```js
+// Example: save new annotations to a backend
 anno.on('createAnnotation', annotation => {
   console.log('Created:', annotation);
+
+  fetch('/my-api/annotations', {
+    method: 'POST',
+    body: JSON.stringify(annotation)
+  });
 });
 ```
 
@@ -220,7 +226,7 @@ anno.on('deleteAnnotation', annotation => {
 ```
 
 #### `selectionChanged`
-Fired when an the selection was changed by the user.
+Fired when the selection was changed by the user.
 
 ```js
 anno.on('selectionChanged', annotations => {
@@ -281,11 +287,14 @@ const anno = createTextAnnotator(element, {
 });
 ```
 
-You can provide a function to style annotations based on their properties:
+You can provide a function to style annotations based on their properties. The style function receives three arguments:
+- `annotation` - the annotation object
+- `state` - an object with `selected` and `hovered` boolean properties
+- `zIndex` - the stacking order (useful for layering effects on overlapping annotations)
 
 ```js
-anno.setStyle((a: TextAnnotation, state: AnnotationState, zIndex: number) => {
-  const hasTag = a.bodies.some(b => b.purpose === 'tagging');
+anno.setStyle((annotation, state, zIndex) => {
+  const hasTag = annotation.bodies.some(b => b.purpose === 'tagging');
   
   return {
     fill: hasTag ? '#ffeb3b' : '#bbdefb',
