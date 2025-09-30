@@ -1,3 +1,5 @@
+![Animated screenshot of the Recogito Text Annotator](/screen-video.gif "Animated screenshot of the Recogito Text Annotator")
+
 # Recogito Text Annotator
 
 A JavaScript library for adding interactive text annotation functionality to web applications.
