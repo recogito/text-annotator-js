@@ -1,5 +1,3 @@
-![Animated screenshot of the Recogito Text Annotator](/animated-screenshot.gif "Animated screenshot of the Recogito Text Annotator")
-
 # Recogito Text Annotator
 
 A JavaScript library for adding interactive text annotation functionality to web applications.
@@ -7,6 +5,8 @@ A JavaScript library for adding interactive text annotation functionality to web
 ```sh
 npm install @recogito/text-annotator
 ```
+
+![Animated screenshot of the Recogito Text Annotator](/animated-screenshot.gif "Animated screenshot of the Recogito Text Annotator")
 
 ## Quick Start
 
