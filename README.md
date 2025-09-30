@@ -1,4 +1,4 @@
-![Animated screenshot of the Recogito Text Annotator](/screen-video.gif "Animated screenshot of the Recogito Text Annotator")
+![Animated screenshot of the Recogito Text Annotator](/animated-screenshot.gif "Animated screenshot of the Recogito Text Annotator")
 
 # Recogito Text Annotator
 
