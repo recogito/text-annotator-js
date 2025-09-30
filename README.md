@@ -30,15 +30,13 @@ const anno = createTextAnnotator(element, options);
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `annotatingEnabled` | `boolean` | `true` | Enable or disable annotation creation. |
-| `dismissOnNotAnnotatable` | `'NEVER' \| 'ALWAYS' \| function` | `'NEVER'` | Controls whether the current selection is dismissed when clicking outside annotatable content |
-| `selectionMode` | `'shortest' \| 'all'` | `'shortest'` | When clicking overlapping annotations: select shortest or all |
-| `style` | `HighlightStyleExpression` | `undefined` | Custom styling function for highlights |
-| `user` | `User` | anonymous guest | Current user information, automatically added to created annotations |
+| `annotatingEnabled` | `boolean` | `true` | Enable or disable interactive creation of new annotations. |
+| `dismissOnNotAnnotatable` | `'NEVER' \| 'ALWAYS' \| function` | `'NEVER'` | Controls whether the current selection is dismissed when clicking outside of annotatable content. |
+| `selectionMode` | `'shortest' \| 'all'` | `'shortest'` | When the user selects overlapping annotations: select all or only the shortest. |
+| `style` | `HighlightStyleExpression` | `undefined` | Custom styling function for highlights. |
+| `user` | `User` | anonymous guest | Current user information, automatically added to created or updated annotations. |
 
-## API
-
-### Annotator Methods
+## Annotator API
 
 #### `getAnnotations(): TextAnnotation[]`
 Returns all annotations.
@@ -47,31 +45,39 @@ Returns all annotations.
 const annotations = anno.getAnnotations();
 ```
 
-#### `setAnnotations(annotations: TextAnnotation[]): void`
-Replaces all annotations with the given array.
+#### `getAnnotationById(id: string): TextAnnotation`
+Returns the annotations with the given ID.
 
 ```js
-anno.setAnnotations(loadedAnnotations);
+const annotation = anno.getAnnotationById('annotation-id');
 ```
 
-#### `loadAnnotations(url: string): Promise<TextAnnotation[]>`
+#### `setAnnotations(annotations: TextAnnotation[], replace = true): void`
+Bulk-adds the annotations with the given array. If `replace` is set to `true` (default), previous annotations will be deleted. Otherwise, the annotations will be appended.
+
+```js
+anno.setAnnotations(annotations);
+```
+
+#### `loadAnnotations(url: string, replace = true): Promise<TextAnnotation[]>`
 Loads annotations from a URL.
 
 ```js
-await anno.loadAnnotations('/api/annotations.json');
+await anno.loadAnnotations('/annotations.json');
 ```
+
 #### `addAnnotation(annotation: TextAnnotation): void`
 Adds a single annotation programmatically.
 
 ```js
-anno.addAnnotation(newAnnotation);
+anno.addAnnotation(annotation);
 ```
 
-#### `updateAnnotation(annotation: TextAnnotation): void`
-Updates an existing annotation.
+#### `updateAnnotation(updated: TextAnnotation): void`
+Updates an existing annotation. (The original annotation with the same ID will be replaced.)
 
 ```js
-anno.updateAnnotation(modifiedAnnotation);
+anno.updateAnnotation(updated);
 ```
 
 #### `removeAnnotation(annotationOrId: TextAnnotation | string): void`
@@ -79,6 +85,13 @@ Removes an annotation by object or ID.
 
 ```js
 anno.removeAnnotation('annotation-id');
+```
+
+#### `clearAnnotations(): void`
+Removes all annotations.
+
+```js
+anno.clearAnnotations();
 ```
 
 #### `getSelected(): TextAnnotation[]`
@@ -89,12 +102,18 @@ const selected = anno.getSelected();
 ```
 
 #### `setSelected(annotationOrId?: string | string[]): void`
-Programmatically select annotation(s). Pass `undefined` or no argument to clear selection.
+Programmatically select annotation(s). Passing `undefined` or no argument will clear selection. You can
 
 ```js
 anno.setSelected('annotation-id');
 anno.setSelected(['id-1', 'id-2']);
-anno.setSelected(); // Clear selection
+```
+
+#### `cancelSelected(): void`
+Programmatically cancel the current selection.
+
+```js
+anno.cancelSelected();
 ```
 
 #### `scrollIntoView(annotationOrId: TextAnnotation | string): boolean`
@@ -132,7 +151,8 @@ Updates the highlighting style function.
 
 ```js
 anno.setStyle(annotation => ({
-  backgroundColor: annotation.bodies[0]?.purpose === 'tagging' ? 'yellow' : 'lightblue'
+  fill: annotation.bodies[0]?.purpose === 'tagging' ? 'yellow' : 'lightblue',
+  fillOpacity: 0.25
 }));
 ```
 
@@ -140,7 +160,23 @@ anno.setStyle(annotation => ({
 Shows or hides all annotations.
 
 ```js
-anno.setVisible(false); // Hide all highlights
+anno.setVisible(false); 
+```
+
+#### `undo(): void`
+
+Programmatically undo the last user edit.
+
+```js
+anno.undo();
+```
+
+#### `redo(): void`
+
+Programmatically redo the last undone user edit.
+
+```js
+anno.redo();
 ```
 
 #### `destroy(): void`
@@ -149,7 +185,6 @@ Destroys the annotator instance and cleans up all event listeners.
 ```js
 anno.destroy();
 ```
-
 
 ## License
 
