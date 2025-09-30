@@ -264,6 +264,37 @@ The Text Annotator data model aligns closely with the [W3C Web Annotation Data M
 
 * `bodies` are designed to carry application-specific payload, such as comments, tags, or other metadata associated with the annotation.
 
+## Annotation Styling
+
+You can customize the appearance of highlights using the `style` config option or `setStyle()` method.
+
+```js
+const anno = createTextAnnotator(element, {
+  style: {
+    fill: '#ffeb3b',
+    fillOpacity: 0.25,
+    underlineStyle: 'dashed',
+    underlineColor: '#7d7208ff',
+    underlineOffset: 0,
+    underlineThickness: 2
+  }
+});
+```
+
+You can provide a function to style annotations based on their properties:
+
+```js
+anno.setStyle((a: TextAnnotation, state: AnnotationState, zIndex: number) => {
+  const hasTag = a.bodies.some(b => b.purpose === 'tagging');
+  
+  return {
+    fill: hasTag ? '#ffeb3b' : '#bbdefb',
+    fillOpacity: state.hovered ? 0.35 : 0.2,
+    underlineColor: hasTag ? '#f57f17' : undefined
+  };
+});
+```
+
 ## License
 
 The Recogito Text Annotator is licensed under the [BSD 3-Clause](LICENSE) license. 
