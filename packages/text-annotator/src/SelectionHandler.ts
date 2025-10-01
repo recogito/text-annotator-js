@@ -240,7 +240,20 @@ export const SelectionHandler = (
       await pollSelectionCollapsed();
 
       const sel = document.getSelection();
-      if (sel?.isCollapsed) {
+
+      const isDownOnNotAnnotatable = isNotAnnotatable(container, lastDownEvent.target as Node);
+      const isUpOnNotAnnotatable = isNotAnnotatable(container, lastUpEvent.target as Node);
+
+      /**
+       * Route to `clickSelect` if selection collapsed OR
+       * the click happened entirely over a not-annotatable element.
+       *
+       * The latter allows preventing re-selection of an existing
+       * annotation when a user clicks on not-annotatable controls.
+       * For example, a click on a `button` element doesn't make the
+       * selection collapse, but it still needs to be processed with `clickSelect`.
+       */
+      if (sel?.isCollapsed || (isDownOnNotAnnotatable && isUpOnNotAnnotatable)) {
         currentTarget = undefined;
         clickSelect();
         return;
