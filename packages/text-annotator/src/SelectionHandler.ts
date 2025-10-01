@@ -94,13 +94,16 @@ export const SelectionHandler = (
       return;
     }
 
+    const selectionRanges =
+      Array.from(Array(sel.rangeCount).keys()).map(idx => sel.getRangeAt(idx));
+
     /**
      * This is to handle cases where the selection is "hijacked" by
      * another element in a not-annotatable area. A rare case in practice.
      * But rich text editors like Quill will do it!
      */
     // if (isNotAnnotatable(container, sel.anchorNode) && isNotAnnotatable(container, sel.focusNode)) {
-    if (!sel.getRangeAt(0).intersectsNode(container)) {
+    if (!selectionRanges.some(r => r.intersectsNode(container))) {
       currentTarget = undefined;
       return;
     }
@@ -140,9 +143,6 @@ export const SelectionHandler = (
 
       return;
     }
-
-    const selectionRanges =
-      Array.from(Array(sel.rangeCount).keys()).map(idx => sel.getRangeAt(idx));
 
     const containedRanges =
       selectionRanges.map(r => trimRangeToContainer(r, container));
