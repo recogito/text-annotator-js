@@ -241,8 +241,11 @@ export const SelectionHandler = (
 
       const sel = document.getSelection();
 
-      const isDownOnNotAnnotatable = isNotAnnotatable(container, lastDownEvent.target as Node);
-      const isUpOnNotAnnotatable = isNotAnnotatable(container, lastUpEvent.target as Node);
+      const isDownOnNotAnnotatable =
+        isNotAnnotatable(container, lastDownEvent.target as Node);
+
+      const isUpOnNotAnnotatable = 
+        isNotAnnotatable(container, lastUpEvent.target as Node);
 
       /**
        * Route to `clickSelect` if selection collapsed OR
