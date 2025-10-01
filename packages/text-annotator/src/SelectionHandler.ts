@@ -198,9 +198,9 @@ export const SelectionHandler = (
     const clickSelect = () => {
       const { x, y } = container.getBoundingClientRect();
 
-      if (isNotAnnotatable(container, lastUpEvent.target as Node)) {
+      if (isNotAnnotatable(container, lastDownEvent.target as Node)) {
         const shouldDismissSelection = typeof dismissOnNotAnnotatable === 'function'
-          ? dismissOnNotAnnotatable(lastUpEvent, container)
+          ? dismissOnNotAnnotatable(lastDownEvent, container)
           : dismissOnNotAnnotatable === 'ALWAYS';
         if (shouldDismissSelection) {
           selection.clear();
