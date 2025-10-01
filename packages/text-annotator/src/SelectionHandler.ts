@@ -68,9 +68,9 @@ export const SelectionHandler = (
      * be annotatable (like a component popup).
      * Note that Chrome/iOS will sometimes return the root doc as target!
      */
-    currentTarget = isNotAnnotatable(container, evt.target as Node)
+    currentTarget = /*isNotAnnotatable(container, evt.target as Node)
       ? undefined
-      : {
+      :*/ {
         annotation: uuidv4(),
         selector: [],
         creator: currentUser,
@@ -99,7 +99,7 @@ export const SelectionHandler = (
      * another element in a not-annotatable area. A rare case in practice.
      * But rich text editors like Quill will do it!
      */
-    if (isNotAnnotatable(container, sel.anchorNode)) {
+    if (isNotAnnotatable(container, sel.anchorNode) && isNotAnnotatable(container, sel.focusNode)) {
       currentTarget = undefined;
       return;
     }
