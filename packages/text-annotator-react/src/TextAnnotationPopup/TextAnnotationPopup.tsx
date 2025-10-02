@@ -24,7 +24,7 @@ import {
   useFloating
 } from '@floating-ui/react';
 import { isMobile } from './isMobile';
-import { useAnnotationQuoteIdle } from './useAnnotationQuoteIdle';
+import { useAnnotationQuoteIdle } from '../hooks';
 
 import './TextAnnotationPopup.css';
 
