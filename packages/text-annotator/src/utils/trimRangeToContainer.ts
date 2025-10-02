@@ -1,55 +1,14 @@
-/**
- * Need to manually iterate over the cloned node's children
- * to check if the target node is contained within.
- * Unfortunately, we cannot use `.contains` method,
- * because the cloned node is detached from the DOM.
- */
-const clonedNodeContains = (clonedNode: Node, targetNode: Node) => {
-  if (clonedNode.isEqualNode(targetNode)) {
-    return true;
-  }
-
-  for (let child of clonedNode.childNodes) {
-    if (clonedNodeContains(child, targetNode)) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-const rangeContains = <T extends Node>(range: Range, node: T) => {
-  const rangeContents = range.cloneContents();
-  return clonedNodeContains(rangeContents, node);
-}
-
 export const trimRangeToContainer = (
   range: Range,
   container: HTMLElement
 ): Range => {
   const trimmedRange = range.cloneRange();
 
-  const containsRangeStart = container.contains(trimmedRange.startContainer);
-  const containsRangeEnd = container.contains(trimmedRange.endContainer);
-
-  /**
-   * If both range's edges are not within the container (i.e. the selection is done outside)
-   * and the range doesn't cover the container itself (i.e. "Select All" was pressed) ->
-   * collapse it as irrelevant
-   */
-  if (!containsRangeStart && !containsRangeEnd) {
-    const containedWithinRange = rangeContains(trimmedRange, container);
-    if (!containedWithinRange) {
-      trimmedRange.collapse();
-      return trimmedRange;
-    }
-  }
-
   /**
    * If the range starts outside the container -
    * trim it to the start of the container
    */
-  if (!containsRangeStart) {
+  if (!container.contains(trimmedRange.startContainer)) {
     trimmedRange.setStart(container, 0);
   }
 
@@ -57,9 +16,9 @@ export const trimRangeToContainer = (
    * If the range ends outside the container -
    * trim it to the end of the container
    */
-  if (!containsRangeEnd) {
+  if (!container.contains(trimmedRange.endContainer)) {
     trimmedRange.setEnd(container, container.childNodes.length);
   }
 
   return trimmedRange;
-};
+}
