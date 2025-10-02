@@ -1,5 +1,5 @@
-// The three topological relations we need to check for
-type Relation = 
+// The three topological relations we'll check for
+type Relation =
   // Inline elements, same height, directly adjacent
   'inline-adjacent' |
   // Inline elements, A fully contains B
@@ -14,8 +14,13 @@ type Relation =
 // Note that this is not a general topology test. Takes a 
 // few shortcuts to test ONLY the situations we'll encounter
 // with text selections.
-const getRelation = (rectA: DOMRect, rectB: DOMRect): Relation | undefined => {
-  const round = (num: number ) => Math.round(num * 10) / 10;
+const getRelation = (
+  rectA: DOMRect, 
+  rectB: DOMRect, 
+  hTolerance: number, 
+  vTolerance: number
+): Relation | undefined => {
+  const round = (num: number) => Math.round(num * 10) / 10;
 
   // Some browsers have fractional pixel differences (looking at you FF!)
   const a = {
@@ -32,9 +37,9 @@ const getRelation = (rectA: DOMRect, rectB: DOMRect): Relation | undefined => {
     right: round(rectB.right)
   };
 
-  if (Math.abs(a.top - b.top) < 0.5 && Math.abs(a.bottom - b.bottom) < 0.5) {
+  if (Math.abs(a.top - b.top) < vTolerance && Math.abs(a.bottom - b.bottom) < vTolerance) {
     // Same height - check for containment and adjacency
-    if (Math.abs(a.left - b.right) < 0.5 || Math.abs(a.right - b.left) < 0.5)
+    if (Math.abs(a.left - b.right) < hTolerance || Math.abs(a.right - b.left) < hTolerance)
       return 'inline-adjacent';
 
     if (a.left >= b.left && a.right <= b.right)
@@ -46,7 +51,7 @@ const getRelation = (rectA: DOMRect, rectB: DOMRect): Relation | undefined => {
     // Different heights - check for containment
     if (a.top <= b.top && a.bottom >= b.bottom) {
       if (a.left <= b.left && a.right >= b.right) {
-        return 'block-contains'
+        return 'block-contains';
       }
     } else if (a.top >= b.top && a.bottom <= b.bottom) {
       if (a.left >= b.left && a.right <= b.right) {
@@ -65,7 +70,11 @@ const union = (a: DOMRect, b: DOMRect): DOMRect => {
   return new DOMRect(left, top, right - left, bottom - top);
 }
 
-export const mergeClientRects = (rects: DOMRect[]) => rects.reduce<DOMRect[]>((merged, rectA) => {
+export const mergeClientRects = (
+  rects: DOMRect[], 
+  hTolerance = 0.5, 
+  vTolerance = 0.5
+) => rects.reduce<DOMRect[]>((merged, rectA) => {
   // Some browser report empty rects - discard
   if (rectA.width === 0 || rectA.height === 0)
     return merged;
@@ -75,8 +84,8 @@ export const mergeClientRects = (rects: DOMRect[]) => rects.reduce<DOMRect[]>((m
   let wasMerged = false;
 
   for (const rectB of merged) {
-    const relation = getRelation(rectA, rectB);
-    
+    const relation = getRelation(rectA, rectB, hTolerance, vTolerance);
+
     if (relation === 'inline-adjacent') {
       // A and B are adjacent - remove B and keep union
       next = next.map(r => r === rectB ? union(rectA, rectB) : r);
@@ -92,16 +101,20 @@ export const mergeClientRects = (rects: DOMRect[]) => rects.reduce<DOMRect[]>((m
       wasMerged = true;
       break;
     } else if (relation === 'block-contains' || relation === 'block-is-contained') {
-      // Block containment - keep the element with smaller width
-      if (rectA.width < rectB.width) {
+      // Block containment - keep the element with a smaller width
+      if (rectA.width < rectB.width)
         next = next.map(r => r === rectB ? rectA : r);
-      }
+
+      // When the width is the same, keep the element with a smaller height
+      if (rectA.width === rectB.width && rectA.height < rectB.width)
+        next = next.map(r => r === rectB ? rectA : r);
+
       wasMerged = true;
       break;
     }
   }
 
-  return wasMerged ? next : [ ...next, rectA ];
+  return wasMerged ? next : [...next, rectA];
 }, []);
 
 export const toDomRectList = (rects: DOMRect[]): DOMRectList => ({
@@ -111,55 +124,4 @@ export const toDomRectList = (rects: DOMRect[]): DOMRectList => ({
     for (let i = 0; i < this.length; i++)
       yield this.item(i)!;
   }
-})
-
-/* Pixels that rects can be apart vertically while still
-// being considered to be on the same line.
-const TOLERANCE = 3;
-
-export const mergeClientRects = (rects: DOMRect[]) => {
-  const lines: DOMRect[][] = [];
-
-  // Sort rects from the top, to make grouping simpler
-  rects.sort((a, b) => a.top - b.top);
-
-  // Group rects into lines
-  for (const rect of rects) {
-    if (lines.length === 0 || Math.abs(rect.top - lines[lines.length - 1][0].top) > TOLERANCE) {
-      // Start a new line
-      lines.push([rect]);
-    } else {
-      lines[lines.length - 1].push(rect);
-    }
-  }
-
-  // Merge lines
-  const mergedRects = lines.map(line => {
-    const top = Math.min(...line.map(r => r.top));
-    const bottom = Math.max(...line.map(r => r.bottom));
-    const left = Math.min(...line.map(r => r.left));
-    const right = Math.max(...line.map(r => r.right));
-
-    return {
-      top: top,
-      bottom: bottom,
-      left: left,
-      right: right,
-      height: bottom - top,
-      width: right - left
-    } as DOMRect;
-  }).filter(r => r.height > 0 && r.width > 0);
-
-  // Checks if the given rect contains any other rects
-  const containsOthers = (rect: DOMRect) => mergedRects.some(other =>
-    other !== rect &&
-    other.left >= rect.left &&
-    other.right <= rect.right &&
-    other.top >= rect.top &&
-    other.bottom <= rect.bottom
-  );
-
-  // Remove all rects that contain other rects (block-level elements!)
-  return mergedRects.filter(rect => !containsOthers(rect));
-}
-*/
+});

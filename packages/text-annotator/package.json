@@ -1,13 +1,13 @@
 {
   "name": "@recogito/text-annotator",
-  "version": "3.1.6",
+  "version": "3.2.0",
   "description": "A JavaScript text annotation library",
   "author": "Rainer Simon",
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
     "start": "vite --host",
-    "build": "vite build",
+    "build": "vite build && vite build --config vite.config.umd.ts",
     "preview": "vite preview",
     "test": "vitest"
   },
@@ -43,6 +43,7 @@
     "poll": "^3.2.2",
     "nanoevents": "^9.0.0",
     "rbush": "^4.0.1",
+    "ua-parser-js": "^2.0.5",
     "uuid": "^13.0.0"
   }
 }

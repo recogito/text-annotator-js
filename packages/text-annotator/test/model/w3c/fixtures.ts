@@ -23,13 +23,13 @@ export const textAnnotation: W3CTextAnnotation = {
         {
           type: 'TextQuoteSelector',
           exact: 'But as years',
-          prefix: 'arry him. ',
-          suffix: ' went by, '
+          prefix: ' time when',
+          suffix: ' Then Mine'
         },
         {
           type: 'TextPositionSelector',
-          start: 958,
-          end: 970
+          start: 1070,
+          end: 2001
         },
       ]
     }
