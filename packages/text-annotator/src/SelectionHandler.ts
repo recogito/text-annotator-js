@@ -102,7 +102,6 @@ export const SelectionHandler = (
      * another element in a not-annotatable area. A rare case in practice.
      * But rich text editors like Quill will do it!
      */
-    // if (isNotAnnotatable(container, sel.anchorNode) && isNotAnnotatable(container, sel.focusNode)) {
     if (!selectionRanges.some(r => r.intersectsNode(container))) {
       currentTarget = undefined;
       return;
