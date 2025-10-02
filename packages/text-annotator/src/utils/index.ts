@@ -2,7 +2,6 @@ export * from './cancelSingleClickEvents';
 export * from './cloneEvents';
 export * from './device';
 export * from './programmaticallyFocusable';
-export * from './debounce';
 export * from './getHighlightClientRects';
 export * from './getQuoteContext';
 export * from './isNotAnnotatable';
