@@ -10,6 +10,7 @@ import { DEFAULT_STYLE, type HighlightStyleExpression } from '../HighlightStyle'
 import type { TextAnnotation } from 'src/model';
 
 import './spansRenderer.css';
+import { getBackgroundColor } from './color';
 
 const computeZIndex = (rect: Rect, all: Highlight[]): number => {
   const intersects = (a: Rect, b: Rect): boolean => (
@@ -85,9 +86,7 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
           span.style.width = `${rect.width}px`;
           span.style.height = `${rect.height}px`;
 
-          span.style.backgroundColor = colord(style?.fill || DEFAULT_STYLE.fill)
-            .alpha(style?.fillOpacity === undefined ? DEFAULT_STYLE.fillOpacity : style.fillOpacity)
-            .toHex();
+          span.style.backgroundColor = getBackgroundColor(style);
 
           if (style.underlineStyle)
             span.style.borderStyle = style.underlineStyle;
