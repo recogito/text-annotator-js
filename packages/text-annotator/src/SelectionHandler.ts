@@ -95,7 +95,7 @@ export const SelectionHandler = (
      * But rich text editors like Quill will do it!
      */
     if (!selectionRanges.some(r => r.intersectsNode(container))) {
-      currentTarget = undefined;
+      // currentTarget = undefined;
       return;
     }
 
