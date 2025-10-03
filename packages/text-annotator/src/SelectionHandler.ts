@@ -95,7 +95,7 @@ export const SelectionHandler = (
      * But rich text editors like Quill will do it!
      */
     if (!selectionRanges.some(r => r.intersectsNode(container))) {
-      // currentTarget = undefined;
+      currentTarget = undefined;
       return;
     }
 
@@ -117,8 +117,19 @@ export const SelectionHandler = (
       }
     }
 
+    // Note: commenting out the line below. We should no longer do this. Why?
+    // Let's assume the user drags the selection from outside the annotatable area
+    // over the anntoatable area (intersection!). Then drags it out again
+    // (no intersection!), then in again (intersection). Because the
+    // currentTarget will have been cleared meanwhile, execution will stop.
+    // 
+    // But we don't want this - instead, processing should continue as normal,
+    // and a new currentTarget should be computed when the user drags the
+    // selection into the annotatable area a second time.
+
     // The selection isn't active -> bail out from selection change processing
-    if (!currentTarget) return;
+    // if (!currentTarget) return;
+    if (!currentTarget) onSelectStart();
 
     if (sel.isCollapsed) {
       /**
@@ -144,6 +155,7 @@ export const SelectionHandler = (
     const annotatableRanges = containedRanges.flatMap(r => splitAnnotatableRanges(container, r.cloneRange()));
 
     const hasChanged =
+      (annotatableRanges.length > 0 && !currentTarget) ||
       annotatableRanges.length !== currentTarget.selector.length ||
       annotatableRanges.some((r, i) => r.toString() !== currentTarget.selector[i]?.quote);
 
