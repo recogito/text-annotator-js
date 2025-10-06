@@ -1,7 +1,13 @@
 import RBush from 'rbush';
 import type { Store } from '@annotorious/core';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
-import { isRevived, reviveSelector, mergeClientRects, getHighlightClientRects } from '../utils';
+import {
+  isRevived,
+  reviveSelector,
+  mergeClientRects,
+  getHighlightClientRects,
+  toParentBounds
+} from '../utils';
 import type { AnnotationRects } from './TextAnnotationStore';
 
 interface IndexedHighlightRect {
@@ -25,7 +31,7 @@ interface IndexedHighlightRect {
 }
 
 export const createSpatialTree = <T extends TextAnnotation>(
-  store: Store<T>, 
+  store: Store<T>,
   container: HTMLElement,
   hMergeTolerance?: number,
   vMergeTolerance?: number
@@ -37,20 +43,17 @@ export const createSpatialTree = <T extends TextAnnotation>(
 
   // Helper: converts a single text annotation target to a list of hightlight rects
   const toItems = (target: TextAnnotationTarget, offset: DOMRect): IndexedHighlightRect[] => {
-    // const start = performance.now();
-
     const rects = target.selector.flatMap(s => {
       const revivedRange = isRevived([s]) ? s.range : reviveSelector(s, container).range;
       return getHighlightClientRects(revivedRange);
     });
 
-    // console.log(`Highlights took ${performance.now() - start}ms`);
-
+    /**
+     * Offset the merged client rects so that coords
+     * are relative to the parent container
+     */
     const merged = mergeClientRects(rects, hMergeTolerance, vMergeTolerance)
-      // Offset the merged client rects so that coords
-      // are relative to the parent container
-      .map(({ left, top, right, bottom }) =>  
-        new DOMRect(left - offset.left, top - offset.top, right - left, bottom - top));
+      .map(rect => toParentBounds(rect, offset));
 
     // console.log(`Merging took ${performance.now() - start}ms`);
 
