@@ -13,7 +13,7 @@ import {
   splitAnnotatableRanges,
   rangeToSelector,
   isMac,
-  isWhitespaceOrEmpty,
+  isRangeWhitespaceOrEmpty,
   trimRangeToContainer,
   isNotAnnotatable
 } from './utils';
@@ -150,7 +150,7 @@ export const SelectionHandler = (
       selectionRanges.map(r => trimRangeToContainer(r, container));
 
     // The selection should be captured only within the annotatable container
-    if (containedRanges.every(r => isWhitespaceOrEmpty(r))) return;
+    if (containedRanges.every(r => isRangeWhitespaceOrEmpty(r))) return;
 
     const annotatableRanges = containedRanges.flatMap(r => splitAnnotatableRanges(container, r.cloneRange()));
 
