@@ -1,10 +1,10 @@
-import { isNodeWhitespaceOrEmpty } from './isWhitespaceOrEmpty';
-
 export const getHighlightClientRects = (range: Range) => {
   const textNodes: Text[] = [];
 
   // Get all text nodes inside the range's commonAncestorContainer
-  const it = document.createNodeIterator(range.commonAncestorContainer, NodeFilter.SHOW_TEXT);
+  const it = document.createNodeIterator(
+    range.commonAncestorContainer, 
+    NodeFilter.SHOW_TEXT);
 
   /*
    Filter text nodes that intersect the range. Note that we could
@@ -14,7 +14,7 @@ export const getHighlightClientRects = (range: Range) => {
   let currentNode: Text | undefined;
  
   while ((currentNode = it.nextNode() as Text)) {
-    if (range.intersectsNode(currentNode) && !isNodeWhitespaceOrEmpty(currentNode)) {
+    if (range.intersectsNode(currentNode)) {
       textNodes.push(currentNode);
     }
   }
@@ -31,16 +31,17 @@ export const getHighlightClientRects = (range: Range) => {
 
     const firstRange = document.createRange();
     firstRange.selectNode(first);
-    if (range.startContainer.nodeType === Node.TEXT_NODE)
+    if (range.startContainer.nodeType === Node.TEXT_NODE) {
       firstRange.setStart(first, range.startOffset);
-    else
+    } else {
       firstRange.setStartAfter(range.startContainer);
+    }
 
     const lastRange = document.createRange();
     lastRange.selectNode(last);
     if (range.endContainer.nodeType === Node.TEXT_NODE)
       lastRange.setEnd(last, range.endOffset);
-    else 
+    else
       lastRange.setEndBefore(range.endContainer);
 
     // Text nodes have no .getClientRects()!
