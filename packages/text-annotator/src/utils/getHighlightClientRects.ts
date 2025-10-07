@@ -1,23 +1,29 @@
+import { isNodeWhitespaceOrEmpty } from './isWhitespaceOrEmpty';
+
 export const getHighlightClientRects = (range: Range) => {
   const textNodes: Text[] = [];
 
   // Get all text nodes inside the range's commonAncestorContainer
   const it = document.createNodeIterator(range.commonAncestorContainer, NodeFilter.SHOW_TEXT);
 
-  // Filter text nodes that intersect the range. Note that we could
-  // also include this filter into the node iterator directly. But
-  // The while loop is faster (!) - possibly due to function call overhead.
+  /*
+   Filter text nodes that intersect the range. Note that we could
+   also include this filter in the node iterator directly.
+   But the while loop is faster (!) - possibly due to a function call overhead.
+  */
   let currentNode: Text | undefined;
  
   while ((currentNode = it.nextNode() as Text)) {
-    if (range.intersectsNode(currentNode))
+    if (range.intersectsNode(currentNode) && !isNodeWhitespaceOrEmpty(currentNode)) {
       textNodes.push(currentNode);
+    }
   }
 
   if (textNodes.length < 2) {
-    // Trivial case: selection inside a single text 
-    // node, or empty (shouldn't happen!) - no need 
-    // to create our own ranges.
+    /*
+     Trivial case: selection is inside a single text node
+     or empty (shouldn't happen!) - no need to create our own ranges.
+    */
     return Array.from(range.getClientRects());
   } else {
     const first = textNodes[0];
