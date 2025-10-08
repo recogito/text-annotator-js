@@ -20,10 +20,8 @@ export const getHighlightClientRects = (range: Range) => {
   }
 
   if (textNodes.length < 2) {
-    /*
-     Trivial case: selection is inside a single text node
-     or empty (shouldn't happen!) - no need to create our own ranges.
-    */
+    // Trivial case: selection is inside a single text node
+    // or empty (shouldn't happen!) - no need to create our own ranges.
     return Array.from(range.getClientRects());
   } else {
     const first = textNodes[0];
@@ -35,10 +33,11 @@ export const getHighlightClientRects = (range: Range) => {
       firstRange.setStart(first, range.startOffset);
     } else {
       const childNode = range.startContainer.childNodes[range.startOffset];
-      if (childNode)
+      if (childNode) {
         firstRange.setStartBefore(childNode);
-      else 
+      } else {
         firstRange.setStartAfter(range.startContainer);
+      }
     }
 
     const lastRange = document.createRange();
@@ -48,9 +47,9 @@ export const getHighlightClientRects = (range: Range) => {
     } else {
       const childNode = range.endContainer.childNodes[range.endOffset];
       if (childNode)
-        lastRange.setEndAfter(childNode);
+        lastRange.setEndBefore(childNode);
       else 
-        lastRange.setEndBefore(range.endContainer);
+        lastRange.setEndAfter(range.endContainer);
     }
 
     // Text nodes have no .getClientRects()!
