@@ -34,15 +34,24 @@ export const getHighlightClientRects = (range: Range) => {
     if (range.startContainer.nodeType === Node.TEXT_NODE) {
       firstRange.setStart(first, range.startOffset);
     } else {
-      firstRange.setStartAfter(range.startContainer);
+      const childNode = range.startContainer.childNodes[range.startOffset];
+      if (childNode)
+        firstRange.setStartBefore(childNode);
+      else 
+        firstRange.setStartAfter(range.startContainer);
     }
 
     const lastRange = document.createRange();
     lastRange.selectNode(last);
-    if (range.endContainer.nodeType === Node.TEXT_NODE)
+    if (range.endContainer.nodeType === Node.TEXT_NODE) {
       lastRange.setEnd(last, range.endOffset);
-    else
-      lastRange.setEndBefore(range.endContainer);
+    } else {
+      const childNode = range.endContainer.childNodes[range.endOffset];
+      if (childNode)
+        lastRange.setEndAfter(childNode);
+      else 
+        lastRange.setEndBefore(range.endContainer);
+    }
 
     // Text nodes have no .getClientRects()!
     const getTextClientRects = (t: Text) => {
