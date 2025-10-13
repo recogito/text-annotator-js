@@ -9,9 +9,10 @@ export * from './isRevived';
 export * from './isWhitespaceOrEmpty';
 export * from './mergeClientRects';
 export * from './rangeToSelector';
+export * from './rectsToBounds';
 export * from './reviveAnnotation';
 export * from './reviveSelector';
 export * from './reviveTarget';
 export * from './splitAnnotatableRanges';
 export * from './trimRangeToContainer';
-export * from './rectsToBounds';
+

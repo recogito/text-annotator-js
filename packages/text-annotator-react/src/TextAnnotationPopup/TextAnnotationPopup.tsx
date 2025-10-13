@@ -131,16 +131,15 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
     if (isOpen && annotation?.id) {
       refs.setPositionReference({
         getBoundingClientRect: () => {
-          // Debounced!
           updateViewportBounds(annotation.id, r.state.store, r.element);
           return cachedBounds ? cachedBounds : new DOMRect();
         },
         getClientRects: () => {
           const rects = r.state.store.getAnnotationRects(annotation.id);
-          const denormalizedRects = rects.map((rect) =>
+          const viewportRects = rects.map((rect) =>
             toViewportBounds(rect, r.element.getBoundingClientRect())
           );
-          return toDomRectList(denormalizedRects);
+          return toDomRectList(viewportRects);
         }
       });
     } else {
