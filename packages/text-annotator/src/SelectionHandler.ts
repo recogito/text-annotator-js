@@ -1,19 +1,20 @@
-import { Origin } from '@annotorious/core';
-import type { Filter, Selection, User } from '@annotorious/core';
+import debounce from 'debounce';
 import { v4 as uuidv4 } from 'uuid';
 import hotkeys from 'hotkeys-js';
 import { poll } from 'poll';
+
+import { Origin, type Filter, type Selection, type User } from '@annotorious/core';
+
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotation, TextAnnotationTarget } from './model';
 import type { TextAnnotatorOptions } from './TextAnnotatorOptions';
 import {
   clonePointerEvent,
   cloneKeyboardEvent,
-  debounce,
   splitAnnotatableRanges,
   rangeToSelector,
   isMac,
-  isWhitespaceOrEmpty,
+  isRangeWhitespaceOrEmpty,
   trimRangeToContainer,
   isNotAnnotatable
 } from './utils';
@@ -29,11 +30,13 @@ const SELECTION_KEYS = [
   SELECT_ALL
 ];
 
-export const SelectionHandler = (
+export const createSelectionHandler = (
   container: HTMLElement,
   state: TextAnnotatorState<TextAnnotation, unknown>,
   options: TextAnnotatorOptions<TextAnnotation, unknown>
 ) => {
+
+  const { store, selection } = state;
 
   let currentUser: User | undefined;
 
@@ -50,35 +53,41 @@ export const SelectionHandler = (
 
   const setFilter = (filter?: Filter) => currentFilter = filter;
 
-  const { store, selection } = state;
-
   let currentTarget: TextAnnotationTarget | undefined;
 
   let isLeftClick: boolean | undefined;
 
   let lastDownEvent: Selection['event'] | undefined;
+  
+  let currentAnnotatingEnabled = annotatingEnabled;
 
-  const onSelectStart = (evt: Event) => {
-    if (isLeftClick === false)
-      return;
+  const setAnnotatingEnabled = (enabled: boolean) => {
+    currentAnnotatingEnabled = enabled;
+    onSelectionChange.clear();
 
-    /**
-     * Make sure we don't listen to selection changes that were
-     * not started on the container, or which are not supposed to
-     * be annotatable (like a component popup).
-     * Note that Chrome/iOS will sometimes return the root doc as target!
-     */
-    currentTarget = isNotAnnotatable(container, evt.target as Node)
-      ? undefined
-      : {
-        annotation: uuidv4(),
-        selector: [],
-        creator: currentUser,
-        created: new Date()
-      };
+    if (!enabled) {
+      currentTarget = undefined;
+      isLeftClick = undefined;
+      lastDownEvent = undefined;
+    }
+  };
+
+  const onSelectStart = () => {
+    if (!currentAnnotatingEnabled) return;
+
+    if (isLeftClick === false) return;
+
+    currentTarget = {
+      annotation: uuidv4(),
+      selector: [],
+      creator: currentUser,
+      created: new Date()
+    };
   };
 
   const onSelectionChange = debounce((evt: Event) => {
+    if (!currentAnnotatingEnabled) return;
+
     const sel = document.getSelection();
 
     /**
@@ -94,12 +103,15 @@ export const SelectionHandler = (
       return;
     }
 
+    const selectionRanges =
+      Array.from(Array(sel.rangeCount).keys()).map(idx => sel.getRangeAt(idx));
+
     /**
      * This is to handle cases where the selection is "hijacked" by
      * another element in a not-annotatable area. A rare case in practice.
      * But rich text editors like Quill will do it!
      */
-    if (isNotAnnotatable(container, sel.anchorNode)) {
+    if (!selectionRanges.some(r => r.intersectsNode(container))) {
       currentTarget = undefined;
       return;
     }
@@ -114,16 +126,27 @@ export const SelectionHandler = (
     if (lastDownEvent?.type === 'pointerdown') {
       if (timeDifference < 1000 && !currentTarget) {
         // Chrome/iOS does not reliably fire the 'selectstart' event!
-        onSelectStart(lastDownEvent || evt);
+        onSelectStart();
       } else if (sel.isCollapsed && timeDifference < CLICK_TIMEOUT) {
         // Firefox doesn't fire the 'selectstart' when user clicks
         // over the text, which collapses the selection
-        onSelectStart(lastDownEvent || evt);
+        onSelectStart();
       }
     }
 
+    // Note: commenting out the line below. We should no longer do this. Why?
+    // Let's assume the user drags the selection from outside the annotatable area
+    // over the anntoatable area (intersection!). Then drags it out again
+    // (no intersection!), then in again (intersection). Because the
+    // currentTarget will have been cleared meanwhile, execution will stop.
+    // 
+    // But we don't want this - instead, processing should continue as normal,
+    // and a new currentTarget should be computed when the user drags the
+    // selection into the annotatable area a second time.
+
     // The selection isn't active -> bail out from selection change processing
-    if (!currentTarget) return;
+    // if (!currentTarget) return;
+    if (!currentTarget) onSelectStart();
 
     if (sel.isCollapsed) {
       /**
@@ -140,18 +163,16 @@ export const SelectionHandler = (
       return;
     }
 
-    const selectionRanges =
-      Array.from(Array(sel.rangeCount).keys()).map(idx => sel.getRangeAt(idx));
-
     const containedRanges =
       selectionRanges.map(r => trimRangeToContainer(r, container));
 
     // The selection should be captured only within the annotatable container
-    if (containedRanges.every(r => isWhitespaceOrEmpty(r))) return;
+    if (containedRanges.every(r => isRangeWhitespaceOrEmpty(r))) return;
 
     const annotatableRanges = containedRanges.flatMap(r => splitAnnotatableRanges(container, r.cloneRange()));
 
     const hasChanged =
+      (annotatableRanges.length > 0 && !currentTarget) ||
       annotatableRanges.length !== currentTarget.selector.length ||
       annotatableRanges.some((r, i) => r.toString() !== currentTarget.selector[i]?.quote);
 
@@ -173,7 +194,7 @@ export const SelectionHandler = (
       // Proper lifecycle management: clear the previous selection first...
       selection.clear();
     }
-  });
+  }, 10);
 
   /**
    * Select events don't carry information about the mouse button.
@@ -315,6 +336,8 @@ export const SelectionHandler = (
   }
 
   const onKeyup = (evt: KeyboardEvent) => {
+    if (!currentAnnotatingEnabled) return;
+
     if (evt.key === 'Shift' && currentTarget) {
       const sel = document.getSelection();
 
@@ -349,7 +372,7 @@ export const SelectionHandler = (
     document.addEventListener('selectionchange', onSelected);
 
     // Start selection!
-    onSelectStart(evt);
+    onSelectStart();
   }
 
   hotkeys(SELECTION_KEYS.join(','), { element: container, keydown: true, keyup: false }, evt => {
@@ -411,13 +434,17 @@ export const SelectionHandler = (
   document.addEventListener('pointerup', onPointerUp);
   document.addEventListener('contextmenu', onContextMenu);
 
-  if (annotatingEnabled) {
-    container.addEventListener('keyup', onKeyup);
-    container.addEventListener('selectstart', onSelectStart);
-    document.addEventListener('selectionchange', onSelectionChange);
-  }
+  container.addEventListener('keyup', onKeyup);
+  container.addEventListener('selectstart', onSelectStart);
+  document.addEventListener('selectionchange', onSelectionChange);
 
   const destroy = () => {
+    currentTarget = undefined;
+    isLeftClick = undefined;
+    lastDownEvent = undefined;
+
+    onSelectionChange.clear();
+
     document.removeEventListener('pointerdown', onPointerDown);
     document.removeEventListener('pointerup', onPointerUp);
     document.removeEventListener('contextmenu', onContextMenu);
@@ -432,7 +459,8 @@ export const SelectionHandler = (
   return {
     destroy,
     setFilter,
-    setUser
+    setUser,
+    setAnnotatingEnabled
   }
 
 }
