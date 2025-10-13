@@ -1,16 +1,15 @@
-import type { ViewportState } from '@annotorious/core';
-import { colord } from 'colord';
 import { dequal } from 'dequal/lite';
+import type { ViewportState } from '@annotorious/core';
+import type { TextAnnotation } from '../../model';
 import type { Rect, TextAnnotatorState } from '../../state';
 import { type HighlightPainter, paint } from '../HighlightPainter';
 import type { ViewportBounds } from '../viewport';
 import { createBaseRenderer, type RendererImplementation } from '../baseRenderer';
 import type { Highlight } from '../Highlight';
-import { DEFAULT_STYLE, type HighlightStyleExpression } from '../HighlightStyle';
-import type { TextAnnotation } from 'src/model';
+import type { HighlightStyleExpression } from '../HighlightStyle';
+import { getBackgroundColor } from './color';
 
 import './spansRenderer.css';
-import { getBackgroundColor } from './color';
 
 const computeZIndex = (rect: Rect, all: Highlight[]): number => {
   const intersects = (a: Rect, b: Rect): boolean => (

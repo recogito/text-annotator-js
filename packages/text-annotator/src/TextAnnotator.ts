@@ -20,7 +20,7 @@ export interface TextAnnotator<I extends TextAnnotation = TextAnnotation, E exte
 
   setStyle(style: HighlightStyleExpression | undefined): void;
 
-  redraw(force?: boolean): void;
+  redraw(lazy?: boolean): void;
 
   // Returns true if successful (or false if the annotation is not currently rendered)
   scrollIntoView(annotationOrId: I | string): boolean;
