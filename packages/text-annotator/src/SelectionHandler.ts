@@ -72,7 +72,7 @@ export const createSelectionHandler = (
     }
   };
 
-  const onSelectStart = (evt: Event) => {
+  const onSelectStart = () => {
     if (!currentAnnotatingEnabled) return;
 
     if (isLeftClick === false) return;
