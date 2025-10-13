@@ -55,8 +55,6 @@ export const createSpatialTree = <T extends TextAnnotation>(
     const merged = mergeClientRects(rects, hMergeTolerance, vMergeTolerance)
       .map(rect => toParentBounds(rect, offset));
 
-    // console.log(`Merging took ${performance.now() - start}ms`);
-
     return merged.map(rect => {
       const { x, y, width, height } = rect;
 
