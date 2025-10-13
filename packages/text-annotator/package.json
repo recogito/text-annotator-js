@@ -38,6 +38,7 @@
   "dependencies": {
     "@annotorious/core": "^3.7.8",
     "colord": "^2.9.3",
+    "debounce": "^2.2.0",
     "dequal": "^2.0.3",
     "hotkeys-js": "^3.13.15",
     "poll": "^3.2.2",

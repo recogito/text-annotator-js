@@ -1,15 +1,16 @@
-import { Origin } from '@annotorious/core';
-import type { Filter, Selection, User } from '@annotorious/core';
+import debounce from 'debounce';
 import { v4 as uuidv4 } from 'uuid';
 import hotkeys from 'hotkeys-js';
 import { poll } from 'poll';
+
+import { Origin, type Filter, type Selection, type User } from '@annotorious/core';
+
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotation, TextAnnotationTarget } from './model';
 import type { TextAnnotatorOptions } from './TextAnnotatorOptions';
 import {
   clonePointerEvent,
   cloneKeyboardEvent,
-  debounce,
   splitAnnotatableRanges,
   rangeToSelector,
   isMac,
@@ -29,11 +30,13 @@ const SELECTION_KEYS = [
   SELECT_ALL
 ];
 
-export const SelectionHandler = (
+export const createSelectionHandler = (
   container: HTMLElement,
   state: TextAnnotatorState<TextAnnotation, unknown>,
   options: TextAnnotatorOptions<TextAnnotation, unknown>
 ) => {
+
+  const { store, selection } = state;
 
   let currentUser: User | undefined;
 
@@ -50,17 +53,29 @@ export const SelectionHandler = (
 
   const setFilter = (filter?: Filter) => currentFilter = filter;
 
-  const { store, selection } = state;
-
   let currentTarget: TextAnnotationTarget | undefined;
 
   let isLeftClick: boolean | undefined;
 
   let lastDownEvent: Selection['event'] | undefined;
+  
+  let currentAnnotatingEnabled = annotatingEnabled;
 
-  const onSelectStart = () => {
-    if (isLeftClick === false)
-      return;
+  const setAnnotatingEnabled = (enabled: boolean) => {
+    currentAnnotatingEnabled = enabled;
+    onSelectionChange.clear();
+
+    if (!enabled) {
+      currentTarget = undefined;
+      isLeftClick = undefined;
+      lastDownEvent = undefined;
+    }
+  };
+
+  const onSelectStart = (evt: Event) => {
+    if (!currentAnnotatingEnabled) return;
+
+    if (isLeftClick === false) return;
 
     currentTarget = {
       annotation: uuidv4(),
@@ -71,6 +86,8 @@ export const SelectionHandler = (
   };
 
   const onSelectionChange = debounce((evt: Event) => {
+    if (!currentAnnotatingEnabled) return;
+
     const sel = document.getSelection();
 
     /**
@@ -177,7 +194,7 @@ export const SelectionHandler = (
       // Proper lifecycle management: clear the previous selection first...
       selection.clear();
     }
-  });
+  }, 10);
 
   /**
    * Select events don't carry information about the mouse button.
@@ -319,6 +336,8 @@ export const SelectionHandler = (
   }
 
   const onKeyup = (evt: KeyboardEvent) => {
+    if (!currentAnnotatingEnabled) return;
+
     if (evt.key === 'Shift' && currentTarget) {
       const sel = document.getSelection();
 
@@ -415,13 +434,17 @@ export const SelectionHandler = (
   document.addEventListener('pointerup', onPointerUp);
   document.addEventListener('contextmenu', onContextMenu);
 
-  if (annotatingEnabled) {
-    container.addEventListener('keyup', onKeyup);
-    container.addEventListener('selectstart', onSelectStart);
-    document.addEventListener('selectionchange', onSelectionChange);
-  }
+  container.addEventListener('keyup', onKeyup);
+  container.addEventListener('selectstart', onSelectStart);
+  document.addEventListener('selectionchange', onSelectionChange);
 
   const destroy = () => {
+    currentTarget = undefined;
+    isLeftClick = undefined;
+    lastDownEvent = undefined;
+
+    onSelectionChange.clear();
+
     document.removeEventListener('pointerdown', onPointerDown);
     document.removeEventListener('pointerup', onPointerUp);
     document.removeEventListener('contextmenu', onContextMenu);
@@ -436,7 +459,8 @@ export const SelectionHandler = (
   return {
     destroy,
     setFilter,
-    setUser
+    setUser,
+    setAnnotatingEnabled
   }
 
 }

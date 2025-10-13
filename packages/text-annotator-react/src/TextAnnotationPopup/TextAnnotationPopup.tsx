@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+import debounce from 'debounce';
 import { useAnnotator, useSelection } from '@annotorious/react';
 import {
-  debounce,
   NOT_ANNOTATABLE_CLASS,
   TextAnnotationStore,
   toDomRectList,

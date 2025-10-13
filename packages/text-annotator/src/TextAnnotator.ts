@@ -1,14 +1,25 @@
-import { createAnonymousGuest, createLifecycleObserver, createBaseAnnotator, createUndoStack } from '@annotorious/core';
-import type { Filter } from '@annotorious/core';
+import {
+  createAnonymousGuest,
+  createLifecycleObserver,
+  createBaseAnnotator,
+  createUndoStack,
+  type Filter,
+} from '@annotorious/core';
 import type { Annotator, User, PresenceProvider } from '@annotorious/core';
-import { createCanvasRenderer, createHighlightsRenderer, createSpansRenderer, type HighlightStyleExpression } from './highlight';
+
+import {
+  createCanvasRenderer,
+  createHighlightsRenderer,
+  createSpansRenderer,
+  type HighlightStyleExpression
+} from './highlight';
 import { createPresencePainter } from './presence';
 import { scrollIntoView } from './api';
 import { type TextAnnotationStore, type TextAnnotatorState, createTextAnnotatorState } from './state';
 import type { TextAnnotation } from './model';
 import { cancelSingleClickEvents, programmaticallyFocusable } from './utils';
 import { fillDefaults, type RendererType, type TextAnnotatorOptions } from './TextAnnotatorOptions';
-import { SelectionHandler } from './SelectionHandler';
+import { createSelectionHandler } from './SelectionHandler';
 
 import './TextAnnotator.css';
 
@@ -24,6 +35,8 @@ export interface TextAnnotator<I extends TextAnnotation = TextAnnotation, E exte
 
   // Returns true if successful (or false if the annotation is not currently rendered)
   scrollIntoView(annotationOrId: I | string): boolean;
+
+  setAnnotatingEnabled: (enabled: boolean) => void;
 
   state: TextAnnotatorState<I, E>;
 
@@ -66,8 +79,8 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
 
   const highlightRenderer =
     useRenderer === 'SPANS' ? createSpansRenderer(container, state, viewport) :
-    useRenderer === 'CSS_HIGHLIGHTS' ? createHighlightsRenderer(container, state, viewport) :
-    useRenderer === 'CANVAS' ? createCanvasRenderer(container, state, viewport) : undefined;
+      useRenderer === 'CSS_HIGHLIGHTS' ? createHighlightsRenderer(container, state, viewport) :
+        useRenderer === 'CANVAS' ? createCanvasRenderer(container, state, viewport) : undefined;
 
   if (!highlightRenderer)
     throw `Unknown renderer implementation: ${useRenderer}`;
@@ -77,8 +90,9 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
   if (opts.style)
     highlightRenderer.setStyle(opts.style);
 
-  const selectionHandler = SelectionHandler(container, state, opts);
+  const selectionHandler = createSelectionHandler(container, state, opts);
   selectionHandler.setUser(currentUser);
+  selectionHandler.setAnnotatingEnabled(opts.annotatingEnabled);
 
   /*************************/
   /*      External API     */
@@ -88,6 +102,12 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
   const base = createBaseAnnotator<I, E>(state, undoStack, opts.adapter);
 
   const getUser = () => currentUser;
+
+  const setAnnotatingEnabled = (enabled?: boolean) => {
+    selectionHandler.setAnnotatingEnabled(
+      enabled === undefined ? true : enabled
+    );
+  };
 
   const setFilter = (filter?: Filter<I>) => {
     highlightRenderer.setFilter(filter);
@@ -127,6 +147,7 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
     destroy,
     element: container,
     getUser,
+    setAnnotatingEnabled,
     setFilter,
     setStyle: highlightRenderer.setStyle.bind(highlightRenderer),
     redraw: highlightRenderer.redraw.bind(highlightRenderer),

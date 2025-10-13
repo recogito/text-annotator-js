@@ -53,12 +53,8 @@ export type DismissOnNotAnnotatableExpression =  'NEVER'| 'ALWAYS' | ((event: Ev
 export const fillDefaults = <I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation>(
   opts: TextAnnotatorOptions<I, E>,
   defaults: TextAnnotatorOptions<I, E>
-): TextAnnotatorOptions<I, E> => {
-
-  return {
-    ...opts,
-    annotatingEnabled: opts.annotatingEnabled ?? defaults.annotatingEnabled,
-    user: opts.user || defaults.user
-  };
-
-};
+): TextAnnotatorOptions<I, E> => ({
+  ...opts,
+  annotatingEnabled: opts.annotatingEnabled ?? defaults.annotatingEnabled,
+  user: opts.user || defaults.user
+});
