@@ -47,13 +47,33 @@ const getXPath = (node: Node, path: string[] = []) => {
  * For the given path sgement lists, this function returns the the
  * start & end XPath expression pair.
  */
-const toTEIXPaths = (startPath: string[], endPath: string[], selectedRange: Range) => {
+const toTEIXPaths = (container: HTMLElement, startPath: string[], endPath: string[], selectedRange: Range) => {
+  
+  const findFirstTEIChild = (node: Node): Element | null => {
+    const iterator = document.createNodeIterator(
+      node,
+      NodeFilter.SHOW_ELEMENT,
+      (node) => {
+        return (node as Element).nodeName.toLowerCase().startsWith('tei-')
+          ? NodeFilter.FILTER_ACCEPT
+          : NodeFilter.FILTER_SKIP;
+      }
+    );
+    
+    return iterator.nextNode() as Element | null;
+  }
+
   // For a given node, returns the closest parent that is a TEI element
   const getClosestTEINode = (node: Node | null) => {
     if (!node) return null;
 
-    return (node.nodeName.toLowerCase().indexOf('tei-') === 0) ?
-      node : getClosestTEINode(node.parentNode);
+    // Edge case: node is the container itself
+    if (node === container) {
+      return findFirstTEIChild(node);
+    } else {
+      return (node.nodeName.toLowerCase().indexOf('tei-') === 0) ?
+        node : getClosestTEINode(node.parentNode);
+    }
   };
 
   // Helper to compute char offsets between end of XPath and a given reference node
@@ -85,7 +105,7 @@ const toTEIXPaths = (startPath: string[], endPath: string[], selectedRange: Rang
  * Using the DOM Range from a (revived!) TextSelector, this function computes
  * the TEIRangeSelector corresponding to that range.
  */
-export const textToTEISelector = (selector: TextSelector): TEIRangeSelector => {
+export const textToTEISelector = (container: HTMLElement) => (selector: TextSelector): TEIRangeSelector => {
   const { range } = selector;
 
   // XPath segments for Range start and end nodes as a list
@@ -93,7 +113,7 @@ export const textToTEISelector = (selector: TextSelector): TEIRangeSelector => {
   const endPathSegments: string[] = getXPath(range.endContainer);
 
   // TEI XPath expressions
-  const { start, end } = toTEIXPaths(startPathSegments, endPathSegments, range);
+  const { start, end } = toTEIXPaths(container, startPathSegments, endPathSegments, range);
 
   return {
     start: selector.start,
@@ -179,7 +199,7 @@ export const textToTEITarget =  (container: HTMLElement) => (t: TextAnnotationTa
   const target = reviveTarget(t, container);
   return {
     ...t,
-    selector: target.selector.map(textToTEISelector)
+    selector: target.selector.map(textToTEISelector(container))
   }
 }
 

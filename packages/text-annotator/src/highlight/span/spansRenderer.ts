@@ -1,13 +1,13 @@
-import type { ViewportState } from '@annotorious/core';
-import { colord } from 'colord';
 import { dequal } from 'dequal/lite';
+import type { ViewportState } from '@annotorious/core';
+import type { TextAnnotation } from '../../model';
 import type { Rect, TextAnnotatorState } from '../../state';
 import { type HighlightPainter, paint } from '../HighlightPainter';
 import type { ViewportBounds } from '../viewport';
 import { createBaseRenderer, type RendererImplementation } from '../baseRenderer';
 import type { Highlight } from '../Highlight';
-import { DEFAULT_STYLE, type HighlightStyleExpression } from '../HighlightStyle';
-import type { TextAnnotation } from 'src/model';
+import type { HighlightStyleExpression } from '../HighlightStyle';
+import { getBackgroundColor } from './color';
 
 import './spansRenderer.css';
 
@@ -85,9 +85,7 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
           span.style.width = `${rect.width}px`;
           span.style.height = `${rect.height}px`;
 
-          span.style.backgroundColor = colord(style?.fill || DEFAULT_STYLE.fill)
-            .alpha(style?.fillOpacity === undefined ? DEFAULT_STYLE.fillOpacity : style.fillOpacity)
-            .toHex();
+          span.style.backgroundColor = getBackgroundColor(style);
 
           if (style.underlineStyle)
             span.style.borderStyle = style.underlineStyle;

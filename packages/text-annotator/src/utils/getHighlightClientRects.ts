@@ -2,22 +2,26 @@ export const getHighlightClientRects = (range: Range) => {
   const textNodes: Text[] = [];
 
   // Get all text nodes inside the range's commonAncestorContainer
-  const it = document.createNodeIterator(range.commonAncestorContainer, NodeFilter.SHOW_TEXT);
+  const it = document.createNodeIterator(
+    range.commonAncestorContainer, 
+    NodeFilter.SHOW_TEXT);
 
-  // Filter text nodes that intersect the range. Note that we could
-  // also include this filter into the node iterator directly. But
-  // The while loop is faster (!) - possibly due to function call overhead.
+  /*
+   Filter text nodes that intersect the range. Note that we could
+   also include this filter in the node iterator directly.
+   But the while loop is faster (!) - possibly due to a function call overhead.
+  */
   let currentNode: Text | undefined;
  
   while ((currentNode = it.nextNode() as Text)) {
-    if (range.intersectsNode(currentNode))
+    if (range.intersectsNode(currentNode)) {
       textNodes.push(currentNode);
+    }
   }
 
   if (textNodes.length < 2) {
-    // Trivial case: selection inside a single text 
-    // node, or empty (shouldn't happen!) - no need 
-    // to create our own ranges.
+    // Trivial case: selection is inside a single text node
+    // or empty (shouldn't happen!) - no need to create our own ranges.
     return Array.from(range.getClientRects());
   } else {
     const first = textNodes[0];
@@ -25,17 +29,28 @@ export const getHighlightClientRects = (range: Range) => {
 
     const firstRange = document.createRange();
     firstRange.selectNode(first);
-    if (range.startContainer.nodeType === Node.TEXT_NODE)
+    if (range.startContainer.nodeType === Node.TEXT_NODE) {
       firstRange.setStart(first, range.startOffset);
-    else
-      firstRange.setStartAfter(range.startContainer);
+    } else {
+      const childNode = range.startContainer.childNodes[range.startOffset];
+      if (childNode) {
+        firstRange.setStartBefore(childNode);
+      } else {
+        firstRange.setStartAfter(range.startContainer);
+      }
+    }
 
     const lastRange = document.createRange();
     lastRange.selectNode(last);
-    if (range.endContainer.nodeType === Node.TEXT_NODE)
+    if (range.endContainer.nodeType === Node.TEXT_NODE) {
       lastRange.setEnd(last, range.endOffset);
-    else 
-      lastRange.setEndBefore(range.endContainer);
+    } else {
+      const childNode = range.endContainer.childNodes[range.endOffset];
+      if (childNode)
+        lastRange.setEndBefore(childNode);
+      else 
+        lastRange.setEndAfter(range.endContainer);
+    }
 
     // Text nodes have no .getClientRects()!
     const getTextClientRects = (t: Text) => {

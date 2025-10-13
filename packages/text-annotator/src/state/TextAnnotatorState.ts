@@ -116,8 +116,7 @@ export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotati
 
   const getAnnotationBounds = (id: string): DOMRect | undefined => {
     const rects = tree.getAnnotationRects(id);
-    if (rects.length === 0) return;
-    return tree.getAnnotationBounds(id);
+    return rects.length > 0 ? tree.getAnnotationBounds(id) : undefined;
   }
 
   const getIntersecting = (
