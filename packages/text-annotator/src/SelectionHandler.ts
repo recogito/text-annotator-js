@@ -14,7 +14,7 @@ import {
   splitAnnotatableRanges,
   rangeToSelector,
   isMac,
-  isWhitespaceOrEmpty,
+  isRangeWhitespaceOrEmpty,
   trimRangeToContainer,
   isNotAnnotatable
 } from './utils';
@@ -58,7 +58,7 @@ export const createSelectionHandler = (
   let isLeftClick: boolean | undefined;
 
   let lastDownEvent: Selection['event'] | undefined;
-
+  
   let currentAnnotatingEnabled = annotatingEnabled;
 
   const setAnnotatingEnabled = (enabled: boolean) => {
@@ -77,20 +77,12 @@ export const createSelectionHandler = (
 
     if (isLeftClick === false) return;
 
-    /**
-     * Make sure we don't listen to selection changes that were
-     * not started on the container, or which are not supposed to
-     * be annotatable (like a component popup).
-     * Note that Chrome/iOS will sometimes return the root doc as target!
-     */
-    currentTarget = isNotAnnotatable(container, evt.target as Node)
-      ? undefined
-      : {
-        annotation: uuidv4(),
-        selector: [],
-        creator: currentUser,
-        created: new Date()
-      };
+    currentTarget = {
+      annotation: uuidv4(),
+      selector: [],
+      creator: currentUser,
+      created: new Date()
+    };
   };
 
   const onSelectionChange = debounce((evt: Event) => {
@@ -111,12 +103,15 @@ export const createSelectionHandler = (
       return;
     }
 
+    const selectionRanges =
+      Array.from(Array(sel.rangeCount).keys()).map(idx => sel.getRangeAt(idx));
+
     /**
      * This is to handle cases where the selection is "hijacked" by
      * another element in a not-annotatable area. A rare case in practice.
      * But rich text editors like Quill will do it!
      */
-    if (isNotAnnotatable(container, sel.anchorNode)) {
+    if (!selectionRanges.some(r => r.intersectsNode(container))) {
       currentTarget = undefined;
       return;
     }
@@ -131,16 +126,27 @@ export const createSelectionHandler = (
     if (lastDownEvent?.type === 'pointerdown') {
       if (timeDifference < 1000 && !currentTarget) {
         // Chrome/iOS does not reliably fire the 'selectstart' event!
-        onSelectStart(lastDownEvent || evt);
+        onSelectStart();
       } else if (sel.isCollapsed && timeDifference < CLICK_TIMEOUT) {
         // Firefox doesn't fire the 'selectstart' when user clicks
         // over the text, which collapses the selection
-        onSelectStart(lastDownEvent || evt);
+        onSelectStart();
       }
     }
 
+    // Note: commenting out the line below. We should no longer do this. Why?
+    // Let's assume the user drags the selection from outside the annotatable area
+    // over the anntoatable area (intersection!). Then drags it out again
+    // (no intersection!), then in again (intersection). Because the
+    // currentTarget will have been cleared meanwhile, execution will stop.
+    // 
+    // But we don't want this - instead, processing should continue as normal,
+    // and a new currentTarget should be computed when the user drags the
+    // selection into the annotatable area a second time.
+
     // The selection isn't active -> bail out from selection change processing
-    if (!currentTarget) return;
+    // if (!currentTarget) return;
+    if (!currentTarget) onSelectStart();
 
     if (sel.isCollapsed) {
       /**
@@ -157,18 +163,16 @@ export const createSelectionHandler = (
       return;
     }
 
-    const selectionRanges =
-      Array.from(Array(sel.rangeCount).keys()).map(idx => sel.getRangeAt(idx));
-
     const containedRanges =
       selectionRanges.map(r => trimRangeToContainer(r, container));
 
     // The selection should be captured only within the annotatable container
-    if (containedRanges.every(r => isWhitespaceOrEmpty(r))) return;
+    if (containedRanges.every(r => isRangeWhitespaceOrEmpty(r))) return;
 
     const annotatableRanges = containedRanges.flatMap(r => splitAnnotatableRanges(container, r.cloneRange()));
 
     const hasChanged =
+      (annotatableRanges.length > 0 && !currentTarget) ||
       annotatableRanges.length !== currentTarget.selector.length ||
       annotatableRanges.some((r, i) => r.toString() !== currentTarget.selector[i]?.quote);
 
@@ -257,7 +261,23 @@ export const createSelectionHandler = (
       await pollSelectionCollapsed();
 
       const sel = document.getSelection();
-      if (sel?.isCollapsed) {
+
+      const isDownOnNotAnnotatable =
+        isNotAnnotatable(container, lastDownEvent.target as Node);
+
+      const isUpOnNotAnnotatable = 
+        isNotAnnotatable(container, lastUpEvent.target as Node);
+
+      /**
+       * Route to `clickSelect` if selection collapsed OR
+       * the click happened entirely over a not-annotatable element.
+       *
+       * The latter allows preventing re-selection of an existing
+       * annotation when a user clicks on not-annotatable controls.
+       * For example, a click on a `button` element doesn't make the
+       * selection collapse, but it still needs to be processed with `clickSelect`.
+       */
+      if (sel?.isCollapsed || (isDownOnNotAnnotatable && isUpOnNotAnnotatable)) {
         currentTarget = undefined;
         clickSelect();
         return;
@@ -352,7 +372,7 @@ export const createSelectionHandler = (
     document.addEventListener('selectionchange', onSelected);
 
     // Start selection!
-    onSelectStart(evt);
+    onSelectStart();
   }
 
   hotkeys(SELECTION_KEYS.join(','), { element: container, keydown: true, keyup: false }, evt => {

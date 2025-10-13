@@ -31,6 +31,8 @@ export interface TextAnnotator<I extends TextAnnotation = TextAnnotation, E exte
 
   setStyle(style: HighlightStyleExpression | undefined): void;
 
+  redraw(lazy?: boolean): void;
+
   // Returns true if successful (or false if the annotation is not currently rendered)
   scrollIntoView(annotationOrId: I | string): boolean;
 
@@ -112,9 +114,6 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
     selectionHandler.setFilter(filter);
   }
 
-  const setStyle = (style: HighlightStyleExpression | undefined) =>
-    highlightRenderer.setStyle(style);
-
   const setUser = (user: User) => {
     currentUser = user;
     selectionHandler.setUser(user);
@@ -135,9 +134,6 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
     }
   }
 
-  const setVisible = (visible: boolean) =>
-    highlightRenderer.setVisible(visible);
-
   const destroy = () => {
     highlightRenderer.destroy();
     selectionHandler.destroy();
@@ -153,11 +149,12 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
     getUser,
     setAnnotatingEnabled,
     setFilter,
-    setStyle,
+    setStyle: highlightRenderer.setStyle.bind(highlightRenderer),
+    redraw: highlightRenderer.redraw.bind(highlightRenderer),
     setUser,
     setSelected,
     setPresenceProvider,
-    setVisible,
+    setVisible: highlightRenderer.setVisible.bind(highlightRenderer),
     on: lifecycle.on,
     off: lifecycle.off,
     scrollIntoView: scrollIntoView(container, store),
