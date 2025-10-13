@@ -7,19 +7,19 @@
   "type": "module",
   "scripts": {
     "start": "vite --host",
-    "build": "vite build",
+    "build": "tsc -p tsconfig.build.json && vite build",
     "preview": "vite preview",
     "test": "echo 'Skipping tests in @recogito/text-annotator package'"
   },
   "main": "./dist/text-annotator-tei.umd.js",
   "module": "./dist/text-annotator-tei.es.js",
-  "types": "./dist/src/index.d.ts",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
   "exports": {
     ".": {
-      "types": "./dist/src/index.d.ts",
+      "types": "./dist/index.d.ts",
       "import": "./dist/text-annotator-tei.es.js",
       "require": "./dist/text-annotator-tei.umd.js"
     },
@@ -28,8 +28,7 @@
   "devDependencies": {
     "CETEIcean": "^1.9.5",
     "typescript": "5.9.3",
-    "vite": "^6.3.6",
-    "vite-plugin-dts": "^4.5.4"
+    "vite": "^6.3.6"
   },
   "peerDependencies": {
     "@annotorious/core": "^3.7.11",

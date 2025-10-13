@@ -1,30 +1,48 @@
 {
   "compilerOptions": {
+    "target": "ESNext",
+    "lib": [
+      "DOM",
+      "ESNext"
+    ],
+    /*
+    `bundler` allows resolving the new `exports`/`imports` syntax in the `package.json`
+    But it doesn't enforce specifying files extensions for imports.
+    @see https://www.typescriptlang.org/docs/handbook/modules/theory.html#module-resolution-is-host-defined
+    */
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    /* Linting */
     "allowJs": false,
     "allowSyntheticDefaultImports": true,
-    "baseUrl": ".",
-    "declaration": true,
-    "declarationDir": "dist",
-    "declarationMap": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
-    "jsx": "react-jsx",
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "noEmit": true,
-    "outDir": "dist",
-    "paths": {
-      "@recogito/react": ["src/index.ts"]
-    },
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "sourceMap": true,
-    "target": "ESNext",
-    "useDefineForClassFields": true
+    "useDefineForClassFields": true,
+    /* React */
+    "jsx": "react-jsx",
+    /* Declarations, the `dts` plugin is used */
+    "noEmit": true,
+    /* Aliases */
+    "baseUrl": ".",
+    "paths": {
+      "@recogito/react": [
+        "src/index.ts"
+      ]
+    }
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist"],
-  "references": [{ "path": "./tsconfig.node.json" }],
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
 }
