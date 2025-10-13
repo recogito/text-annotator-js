@@ -1,11 +1,6 @@
 {
   "compilerOptions": {
     "composite": true,
-    /*
-    `bundler` allows resolving the new `exports`/`imports` syntax in the `package.json`
-    But it doesn't enforce specifying files extensions for imports.
-    @see https://www.typescriptlang.org/docs/handbook/modules/theory.html#module-resolution-is-host-defined
-    */
     "module": "ESNext",
     "moduleResolution": "bundler",
     "noEmit": true,
