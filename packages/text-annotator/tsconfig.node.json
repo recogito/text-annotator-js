@@ -3,7 +3,7 @@
     "composite": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "emitDeclarationOnly": true,
+    "noEmit": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "strict": true
