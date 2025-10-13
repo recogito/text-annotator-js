@@ -92,7 +92,6 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
 
   const selectionHandler = createSelectionHandler(container, state, opts);
   selectionHandler.setUser(currentUser);
-  selectionHandler.setAnnotatingEnabled(opts.annotatingEnabled);
 
   /*************************/
   /*      External API     */
