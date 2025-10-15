@@ -31,7 +31,7 @@
     "vite": "^6.3.6"
   },
   "peerDependencies": {
-    "@annotorious/core": "^3.7.11",
+    "@annotorious/core": "^3.7.12",
     "@recogito/text-annotator": "3.4.0"
   }
 }
