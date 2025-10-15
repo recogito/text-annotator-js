@@ -1,5 +1,7 @@
 import RBush from 'rbush';
 import type { Store } from '@annotorious/core';
+import { createNanoEvents, type Unsubscribe } from 'nanoevents';
+
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
 import {
   isRevived,
@@ -30,6 +32,12 @@ interface IndexedHighlightRect {
 
 }
 
+export interface SpatialTreeEvents {
+
+  recalculate(): void;
+
+}
+
 export const createSpatialTree = <T extends TextAnnotation>(
   store: Store<T>,
   container: HTMLElement,
@@ -40,6 +48,8 @@ export const createSpatialTree = <T extends TextAnnotation>(
   const tree = new RBush<IndexedHighlightRect>();
 
   const index = new Map<string, IndexedHighlightRect[]>();
+
+  const emitter = createNanoEvents<SpatialTreeEvents>();
 
   // Helper: converts a single text annotation target to a list of hightlight rects
   const toItems = (target: TextAnnotationTarget, offset: DOMRect): IndexedHighlightRect[] => {
@@ -192,8 +202,12 @@ export const createSpatialTree = <T extends TextAnnotation>(
 
   const size = () => tree.all().length;
 
-  const recalculate = () =>
+  const recalculate = () => {
     set(store.all().map(a => a.target), true);
+    emitter.emit('recalculate');
+  };
+
+  const on = <E extends keyof SpatialTreeEvents>(event: E, callback: SpatialTreeEvents[E]): Unsubscribe => emitter.on(event, callback);
 
   return {
     all,
@@ -207,7 +221,8 @@ export const createSpatialTree = <T extends TextAnnotation>(
     remove,
     set,
     size,
-    update
+    update,
+    on
   }
 
 }
