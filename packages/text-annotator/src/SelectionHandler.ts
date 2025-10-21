@@ -55,6 +55,8 @@ export const createSelectionHandler = (
 
   let currentTarget: TextAnnotationTarget | undefined;
 
+  let targetToModify: TextAnnotationTarget | undefined;
+
   let isLeftClick: boolean | undefined;
 
   let lastDownEvent: Selection['event'] | undefined;
@@ -72,16 +74,43 @@ export const createSelectionHandler = (
     }
   };
 
+  const isCtrlSelect = (evt: Event) => {
+    const asPtr = evt as PointerEvent;
+    return (asPtr.ctrlKey || asPtr.metaKey);
+  }
+
   const onSelectStart = () => {
     if (!currentAnnotatingEnabled) return;
 
     if (isLeftClick === false) return;
 
+    const { selected } = selection;
+
+    if (isCtrlSelect(lastDownEvent) && selected.length === 1 && selected[0].editable) {
+      // Modify the currently selected annotation
+      const existing = store.getAnnotation(selected[0].id);
+
+      if (existing?.target) {
+        targetToModify = existing.target;
+
+        currentTarget = {
+          annotation: existing.id,
+          selector: [],
+          created: targetToModify.created,
+          creator: targetToModify.creator,
+          updated: new Date(),
+          updatedBy: currentUser
+        };
+
+        return;
+      }
+    }
+
     currentTarget = {
       annotation: uuidv4(),
       selector: [],
-      creator: currentUser,
-      created: new Date()
+      created: new Date(),
+      creator: currentUser
     };
   };
 
@@ -150,12 +179,13 @@ export const createSelectionHandler = (
 
     if (sel.isCollapsed) {
       /**
-       * The selection range got collapsed during the selecting process.
-       * The previously created annotation isn't relevant anymore and can be discarded
+       * The selection range got collapsed during the selecting process. Unless this
+       * is intentional (CTRL + select), the previously created annotation isn't relevant 
+       * anymore and can be discarded
        *
        * @see https://github.com/recogito/text-annotator-js/issues/139
        */
-      if (store.getAnnotation(currentTarget.annotation)) {
+      if (store.getAnnotation(currentTarget.annotation) && !isCtrlSelect(lastDownEvent)) {
         selection.clear();
         store.deleteAnnotation(currentTarget.annotation);
       }
@@ -180,7 +210,10 @@ export const createSelectionHandler = (
 
     currentTarget = {
       ...currentTarget,
-      selector: annotatableRanges.map(r => rangeToSelector(r, container, offsetReferenceSelector)),
+      selector: [
+        ...(targetToModify?.selector ? targetToModify.selector : []),
+        ...annotatableRanges.map(r => rangeToSelector(r, container, offsetReferenceSelector))
+      ],
       updated: new Date()
     };
 
@@ -191,8 +224,9 @@ export const createSelectionHandler = (
     if (store.getAnnotation(currentTarget.annotation)) {
       store.updateTarget(currentTarget, Origin.LOCAL);
     } else {
-      // Proper lifecycle management: clear the previous selection first...
-      selection.clear();
+      // Proper lifecycle management: clear the previous selection first
+      if (!isCtrlSelect(evt))
+        selection.clear();
     }
   }, 10);
 
