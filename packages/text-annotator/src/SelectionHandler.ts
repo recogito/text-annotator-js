@@ -109,12 +109,10 @@ export const createSelectionHandler = (
         };
 
         return;
-      } else {
-        targetToModify = undefined;
       }
-    } else {
-      targetToModify = undefined;
     }
+
+    targetToModify = undefined;
 
     currentTarget = {
       annotation: uuidv4(),
