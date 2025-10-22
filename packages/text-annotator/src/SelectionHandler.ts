@@ -88,12 +88,12 @@ export const createSelectionHandler = (
     const { selected } = selection;
 
     // Will this selection modify an existing annotation?
-    const isModifiyExisting = options.allowModifierSelect
+    const isModifyExisting = options.allowModifierSelect
       && isModifierSelect(lastDownEvent)
       && selected.length === 1
       && selected[0].editable;
 
-    if (isModifiyExisting) {
+    if (isModifyExisting) {
       // Modify the currently selected annotation
       const existing = store.getAnnotation(selected[0].id);
 
