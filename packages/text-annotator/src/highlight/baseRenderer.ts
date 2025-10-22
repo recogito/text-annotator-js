@@ -62,7 +62,7 @@ export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorS
 
   const onDraw = trackViewport(viewport);
 
-  const onPointerMove = debounce((event: PointerEvent) => {
+  const onPointerMove = (event: PointerEvent) => {
     const {x, y} = container.getBoundingClientRect();
 
     const hit = store.getAt(event.clientX - x, event.clientY - y, false, currentFilter);
@@ -77,7 +77,7 @@ export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorS
         hover.set(null);
       }
     }
-  }, 10);
+  }
 
   container.addEventListener('pointermove', onPointerMove);
 
