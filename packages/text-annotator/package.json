@@ -28,9 +28,9 @@
   "devDependencies": {
     "@types/jsdom": "^27.0.0",
     "@types/rbush": "^4.0.0",
-    "jsdom": "^27.0.0",
+    "jsdom": "^27.0.1",
     "typescript": "5.9.3",
-    "vite": "^6.3.6",
+    "vite": "^6.4.1",
     "vite-plugin-externalize-deps": "^0.10.0",
     "vitest": "^3.2.4"
   },

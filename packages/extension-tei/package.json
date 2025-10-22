@@ -28,7 +28,7 @@
   "devDependencies": {
     "CETEIcean": "^1.9.5",
     "typescript": "5.9.3",
-    "vite": "^6.3.6"
+    "vite": "^6.4.1"
   },
   "peerDependencies": {
     "@annotorious/core": "^3.7.12",
