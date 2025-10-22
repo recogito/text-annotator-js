@@ -6,7 +6,6 @@ import {
   type Filter,
 } from '@annotorious/core';
 import type { Annotator, User, PresenceProvider } from '@annotorious/core';
-
 import {
   createCanvasRenderer,
   createHighlightsRenderer,
@@ -90,7 +89,7 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
   if (opts.style)
     highlightRenderer.setStyle(opts.style);
 
-  const selectionHandler = createSelectionHandler(container, state, opts);
+  const selectionHandler = createSelectionHandler(container, state, lifecycle, opts);
   selectionHandler.setUser(currentUser);
 
   /*************************/

@@ -366,6 +366,10 @@
           console.log('deleteAnnotation', annotation);
         });
 
+        r.on('clickAnnotation', (annotations) => {
+          console.log('clicked', annotations);
+        })
+
         r.on('selectionChanged', (annotations) => {
           console.log('selectionChanged', annotations);
         });

@@ -2,7 +2,8 @@ import debounce from 'debounce';
 import { v4 as uuidv4 } from 'uuid';
 import hotkeys from 'hotkeys-js';
 import { poll } from 'poll';
-import { Origin, type Filter, type Selection, type User } from '@annotorious/core';
+import { Origin } from '@annotorious/core';
+import type { Filter, Lifecycle, Selection, User } from '@annotorious/core';
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotation, TextAnnotationTarget } from './model';
 import type { TextAnnotatorOptions } from './TextAnnotatorOptions';
@@ -32,9 +33,9 @@ const SELECTION_KEYS = [
 export const createSelectionHandler = (
   container: HTMLElement,
   state: TextAnnotatorState<TextAnnotation, unknown>,
+  lifecycle: Lifecycle<TextAnnotation, unknown>,
   options: TextAnnotatorOptions<TextAnnotation, unknown>
 ) => {
-
   const { store, selection } = state;
 
   let currentUser: User | undefined;
@@ -294,8 +295,10 @@ export const createSelectionHandler = (
           currentIds.size !== nextIds.length ||
           !nextIds.every(id => currentIds.has(id));
 
-        if (hasChanged)
+        if (hasChanged) {
+          lifecycle.emit('clickAnnotation', hovered);
           selection.userSelect(nextIds, lastUpEvent);
+        }
       } else {
         selection.clear();
       }
