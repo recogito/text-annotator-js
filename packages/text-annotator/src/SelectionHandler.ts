@@ -94,7 +94,6 @@ export const createSelectionHandler = (
       && selected[0].editable;
 
     if (isModifyExisting) {
-      // Modify the currently selected annotation
       const existing = store.getAnnotation(selected[0].id);
 
       if (existing?.target) {
