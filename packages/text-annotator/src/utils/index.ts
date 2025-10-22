@@ -8,6 +8,7 @@ export * from './isNotAnnotatable';
 export * from './isRevived';
 export * from './isWhitespaceOrEmpty';
 export * from './mergeClientRects';
+export * from './mergeRanges';
 export * from './rangeToSelector';
 export * from './rectsToBounds';
 export * from './reviveAnnotation';

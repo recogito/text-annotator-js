@@ -2,9 +2,7 @@ import debounce from 'debounce';
 import { v4 as uuidv4 } from 'uuid';
 import hotkeys from 'hotkeys-js';
 import { poll } from 'poll';
-
 import { Origin, type Filter, type Selection, type User } from '@annotorious/core';
-
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotation, TextAnnotationTarget } from './model';
 import type { TextAnnotatorOptions } from './TextAnnotatorOptions';
@@ -16,7 +14,8 @@ import {
   isMac,
   isRangeWhitespaceOrEmpty,
   trimRangeToContainer,
-  isNotAnnotatable
+  isNotAnnotatable,
+  mergeRanges
 } from './utils';
 
 const CLICK_TIMEOUT = 300;
@@ -55,6 +54,7 @@ export const createSelectionHandler = (
 
   let currentTarget: TextAnnotationTarget | undefined;
 
+  // Only used if allowModifierSelect === true
   let targetToModify: TextAnnotationTarget | undefined;
 
   let isLeftClick: boolean | undefined;
@@ -68,15 +68,16 @@ export const createSelectionHandler = (
     onSelectionChange.clear();
 
     if (!enabled) {
+      targetToModify = undefined;
       currentTarget = undefined;
       isLeftClick = undefined;
       lastDownEvent = undefined;
     }
   };
 
-  const isCtrlSelect = (evt: Event) => {
+  const isModifierSelect = (evt: Event) => {
     const asPtr = evt as PointerEvent;
-    return (asPtr.ctrlKey || asPtr.metaKey);
+    return isMac ? asPtr.metaKey : asPtr.ctrlKey;
   }
 
   const onSelectStart = () => {
@@ -86,7 +87,13 @@ export const createSelectionHandler = (
 
     const { selected } = selection;
 
-    if (isCtrlSelect(lastDownEvent) && selected.length === 1 && selected[0].editable) {
+    // Will this selection modify an existing annotation?
+    const isModifiyExisting = options.allowModifierSelect
+      && isModifierSelect(lastDownEvent)
+      && selected.length === 1
+      && selected[0].editable;
+
+    if (isModifiyExisting) {
       // Modify the currently selected annotation
       const existing = store.getAnnotation(selected[0].id);
 
@@ -104,6 +111,8 @@ export const createSelectionHandler = (
 
         return;
       }
+    } else {
+      targetToModify = undefined;
     }
 
     currentTarget = {
@@ -185,7 +194,7 @@ export const createSelectionHandler = (
        *
        * @see https://github.com/recogito/text-annotator-js/issues/139
        */
-      if (store.getAnnotation(currentTarget.annotation) && !isCtrlSelect(lastDownEvent)) {
+      if (store.getAnnotation(currentTarget.annotation) && !isModifierSelect(lastDownEvent)) {
         selection.clear();
         store.deleteAnnotation(currentTarget.annotation);
       }
@@ -208,12 +217,15 @@ export const createSelectionHandler = (
 
     if (!hasChanged) return;
 
+    // Annotatable ranges + ranges of the modified target (if any)
+    const combinedRanges = targetToModify ? mergeRanges([ 
+      ...(targetToModify.selector.map(s => s.range)),
+      ...annotatableRanges
+    ]) : annotatableRanges;
+
     currentTarget = {
       ...currentTarget,
-      selector: [
-        ...(targetToModify?.selector ? targetToModify.selector : []),
-        ...annotatableRanges.map(r => rangeToSelector(r, container, offsetReferenceSelector))
-      ],
+      selector: combinedRanges.map(r => rangeToSelector(r, container, offsetReferenceSelector)),
       updated: new Date()
     };
 
@@ -225,7 +237,7 @@ export const createSelectionHandler = (
       store.updateTarget(currentTarget, Origin.LOCAL);
     } else {
       // Proper lifecycle management: clear the previous selection first
-      if (!isCtrlSelect(evt))
+      if (!isModifierSelect(evt))
         selection.clear();
     }
   }, 10);
@@ -474,6 +486,7 @@ export const createSelectionHandler = (
 
   const destroy = () => {
     currentTarget = undefined;
+    targetToModify = undefined;
     isLeftClick = undefined;
     lastDownEvent = undefined;
 
