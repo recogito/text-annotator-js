@@ -7,6 +7,8 @@ export interface TextAnnotatorOptions<I extends TextAnnotation = TextAnnotation,
 
   adapter?: FormatAdapter<I, E> | null;
 
+  allowModifierSelect?: boolean;
+
   annotatingEnabled?: boolean;
 
   /**

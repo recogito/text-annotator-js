@@ -2,9 +2,7 @@ import debounce from 'debounce';
 import { v4 as uuidv4 } from 'uuid';
 import hotkeys from 'hotkeys-js';
 import { poll } from 'poll';
-
 import { Origin, type Filter, type Selection, type User } from '@annotorious/core';
-
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotation, TextAnnotationTarget } from './model';
 import type { TextAnnotatorOptions } from './TextAnnotatorOptions';
@@ -16,7 +14,8 @@ import {
   isMac,
   isRangeWhitespaceOrEmpty,
   trimRangeToContainer,
-  isNotAnnotatable
+  isNotAnnotatable,
+  mergeRanges
 } from './utils';
 
 const CLICK_TIMEOUT = 300;
@@ -55,6 +54,9 @@ export const createSelectionHandler = (
 
   let currentTarget: TextAnnotationTarget | undefined;
 
+  // Only used if allowModifierSelect === true
+  let targetToModify: TextAnnotationTarget | undefined;
+
   let isLeftClick: boolean | undefined;
 
   let lastDownEvent: Selection['event'] | undefined;
@@ -66,22 +68,57 @@ export const createSelectionHandler = (
     onSelectionChange.clear();
 
     if (!enabled) {
+      targetToModify = undefined;
       currentTarget = undefined;
       isLeftClick = undefined;
       lastDownEvent = undefined;
     }
   };
 
+  const isModifierSelect = (evt: Event) => {
+    const asPtr = evt as PointerEvent;
+    return isMac ? asPtr.metaKey : asPtr.ctrlKey;
+  }
+
   const onSelectStart = () => {
     if (!currentAnnotatingEnabled) return;
 
     if (isLeftClick === false) return;
 
+    const { selected } = selection;
+
+    // Will this selection modify an existing annotation?
+    const isModifyExisting = options.allowModifierSelect
+      && isModifierSelect(lastDownEvent)
+      && selected.length === 1
+      && selected[0].editable;
+
+    if (isModifyExisting) {
+      const existing = store.getAnnotation(selected[0].id);
+
+      if (existing?.target) {
+        targetToModify = existing.target;
+
+        currentTarget = {
+          annotation: existing.id,
+          selector: [],
+          created: targetToModify.created,
+          creator: targetToModify.creator,
+          updated: new Date(),
+          updatedBy: currentUser
+        };
+
+        return;
+      }
+    }
+
+    targetToModify = undefined;
+
     currentTarget = {
       annotation: uuidv4(),
       selector: [],
-      creator: currentUser,
-      created: new Date()
+      created: new Date(),
+      creator: currentUser
     };
   };
 
@@ -150,12 +187,13 @@ export const createSelectionHandler = (
 
     if (sel.isCollapsed) {
       /**
-       * The selection range got collapsed during the selecting process.
-       * The previously created annotation isn't relevant anymore and can be discarded
+       * The selection range got collapsed during the selecting process. Unless this
+       * is intentional (CTRL + select), the previously created annotation isn't relevant 
+       * anymore and can be discarded
        *
        * @see https://github.com/recogito/text-annotator-js/issues/139
        */
-      if (store.getAnnotation(currentTarget.annotation)) {
+      if (store.getAnnotation(currentTarget.annotation) && !isModifierSelect(lastDownEvent)) {
         selection.clear();
         store.deleteAnnotation(currentTarget.annotation);
       }
@@ -178,9 +216,15 @@ export const createSelectionHandler = (
 
     if (!hasChanged) return;
 
+    // Annotatable ranges + ranges of the modified target (if any)
+    const combinedRanges = targetToModify ? mergeRanges([ 
+      ...(targetToModify.selector.map(s => s.range)),
+      ...annotatableRanges
+    ]) : annotatableRanges;
+
     currentTarget = {
       ...currentTarget,
-      selector: annotatableRanges.map(r => rangeToSelector(r, container, offsetReferenceSelector)),
+      selector: combinedRanges.map(r => rangeToSelector(r, container, offsetReferenceSelector)),
       updated: new Date()
     };
 
@@ -191,8 +235,9 @@ export const createSelectionHandler = (
     if (store.getAnnotation(currentTarget.annotation)) {
       store.updateTarget(currentTarget, Origin.LOCAL);
     } else {
-      // Proper lifecycle management: clear the previous selection first...
-      selection.clear();
+      // Proper lifecycle management: clear the previous selection first
+      if (!isModifierSelect(evt))
+        selection.clear();
     }
   }, 10);
 
@@ -440,6 +485,7 @@ export const createSelectionHandler = (
 
   const destroy = () => {
     currentTarget = undefined;
+    targetToModify = undefined;
     isLeftClick = undefined;
     lastDownEvent = undefined;
 
