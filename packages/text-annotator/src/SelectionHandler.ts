@@ -109,6 +109,8 @@ export const createSelectionHandler = (
         };
 
         return;
+      } else {
+        targetToModify = undefined;
       }
     } else {
       targetToModify = undefined;
