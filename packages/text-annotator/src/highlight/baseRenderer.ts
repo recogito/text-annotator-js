@@ -1,7 +1,5 @@
 import debounce from 'debounce';
-
-import type { Filter, ViewportState } from '@annotorious/core';
-
+import { UserSelectAction, type Filter, type ViewportState } from '@annotorious/core';
 import type { TextAnnotatorState } from '../state';
 import { type ViewportBounds, getViewportBounds, trackViewport } from './viewport';
 import type { HighlightPainter } from './HighlightPainter';
@@ -65,8 +63,10 @@ export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorS
   const onPointerMove = (event: PointerEvent) => {
     const {x, y} = container.getBoundingClientRect();
 
+    // TODO this may be a bit of an edge case... but ideally we'd retrieve the whole 
+    // stack of annotations, and then evaluate if ANY of them is clickable.
     const hit = store.getAt(event.clientX - x, event.clientY - y, false, currentFilter);
-    if (hit) {
+    if (hit && state.selection.evalSelectAction(hit) !== UserSelectAction.NONE) {
       if (hover.current !== hit.id) {
         container.classList.add('hovered');
         hover.set(hit.id);
