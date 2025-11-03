@@ -23,7 +23,7 @@
       "import": "./dist/text-annotator.es.js",
       "require": "./dist/text-annotator.umd.js"
     },
-    "./dist/text-annotator.css": "./dist/text-annotator.css"
+    "./text-annotator.css": "./dist/text-annotator.css"
   },
   "devDependencies": {
     "@types/jsdom": "^27.0.0",

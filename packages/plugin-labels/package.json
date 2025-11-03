@@ -1,0 +1,33 @@
+{
+  "name": "@recogito/text-annotator-plugin-labels",
+  "version": "0.0.1",
+  "description": "A plugin to the text annotator that places labels on annotations",
+  "author": "Rainer Simon",
+  "license": "BSD-3-Clause",
+  "type": "module",
+  "scripts": {
+    "start": "vite",
+    "build": "vite build"
+  },
+  "main": "./dist/text-annotator-plugin-labels.umd.js",
+  "module": "./dist/text-annotator-plugin-labels.es.js",
+  "types": "./dist/src/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./disttext-annotator-plugin-labels.es.js",
+      "require": "./dist/text-annotator-plugin-labels.umd.js"
+    },
+    "./dist/text-annotator.css": "./dist/text-annotator-plugin-labels.css"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "vite": "^6.4.1"
+  },
+  "dependencies": {
+    "@recogito/text-annotator": "^3.4.3"
+  }
+}

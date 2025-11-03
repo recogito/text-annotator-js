@@ -23,7 +23,7 @@
       "import": "./dist/text-annotator-tei.es.js",
       "require": "./dist/text-annotator-tei.umd.js"
     },
-    "./dist/text-annotator.css": "./dist/text-annotator-tei.css"
+    "./text-annotator.css": "./dist/text-annotator-tei.css"
   },
   "devDependencies": {
     "CETEIcean": "^1.9.5",
