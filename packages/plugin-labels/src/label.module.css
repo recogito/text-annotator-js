@@ -1,0 +1,8 @@
+.container {
+  position: absolute;
+  background-color: #fff;
+  border: 1px solid #000;
+  z-index: 999;
+  transform: translateY(-100%);
+  cursor: pointer;
+}

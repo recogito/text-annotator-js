@@ -162,12 +162,15 @@
 
     <script type="module">
       import { createTextAnnotator, W3CTextFormat } from '@recogito/text-annotator';
+      import { mountPlugin } from '../src/index.ts';
 
       import '@recogito/text-annotator/dist/text-annotator.css';
 
       window.onload = async () => {
         const contentContainer = document.getElementById('content');
         const r = createTextAnnotator(contentContainer);
+
+        const plugin = mountPlugin(r);
       };
     </script>
   </body>
