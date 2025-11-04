@@ -1,5 +1,6 @@
 import type { TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
-import { createLabelFactory, Label } from './label';
+import type { Label } from './label';
+import { createLabelFactory } from './labelFactory';
 
 export const mountPlugin = (r: TextAnnotator) => {
 
