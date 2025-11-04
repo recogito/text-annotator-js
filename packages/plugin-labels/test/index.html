@@ -36,6 +36,27 @@
         font-size: 17px;
         line-height: 160%;
       }
+
+      marker {
+
+      }
+
+      marker.start::after {
+        content: '[';
+      }
+
+      marker.end::before {
+        content: ']';
+      }
+
+      marker > span:before {
+        border-left: 1px solid oklch(59% 0.136 62 / 0.5);
+        color: oklch(59% 0.136 62);
+        font-family: sans-serif;
+        font-size: 12px;
+        content: attr(data-count);
+        padding: 0 3px;
+      }
     </style>
   </head>
 
@@ -43,12 +64,12 @@
     <div id="content">
       <h1>Homer: The Odyssey</h1>
       <p>
-        Tell me, O muse, of that ingenious hero who travelled far and wide after he had sacked the famous town of Troy.
+        Tell me, O muse, of <marker class="start"></marker>that <marker class="start"></marker>ingenious hero<marker class="end"></marker> who travelled far and wide<marker class="end"></marker> after he had sacked the famous town of Troy<marker><span data-count="2"></span></marker>.
         Many cities did he visit, and many were the nations with whose manners and customs he was acquainted; moreover
         he suffered much by sea while trying to save his own life and bring his men safely home; but do what he might he
         could not save his men, for they perished through their own sheer folly in eating the cattle of the Sun-god
-        Hyperion; so the god prevented them from ever reaching home. Tell me, too, about all these things, O daughter of
-        Jove, from whatsoever source you may know them.
+        Hyperion<marker><span data-count="3"></span></marker>; so the god prevented them from ever reaching home. Tell me, too, about all these things, O daughter of
+        Jove<marker><span data-count="4"></span></marker>, from whatsoever source you may know them.
       </p>
       <p>
         So now all who escaped death in battle or by shipwreck had got safely home except Ulysses, and he, though he was
@@ -168,7 +189,18 @@
 
       window.onload = async () => {
         const contentContainer = document.getElementById('content');
-        const r = createTextAnnotator(contentContainer);
+        const r = createTextAnnotator(contentContainer, {
+          mergeHighlights: {
+            horizontalTolerance: 30
+          },
+          style: (_, __, z) => ({
+            // fill: 'oklch(0.8 0.18 59.17 / 0.14)',
+            fill: 'oklch(0.8 0.18 59.17 / 0.25)',
+            underlineColor: 'oklch(0.78 0.19 57.08 / 0.75)',
+            underlineThickness: 1,
+            underlineOffset: 2.5 * z
+          })
+        });
 
         const plugin = mountPlugin(r);
       };

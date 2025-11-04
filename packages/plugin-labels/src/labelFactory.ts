@@ -2,6 +2,7 @@ import { TextAnnotation, TextAnnotator } from '@recogito/text-annotator';
 import { Label } from './label';
 
 import style from './label.module.css';
+import { getKey } from './utils';
 
 export const createLabelFactory = (r: TextAnnotator) => {
   const { element } = r;
@@ -10,11 +11,11 @@ export const createLabelFactory = (r: TextAnnotator) => {
   const createLabel = (annotations: TextAnnotation[]): Label => {
     if (annotations.length === 0) return;
 
-    const { x, y } = store.getAnnotationBounds(annotations[0].id);
+    const { x, y, width } = store.getAnnotationBounds(annotations[0].id);
 
     const el = document.createElement('div');
     el.className = style.container;
-    el.style.left = `${x}px`;
+    el.style.left = `${x + width}px`;
     el.style.top = `${y}px`;
 
     el.innerHTML = `${annotations.length}`;
@@ -27,7 +28,9 @@ export const createLabelFactory = (r: TextAnnotator) => {
       el.remove();
     }
 
-    return { annotations, destroy };
+    const key = getKey(annotations[0]);
+
+    return { key, annotations, destroy };
   }
 
   return {
