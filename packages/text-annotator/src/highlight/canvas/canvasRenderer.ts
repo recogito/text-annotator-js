@@ -7,7 +7,7 @@ import type { ViewportBounds } from '../viewport';
 import type { HighlightStyle } from '../HighlightStyle';
 import { DEFAULT_SELECTED_STYLE, DEFAULT_STYLE, type HighlightStyleExpression } from '../HighlightStyle';
 import type { HighlightPainter } from '../HighlightPainter';
-import { createBaseRenderer, type RendererImplementation } from '../baseRenderer';
+import { createBaseRenderer, type RendererImplementation } from '../Renderer';
 import type { Highlight } from '../Highlight';
 import type { TextAnnotation } from 'src/model';
 

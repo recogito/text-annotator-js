@@ -4,7 +4,7 @@ import type { TextAnnotation } from '../../model';
 import type { Rect, TextAnnotatorState } from '../../state';
 import { type HighlightPainter, paint } from '../HighlightPainter';
 import type { ViewportBounds } from '../viewport';
-import { createBaseRenderer, type RendererImplementation } from '../baseRenderer';
+import { createBaseRenderer, type RendererFactory, type RendererImplementation } from '../Renderer';
 import type { Highlight } from '../Highlight';
 import type { HighlightStyleExpression } from '../HighlightStyle';
 import { getBackgroundColor } from './color';
@@ -126,7 +126,7 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
 
 }
 
-export const createSpansRenderer = (
+export const createSpansRenderer: RendererFactory = (
   container: HTMLElement,
   state: TextAnnotatorState<TextAnnotation, unknown>,
   viewport: ViewportState

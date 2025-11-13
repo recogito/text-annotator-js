@@ -5,7 +5,7 @@ import type { TextAnnotatorState } from 'src/state';
 import type { ViewportBounds } from '../viewport';
 import { DEFAULT_SELECTED_STYLE, DEFAULT_STYLE } from '../HighlightStyle';
 import type { HighlightStyle, HighlightStyleExpression } from '../HighlightStyle';
-import { type RendererImplementation, createBaseRenderer } from '../baseRenderer';
+import { type RendererImplementation, createBaseRenderer } from '../Renderer';
 import type { Highlight } from '../Highlight';
 import type { TextAnnotation } from 'src/model';
 

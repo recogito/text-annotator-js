@@ -1,10 +1,17 @@
 import debounce from 'debounce';
 import { UserSelectAction, type Filter, type ViewportState } from '@annotorious/core';
+import type { TextAnnotation } from '../model';
 import type { TextAnnotatorState } from '../state';
 import { type ViewportBounds, getViewportBounds, trackViewport } from './viewport';
 import type { HighlightPainter } from './HighlightPainter';
 import type { Highlight } from './Highlight';
 import type { HighlightStyleExpression } from './HighlightStyle';
+
+export type RendererFactory = (
+  container: HTMLElement, 
+  state: TextAnnotatorState<TextAnnotation, unknown>,
+  viewport: ViewportState
+) => Renderer;
 
 export interface RendererImplementation {
 
