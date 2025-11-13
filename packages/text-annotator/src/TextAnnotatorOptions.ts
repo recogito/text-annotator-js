@@ -1,7 +1,7 @@
-import type { FormatAdapter, UserSelectActionExpression, User, Annotation } from '@annotorious/core';
+import type { FormatAdapter, UserSelectActionExpression, User } from '@annotorious/core';
 import type { PresencePainterOptions } from './presence';
 import type { TextAnnotation } from './model';
-import type { HighlightStyleExpression } from './highlight';
+import type { HighlightStyleExpression, RendererFactory } from './highlight';
 
 export interface TextAnnotatorOptions<I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation> {
 
@@ -36,7 +36,7 @@ export interface TextAnnotatorOptions<I extends TextAnnotation = TextAnnotation,
 
   presence?: PresencePainterOptions;
   
-  renderer?: RendererType;
+  renderer?: RendererType | RendererFactory;
 
   selectionMode?: 'shortest' | 'all';
 
