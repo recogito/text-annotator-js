@@ -100,6 +100,7 @@
     <div id="buttons">
       <button id="filter">Toggle Filter</button>
       <button id="fake-presence">Fake Presence</button>
+      <button id="toggle-extend-mode">Toggle Extend Mode</button>
     </div>
 
     <div id="container">
@@ -380,15 +381,15 @@
 
         var filterActive = false;
 
-        var toggleButton = document.getElementById('filter');
-        var toggleButtonLabel = toggleButton.innerText;
+        var toggleFilterButton = document.getElementById('filter');
+        var toggleFilterButtonLabel = toggleFilterButton.innerText;
 
-        toggleButton.addEventListener('click', function () {
+        toggleFilterButton.addEventListener('click', function () {
           if (filterActive) {
             r.setFilter(undefined);
 
             filterActive = false;
-            toggleButton.innerText = `${toggleButtonLabel} on`;
+            toggleFilterButton.innerText = `${toggleFilterButtonLabel} on`;
           } else {
             // Dummy filter - just filter randomly
             r.setFilter(a => {
@@ -399,7 +400,7 @@
             });
 
             filterActive = true;
-            toggleButton.innerText = `${toggleButtonLabel} off`;
+            toggleFilterButton.innerText = `${toggleFilterButtonLabel} off`;
           }
         });
 
@@ -425,7 +426,6 @@
         };
 
         var presenceButton = document.getElementById('fake-presence');
-
         presenceButton.addEventListener('click', function () {
           if (remoteSelection) {
             remoteSelection = undefined;
@@ -441,6 +441,13 @@
               callback(fakeCollaborator, [remoteSelection]);
             });
           }
+        });
+
+        var extendMode = 'CREATE_NEW';
+        var toggleExtendButton = document.getElementById('toggle-extend-mode');
+        toggleExtendButton.addEventListener('click', () => {
+          extendMode = extendMode === 'CREATE_NEW' ? 'ADD_TO_CURRENT' : 'CREATE_NEW';
+          r.setAnnotatingMode(extendMode);
         });
 
         // Make global so we can manipulate from the console

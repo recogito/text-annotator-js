@@ -6,6 +6,7 @@ import { Origin } from '@annotorious/core';
 import type { Filter, Lifecycle, Selection, User } from '@annotorious/core';
 import type { TextAnnotatorState } from './state';
 import type { TextAnnotation, TextAnnotationTarget } from './model';
+import type { AnnotatingMode } from './TextAnnotator';
 import type { TextAnnotatorOptions } from './TextAnnotatorOptions';
 import {
   clonePointerEvent,
@@ -47,22 +48,20 @@ export const createSelectionHandler = (
     dismissOnNotAnnotatable = 'NEVER'
   } = options;
 
-  const setUser = (user?: User) => currentUser = user;
-
   let currentFilter: Filter | undefined;
 
-  const setFilter = (filter?: Filter) => currentFilter = filter;
+  let currentAnnotatingEnabled = annotatingEnabled;
+
+  let annotatingMode: AnnotatingMode = 'CREATE_NEW';
 
   let currentTarget: TextAnnotationTarget | undefined;
 
-  // Only used if allowModifierSelect === true
+  // Only used if allowModifierSelect === true or annotatingMode === 'ADD_TO_CURRENT'
   let targetToModify: TextAnnotationTarget | undefined;
 
   let isLeftClick: boolean | undefined;
 
   let lastDownEvent: Selection['event'] | undefined;
-  
-  let currentAnnotatingEnabled = annotatingEnabled;
 
   const setAnnotatingEnabled = (enabled: boolean) => {
     currentAnnotatingEnabled = enabled;
@@ -74,11 +73,25 @@ export const createSelectionHandler = (
       isLeftClick = undefined;
       lastDownEvent = undefined;
     }
-  };
+  }
 
-  const isModifierSelect = (evt: Event) => {
-    const asPtr = evt as PointerEvent;
-    return isMac ? asPtr.metaKey : asPtr.ctrlKey;
+  const setAnnotatingMode = (mode?: AnnotatingMode) =>
+    annotatingMode = mode || 'CREATE_NEW';
+
+  const setFilter = (filter?: Filter) => currentFilter = filter;
+  
+  const setUser = (user?: User) => currentUser = user;
+
+  const isAddToCurrentSelect = (evt: Event) => {
+    if (annotatingMode === 'ADD_TO_CURRENT')
+      return true;
+
+    if (options.allowModifierSelect) {
+      const asPtr = evt as PointerEvent;
+      return isMac ? asPtr.metaKey : asPtr.ctrlKey;
+    } else {
+      return false;
+    }
   }
 
   const onSelectStart = () => {
@@ -89,8 +102,7 @@ export const createSelectionHandler = (
     const { selected } = selection;
 
     // Will this selection modify an existing annotation?
-    const isModifyExisting = options.allowModifierSelect
-      && isModifierSelect(lastDownEvent)
+    const isModifyExisting = isAddToCurrentSelect(lastDownEvent)
       && selected.length === 1
       && selected[0].editable;
 
@@ -194,7 +206,7 @@ export const createSelectionHandler = (
        *
        * @see https://github.com/recogito/text-annotator-js/issues/139
        */
-      if (store.getAnnotation(currentTarget.annotation) && !isModifierSelect(lastDownEvent)) {
+      if (store.getAnnotation(currentTarget.annotation) && !isAddToCurrentSelect(lastDownEvent)) {
         selection.clear();
         store.deleteAnnotation(currentTarget.annotation);
       }
@@ -237,7 +249,7 @@ export const createSelectionHandler = (
       store.updateTarget(currentTarget, Origin.LOCAL);
     } else {
       // Proper lifecycle management: clear the previous selection first
-      if (!isModifierSelect(evt))
+      if (!isAddToCurrentSelect(evt))
         selection.clear();
     }
   }, 10);
@@ -509,7 +521,8 @@ export const createSelectionHandler = (
     destroy,
     setFilter,
     setUser,
-    setAnnotatingEnabled
+    setAnnotatingEnabled,
+    setAnnotatingMode
   }
 
 }
