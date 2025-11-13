@@ -35,11 +35,15 @@ export interface TextAnnotator<I extends TextAnnotation = TextAnnotation, E exte
   // Returns true if successful (or false if the annotation is not currently rendered)
   scrollIntoView(annotationOrId: I | string, scrollParentOrId?: string | Element): boolean;
 
-  setAnnotatingEnabled: (enabled: boolean) => void;
+  setAnnotatingEnabled(enabled?: boolean): void;
+
+  setAnnotatingMode(mode?: AnnotatingMode): void;
 
   state: TextAnnotatorState<I, E>;
 
 }
+
+export type AnnotatingMode = 'CREATE_NEW' | 'ADD_TO_CURRENT'; // Possibly 'REPLACE_CURRENT' in the future
 
 export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation>(
   container: HTMLElement,
@@ -105,7 +109,11 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
     selectionHandler.setAnnotatingEnabled(
       enabled === undefined ? true : enabled
     );
-  };
+  }
+
+  const setAnnotatingMode = (mode?: AnnotatingMode) => {
+    selectionHandler.setAnnotatingMode(mode)
+  }
 
   const setFilter = (filter?: Filter<I>) => {
     highlightRenderer.setFilter(filter);
@@ -146,6 +154,7 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
     element: container,
     getUser,
     setAnnotatingEnabled,
+    setAnnotatingMode,
     setFilter,
     setStyle: highlightRenderer.setStyle.bind(highlightRenderer),
     redraw: highlightRenderer.redraw.bind(highlightRenderer),
