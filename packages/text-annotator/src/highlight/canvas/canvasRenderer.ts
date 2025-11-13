@@ -33,7 +33,11 @@ const resetCanvas = (canvas: HTMLCanvasElement, highres?: boolean) => {
   }
 }
 
+/**
+ * @deprecated Canvas renderer is deprecated and will be removed in the next major release. Please use 'span' renderer instead.
+ */
 const createRenderer = (container: HTMLElement): RendererImplementation => {
+  console.warn('WARNING! Canvas renderer is deprecated and will be removed in the next major release. Please use the default "SPANS" renderer instead.');
 
   container.classList.add('r6o-annotatable');
 
