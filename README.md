@@ -2,7 +2,7 @@
 
 A JavaScript library for adding interactive text annotation functionality to web applications.
 
-Also available: [React wrapper](packages/text-annotator-react) | [TEI/XML extension](packages/extension-tei) | [Recogito PDF Annotator](https://github.com/recogito/pdf-annotator-js) 
+Also available: [React wrapper](packages/text-annotator-react) | [TEI/XML extension](packages/text-annotator-tei) | [Recogito PDF Annotator](https://github.com/recogito/pdf-annotator-js) 
 
 ![Animated screenshot of the Recogito Text Annotator](/animated-screenshot.gif "Animated screenshot of the Recogito Text Annotator")
 
@@ -28,7 +28,7 @@ anno.on('createAnnotation', annotation => {
 });     
 ```
 
-## Configuration Options
+## Configuration
 
 ```js
 const anno = createTextAnnotator(element, options);
@@ -36,15 +36,33 @@ const anno = createTextAnnotator(element, options);
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `annotatingEnabled` | `boolean` | `true` | Enable or disable interactive creation of new annotations. |
-| `dismissOnNotAnnotatable` | `'NEVER' \| 'ALWAYS' \| function` | `'NEVER'` | Controls whether the current selection is dismissed when clicking outside of annotatable content. |
-| `selectionMode` | `'shortest' \| 'all'` | `'shortest'` | When the user selects overlapping annotations: select all or only the shortest. |
-| `style` | `HighlightStyleExpression` | `undefined` | Custom styling function for highlights. |
-| `user` | `User` | anonymous guest | Current user information, automatically added to created or updated annotations. |
+| `allowModifierSelect` | `boolean` | `false` | Allows users to extend an existing annotation by holding `Ctrl` (`Cmd` on Mac) while selecting text |
+| `annotatingEnabled` | `boolean` | `true` | Enables or disables creation of new annotations. |
+| `dismissOnNotAnnotatable` | `'NEVER' \| 'ALWAYS' \| function` | `'NEVER'` | Controls whether a selection is dismissed when clicking outside annotatable content. |
+| `selectionMode` | `'shortest' \| 'all'` | `'shortest'` | When selecting overlapping annotations: select all or only the shortest. |
+| `style` | `HighlightStyleExpression` | `undefined` | Custom highlight styling function. |
+| `user` | `User` | anonymous guest | Current user info, automatically added to new or updated annotations. |
 
 ## Annotator API
 
 ### Methods
+
+#### `setAnnotatingEnabled(enabled?: boolean): void;`
+Enable or disable annotation creation (exising annotations remain interactive).
+
+```js
+anno.setAnnotatingEnabled(false);
+```
+
+#### `setAnnotatingMode(mode?: AnnotatingMode): void;`
+Switch between annotation creation modes:
+
+- `CREATE_NEW` (default): each user selection creates a new annotation
+- `ADD_TO_CURRENT`: the user selection extends the currently selected annotation, if any
+
+```js
+anno.setAnnotatingMode('ADD_TO_CURRENT');
+```
 
 #### `getAnnotations(): TextAnnotation[]`
 Returns all annotations.
@@ -237,6 +255,15 @@ Fired when the selection was changed by the user.
 ```js
 anno.on('selectionChanged', annotations => {
   console.log('Selected:', annotations);
+});
+```
+
+#### `viewportIntersect`
+Fired when annotations enter or leave the visible area.
+
+```js
+anno.on('viewportIntersect', annotations => {
+  console.log('Visible:', annotations);
 });
 ```
 
