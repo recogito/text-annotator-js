@@ -102,8 +102,9 @@ export const createSelectionHandler = (
     const { selected } = selection;
 
     // Will this selection modify an existing annotation?
-    const isModifyExisting = isAddToCurrentSelect(lastDownEvent)
-      && selected.length === 1
+    const isModifyExisting = (
+      isAddToCurrentSelect(lastDownEvent) || annotatingMode === 'REPLACE_CURRENT'
+    ) && selected.length === 1
       && selected[0].editable;
 
     if (isModifyExisting) {
@@ -206,7 +207,9 @@ export const createSelectionHandler = (
        *
        * @see https://github.com/recogito/text-annotator-js/issues/139
        */
-      if (store.getAnnotation(currentTarget.annotation) && !isAddToCurrentSelect(lastDownEvent)) {
+      if (store.getAnnotation(currentTarget.annotation) && !(
+        isAddToCurrentSelect(lastDownEvent) || annotatingMode === 'REPLACE_CURRENT'
+      )) {
         selection.clear();
         store.deleteAnnotation(currentTarget.annotation);
       }
@@ -230,7 +233,7 @@ export const createSelectionHandler = (
     if (!hasChanged) return;
 
     // Annotatable ranges + ranges of the modified target (if any)
-    const combinedRanges = targetToModify ? mergeRanges([ 
+    const combinedRanges = (isAddToCurrentSelect(lastDownEvent) && targetToModify) ? mergeRanges([ 
       ...(targetToModify.selector.map(s => s.range)),
       ...annotatableRanges
     ]) : annotatableRanges;
@@ -241,10 +244,13 @@ export const createSelectionHandler = (
       updated: new Date()
     };
 
-    // If we're adding to a selection, we don't need to perform the steps below.
+    // If we're modifying an existing annotation, we don't need to perform the steps below.
     // - We don't want to clear the selection
     // - We don't want to update the target until mouse-up
-    if (isAddToCurrentSelect(lastDownEvent)) return;
+    // 
+    // CAVEAT: this won't work with keyboard selection yet. Ideally, we'd need an explicit
+    // "isKeyboardSelection" flag to handle this state.
+    if (isAddToCurrentSelect(lastDownEvent) || annotatingMode === 'REPLACE_CURRENT') return;
 
     /**
      * During mouse selection on the desktop, the annotation won't usually exist while the selection is being edited.
@@ -426,7 +432,7 @@ export const createSelectionHandler = (
 
         selection.userSelect(currentTarget.annotation, cloneKeyboardEvent(evt));
       }
-
+      
       document.removeEventListener('selectionchange', onSelected);
 
       // Sigh... this needs a delay to work. But doesn't seem reliable.
@@ -480,17 +486,17 @@ export const createSelectionHandler = (
         bodies: [],
         target: currentTarget
       });
-      return;
-    }
+    } else {
+      const { target: { updated: existingTargetUpdated } } = existingAnnotation;
+      const { updated: currentTargetUpdated } = currentTarget;
 
-    const { target: { updated: existingTargetUpdated } } = existingAnnotation;
-    const { updated: currentTargetUpdated } = currentTarget;
-    if (
-      !existingTargetUpdated ||
-      !currentTargetUpdated ||
-      existingTargetUpdated < currentTargetUpdated
-    ) {
-      store.updateTarget(currentTarget);
+      if (
+        !existingTargetUpdated ||
+        !currentTargetUpdated ||
+        existingTargetUpdated < currentTargetUpdated
+      ) {
+        store.updateTarget(currentTarget);
+      }
     }
   };
 

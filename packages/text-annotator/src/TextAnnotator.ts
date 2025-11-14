@@ -33,7 +33,7 @@ export interface TextAnnotator<I extends TextAnnotation = TextAnnotation, E exte
 
 }
 
-export type AnnotatingMode = 'CREATE_NEW' | 'ADD_TO_CURRENT'; // Possibly 'REPLACE_CURRENT' in the future
+export type AnnotatingMode = 'CREATE_NEW' | 'ADD_TO_CURRENT' | 'REPLACE_CURRENT';
 
 export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation>(
   container: HTMLElement,

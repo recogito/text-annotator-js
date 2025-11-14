@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>RecogitoJS 3</title>
+    <title>Recogito Text Annotator</title>
     <style>
       *, *:before, *:after {
         box-sizing: border-box;
@@ -100,7 +100,7 @@
     <div id="buttons">
       <button id="filter">Toggle Filter</button>
       <button id="fake-presence">Fake Presence</button>
-      <button id="toggle-extend-mode">Toggle Extend Mode</button>
+      <button id="toggle-annotating-mode">Mode: CREATE_NEW</button>
     </div>
 
     <div id="container">
@@ -443,11 +443,16 @@
           }
         });
 
-        var extendMode = 'CREATE_NEW';
-        var toggleExtendButton = document.getElementById('toggle-extend-mode');
-        toggleExtendButton.addEventListener('click', () => {
-          extendMode = extendMode === 'CREATE_NEW' ? 'ADD_TO_CURRENT' : 'CREATE_NEW';
-          r.setAnnotatingMode(extendMode);
+        var annotatingMode = 'CREATE_NEW';
+        var annotatingModeButton = document.getElementById('toggle-annotating-mode');
+        annotatingModeButton.addEventListener('click', () => {
+          annotatingMode = 
+            annotatingMode === 'CREATE_NEW' ? 'ADD_TO_CURRENT' : 
+            annotatingMode === 'ADD_TO_CURRENT' ? 'REPLACE_CURRENT' : 
+            'CREATE_NEW';
+
+          annotatingModeButton.innerHTML =  `Mode: ${annotatingMode}`;
+          r.setAnnotatingMode(annotatingMode);
         });
 
         // Make global so we can manipulate from the console
