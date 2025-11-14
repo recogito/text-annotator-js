@@ -38,12 +38,12 @@ const anno = createTextAnnotator(element, options);
 |--------|------|---------|-------------|
 | `allowModifierSelect` | `boolean` | `false` | Allows users to extend an existing annotation by holding `Ctrl` (`Cmd` on Mac) while selecting. |
 | `annotatingEnabled` | `boolean` | `true` | Enable or disable creation of new annotations. |
-| `dismissOnNotAnnotatable` | `'NEVER' \| 'ALWAYS' \| function` | `'NEVER'` | Controls whether a selection is dismissed when clicking outside annotatable content. |
+| `dismissOnNotAnnotatable` | `'NEVER' \| 'ALWAYS' \| function` | `'NEVER'` | Controls whether the currently selected annotation is un-selected when clicking outside the annotatable area. |
 | `mergeHighlights` | `object` | `undefined` | Merge adjacent highlights. Options: `horizontalTolerance` and `verticalTolerance` (pixels) |
 | `selectionMode` | `'shortest' \| 'all'` | `'shortest'` | When selecting overlapping annotations: select all or only the shortest. |
 | `style` | `HighlightStyleExpression` | `undefined` | Custom highlight styling function. |
 | `user` | `User` | anonymous guest | Current user info, automatically added to new or updated annotations. |
-| `userSelectAction` | `UserSelectActionExpression` | `undefined` | Behavior when the user selects an annotation (see below) |
+| `userSelectAction` | `UserSelectActionExpression` | `SELECT` | Behavior when the user selects an annotation (see below) |
 
 ## Annotator API
 
@@ -106,14 +106,14 @@ const selected = anno.getSelected();
 ```
 
 #### `getUser()`
-Returns the current user.
+Return the current user.
 
 ```js
 const user = anno.getUser();
 ```
 
 #### `loadAnnotations(url, replace = true)`
-Loads annotations from a URL.
+Load annotations from a URL.
 
 ```js
 await anno.loadAnnotations('/annotations.json');
@@ -135,7 +135,7 @@ anno.removeAnnotation('annotation-id');
 ```
 
 #### `scrollIntoView(annotationOrId)`
-Scrolls the annotation into view. Returns `true` if successful, `false` if annotation is not currently rendered.
+Scroll the annotation into view. Returns `true` if successful, `false` if annotation is not currently rendered.
 
 ```js
 anno.scrollIntoView('annotation-id');
@@ -149,25 +149,25 @@ anno.setAnnotatingEnabled(false);
 ```
 
 #### `setAnnotatingMode(mode)`
-Choose how selections create annotations:
+Configure the annotation mode:
 
-- `CREATE_NEW` (default): each user selection creates a new annotation
-- `ADD_TO_CURRENT`: the user selection extends the currently selected annotation, if any
-- `REPLACE_CURRENT`: the user selection replaces the currently selected annotation, if any
+- `CREATE_NEW` (default): each user selection creates a new annotation.
+- `ADD_TO_CURRENT`: the user selection extends the currently selected annotation's range, if any.
+- `REPLACE_CURRENT`: the user selection replaces the currently selected annotations' range, if any.
 
 ```js
 anno.setAnnotatingMode('ADD_TO_CURRENT');
 ```
 
 #### `setAnnotations(annotations, replace = true)`
-Bulk-add annotations. If `replace` is `true` (default), all existing annotations are removed first. If `false`, the new annotations are appended to existing ones.
+Bulk-add annotations. If `replace` is `true` (default), all existing annotations are deleted first. If `false`, the new annotations are appended to existing ones.
 
 ```js
 anno.setAnnotations(annotations);
 ```
 
 #### `setFilter(filter)`
-Applies a filter function to control which annotations are displayed.
+Apply a filter function to control which annotations are displayed.
 
 ```js
 anno.setFilter(annotation => 
@@ -206,28 +206,25 @@ anno.setUser({ id: 'new-user@example.com', name: 'John' });
 ```
 
 #### `setUserSelectAction(action)`
-Change the current `userSelectAction`, which determines what happens when the user selects an annotation interactively.
-
-Can be a `UserSelectAction`, or a function that receives the annotation as input and returns a `UserSelectAction`.
+Change the current `userSelectAction`, which determines what happens when the user selects an annotation interactively. Can be a `UserSelectAction`, or a function that receives the annotation as input and returns a `UserSelectAction`.
 
 - **SELECT** (default): The annotation will be selected and the `selectionChanged` event will be triggered.
 - **NONE**: the annotation is inert, clicking has no effect.
 
 ```js
 anno.setUserSelectAction('NONE');
-
 anno.setUserSelectAction(annotation => annotation.bodies.length > 0 ? 'SELECT' : 'NONE');
 ```
 
 #### `setVisible(visible)`
-Show or hides all annotations.
+Show or hide all annotations.
 
 ```js
 anno.setVisible(false); 
 ```
 
 #### `updateAnnotation(updated)`
-Update an existing annotation. (The original annotation with the same ID will be replaced.)
+Update an existing annotation.
 
 ```js
 anno.updateAnnotation(updated);
