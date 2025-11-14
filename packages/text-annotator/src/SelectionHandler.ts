@@ -241,6 +241,11 @@ export const createSelectionHandler = (
       updated: new Date()
     };
 
+    // If we're adding to a selection, we don't need to perform the steps below.
+    // - We don't want to clear the selection
+    // - We don't want to update the target until mouse-up
+    if (isAddToCurrentSelect(lastDownEvent)) return;
+
     /**
      * During mouse selection on the desktop, the annotation won't usually exist while the selection is being edited.
      * But it'll be typical during selection via the keyboard or mobile's handlebars.
@@ -249,8 +254,7 @@ export const createSelectionHandler = (
       store.updateTarget(currentTarget, Origin.LOCAL);
     } else {
       // Proper lifecycle management: clear the previous selection first
-      if (!isAddToCurrentSelect(evt))
-        selection.clear();
+      selection.clear();
     }
   }, 10);
 
