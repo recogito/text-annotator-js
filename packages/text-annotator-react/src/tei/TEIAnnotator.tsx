@@ -1,8 +1,8 @@
 import { Children, JSX, ReactElement, ReactNode, cloneElement, useCallback, useContext, useEffect } from 'react';
 import { AnnotoriousContext, Filter } from '@annotorious/react';
 import { TEIPlugin } from '@recogito/text-annotator-tei';
-import { createTextAnnotator, HighlightStyleExpression } from '@recogito/text-annotator';
-import type { TextAnnotatorOptions } from '@recogito/text-annotator';
+import { createTextAnnotator } from '@recogito/text-annotator';
+import type { AnnotatingMode, TextAnnotatorOptions } from '@recogito/text-annotator';
 
 import '@recogito/text-annotator/text-annotator.css';
 
@@ -10,9 +10,9 @@ export type TEIAnnotatorProps = TextAnnotatorOptions & {
 
   children?: ReactNode | JSX.Element;
 
-  filter?: Filter;
+  annotatingMode?: AnnotatingMode;
 
-  style?: HighlightStyleExpression
+  filter?: Filter;
 
 }
 
@@ -27,19 +27,15 @@ export const TEIAnnotator = (props: TEIAnnotatorProps) => {
     setAnno(anno);
   }, []);
 
-  useEffect(() => {
-    if (!anno)
-      return;
-    
-    anno.setStyle(props.style);
-  }, [props.style]);
+  useEffect(() => anno?.setStyle(props.style), [anno, props.style]);
 
-  useEffect(() => {
-    if (!anno)
-      return;
-    
-    anno.setFilter(props.filter);
-  }, [props.filter]);
+  useEffect(() => anno?.setFilter(props.filter), [anno, props.filter]);
+
+  useEffect(() => anno?.setUser(opts.user), [anno, opts.user]);
+
+  useEffect(() => anno?.setAnnotatingEnabled(opts.annotatingEnabled), [anno, opts.annotatingEnabled]);
+
+  useEffect(() => anno?.setAnnotatingMode(opts.annotatingMode), [anno, opts.annotatingMode]);
 
   return props.children ? (
     <>
