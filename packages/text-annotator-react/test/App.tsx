@@ -1,7 +1,7 @@
-import { FC, useCallback, useEffect } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import { AnnotationBody, Annotorious, useAnnotationStore, useAnnotator } from '@annotorious/react';
 import { TextAnnotationPopup, TextAnnotationPopupContentProps, TextAnnotator } from '../src';
-import { W3CTextFormat, type TextAnnotation, type TextAnnotator as RecogitoTextAnnotator } from '@recogito/text-annotator';
+import { W3CTextFormat, type TextAnnotation, type TextAnnotator as RecogitoTextAnnotator, AnnotatingMode } from '@recogito/text-annotator';
 
 const TestPopup: FC<TextAnnotationPopupContentProps> = (props) => {
 
@@ -63,12 +63,24 @@ const MockStorage: FC = () => {
 };
 
 export const App: FC = () => {
+
+  const [mode, setMode] = useState<AnnotatingMode>('CREATE_NEW');
+
   const w3cAdapter = useCallback((container: HTMLElement) => W3CTextFormat('https://www.gutenberg.org', container), []);
+
+  const cycleMode = () => setMode(current => 
+    current === 'CREATE_NEW' ? 'ADD_TO_CURRENT' :
+    current === 'ADD_TO_CURRENT' ? 'REPLACE_CURRENT' :
+    'CREATE_NEW');
 
   return (
     <Annotorious>
+      <button onClick={cycleMode}>
+        Mode: {mode}
+      </button>
       <TextAnnotator
-        adapter={w3cAdapter}>
+        adapter={w3cAdapter}
+        annotatingMode={mode}>
         <p>
           Tell me, O muse, of that ingenious hero who travelled far and wide
           after he had sacked the famous town of Troy. Many cities did he
