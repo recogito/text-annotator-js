@@ -40,6 +40,7 @@ export {
 } from '@annotorious/react';
 
 export type { 
+  AnnotatingMode,
   HighlightStyle,
   HighlightStyleExpression,
   TextAnnotation,
