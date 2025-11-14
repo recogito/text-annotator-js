@@ -4,7 +4,7 @@ import { TEIPlugin } from '@recogito/text-annotator-tei';
 import { createTextAnnotator, HighlightStyleExpression } from '@recogito/text-annotator';
 import type { TextAnnotatorOptions } from '@recogito/text-annotator';
 
-import '@recogito/text-annotator/dist/text-annotator.css';
+import '@recogito/text-annotator/text-annotator.css';
 
 export type TEIAnnotatorProps = TextAnnotatorOptions & {
 

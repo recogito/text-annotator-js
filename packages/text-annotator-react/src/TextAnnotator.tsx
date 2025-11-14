@@ -4,7 +4,7 @@ import type { FormatAdapter } from '@annotorious/core';
 import type { HighlightStyleExpression, TextAnnotation, TextAnnotatorOptions } from '@recogito/text-annotator';
 import { createTextAnnotator } from '@recogito/text-annotator';
 
-import '@recogito/text-annotator/dist/text-annotator.css';
+import '@recogito/text-annotator/text-annotator.css';
 
 export interface TextAnnotatorProps<I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation> extends Omit<TextAnnotatorOptions<I, E>, 'adapter'> {
 
