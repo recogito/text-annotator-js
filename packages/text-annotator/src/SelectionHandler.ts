@@ -56,7 +56,8 @@ export const createSelectionHandler = (
 
   let currentTarget: TextAnnotationTarget | undefined;
 
-  // Only used if allowModifierSelect === true or annotatingMode === 'ADD_TO_CURRENT'
+  // Only used if allowModifierSelect === true or if
+  // annotatingMode === 'ADD_TO_CURRENT' | 'REPLACE_CURRENT'
   let targetToModify: TextAnnotationTarget | undefined;
 
   let isLeftClick: boolean | undefined;
@@ -75,8 +76,7 @@ export const createSelectionHandler = (
     }
   }
 
-  const setAnnotatingMode = (mode?: AnnotatingMode) =>
-    annotatingMode = mode || 'CREATE_NEW';
+  const setAnnotatingMode = (mode?: AnnotatingMode) => annotatingMode = mode || 'CREATE_NEW';
 
   const setFilter = (filter?: Filter) => currentFilter = filter;
   
@@ -150,9 +150,7 @@ export const createSelectionHandler = (
      *
      * @see https://github.com/recogito/text-annotator-js/pull/164#issuecomment-2416961473
      */
-    if (!sel?.anchorNode) {
-      return;
-    }
+    if (!sel?.anchorNode) return;
 
     const selectionRanges =
       Array.from(Array(sel.rangeCount).keys()).map(idx => sel.getRangeAt(idx));
@@ -170,9 +168,10 @@ export const createSelectionHandler = (
     const timeDifference = evt.timeStamp - (lastDownEvent?.timeStamp || evt.timeStamp);
 
     /**
-     * The selection start needs to be emulated only for the pointer events!
-     * The keyboard ones are consistently fired on desktops
-     * and the `timeDifference` will always be <10ms. between the `keydown` and `selectionchange`
+     * The selection start needs to be emulated for some platforms, but only 
+     * for the pointer events! (Keyboard events fire consistently on desktops 
+     * and the `timeDifference` will always be <10ms between `keydown` and
+     * `selectionchange`)
      */
     if (lastDownEvent?.type === 'pointerdown') {
       if (timeDifference < 1000 && !currentTarget) {
@@ -185,25 +184,13 @@ export const createSelectionHandler = (
       }
     }
 
-    // Note: commenting out the line below. We should no longer do this. Why?
-    // Let's assume the user drags the selection from outside the annotatable area
-    // over the anntoatable area (intersection!). Then drags it out again
-    // (no intersection!), then in again (intersection). Because the
-    // currentTarget will have been cleared meanwhile, execution will stop.
-    // 
-    // But we don't want this - instead, processing should continue as normal,
-    // and a new currentTarget should be computed when the user drags the
-    // selection into the annotatable area a second time.
-
-    // The selection isn't active -> bail out from selection change processing
-    // if (!currentTarget) return;
     if (!currentTarget) onSelectStart();
 
     if (sel.isCollapsed) {
       /**
        * The selection range got collapsed during the selecting process. Unless this
-       * is intentional (CTRL + select), the previously created annotation isn't relevant 
-       * anymore and can be discarded
+       * is intentional (CTRL + select, modifying existing annotations), the previously 
+       * created annotation isn't relevant anymore and can be discarded
        *
        * @see https://github.com/recogito/text-annotator-js/issues/139
        */
@@ -232,7 +219,11 @@ export const createSelectionHandler = (
 
     if (!hasChanged) return;
 
-    // Annotatable ranges + ranges of the modified target (if any)
+    /** 
+     * The annotatable ranges are:
+     * - the current annotatable ranges
+     * - the ranges of the existing annotatation IFF we are adding to the current
+     */
     const combinedRanges = (isAddToCurrentSelect(lastDownEvent) && targetToModify) ? mergeRanges([ 
       ...(targetToModify.selector.map(s => s.range)),
       ...annotatableRanges
@@ -244,12 +235,16 @@ export const createSelectionHandler = (
       updated: new Date()
     };
 
-    // If we're modifying an existing annotation, we don't need to perform the steps below.
-    // - We don't want to clear the selection
-    // - We don't want to update the target until mouse-up
-    // 
-    // CAVEAT: this won't work with keyboard selection yet. Ideally, we'd need an explicit
-    // "isKeyboardSelection" flag to handle this state.
+    /** 
+     * If we're modifying (adding to/replacing) an existing annotation, we don't 
+     * need to perform the steps below.
+     * 
+     * - We don't want to clear the selection
+     * - We don't want to update the target until mouse-up
+     * 
+     * CAVEAT: this won't work with keyboard selection yet. Ideally, we'd need an explicit
+     * "isKeyboardSelection" flag to handle this case correctly.
+     */
     if (isAddToCurrentSelect(lastDownEvent) || annotatingMode === 'REPLACE_CURRENT') return;
 
     /**
@@ -339,13 +334,13 @@ export const createSelectionHandler = (
         isNotAnnotatable(container, lastUpEvent.target as Node);
 
       /**
-       * Route to `clickSelect` if selection collapsed OR
-       * the click happened entirely over a not-annotatable element.
+       * Route to `clickSelect` if selection is collapsed OR the click happened
+       * entirely over a not-annotatable element.
        *
-       * The latter allows preventing re-selection of an existing
-       * annotation when a user clicks on not-annotatable controls.
-       * For example, a click on a `button` element doesn't make the
-       * selection collapse, but it still needs to be processed with `clickSelect`.
+       * The latter allows preventing re-selection of an existing annotation
+       * when a user clicks on not-annotatable controls. For example, a click
+       * on a `button` element doesn't make the selection collapse, but it still 
+       * needs to be processed with `clickSelect`.
        */
       if (sel?.isCollapsed || (isDownOnNotAnnotatable && isUpOnNotAnnotatable)) {
         currentTarget = undefined;
@@ -396,6 +391,7 @@ export const createSelectionHandler = (
     if (!currentTarget || currentTarget.selector.length === 0) {
       onSelectionChange(evt);
     }
+    
     /**
      * The selection couldn't be initiated - might span over a not-annotatable element.
      */
