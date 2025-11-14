@@ -1,6 +1,6 @@
 {
   "name": "@recogito/react-text-annotator",
-  "version": "3.4.6",
+  "version": "3.4.7",
   "description": "Recogito Text Annotator React bindings",
   "author": "Rainer Simon",
   "license": "BSD-3-Clause",
@@ -48,8 +48,8 @@
     "@annotorious/core": "^3.7.13",
     "@annotorious/react": "^3.7.13",
     "@floating-ui/react": "^0.27.16",
-    "@recogito/text-annotator": "3.4.6",
-    "@recogito/text-annotator-tei": "3.4.6",
+    "@recogito/text-annotator": "3.4.7",
+    "@recogito/text-annotator-tei": "3.4.7",
     "CETEIcean": "^1.9.5",
     "debounce": "^3.0.0"
   }
