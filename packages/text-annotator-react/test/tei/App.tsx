@@ -1,6 +1,6 @@
-import React, { FC, useEffect, useRef, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { AnnotationBody, Annotorious, useAnnotationStore, useAnnotator } from '@annotorious/react';
-import { TextAnnotation, TextAnnotator as VanillaTextAnnotator } from '@recogito/text-annotator';
+import { AnnotatingMode, TextAnnotation, TextAnnotator as VanillaTextAnnotator } from '@recogito/text-annotator';
 import { 
   TEIAnnotator, 
   CETEIcean, 
@@ -70,6 +70,13 @@ export const App: FC = () => {
 
   const [tei, setTEI] = useState<string | undefined>(undefined);
 
+  const [mode, setMode] = useState<AnnotatingMode>('CREATE_NEW');
+
+  const cycleMode = () => setMode(current => 
+    current === 'CREATE_NEW' ? 'ADD_TO_CURRENT' :
+    current === 'ADD_TO_CURRENT' ? 'REPLACE_CURRENT' :
+    'CREATE_NEW');
+
   useEffect(() => {
     fetch('sample.xml')
       .then(res => res.text())
@@ -78,7 +85,12 @@ export const App: FC = () => {
 
   return (
     <Annotorious>
-      <TEIAnnotator>
+      <button onClick={cycleMode}>
+        Mode: {mode}
+      </button>
+
+      <TEIAnnotator
+        annotatingMode={mode}>
         <CETEIcean tei={tei} />
 
         <TextAnnotationPopup
