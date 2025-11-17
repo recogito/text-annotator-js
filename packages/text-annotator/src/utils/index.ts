@@ -1,5 +1,6 @@
 export * from './cancelSingleClickEvents';
 export * from './cloneEvents';
+export * from './debounce';
 export * from './device';
 export * from './programmaticallyFocusable';
 export * from './getHighlightClientRects';

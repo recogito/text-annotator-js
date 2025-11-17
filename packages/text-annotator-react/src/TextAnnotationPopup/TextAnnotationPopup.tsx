@@ -52,7 +52,7 @@ export interface TextAnnotationPopupContentProps<T extends TextAnnotation = Text
 
   annotation: T;
 
-  annotations: T[];
+  selected: { annotation: T; editable?: boolean; }[];
 
   editable?: boolean;
 
@@ -182,8 +182,8 @@ export const TextAnnotationPopup = (props: TextAnnotationPopupProps) => {
           style={floatingStyles}>
           {props.popup({
             annotation: selected[0].annotation, // for backwards compatibility
-            annotations: selected.map(s => s.annotation),
             editable: selected[0].editable,
+            selected,
             event
           })}
 

@@ -1,4 +1,3 @@
-import debounce from 'debounce';
 import { UserSelectAction, type Filter, type ViewportState } from '@annotorious/core';
 import type { TextAnnotation } from '../model';
 import type { TextAnnotatorState } from '../state';
@@ -6,6 +5,10 @@ import { type ViewportBounds, getViewportBounds, trackViewport } from './viewpor
 import type { HighlightPainter } from './HighlightPainter';
 import type { Highlight } from './Highlight';
 import type { HighlightStyleExpression } from './HighlightStyle';
+// Note that the debounce npm package has the same issue as below under
+// some circumstances:
+// https://github.com/agentcooper/react-pdf-highlighter/issues/276
+import { debounce } from '../utils';
 
 export type RendererFactory = (
   container: HTMLElement, 
@@ -189,7 +192,7 @@ export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorS
 
     document.removeEventListener('scroll', onScroll);
 
-    onResize.clear();
+    // onResize.clear();
     window.removeEventListener('resize', onResize);
     resizeObserver.disconnect();
 
