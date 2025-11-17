@@ -1,6 +1,6 @@
 {
   "name": "@recogito/text-annotator-tei",
-  "version": "3.4.7",
+  "version": "3.4.8",
   "description": "Recogito Text Annotator TEI extension",
   "author": "Rainer Simon",
   "license": "BSD-3-Clause",
@@ -32,6 +32,6 @@
   },
   "peerDependencies": {
     "@annotorious/core": "^3.7.13",
-    "@recogito/text-annotator": "3.4.7"
+    "@recogito/text-annotator": "3.4.8"
   }
 }
