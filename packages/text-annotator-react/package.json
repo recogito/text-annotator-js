@@ -24,7 +24,7 @@
   "module": "./dist/react-text-annotator.es.js",
   "types": "./dist/index.d.ts",
   "devDependencies": {
-    "@types/react": "^19.2.4",
+    "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
     "react": "^19.2.0",
