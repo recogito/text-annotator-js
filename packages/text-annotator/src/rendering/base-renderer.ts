@@ -1,10 +1,10 @@
 import { UserSelectAction, type Filter, type ViewportState } from '@annotorious/core';
+import type { TextAnnotation } from '@/model';
 import type { TextAnnotatorState } from '@/state';
 import { 
   type Highlight,
   type HighlightStyleExpression,
-  type Painter,
-  type Renderer,
+  type ViewportBounds,
   getViewportBounds, 
   trackViewport 
 } from '@/rendering';
@@ -12,6 +12,54 @@ import {
 // some circumstances:
 // https://github.com/agentcooper/react-pdf-highlighter/issues/276
 import { debounce } from '@/utils/events';
+
+/**
+ * The renderer runtime interface.
+ */
+export interface Renderer {
+
+  destroy(): void;
+
+  redraw(force?: boolean): void;
+
+  setStyle(style?: HighlightStyleExpression, id?: string): void;
+
+  setFilter(filter?: Filter): void;
+
+  setVisible(visible: boolean): void;
+
+}
+
+export type RendererFactory = (
+
+  container: HTMLElement,
+
+  state: TextAnnotatorState<TextAnnotation, unknown>,
+
+  viewport: ViewportState
+
+) => Renderer;
+
+/**
+ * A utility interface. Instead of implementing a Renderer from scratch,
+ * implementers can simply implement a painter, and wrap it in the
+ * BaseRenderer, which will handle common concerns.
+ */
+export interface Painter {
+
+  destroy(): void;
+
+  redraw(
+    highlights:Highlight[], 
+    bounds: ViewportBounds, 
+    style?: HighlightStyleExpression,
+    styleOverrides?: Map<string, HighlightStyleExpression>,
+    force?: boolean
+  ): void;
+
+  setVisible(visible: boolean): void;
+
+}
 
 export const createRenderer = <T extends TextAnnotatorState = TextAnnotatorState> (
   painter: Painter,
