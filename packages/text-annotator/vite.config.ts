@@ -1,3 +1,4 @@
+import path from 'path';
 import { defineConfig } from 'vite';
 import { externalizeDeps } from 'vite-plugin-externalize-deps';
 
@@ -7,6 +8,11 @@ export default defineConfig({
   ],
   server: {
     open: '/test/index.html'
+  },
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src')
+    }
   },
   build: {
     emptyOutDir: false,

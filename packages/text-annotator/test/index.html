@@ -99,7 +99,6 @@
   <body>
     <div id="buttons">
       <button id="filter">Toggle Filter</button>
-      <button id="fake-presence">Fake Presence</button>
       <button id="toggle-annotating-mode">Mode: CREATE_NEW</button>
     </div>
 
@@ -351,9 +350,7 @@
           style
         });
 
-        var annotations;
-
-        r.loadAnnotations('annotations.w3c.json').then(a => annotations = a);
+        r.loadAnnotations('annotations.w3c.json');
 
         r.on('createAnnotation', annotation => {
           console.log('createAnnotation', annotation);
@@ -401,45 +398,6 @@
 
             filterActive = true;
             toggleFilterButton.innerText = `${toggleFilterButtonLabel} off`;
-          }
-        });
-
-        // Just a hack for testing...
-        var remoteSelection;
-
-        var handlers = [];
-
-        var presenceProvider = {
-          on: function (event, callback) {
-            handlers.push(callback);
-          }
-        };
-
-        r.setPresenceProvider(presenceProvider);
-
-        const fakeCollaborator = {
-          presenceKey: '1',
-          appearance: {
-            label: 'Rainer',
-            color: '#00cc00'
-          }
-        };
-
-        var presenceButton = document.getElementById('fake-presence');
-        presenceButton.addEventListener('click', function () {
-          if (remoteSelection) {
-            remoteSelection = undefined;
-
-            handlers.forEach(callback => {
-              callback(fakeCollaborator, []);
-            });
-          } else {
-            const randomIdx = Math.floor(Math.random() * annotations.length);
-            remoteSelection = annotations[randomIdx].id;
-
-            handlers.forEach(callback => {
-              callback(fakeCollaborator, [remoteSelection]);
-            });
           }
         });
 

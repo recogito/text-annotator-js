@@ -16,7 +16,10 @@
     "skipLibCheck": true,
     "verbatimModuleSyntax": true,
     "noEmit": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "include": [
     "src",
