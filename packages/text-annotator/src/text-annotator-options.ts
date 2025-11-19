@@ -1,7 +1,6 @@
 import type { FormatAdapter, UserSelectActionExpression, User } from '@annotorious/core';
 import type { HighlightStyleExpression, RendererFactory } from '@/rendering';
 import type { TextAnnotation } from '@/model';
-import type { PresencePainterOptions } from '@/presence';
 
 export interface TextAnnotatorOptions<I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation> {
 
@@ -33,8 +32,6 @@ export interface TextAnnotatorOptions<I extends TextAnnotation = TextAnnotation,
   }
 
   offsetReferenceSelector?: string;
-
-  presence?: PresencePainterOptions;
   
   renderer?: RendererType | RendererFactory;
 
@@ -48,7 +45,7 @@ export interface TextAnnotatorOptions<I extends TextAnnotation = TextAnnotation,
 
 }
 
-export type RendererType = 'SPANS' | 'CANVAS' | 'CSS_HIGHLIGHTS';
+export type RendererType = 'SPANS' | 'CSS_HIGHLIGHTS';
 
 export type DismissOnNotAnnotatableExpression =  'NEVER'| 'ALWAYS' | ((event: Event, container: HTMLElement) => boolean)
 
