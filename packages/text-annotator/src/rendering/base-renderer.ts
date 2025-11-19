@@ -5,7 +5,6 @@ import {
   type HighlightStyleExpression,
   type Painter,
   type Renderer,
-  type RendererFactory,
   getViewportBounds, 
   trackViewport 
 } from '@/rendering';
