@@ -60,35 +60,33 @@ const createSpansPainter = (container: HTMLElement): Painter => {
       const style = styleOverrides.get(highlight.annotation.id) || currentStyle;
 
       highlight.rects.map(rect => {
-        const zIndex = computeZIndex(rect, highlights);
-        const computedStyle = computeStyle(highlight, style, zIndex);
+        const z = computeZIndex(rect, highlights);
+        const computedStyle = computeStyle(highlight, style, z);
 
-        if (shouldRedraw) {
-          const span = document.createElement('span');
-          span.className = 'r6o-annotation';
-          span.dataset.annotation = highlight.annotation.id;
+        const span = document.createElement('span');
+        span.className = 'r6o-annotation';
+        span.dataset.annotation = highlight.annotation.id;
 
-          span.style.left = `${rect.x}px`;
-          span.style.top = `${rect.y}px`;
-          span.style.width = `${rect.width}px`;
-          span.style.height = `${rect.height}px`;
+        span.style.left = `${rect.x}px`;
+        span.style.top = `${rect.y}px`;
+        span.style.width = `${rect.width}px`;
+        span.style.height = `${rect.height}px`;
 
-          span.style.backgroundColor = getBackgroundColor(computedStyle);
+        span.style.backgroundColor = getBackgroundColor(computedStyle);
 
-          if (computedStyle.underlineStyle)
-            span.style.borderStyle = computedStyle.underlineStyle;
+        if (computedStyle.underlineStyle)
+          span.style.borderStyle = computedStyle.underlineStyle;
 
-          if (computedStyle.underlineColor)
-            span.style.borderColor = computedStyle.underlineColor;
+        if (computedStyle.underlineColor)
+          span.style.borderColor = computedStyle.underlineColor;
 
-          if (computedStyle.underlineThickness)
-            span.style.borderBottomWidth = `${computedStyle.underlineThickness}px`;
+        if (computedStyle.underlineThickness)
+          span.style.borderBottomWidth = `${computedStyle.underlineThickness}px`;
 
-          if (computedStyle.underlineOffset)
-            span.style.paddingBottom = `${computedStyle.underlineOffset}px`;
+        if (computedStyle.underlineOffset)
+          span.style.paddingBottom = `${computedStyle.underlineOffset}px`;
 
-          highlightLayer.appendChild(span);
-        }
+        highlightLayer.appendChild(span);
       });
     });
 

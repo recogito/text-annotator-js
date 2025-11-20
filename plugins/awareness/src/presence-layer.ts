@@ -40,6 +40,7 @@ export const createPresenceLayer = (
   provider.on('selectionChange', (p: PresentUser, selection: string[] | null) => {
     // Remove this user's previous selection
     const currentIds = getAnnotationsForUser(p);
+
     currentIds.forEach(id => {
       trackedAnnotations.delete(id);
       anno.setStyle(undefined, id);
@@ -47,9 +48,10 @@ export const createPresenceLayer = (
 
     // Set new selection (if any)
     if (selection)
-      selection.forEach(id => trackedAnnotations.set(id, p));
-
-    redraw();
+      selection.forEach(id => { 
+        trackedAnnotations.set(id, p);
+        anno.setStyle({ fill: p.appearance.color as Color }, id);
+      });
   });  
 
   const clear = () => {
@@ -57,17 +59,14 @@ export const createPresenceLayer = (
     ctx.clearRect(-0.5, -0.5, width + 1, height + 1);
   }
 
-  anno.renderer.on('afterRedraw', () => redraw());
+  anno.renderer.on('onRedraw', () => redraw());
 
   const redraw = () => {
-    // console.log('redraw', [...trackedAnnotations.keys()]);
     clear();
 
     const viewportBounds = anno.element.getBoundingClientRect();
 
     trackedAnnotations.entries().forEach(([id, user]) => {
-      anno.setStyle({ fill: user.appearance.color as Color }, id);
-
       const rects = anno.state.store.getAnnotationRects(id);
 
       // Draw cursor + label to the presence canvas

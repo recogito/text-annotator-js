@@ -149,11 +149,13 @@ export const createRenderer = <T extends TextAnnotatorState = TextAnnotatorState
       currentStyle = style;
     }
 
-    redraw();
+    // console.log('[base-renderer] redrawing style change');
+    redraw(true);
   }
 
   const setFilter = (filter?: Filter) => {
     currentFilter = filter;
+    // console.log('[base-renderer] redrawing filter change');
     redraw(false);
   } 
 
@@ -161,23 +163,37 @@ export const createRenderer = <T extends TextAnnotatorState = TextAnnotatorState
     emitter.on(event, callback);
 
   // Refresh on store change
-  const onStoreChange = () => redraw();
+  const onStoreChange = () => {
+    // console.log('[base-renderer] redrawing store change');
+    redraw();
+  }
+
   store.observe(onStoreChange);
 
   // Refresh on selection change
-  const unsubscribeSelection = selection.subscribe(() => redraw());
+  const unsubscribeSelection = selection.subscribe(() => {
+    // console.log('[base-renderer] redrawing selection change');
+    redraw();
+  });
 
   // Refresh on hover change
-  const unsubscribeHover = hover.subscribe(() => redraw());
+  const unsubscribeHover = hover.subscribe(() => {
+    // console.log('[base-renderer] redrawing hover change');
+    redraw()
+  });
 
   // Refresh on scroll
-  const onScroll = () => redraw(true);
+  const onScroll = () => {
+    // console.log('[base-renderer] redrawing scroll');
+    redraw(true);
+  }
 
   document.addEventListener('scroll', onScroll, { capture: true, passive: true });
 
   // Refresh on resize
   const onResize = debounce(() => {
     store.recalculatePositions();
+    // console.log('[base-renderer] redrawing resize');
     redraw();
   }, 10);
 
@@ -195,8 +211,10 @@ export const createRenderer = <T extends TextAnnotatorState = TextAnnotatorState
     const isInternal = records
       .every(record => record.target === container || container.contains(record.target));
 
-    if (!isInternal)
+    if (!isInternal) {
+      // console.log('[base-renderer] redrawing mutation');
       redraw(true);
+    }
   }, 150));
 
   mutationObserver.observe(document.body, config);
