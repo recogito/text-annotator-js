@@ -1,2 +1,2 @@
-export * from './ceteicean';
+export * from './ceteicean-c';
 export * from './tei-annotator';

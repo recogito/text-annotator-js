@@ -1,8 +1,8 @@
 export * from './tei';
 export * from './hooks';
-export * from './TextAnnotator';
-export * from './TextAnnotationPopup';
-export * from './TextAnnotatorPlugin';
+export * from './text-annotator';
+export * from './text-annotation-popup';
+export * from './text-annotator-plugin';
 
 // Essential re-exports from @annotorious/core
 export type {

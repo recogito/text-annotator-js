@@ -1,1 +1,1 @@
-export * from './TextAnnotationPopup';
+export * from './text-annotation-popup';
