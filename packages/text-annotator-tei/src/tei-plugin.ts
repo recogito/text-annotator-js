@@ -15,7 +15,7 @@ import {
 import type { 
   TEIAnnotation,
   TEIAnnotationTarget
-} from './TEIAnnotation';
+} from './tei-annotation';
 
 export type TEIAnnotationStore = Store<TEIAnnotation> & {
 

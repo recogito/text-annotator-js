@@ -1,6 +1,6 @@
 import type { W3CAnnotation, W3CAnnotationTarget } from '@annotorious/core';
 import type { W3CTextQuoteSelector } from '@recogito/text-annotator';
-import type { TEIRangeSelector } from 'src/TEIAnnotation';
+import type { TEIRangeSelector } from 'src/tei-annotation';
 
 export interface W3CTEIAnnotation extends W3CAnnotation {
 

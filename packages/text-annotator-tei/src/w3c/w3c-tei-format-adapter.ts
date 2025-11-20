@@ -1,7 +1,7 @@
 import { serializeW3CBodies } from '@annotorious/core';
 import type { FormatAdapter, ParseResult } from '@annotorious/core';
-import type { W3CTEIAnnotation } from './W3CTEIAnnotation';
-import type { TEIAnnotation } from '../TEIAnnotation';
+import type { W3CTEIAnnotation } from './w3c-tei-annotation';
+import type { TEIAnnotation } from '../tei-annotation';
 
 export type W3CTEIFormatAdapter = FormatAdapter<TEIAnnotation, W3CTEIAnnotation>;
 

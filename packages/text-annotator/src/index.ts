@@ -1,13 +1,13 @@
-export * from '@/rendering';
-export * from '@/model';
-export * from '@/state';
-export * from '@/utils/annotation';
-export * from '@/utils/dom';
-export * from '@/utils/events';
-export * from '@/utils/highlight';
-export * from '@/selection-handler';
-export * from '@/text-annotator';
-export * from '@/text-annotator-options';
+export * from './rendering';
+export * from './model';
+export * from './state';
+export * from './utils/annotation';
+export * from './utils/dom';
+export * from './utils/events';
+export * from './utils/highlight';
+export * from './selection-handler';
+export * from './text-annotator';
+export * from './text-annotator-options';
 
 // Essential re-exports from @annotorious/core
 export type {
