@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Text Annotator Presence</title>
+    <style>
+      *, *:before, *:after {
+        box-sizing: border-box;
+      }
+
+      html, body {
+        background: #e2e2e2;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+      }
+
+      #container {
+        max-width: 800px;
+        min-height: 100vh;
+        background-color: #fff;
+        padding: 40px;
+        border-style: solid;
+        border-color: #cfcfcf;
+        border-width: 0 1px;
+      }
+
+      h1 {
+        margin: 0;
+        padding: 0 0 20px 0;
+      }
+
+      p {
+        font-size: 17px;
+        line-height: 160%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="buttons">
+      <button id="fake-presence">Fake Presence</button>
+    </div>
+
+    <div id="container">
+      <div id="content">
+        <h1>Homer: The Odyssey</h1>
+        <p>
+          Tell me, O muse, of that ingenious hero who travelled far and wide after he had sacked the famous town of Troy.
+          Many cities did he visit, and many were the nations with whose manners and customs he was acquainted; moreover
+          he suffered much by sea while trying to save his own life and bring his men safely home; but do what he might he
+          could not save his men, for they perished through their own sheer folly in eating the cattle of the Sun-god
+          Hyperion; so the god prevented them from ever reaching home. Tell me, too, about all these things, O daughter of
+          Jove, from whatsoever source you may know them.
+        </p>
+      </div>
+    </div>
+
+    <script type="module">
+      import { createTextAnnotator } from '@recogito/text-annotator';
+      // import { mountPlugin } from '../src';
+
+      import '@recogito/text-annotator/text-annotator.css';
+
+      const STYLE_NO_HOVER = {
+        fill: 'oklch(0.8 0.18 59.17 / 0.25)',
+      };
+
+      const STYLE_HOVER = (_, state, z) => {
+        return state.hovered ? {
+          fill: 'oklch(0.87 0.12 66.96)'
+        } : {
+          fill: '#bcbcbc40'
+        }
+      }
+
+      window.onload = async () => {
+        const contentContainer = document.getElementById('content');
+        const r = createTextAnnotator(contentContainer, {
+          mergeHighlights: {
+            horizontalTolerance: 30
+          },
+          style: STYLE_NO_HOVER
+        });
+
+        let annotations = [];
+
+        r.loadAnnotations('annotations.json').then(a => annotations = a);
+
+        r.on('mouseEnterAnnotation', () => {
+          r.setStyle(STYLE_HOVER);
+        });
+
+        r.on('mouseLeaveAnnotation', () => {
+          r.setStyle(STYLE_NO_HOVER);
+        });
+
+        // For this test, we only expect a single event (selectionChange)
+        const handlers = [];
+        const presenceProvider = {
+          on: function (event, callback) {
+            handlers.push(callback);
+          }
+        };
+
+        const presence = mountPlugin(r, { provider: presenceProvider });
+ 
+        let remoteSelection;
+        
+        const dummyCollaborator = {
+          presenceKey: '1',
+          appearance: {
+            label: 'Rainer',
+            color: '#00cc00'
+          }
+        };
+
+        const presenceButton = document.getElementById('fake-presence');
+        presenceButton.addEventListener('click', function () {
+          if (remoteSelection) {
+            remoteSelection = undefined;
+
+            handlers.forEach(callback => {
+              callback(dummyCollaborator, []);
+            });
+          } else {
+            const randomIdx = Math.floor(Math.random() * annotations.length);
+            remoteSelection = annotations[randomIdx].id;
+
+            handlers.forEach(callback => {
+              callback(dummyCollaborator, [remoteSelection]);
+            });
+          }
+        });
+
+        window.r = r;
+      };
+    </script>
+  </body>
+</html>

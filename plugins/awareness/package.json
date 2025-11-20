@@ -1,0 +1,32 @@
+
+{
+  "name": "@recogito/text-annotator-plugin-awareness",
+  "version": "0.0.1",
+  "description": "A realtime-awareness plugin to the text annotator",
+  "author": "Rainer Simon",
+  "license": "BSD-3-Clause",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "module": "./dist/plugin-awareness.es.js",
+  "types": "./dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/plugin-awarenss.es.js"
+    }
+  },
+  "scripts": {
+    "start": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "vite": "^6.4.1"
+  },
+  "dependencies": {
+    "@recogito/text-annotator": "^3.4.3"
+  }
+}
