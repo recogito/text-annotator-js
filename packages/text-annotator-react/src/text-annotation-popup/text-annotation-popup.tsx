@@ -26,7 +26,7 @@ import {
 import { isMobile } from './is-mobile';
 import { useAnnotationQuoteIdle } from '../hooks';
 
-import './TextAnnotationPopup.css';
+import './text-annotation-popup.css';
 
 interface TextAnnotationPopupProps {
 
