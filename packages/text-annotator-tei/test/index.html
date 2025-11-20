@@ -58,8 +58,7 @@
 
     <script type="module">
       import CETEI from 'CETEIcean';
-      import { createTextAnnotator } from '@recogito/text-annotator';
-      import { TEIPlugin } from '../src/index.ts';
+      import { createTEIAnnotator } from '../src/index.ts';
 
       import '@recogito/text-annotator/text-annotator.css';
 
@@ -69,7 +68,7 @@
         CETEIcean.getHTML5('paradise-lost.xml', data => {
           document.getElementById('content').appendChild(data);
 
-          var anno = TEIPlugin(createTextAnnotator(document.getElementById('content')));
+          var anno = createTEIAnnotator(document.getElementById('content'));
 
           anno.loadAnnotations('annotations.json');
 

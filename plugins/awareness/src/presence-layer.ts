@@ -22,10 +22,7 @@ export const createPresenceLayer = (
   anno: TextAnnotator,
   opts: PresenceLayerOptions
 )  => {
-  const { provider } = opts;
-
   const canvas = createCanvas();
-
   const ctx = canvas.getContext('2d');
 
   document.body.appendChild(canvas);
@@ -34,10 +31,10 @@ export const createPresenceLayer = (
 
   const getAnnotationsForUser = (p: PresentUser) =>
     Array.from(trackedAnnotations.entries())
-      .filter(([id, user]) => user.presenceKey === p.presenceKey)
+      .filter(([_, user]) => user.presenceKey === p.presenceKey)
       .map(([id, _]) => id);
 
-  provider.on('selectionChange', (p: PresentUser, selection: string[] | null) => {
+  opts.provider.on('selectionChange', (p: PresentUser, selection: string[] | null) => {
     // Remove this user's previous selection
     const currentIds = getAnnotationsForUser(p);
 

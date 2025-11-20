@@ -1,7 +1,8 @@
-import type { 
-  TextAnnotator,
-  TextAnnotation,
-  TextAnnotationTarget, 
+import { 
+  type TextAnnotation,
+  type TextAnnotationTarget,
+  type TextAnnotatorOptions,
+  createTextAnnotator, 
 } from '@recogito/text-annotator';
 import type { 
   Annotator,
@@ -31,11 +32,13 @@ export type TEIAnnotationStore = Store<TEIAnnotation> & {
 
 }
 
-export interface RecogitoTEIAnnotator<T extends unknown = TEIAnnotation> extends Annotator<TEIAnnotation, T> { }
+export interface TEIAnnotator<T extends unknown = TEIAnnotation> extends Annotator<TEIAnnotation, T> { }
 
-export const TEIPlugin = (anno: TextAnnotator): RecogitoTEIAnnotator => {
-
-  const container: HTMLElement = anno.element;
+export const createTEIAnnotator = <T extends unknown>(
+  container: HTMLElement,
+  options: TextAnnotatorOptions<TEIAnnotation, T> = {}
+): TEIAnnotator => {
+  const anno = createTextAnnotator(container, options);
 
   const toTEI = textToTEIAnnotation(container);
 
