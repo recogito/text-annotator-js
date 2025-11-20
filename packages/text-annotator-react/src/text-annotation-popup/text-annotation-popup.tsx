@@ -23,7 +23,7 @@ import {
   shift,
   useFloating
 } from '@floating-ui/react';
-import { isMobile } from './isMobile';
+import { isMobile } from './is-mobile';
 import { useAnnotationQuoteIdle } from '../hooks';
 
 import './TextAnnotationPopup.css';

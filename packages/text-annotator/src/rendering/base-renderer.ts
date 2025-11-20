@@ -127,11 +127,10 @@ export const createRenderer = <T extends TextAnnotatorState = TextAnnotatorState
 
   const setStyle = (style?: HighlightStyleExpression, id?: string) => {
     if (id) {
-      if (style) {
+      if (style)
         styleOverrides.set(id, style);
-      } else {
+      else
         styleOverrides.delete(id);
-      }
     } else {
       currentStyle = style;
     }

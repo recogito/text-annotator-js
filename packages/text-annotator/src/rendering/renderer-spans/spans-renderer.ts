@@ -29,7 +29,7 @@ const createSpansPainter = (container: HTMLElement): Painter => {
 
   const redraw = (
     highlights:Highlight[], 
-    viewportBounds: ViewportBounds, 
+    _: ViewportBounds, 
     currentStyle?: HighlightStyleExpression,
     styleOverrides?: Map<string, HighlightStyleExpression>,
     force?: boolean
@@ -57,9 +57,11 @@ const createSpansPainter = (container: HTMLElement): Painter => {
     });
 
     sorted.forEach(highlight => {
+      const style = styleOverrides.get(highlight.annotation.id) || currentStyle;
+
       highlight.rects.map(rect => {
         const zIndex = computeZIndex(rect, highlights);
-        const style = computeStyle(highlight, currentStyle, zIndex);
+        const computedStyle = computeStyle(highlight, style, zIndex);
 
         if (shouldRedraw) {
           const span = document.createElement('span');
@@ -71,19 +73,19 @@ const createSpansPainter = (container: HTMLElement): Painter => {
           span.style.width = `${rect.width}px`;
           span.style.height = `${rect.height}px`;
 
-          span.style.backgroundColor = getBackgroundColor(style);
+          span.style.backgroundColor = getBackgroundColor(computedStyle);
 
-          if (style.underlineStyle)
-            span.style.borderStyle = style.underlineStyle;
+          if (computedStyle.underlineStyle)
+            span.style.borderStyle = computedStyle.underlineStyle;
 
-          if (style.underlineColor)
-            span.style.borderColor = style.underlineColor;
+          if (computedStyle.underlineColor)
+            span.style.borderColor = computedStyle.underlineColor;
 
-          if (style.underlineThickness)
-            span.style.borderBottomWidth = `${style.underlineThickness}px`;
+          if (computedStyle.underlineThickness)
+            span.style.borderBottomWidth = `${computedStyle.underlineThickness}px`;
 
-          if (style.underlineOffset)
-            span.style.paddingBottom = `${style.underlineOffset}px`;
+          if (computedStyle.underlineOffset)
+            span.style.paddingBottom = `${computedStyle.underlineOffset}px`;
 
           highlightLayer.appendChild(span);
         }

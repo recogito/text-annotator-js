@@ -34,7 +34,7 @@ export interface TextAnnotator<I extends TextAnnotation = TextAnnotation, E exte
 
   element: HTMLElement;
 
-  setStyle(style: HighlightStyleExpression | undefined): void;
+  setStyle(style?: HighlightStyleExpression, id?: string): void;
 
   redraw(lazy?: boolean): void;
 
