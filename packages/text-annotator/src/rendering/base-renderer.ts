@@ -1,3 +1,4 @@
+import { createNanoEvents, type Unsubscribe } from 'nanoevents';
 import { UserSelectAction, type Filter, type ViewportState } from '@annotorious/core';
 import type { TextAnnotation } from '@/model';
 import type { TextAnnotatorState } from '@/state';
@@ -20,6 +21,8 @@ export interface Renderer {
 
   destroy(): void;
 
+  on: <E extends keyof RendererEvents>(event: E, callback: RendererEvents[E]) => Unsubscribe;
+
   redraw(force?: boolean): void;
 
   setStyle(style?: HighlightStyleExpression, id?: string): void;
@@ -27,6 +30,12 @@ export interface Renderer {
   setFilter(filter?: Filter): void;
 
   setVisible(visible: boolean): void;
+
+}
+
+export interface RendererEvents {
+
+  onRedraw(): void;
 
 }
 
@@ -68,6 +77,8 @@ export const createRenderer = <T extends TextAnnotatorState = TextAnnotatorState
   viewport: ViewportState,
 ): Renderer => {
   const { store, selection, hover } = state;
+
+  const emitter = createNanoEvents<RendererEvents>();
 
   let currentStyle: HighlightStyleExpression | undefined;
 
@@ -122,7 +133,10 @@ export const createRenderer = <T extends TextAnnotatorState = TextAnnotatorState
 
     painter.redraw(highlights, bounds, currentStyle, styleOverrides, force);
 
-    setTimeout(() => onDraw(annotationsInView.map(({ annotation }) => annotation)), 1);
+    setTimeout(() => {
+      onDraw(annotationsInView.map(({ annotation }) => annotation));
+      emitter.emit('onRedraw')
+    }, 1);
   }), 10);
 
   const setStyle = (style?: HighlightStyleExpression, id?: string) => {
@@ -142,6 +156,9 @@ export const createRenderer = <T extends TextAnnotatorState = TextAnnotatorState
     currentFilter = filter;
     redraw(false);
   } 
+
+  const on = <E extends keyof RendererEvents>(event: E, callback: RendererEvents[E]): Unsubscribe => 
+    emitter.on(event, callback);
 
   // Refresh on store change
   const onStoreChange = () => redraw();
@@ -205,6 +222,7 @@ export const createRenderer = <T extends TextAnnotatorState = TextAnnotatorState
 
   return {
     destroy,
+    on,
     redraw,
     setStyle,
     setFilter,

@@ -7,7 +7,7 @@ import {
   createLifecycleObserver,
   createUndoStack 
 } from '@annotorious/core';
-import type { HighlightStyleExpression, RendererFactory } from '@/rendering';
+import type { HighlightStyleExpression, Renderer, RendererFactory } from '@/rendering';
 import { createSpansRenderer } from '@/rendering/renderer-spans';
 import { createCSSHighlightRenderer } from '@/rendering/renderer-css-highlight';
 import type { TextAnnotation } from '@/model';
@@ -34,9 +34,9 @@ export interface TextAnnotator<I extends TextAnnotation = TextAnnotation, E exte
 
   element: HTMLElement;
 
-  setStyle(style?: HighlightStyleExpression, id?: string): void;
+  renderer: Renderer;
 
-  redraw(lazy?: boolean): void;
+  setStyle(style?: HighlightStyleExpression, id?: string): void;
 
   // Returns true if successful (or false if the annotation is not currently rendered)
   scrollIntoView(annotationOrId: I | string, scrollParentOrId?: string | Element): boolean;
@@ -88,13 +88,13 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
         : opts.renderer || USE_DEFAULT_RENDERER :
     null;
 
-  const highlightRenderer =
+  const renderer =
     useBuiltInRenderer === null ? (opts.renderer as RendererFactory)(container, state, viewport) :
     useBuiltInRenderer === 'SPANS' ? createSpansRenderer(container, state, viewport) :
     useBuiltInRenderer === 'CSS_HIGHLIGHTS' ? createCSSHighlightRenderer(container, state, viewport) :
     undefined;
 
-  if (!highlightRenderer)
+  if (!renderer)
     throw `Unknown renderer implementation: ${opts.renderer}`;
 
   if (useBuiltInRenderer)
@@ -103,7 +103,7 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
     console.debug('Using custom renderer implementation');
 
   if (opts.style)
-    highlightRenderer.setStyle(opts.style);
+    renderer.setStyle(opts.style);
 
   const selectionHandler = createSelectionHandler(container, state, lifecycle, opts);
   selectionHandler.setUser(currentUser);
@@ -128,7 +128,7 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
   }
 
   const setFilter = (filter?: Filter<I>) => {
-    highlightRenderer.setFilter(filter);
+    renderer.setFilter(filter);
     selectionHandler.setFilter(filter);
   }
 
@@ -146,7 +146,7 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
   }
 
   const destroy = () => {
-    highlightRenderer.destroy();
+    renderer.destroy();
     selectionHandler.destroy();
 
     // Other cleanup actions
@@ -158,14 +158,14 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
     destroy,
     element: container,
     getUser,
+    renderer,
     setAnnotatingEnabled,
     setAnnotatingMode,
     setFilter,
-    setStyle: highlightRenderer.setStyle.bind(highlightRenderer),
-    redraw: highlightRenderer.redraw.bind(highlightRenderer),
+    setStyle: renderer.setStyle.bind(renderer),
     setUser,
     setSelected,
-    setVisible: highlightRenderer.setVisible.bind(highlightRenderer),
+    setVisible: renderer.setVisible.bind(renderer),
     on: lifecycle.on,
     off: lifecycle.off,
     scrollIntoView: scrollIntoView(container, store),
