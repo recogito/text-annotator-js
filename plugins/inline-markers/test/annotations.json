@@ -1,0 +1,296 @@
+
+[
+  {
+    "id": "159d11e1-11b1-40e0-abfb-64d22d333fb3",
+    "bodies": [],
+    "target": {
+      "annotation": "159d11e1-11b1-40e0-abfb-64d22d333fb3",
+      "selector": [
+        {
+          "quote": "that ingenious hero",
+          "start": 67,
+          "end": 86,
+          "range": {}
+        }
+      ],
+      "created": "2025-11-05T10:02:22.596Z",
+      "creator": {
+        "isGuest": true,
+        "id": "mxSAAs8itnJKKRBpcd0n"
+      },
+      "updated": "2025-11-05T10:02:24.133Z"
+    }
+  },
+  {
+    "id": "eec7c95e-a1e5-46e7-b552-41ea0778a5ce",
+    "bodies": [],
+    "target": {
+      "annotation": "eec7c95e-a1e5-46e7-b552-41ea0778a5ce",
+      "selector": [
+        {
+          "quote": "ingenious hero who travelled far and wide",
+          "start": 72,
+          "end": 113,
+          "range": {}
+        }
+      ],
+      "created": "2025-11-05T10:02:27.462Z",
+      "creator": {
+        "isGuest": true,
+        "id": "mxSAAs8itnJKKRBpcd0n"
+      },
+      "updated": "2025-11-05T10:02:29.382Z"
+    }
+  },
+  {
+    "id": "4a5e379d-a425-408a-81bb-6d4350f3cd23",
+    "bodies": [],
+    "target": {
+      "annotation": "4a5e379d-a425-408a-81bb-6d4350f3cd23",
+      "selector": [
+        {
+          "quote": "he suffered much by sea while trying to save his own life",
+          "start": 286,
+          "end": 347,
+          "range": {}
+        }
+      ],
+      "created": "2025-11-05T10:02:36.478Z",
+      "creator": {
+        "isGuest": true,
+        "id": "mxSAAs8itnJKKRBpcd0n"
+      },
+      "updated": "2025-11-05T10:02:37.933Z"
+    }
+  },
+  {
+    "id": "2032aeba-e63b-426d-9061-15bbbd1dcaee",
+    "bodies": [],
+    "target": {
+      "annotation": "2032aeba-e63b-426d-9061-15bbbd1dcaee",
+      "selector": [
+        {
+          "quote": "his own life",
+          "start": 335,
+          "end": 347,
+          "range": {}
+        }
+      ],
+      "created": "2025-11-05T10:02:42.579Z",
+      "creator": {
+        "isGuest": true,
+        "id": "mxSAAs8itnJKKRBpcd0n"
+      },
+      "updated": "2025-11-05T10:02:43.483Z"
+    }
+  },
+  {
+    "id": "bebe542e-5cca-41ac-8cfb-8d65d402a15c",
+    "bodies": [],
+    "target": {
+      "annotation": "bebe542e-5cca-41ac-8cfb-8d65d402a15c",
+      "selector": [
+        {
+          "quote": "his own life",
+          "start": 335,
+          "end": 347,
+          "range": {}
+        }
+      ],
+      "created": "2025-11-05T10:02:45.663Z",
+      "creator": {
+        "isGuest": true,
+        "id": "mxSAAs8itnJKKRBpcd0n"
+      },
+      "updated": "2025-11-05T10:02:46.483Z"
+    }
+  },
+  {
+    "id": "26f50765-5edb-4f3d-8e3c-c3511c9bb4eb",
+    "bodies": [],
+    "target": {
+      "annotation": "26f50765-5edb-4f3d-8e3c-c3511c9bb4eb",
+      "selector": [
+        {
+          "quote": "trying to save his own life",
+          "start": 320,
+          "end": 347,
+          "range": {}
+        }
+      ],
+      "created": "2025-11-05T10:02:50.364Z",
+      "creator": {
+        "isGuest": true,
+        "id": "mxSAAs8itnJKKRBpcd0n"
+      },
+      "updated": "2025-11-05T10:02:51.415Z"
+    }
+  },
+  {
+    "id": "36b0af44-3c09-4270-b91b-f82ad4686546",
+    "bodies": [],
+    "target": {
+      "annotation": "36b0af44-3c09-4270-b91b-f82ad4686546",
+      "selector": [
+        {
+          "quote": "trying to save his own life",
+          "start": 320,
+          "end": 347,
+          "range": {}
+        }
+      ],
+      "created": "2025-11-05T10:02:56.995Z",
+      "creator": {
+        "isGuest": true,
+        "id": "mxSAAs8itnJKKRBpcd0n"
+      },
+      "updated": "2025-11-05T10:02:58.066Z"
+    }
+  },
+  {
+    "id": "b3e5665c-9640-4a6d-8fec-4ecfcccfa13d",
+    "bodies": [],
+    "target": {
+      "annotation": "b3e5665c-9640-4a6d-8fec-4ecfcccfa13d",
+      "selector": [
+        {
+          "quote": "the cattle of the Sun-god\n        Hyperion;",
+          "start": 495,
+          "end": 540,
+          "range": {}
+        }
+      ],
+      "created": "2025-11-05T10:03:09.597Z",
+      "creator": {
+        "isGuest": true,
+        "id": "mxSAAs8itnJKKRBpcd0n"
+      },
+      "updated": "2025-11-05T10:03:13.766Z"
+    }
+  },
+  {
+    "id": "5a95428b-5ebd-49a6-8c7e-609b169cc103",
+    "bodies": [],
+    "target": {
+      "annotation": "5a95428b-5ebd-49a6-8c7e-609b169cc103",
+      "selector": [
+        {
+          "quote": "Sun-god",
+          "start": 513,
+          "end": 520,
+          "range": {}
+        }
+      ],
+      "created": "2025-11-05T10:03:24.131Z",
+      "creator": {
+        "isGuest": true,
+        "id": "mxSAAs8itnJKKRBpcd0n"
+      },
+      "updated": "2025-11-05T10:03:24.649Z"
+    }
+  },
+  {
+    "id": "2af842ce-b291-419b-a9c1-659a9060715a",
+    "bodies": [],
+    "target": {
+      "annotation": "2af842ce-b291-419b-a9c1-659a9060715a",
+      "selector": [
+        {
+          "quote": "Sun-god\n        Hyperion; so the god prevented them",
+          "start": 513,
+          "end": 566,
+          "range": {}
+        }
+      ],
+      "created": "2025-11-05T10:03:28.263Z",
+      "creator": {
+        "isGuest": true,
+        "id": "mxSAAs8itnJKKRBpcd0n"
+      },
+      "updated": "2025-11-05T10:03:29.650Z"
+    }
+  },
+  {
+    "id": "c43f780b-0941-4293-b5c3-80c0d01c53cb",
+    "bodies": [],
+    "target": {
+      "annotation": "c43f780b-0941-4293-b5c3-80c0d01c53cb",
+      "selector": [
+        {
+          "quote": "prevented them",
+          "start": 552,
+          "end": 566,
+          "range": {}
+        }
+      ],
+      "created": "2025-11-05T10:03:36.813Z",
+      "creator": {
+        "isGuest": true,
+        "id": "mxSAAs8itnJKKRBpcd0n"
+      },
+      "updated": "2025-11-05T10:03:38.383Z"
+    }
+  },
+  {
+    "id": "ea26e166-0589-4c54-a89a-0a9da8b49bd1",
+    "bodies": [],
+    "target": {
+      "annotation": "ea26e166-0589-4c54-a89a-0a9da8b49bd1",
+      "selector": [
+        {
+          "quote": "prevented them from",
+          "start": 552,
+          "end": 571,
+          "range": {}
+        }
+      ],
+      "created": "2025-11-05T10:03:47.062Z",
+      "creator": {
+        "isGuest": true,
+        "id": "mxSAAs8itnJKKRBpcd0n"
+      },
+      "updated": "2025-11-05T10:03:47.850Z"
+    }
+  },
+  {
+    "id": "d90ab4ad-838b-44cd-b40b-09f9db8c7847",
+    "bodies": [],
+    "target": {
+      "annotation": "d90ab4ad-838b-44cd-b40b-09f9db8c7847",
+      "selector": [
+        {
+          "quote": "prevented them from ever reaching home",
+          "start": 552,
+          "end": 590,
+          "range": {}
+        }
+      ],
+      "created": "2025-11-05T10:04:00.013Z",
+      "creator": {
+        "isGuest": true,
+        "id": "mxSAAs8itnJKKRBpcd0n"
+      },
+      "updated": "2025-11-05T10:04:06.600Z"
+    }
+  },{
+    "id": "486b783d-d7b7-4607-8673-2837948e8d00",
+    "bodies": [],
+    "target": {
+        "annotation": "486b783d-d7b7-4607-8673-2837948e8d00",
+        "selector": [
+            {
+                "quote": "Hyperion; so the god",
+                "start": 531,
+                "end": 551,
+                "range": {}
+            }
+        ],
+        "created": "2025-11-05T11:51:24.358Z",
+        "creator": {
+            "isGuest": true,
+            "id": "y0qtlbf6IyT3ZbGg60ue"
+        },
+        "updated": "2025-11-05T11:51:25.875Z"
+    }
+}
+]

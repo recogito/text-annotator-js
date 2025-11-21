@@ -22,6 +22,7 @@ export const TEIAnnotator = (props: TEIAnnotatorProps) => {
   const { anno, setAnno } = useContext(AnnotoriousContext);
 
   const onLoad = useCallback((element: HTMLElement) => {
+    // @ts-ignore
     const anno = createTEIAnnotator(element, opts);
     setAnno(anno);
   }, []);

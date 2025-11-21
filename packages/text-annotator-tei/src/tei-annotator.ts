@@ -52,7 +52,7 @@ export const createTEIAnnotator = <T extends unknown>(
     const { selector } = annotation.target;
     try {
       return ('startSelector' in selector && 'start' in selector) ?
-        _addAnnotation(annotation, origin) :
+        _addAnnotation(annotation as TEIAnnotation, origin) :
         _addAnnotation(toTEI(annotation), origin);
     } catch (error) {
       console.warn(error);
@@ -80,10 +80,11 @@ export const createTEIAnnotator = <T extends unknown>(
       })
     }
     
-    return _bulkAddAnnotations(valid, replace, origin);
+    return _bulkAddAnnotations(valid as TEIAnnotation[], replace, origin);
   }
 
   const _updateAnnotation = store.updateAnnotation;
+  // @ts-ignore
   store.updateAnnotation = (annotation: TEIAnnotation | TextAnnotation, origin: Origin) =>
     _updateAnnotation(toTEI(annotation), origin);
 
@@ -93,9 +94,9 @@ export const createTEIAnnotator = <T extends unknown>(
 
   return {
     ...anno,
+    //@ts-ignore
     state: {
       ...anno.state,
-      // @ts-ignore
       store
     }
   }

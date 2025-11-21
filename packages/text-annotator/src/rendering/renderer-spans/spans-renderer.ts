@@ -28,7 +28,7 @@ const createSpansPainter = (container: HTMLElement): Painter => {
   let currentRendered: Highlight[] = [];
 
   const redraw = (
-    highlights:Highlight[], 
+    highlights: Highlight[], 
     _: ViewportBounds, 
     currentStyle?: HighlightStyleExpression,
     styleOverrides?: Map<string, HighlightStyleExpression>,

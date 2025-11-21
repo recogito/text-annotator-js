@@ -15,7 +15,9 @@
   "workspaces": [
     "./packages/text-annotator",
     "./packages/text-annotator-tei",
-    "./packages/text-annotator-react",
-    "./plugins/awareness"
-  ]
+    "./packages/text-annotator-react"
+  ],
+  "devDependencies": {
+    "vite-plugin-dts": "^4.5.4"
+  }
 }
