@@ -112,7 +112,7 @@ const createInlineMarkersPainter = (
 
 }
 
-export const createInlineMarkersRenderer = (
+export const InlineMarkersRenderer = (
   container: HTMLElement,
   state: TextAnnotatorState<TextAnnotation, unknown>,
   viewport: ViewportState
