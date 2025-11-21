@@ -1,4 +1,4 @@
-import { getRangeAnnotatableContents } from '@/utils/dom';
+import { getRangeAnnotatableContents } from '../dom';
 
 export const getQuoteContext = (
   range: Range, 

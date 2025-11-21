@@ -1,10 +1,10 @@
 import RBush from 'rbush';
 import type { Store } from '@annotorious/core';
 import { createNanoEvents, type Unsubscribe } from 'nanoevents';
-import type { TextAnnotation, TextAnnotationTarget } from '@/model';
-import type { AnnotationRects } from '@/state/text-annotation-store';
-import { isRevived, reviveSelector } from '@/utils/annotation';
-import { mergeClientRects, getHighlightClientRects, toParentBounds } from '@/utils/highlight'; 
+import type { TextAnnotation, TextAnnotationTarget } from '../model';
+import type { AnnotationRects } from '../state/text-annotation-store';
+import { isRevived, reviveSelector } from '../utils/annotation';
+import { mergeClientRects, getHighlightClientRects, toParentBounds } from '../utils/highlight'; 
 
 interface IndexedHighlightRect {
 

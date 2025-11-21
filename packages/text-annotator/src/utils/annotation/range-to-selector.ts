@@ -1,5 +1,5 @@
-import type { TextSelector } from '@/model';
-import { getRangeAnnotatableContents } from '@/utils/dom';
+import type { TextSelector } from '../../model';
+import { getRangeAnnotatableContents } from '../dom';
 
 export const rangeToSelector = (
   range: Range,

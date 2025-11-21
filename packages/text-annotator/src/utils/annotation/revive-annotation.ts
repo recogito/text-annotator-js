@@ -1,5 +1,5 @@
-import type { TextAnnotation, TextAnnotationTarget, TextSelector } from '@/model';
-import { NOT_ANNOTATABLE_SELECTOR } from '@/utils/dom';
+import type { TextAnnotation, TextAnnotationTarget, TextSelector } from '../../model';
+import { NOT_ANNOTATABLE_SELECTOR } from '../dom';
 
 export const isRevived = (selector: TextSelector[]) =>
   selector.every(s => s.range instanceof Range && !s.range.collapsed);

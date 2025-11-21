@@ -1,7 +1,7 @@
 import type { Unsubscribe } from 'nanoevents';
 import type { Filter, Origin, Store } from '@annotorious/core';
-import type { TextAnnotation } from '@/model';
-import type { SpatialTreeEvents } from '@/state/spatial-tree';
+import type { TextAnnotation } from '../model';
+import type { SpatialTreeEvents } from '../state/spatial-tree';
 
 export interface TextAnnotationStore<T extends TextAnnotation = TextAnnotation> extends Omit<Store<T>, 'addAnnotation' | 'bulkAddAnnotation'> {
 

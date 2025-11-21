@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
-import type { TextAnnotation, TextAnnotationTarget, TextSelector } from '@/model/core';
-import type { W3CTextAnnotation, W3CTextAnnotationTarget, W3CTextSelector } from '@/model/w3c';
-import { getQuoteContext } from '@/utils/annotation';
+import type { TextAnnotation, TextAnnotationTarget, TextSelector } from '../core';
+import type { W3CTextAnnotation, W3CTextAnnotationTarget, W3CTextSelector } from './';
+import { getQuoteContext } from '../../utils/annotation';
 import {
   type FormatAdapter,
   type ParseResult,

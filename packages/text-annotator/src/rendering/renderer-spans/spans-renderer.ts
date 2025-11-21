@@ -1,8 +1,8 @@
 import { dequal } from 'dequal/lite';
 import type { ViewportState } from '@annotorious/core';
-import type { TextAnnotation } from '@/model';
-import type { TextAnnotatorState } from '@/state';
-import { computeZIndex } from '@/utils/highlight/';
+import type { TextAnnotation } from '../../model';
+import type { TextAnnotatorState } from '../../state';
+import { computeZIndex } from '../../utils/highlight/';
 import { 
   computeStyle,
   createRenderer,
@@ -12,7 +12,7 @@ import {
   type Painter, 
   type RendererFactory, 
   type ViewportBounds 
-} from '@/rendering';
+} from '../';
 
 import './spans-renderer.css';
 

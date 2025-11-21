@@ -11,11 +11,11 @@ import type {
   SelectionState, 
   HoverState, 
 } from '@annotorious/core';
-import type { TextAnnotation, TextAnnotationTarget } from '@/model';
-import { createSpatialTree, type SpatialTreeEvents } from '@/state/spatial-tree';
-import type { AnnotationRects, TextAnnotationStore } from '@/state/text-annotation-store';
-import { isRevived, reviveAnnotation, reviveTarget } from '@/utils/annotation';
-import type { TextAnnotatorOptions } from '@/text-annotator-options';
+import type { TextAnnotation, TextAnnotationTarget } from '../model';
+import { createSpatialTree, type SpatialTreeEvents } from '../state/spatial-tree';
+import type { AnnotationRects, TextAnnotationStore } from '../state/text-annotation-store';
+import { isRevived, reviveAnnotation, reviveTarget } from '../utils/annotation';
+import type { TextAnnotatorOptions } from '../text-annotator-options';
 
 export interface TextAnnotatorState<I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation> extends AnnotatorState<I, E> {
 

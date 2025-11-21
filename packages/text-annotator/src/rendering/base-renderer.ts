@@ -1,18 +1,18 @@
 import { createNanoEvents, type Unsubscribe } from 'nanoevents';
 import { UserSelectAction, type Filter, type ViewportState } from '@annotorious/core';
-import type { TextAnnotation } from '@/model';
-import type { TextAnnotatorState } from '@/state';
+import type { TextAnnotation } from '../model';
+import type { TextAnnotatorState } from '../state';
 import { 
   type Highlight,
   type HighlightStyleExpression,
   type ViewportBounds,
   getViewportBounds, 
   trackViewport 
-} from '@/rendering';
+} from './';
 // Note that the debounce npm package has the same issue as below under
 // some circumstances:
 // https://github.com/agentcooper/react-pdf-highlighter/issues/276
-import { debounce } from '@/utils/events';
+import { debounce } from '../utils/events';
 
 /**
  * The renderer runtime interface.

@@ -4,12 +4,12 @@ import hotkeys from 'hotkeys-js';
 import { poll } from 'poll';
 import { Origin } from '@annotorious/core';
 import type { Filter, Lifecycle, Selection, User } from '@annotorious/core';
-import type { TextAnnotatorState } from '@/state';
-import type { TextAnnotation, TextAnnotationTarget } from '@/model';
-import type { AnnotatingMode } from '@/text-annotator';
-import type { TextAnnotatorOptions } from '@/text-annotator-options';
-import { rangeToSelector } from '@/utils/annotation';
-import { clonePointerEvent, cloneKeyboardEvent } from '@/utils/events';
+import type { TextAnnotatorState } from './state';
+import type { TextAnnotation, TextAnnotationTarget } from './model';
+import type { AnnotatingMode } from './text-annotator';
+import type { TextAnnotatorOptions } from './text-annotator-options';
+import { rangeToSelector } from './utils/annotation';
+import { clonePointerEvent, cloneKeyboardEvent } from './utils/events';
 import { 
   isMac,
   isNotAnnotatable,
@@ -17,7 +17,7 @@ import {
   mergeRanges,
   splitAnnotatableRanges,
   trimRangeToContainer
-} from '@/utils/dom';
+} from './utils/dom';
 
 const CLICK_TIMEOUT = 300;
 

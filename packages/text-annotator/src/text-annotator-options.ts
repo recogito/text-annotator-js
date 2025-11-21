@@ -1,6 +1,6 @@
 import type { FormatAdapter, UserSelectActionExpression, User } from '@annotorious/core';
-import type { HighlightStyleExpression, RendererFactory } from '@/rendering';
-import type { TextAnnotation } from '@/model';
+import type { HighlightStyleExpression, RendererFactory } from './rendering';
+import type { TextAnnotation } from './model';
 
 export interface TextAnnotatorOptions<I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation> {
 

@@ -1,7 +1,7 @@
 import { colord } from 'colord';
 import type { AnnotationState, Color, DrawingStyle } from '@annotorious/core';
-import type { TextAnnotation } from '@/model';
-import type { Highlight } from '@/rendering';
+import type { TextAnnotation } from '../model';
+import type { Highlight } from './';
 
 export interface HighlightStyle extends Pick<DrawingStyle, 'fill' | 'fillOpacity'> {
 

@@ -7,26 +7,26 @@ import {
   createLifecycleObserver,
   createUndoStack 
 } from '@annotorious/core';
-import type { HighlightStyleExpression, Renderer, RendererFactory } from '@/rendering';
-import { createSpansRenderer } from '@/rendering/renderer-spans';
-import { createCSSHighlightRenderer } from '@/rendering/renderer-css-highlight';
-import type { TextAnnotation } from '@/model';
+import type { HighlightStyleExpression, Renderer, RendererFactory } from './rendering';
+import { createSpansRenderer } from './rendering/renderer-spans';
+import { createCSSHighlightRenderer } from './rendering/renderer-css-highlight';
+import type { TextAnnotation } from './model';
 import { 
   type TextAnnotationStore, 
   type TextAnnotatorState, 
   createTextAnnotatorState 
-} from '@/state';
-import { scrollIntoView } from '@/utils/annotation';
-import { programmaticallyFocusable } from '@/utils/dom';
-import { cancelSingleClickEvents } from '@/utils/events';
-import { createSelectionHandler } from '@/selection-handler';
+} from './state';
+import { scrollIntoView } from './utils/annotation';
+import { programmaticallyFocusable } from './utils/dom';
+import { cancelSingleClickEvents } from './utils/events';
+import { createSelectionHandler } from './selection-handler';
 import { 
   type RendererType, 
   type TextAnnotatorOptions,
   fillDefaults
-} from '@/text-annotator-options';
+} from './text-annotator-options';
 
-import '@/text-annotator.css';
+import './text-annotator.css';
 
 const USE_DEFAULT_RENDERER: RendererType = 'SPANS';
 

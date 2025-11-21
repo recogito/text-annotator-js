@@ -1,4 +1,4 @@
-import { NOT_ANNOTATABLE_SELECTOR } from '@/utils/dom';
+import { NOT_ANNOTATABLE_SELECTOR } from '../dom';
 
 /**
  * Calls .preventDefault() on click events in annotable areas, in order

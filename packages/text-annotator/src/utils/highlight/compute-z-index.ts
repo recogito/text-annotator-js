@@ -1,5 +1,5 @@
-import type { Highlight } from '@/rendering';
-import type { Rect } from '@/state';
+import type { Highlight } from '../../rendering';
+import type { Rect } from '../../state';
 
 export const computeZIndex = (rect: Rect, all: Highlight[]): number => {
   const intersects = (a: Rect, b: Rect): boolean => (

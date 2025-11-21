@@ -1,4 +1,4 @@
-import { isRangeAnnotatable, NOT_ANNOTATABLE_CLASS, NOT_ANNOTATABLE_SELECTOR } from '@/utils/dom';
+import { isRangeAnnotatable, NOT_ANNOTATABLE_CLASS, NOT_ANNOTATABLE_SELECTOR } from '../dom';
 
 const iterateNotAnnotatableElements = function*(range: Range): Generator<HTMLElement> {
   const notAnnotatableIterator = document.createNodeIterator(

@@ -1,7 +1,7 @@
 import type { ViewportState } from '@annotorious/core';
 import { colord } from 'colord';
-import type { TextAnnotation } from '@/model';
-import type { TextAnnotatorState } from '@/state';
+import type { TextAnnotation } from '../../model';
+import type { TextAnnotatorState } from '../../state';
 import { 
   computeStyle,
   createRenderer,
@@ -13,7 +13,7 @@ import {
   type Painter, 
   type RendererFactory, 
   type ViewportBounds 
-} from '@/rendering';
+} from '../';
 
 const toCSS = (s?: HighlightStyle) => {
   const backgroundColor = colord(s?.fill || DEFAULT_STYLE.fill)
