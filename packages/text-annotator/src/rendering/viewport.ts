@@ -1,5 +1,5 @@
 import type { ViewportState } from '@annotorious/core';
-import type { TextAnnotation } from '@/model';
+import type { TextAnnotation } from '../model';
 
 export interface ViewportBounds {
 

@@ -16,8 +16,8 @@
     "./packages/text-annotator",
     "./packages/text-annotator-tei",
     "./packages/text-annotator-react",
-    "./plugins/awareness",
-    "./plugins/inline-markers"
+    "./packages/pdf-annotator",
+    "./packages/pdf-annotator-react"
   ],
   "devDependencies": {
     "vite-plugin-dts": "^4.5.4"

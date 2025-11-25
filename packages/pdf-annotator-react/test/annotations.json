@@ -1,0 +1,82 @@
+[
+  {
+    "id": "317adb64-7d66-41bf-9a00-eebbd905fd81",
+    "bodies": [],
+    "target": {
+      "annotation": "317adb64-7d66-41bf-9a00-eebbd905fd81",
+      "selector": [{
+        "quote": "We present a trace-based compilation technique for dynamiclanguages that reconciles speed of compilation with excellent per-formance of the generated machine code. Our system uses a mixed-mode execution approach: the system starts running JavaScript in afast-starting bytecode interpreter. As the program runs, the systemidentiﬁes hot (frequently executed) bytecode sequences, recordsthem, and compiles them to fast native code. We call such a se-quence of instructions a trace",
+        "start": 3589,
+        "end": 4066,
+        "range": {},
+        "offsetReference": {},
+        "pageNumber": 1
+      }],
+      "creator": {
+        "isGuest": true,
+        "id": "nuPGkgB78UAqgmyUysJ1"
+      },
+      "created": "2023-10-13T07:44:48.598Z"
+    }
+  },
+  {
+    "id": "f01a6746-b142-40e3-a12e-b657914e8566",
+    "bodies": [],
+    "target": {
+      "annotation": "f01a6746-b142-40e3-a12e-b657914e8566",
+      "selector": [{
+        "quote": "We solve the nested loop problem by recording nested tracetrees. Our system traces the inner loop exactly as the na¨ıve version.The system stops extending the inner tree when it reaches an outerloop, but then it starts a new trace at the outer loop header. Whenthe outer loop reaches the inner loop header, the system tries to callthe trace tree for the inner loop. If the call succeeds, the VM recordsthe call to the inner tree as part of the outer trace and ﬁnishesthe outer trace as normal. In this way, our system can trace anynumber of loops nested to any depth without causing excessive tailduplication",
+        "start": 1366,
+        "end": 1974,
+        "range": {},
+        "offsetReference": {},
+        "pageNumber": 2
+      }],
+      "creator": {
+        "isGuest": true,
+        "id": "nuPGkgB78UAqgmyUysJ1"
+      },
+      "created": "2023-10-13T07:45:17.581Z"
+    }
+  },
+  {
+    "id": "0611d9e8-4d21-4048-9529-4dcc2ba4a174",
+    "bodies": [],
+    "target": {
+      "annotation": "0611d9e8-4d21-4048-9529-4dcc2ba4a174",
+      "selector": [{
+        "quote": "Work is underway in a number of areas to further improve theperformance of our trace-based JavaScript compiler. We currentlydo not trace across recursive function calls, but plan to add thesupport for this capability in the near term. We are also exploringadoption of the existing work on tree recompilation in the contextof the presented dynamic compiler in order to minimize JIT pausetimes and obtain the best of both worlds, fast tree stitching as wellas the improved code quality due to tree recompilation.",
+        "start": 5001,
+        "end": 5511,
+        "range": {},
+        "offsetReference": {},
+        "pageNumber": 13
+      }],
+      "creator": {
+        "isGuest": true,
+        "id": "nuPGkgB78UAqgmyUysJ1"
+      },
+      "created": "2023-10-13T07:45:42.530Z"
+    }
+  },
+  {
+    "id": "307dfdc5-4039-46a7-98f1-e7ccb40fc097",
+    "bodies": [],
+    "target": {
+      "annotation": "307dfdc5-4039-46a7-98f1-e7ccb40fc097",
+      "selector": [{
+        "quote": " This is a vast simpliﬁcationand speedup compared to the original interpreter code. Inheritancerelationships and object representations can change during execu-tion, so the simpliﬁed code requires guard instructions that ensurethe object representation is the same. In TraceMonkey, objects’ rep-resentations are assigned an integer key called the object shape.Thus, the guard is a simple equality check on the object shape.Representation specialization: numbers. JavaScript has nointeger type, only a Number type that is the set of 64-bit IEEE-754 ﬂoating-pointer numbers (“doubles”). But many JavaScriptoperators, in particular array accesses and bitwise operators, reallyoperate on integers, so they ﬁrst convert the number to an integer,and then convert any integer result back to a double.1 Clearly, aJavaScript VM that wants to be fast must ﬁnd a way to operate onintegers directly and avoid these conversions.In TraceMonkey, we support two representations for numbers:integers and doubles. The interpreter uses integer representationsas much as it can, switching for results that can only be representedas doubles. When a trace is started, some values may be importedand represented as integers. Some operations on integers requireguards. For example, adding two integers can produce a value toolarge for the integer representation.Function inlining. LIR traces can cross function boundariesin either direction, achieving function inlining. Move instructionsneed to be recorded for function entry and exit to copy argumentsin and return values out. These move statements are then optimizedaway by the compiler using copy propagation. In order to be ableto return to the interpreter, the trace must also generate LIR torecord that a call frame has been entered and exited. The frameentry and exit LIR saves just enough information to allow theintepreter call stack to be restored later and is much simpler thanthe interpreter’s standard call code. If the function being enteredis not constant (which in JavaScript includes any call by functionname), the recorder must",
+        "start": 7109,
+        "end": 9181,
+        "range": {},
+        "offsetReference": {},
+        "pageNumber": 4
+      }],
+      "creator": {
+        "isGuest": true,
+        "id": "riDJqR91CAHET2mgXxNy"
+      },
+      "created": "2023-10-13T08:14:06.646Z"
+    }
+  }
+]

@@ -1,5 +1,5 @@
-export * from './rendering';
 export * from './model';
+export * from './rendering';
 export * from './state';
 export * from './utils/annotation';
 export * from './utils/dom';

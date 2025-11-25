@@ -124,7 +124,7 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
   }
 
   const setAnnotatingMode = (mode?: AnnotatingMode) => {
-    selectionHandler.setAnnotatingMode(mode)
+    selectionHandler.setAnnotatingMode(mode);
   }
 
   const setFilter = (filter?: Filter<I>) => {
