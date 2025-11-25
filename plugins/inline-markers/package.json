@@ -26,6 +26,6 @@
     "vite": "^6.4.1"
   },
   "dependencies": {
-    "@recogito/text-annotator": "^3.4.3"
+    "@recogito/text-annotator": "^4.0.0-beta"
   }
 }

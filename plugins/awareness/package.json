@@ -13,7 +13,7 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/plugin-awarenss.es.js"
+      "import": "./dist/plugin-awareness.es.js"
     }
   },
   "scripts": {
