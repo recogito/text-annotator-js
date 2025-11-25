@@ -3,9 +3,9 @@ import type { PresenceProvider } from '@annotorious/core';
 import type { PresenceLayerOptions } from './presence-layer-options';
 import { createPresenceLayer } from './presence-layer';
 
-export const mountPlugin = (anno: TextAnnotator, opts: PresenceLayerOptions) => {
+export const mountPlugin = (anno: TextAnnotator, opts?: PresenceLayerOptions) => {
 
-  const layer = createPresenceLayer(anno, opts);
+  const layer = createPresenceLayer(anno, opts || {});
 
   // Monkey-patch the annotator, to make the API Annotorious-/legacy compatible 
   const _destroy = anno.destroy;
@@ -17,8 +17,15 @@ export const mountPlugin = (anno: TextAnnotator, opts: PresenceLayerOptions) => 
   anno.setPresenceProvider = (provider: PresenceProvider) => {
     layer.setProvider(provider);
   }
+
+  const unmount = () => {
+    layer.destroy();
+  }
   
-  return layer;
+  return {
+    ...layer,
+    unmount
+  }
 }
 
 export * from './presence-layer';

@@ -2,7 +2,7 @@ import { PresenceProvider } from '@annotorious/core';
 
 export interface PresenceLayerOptions {
 
-  provider: PresenceProvider;
+  provider?: PresenceProvider;
 
   font?: string;
 
