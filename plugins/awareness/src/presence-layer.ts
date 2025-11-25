@@ -1,4 +1,4 @@
-import type { Color, PresentUser } from '@annotorious/core';
+import type { Color, PresenceProvider, PresentUser } from '@annotorious/core';
 import { TextAnnotator } from '@recogito/text-annotator';
 import { PresenceLayerOptions } from './presence-layer-options';
 
@@ -29,34 +29,34 @@ export const createPresenceLayer = (
 
   const trackedAnnotations = new Map<string, PresentUser>();
 
+  const setProvider = (provider: PresenceProvider) => {
+    provider.on('selectionChange', (p: PresentUser, selection: string[] | null) => {
+      // Remove this user's previous selection
+      const currentIds = getAnnotationsForUser(p);
+
+      currentIds.forEach(id => {
+        trackedAnnotations.delete(id);
+        anno.setStyle(undefined, id);
+      });
+
+      // Set new selection (if any)
+      if (selection)
+        selection.forEach(id => { 
+          trackedAnnotations.set(id, p);
+          anno.setStyle({ fill: p.appearance.color as Color }, id);
+        });
+    });
+  }
+
   const getAnnotationsForUser = (p: PresentUser) =>
     Array.from(trackedAnnotations.entries())
       .filter(([_, user]) => user.presenceKey === p.presenceKey)
       .map(([id, _]) => id);
 
-  opts.provider.on('selectionChange', (p: PresentUser, selection: string[] | null) => {
-    // Remove this user's previous selection
-    const currentIds = getAnnotationsForUser(p);
-
-    currentIds.forEach(id => {
-      trackedAnnotations.delete(id);
-      anno.setStyle(undefined, id);
-    });
-
-    // Set new selection (if any)
-    if (selection)
-      selection.forEach(id => { 
-        trackedAnnotations.set(id, p);
-        anno.setStyle({ fill: p.appearance.color as Color }, id);
-      });
-  });  
-
   const clear = () => {
     const { width, height } = canvas;
     ctx.clearRect(-0.5, -0.5, width + 1, height + 1);
   }
-
-  anno.renderer.on('onRedraw', () => redraw());
 
   const redraw = () => {
     clear();
@@ -108,6 +108,10 @@ export const createPresenceLayer = (
 
   window.addEventListener('resize', onResize);
 
+  anno.renderer.on('onRedraw', () => redraw());
+
+  if (opts.provider) setProvider(opts.provider);
+
   const destroy = () => {
     canvas.remove();
     window.removeEventListener('resize', onResize);
@@ -116,7 +120,8 @@ export const createPresenceLayer = (
   return {
     clear,
     destroy,
-    reset
+    reset,
+    setProvider
   }
   
 }
