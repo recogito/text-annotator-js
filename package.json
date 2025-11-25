@@ -1,6 +1,6 @@
 {
   "name": "@recogito/text-annotator-monorepo",
-  "version": "3.4.9",
+  "version": "4.0.0-beta",
   "description": "Recogito Text Annotator monorepo",
   "author": "Rainer Simon",
   "repository": {
