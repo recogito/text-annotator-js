@@ -1,4 +1,4 @@
-export * from './PDFAnnotator';
+export * from './pdf-annotator';
 
 // Essential re-exports from @recogito/pdf-annotator
 export type {

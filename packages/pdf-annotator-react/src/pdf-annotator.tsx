@@ -4,7 +4,7 @@ import { Filter, TextAnnotatorOptions, HighlightStyleExpression } from '@recogit
 import { createPDFAnnotator, PDFAnnotator as VanillaPDFAnnotator, PDFScale, PDFAnnotation } from '@recogito/pdf-annotator';
 
 import '@recogito/pdf-annotator/pdf-anntator.css';
-import './PDFAnnotator.css';
+import './pdf-annotator.css';
 
 export type PDFAnnotatorProps = TextAnnotatorOptions<PDFAnnotation, PDFAnnotation> & {
 
