@@ -4,7 +4,7 @@
  * It's required to process keyboard events on an element that is not natively focusable.
  */
 export const programmaticallyFocusable = (container: HTMLElement) => {
-  if (!container.hasAttribute('tabindex') && container.tabIndex < 0) {
+  if (!container.hasAttribute('tabindex') || container.tabIndex < -1) {
     container.setAttribute('tabindex', '-1');
   }
 
