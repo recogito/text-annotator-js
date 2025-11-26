@@ -4,24 +4,31 @@ import type {
   HoverState, 
   SelectionState, 
   TextAnnotation, 
+  TextAnnotationStore, 
   TextAnnotationTarget, 
   TextAnnotatorOptions,
   TextAnnotatorState,
   TextSelector
 } from '@recogito/text-annotator';
-import { shouldNotify } from '@annotorious/core';
-import type { 
-  StoreChangeEvent, 
-  StoreObserveOptions, 
-  StoreObserver, 
-  ViewportState, 
-  Update,
+import { 
+  shouldNotify,
+  type StoreChangeEvent, 
+  type StoreObserveOptions, 
+  type StoreObserver, 
+  type ViewportState, 
+  type Update,
 } from '@annotorious/core';
-import type { PDFAnnotation, PDFAnnotationTarget } from '../PDFAnnotation';
-import { getQuadPoints, reviveAnnotation, reviveTarget } from './utils';
-import type { PDFAnnotationStore } from './PDFAnnotationStore';
-import { createRenderedAnnotationsMap } from './renderedAnnotations';
-import { splitSelector } from './utils/splitSelector';
+import type { PDFAnnotation, PDFAnnotationTarget } from '../model/core/pdf-annotation';
+import { reviveAnnotation, reviveTarget } from '../utils/annotation';
+import { getQuadPoints } from '../utils/pdf';
+import { createRenderedAnnotationsMap } from './rendered-annotations';
+import { splitSelector } from '../utils/dom/split-selector';
+
+export interface PDFAnnotationStore extends TextAnnotationStore<PDFAnnotation> {
+
+  onLazyRender(page: number): void;   
+  
+}
 
 export interface PDFAnnotatorState extends TextAnnotatorState<PDFAnnotation, PDFAnnotation> {
 

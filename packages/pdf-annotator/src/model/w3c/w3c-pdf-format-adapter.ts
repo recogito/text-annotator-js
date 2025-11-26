@@ -1,7 +1,7 @@
 import { serializeW3CBodies } from '@annotorious/core';
 import type { FormatAdapter, ParseResult } from '@annotorious/core';
-import type { PDFAnnotation } from '../PDFAnnotation';
-import type { W3CPDFAnnotation } from './W3CPDFAnnotation';
+import type { PDFAnnotation } from '../core/pdf-annotation';
+import type { W3CPDFAnnotation } from './w3c-pdf-annotation';
 
 export type W3CPDFFormatAdapter = FormatAdapter<PDFAnnotation, W3CPDFAnnotation>;
 

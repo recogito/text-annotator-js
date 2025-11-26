@@ -1,2 +1,1 @@
-export * from './PDFAnnotationStore';
-export * from './PDFAnnotatorState';
+export * from './pdf-annotator-state';

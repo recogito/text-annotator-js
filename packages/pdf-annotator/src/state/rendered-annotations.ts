@@ -1,4 +1,4 @@
-import type { PDFAnnotation, PDFAnnotationTarget, PDFSelector } from '../PDFAnnotation';
+import type { PDFAnnotation, PDFAnnotationTarget, PDFSelector } from '../model/core/pdf-annotation';
 
 // Keep track of annotations per page because PDF.js does lazy rendering.
 export const createRenderedAnnotationsMap = () => {

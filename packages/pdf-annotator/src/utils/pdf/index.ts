@@ -1,3 +1,3 @@
+export * from './get-quad-points';
 export * from './scale';
-export * from './scrollIntoView';
 export * from './zoom';

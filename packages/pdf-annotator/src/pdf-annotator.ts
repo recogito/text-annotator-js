@@ -1,21 +1,22 @@
 import { createSelectionHandler, createSpansRenderer, fillDefaults } from '@recogito/text-annotator';
-import type { AnnotatingMode, HighlightStyleExpression, TextAnnotator, TextAnnotatorOptions } from '@recogito/text-annotator';
+import type { 
+  AnnotatingMode, 
+  HighlightStyleExpression, 
+  TextAnnotator, 
+  TextAnnotatorOptions 
+} from '@recogito/text-annotator';
 import { createBaseAnnotator, createLifecycleObserver, createUndoStack } from '@annotorious/core';
 import type { Filter, User } from '@annotorious/core';
-import { addResizeObserver } from './responsive';
-import type { PDFScale } from './PDFScale';
-import type { PDFAnnotation } from './PDFAnnotation';
-import { createPDFViewer } from './createPDFViewer';
+import type { PDFAnnotation } from './model/core/pdf-annotation';
+import { createPDFViewer } from './create-pdf-viewer';
 import { createPDFAnnotatorState } from './state';
-import { 
-  setScale as _setScale,
-  zoomIn as _zoomIn,
-  zoomOut as _zoomOut,
-  scrollIntoView as _scrollIntoView
- } from './api';
+import type { PDFScale } from './utils/pdf';
+import { addResizeObserver } from './utils/dom';
+import { scrollIntoView as _scrollIntoView } from './utils/annotation';
+import { setScale as _setScale, zoomIn as _zoomIn, zoomOut as _zoomOut } from './utils/pdf';
 
-import './PDFAnnotator.css';
 import '@recogito/text-annotator/text-annotator.css';
+import './pdf-annotator.css';
 
 export interface PDFAnnotator extends Omit<TextAnnotator<PDFAnnotation, PDFAnnotation>, 'setAnnotatingEnabled' | 'redraw'> {
 

@@ -1,4 +1,1 @@
-export * from './PDFAnnotation';
-export * from './PDFAnnotator';
-export * from './PDFScale';
-
+export * from './pdf-annotator';

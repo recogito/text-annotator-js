@@ -26,20 +26,6 @@ const CMAP_PACKED = true;
 
 const ENABLE_XFA = true;
 
-export const addResizeObserver = (container: HTMLDivElement, callback: () => void) => {
-
-  const observer = new ResizeObserver(() => {
-    callback();
-  });
-
-  observer.observe(container);
-
-  return () => {
-    observer.disconnect();
-  }
-
-}
-
 export const createPDFViewer = (
   container: HTMLDivElement,
   pdfURL: string,
