@@ -15,10 +15,7 @@ export default defineConfig({
     sourcemap: true,
     target: 'esnext',
     lib: {
-      entry: {
-        'index': './src/index.ts',
-        'w3c/index': './src/w3c/index.ts'
-      },
+      entry: './src/index.ts',
       formats: ['es'],
     },
     rollupOptions: {
