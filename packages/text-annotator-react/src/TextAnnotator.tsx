@@ -1,7 +1,7 @@
 import { JSX, ReactNode, useContext, useEffect, useRef } from 'react';
 import { AnnotoriousContext, Filter } from '@annotorious/react';
 import type { FormatAdapter } from '@annotorious/core';
-import type { AnnotatingMode, HighlightStyleExpression, TextAnnotation, TextAnnotatorOptions } from '@recogito/text-annotator';
+import type { AnnotatingMode, TextAnnotation, TextAnnotatorOptions } from '@recogito/text-annotator';
 import { createTextAnnotator } from '@recogito/text-annotator';
 
 import '@recogito/text-annotator/text-annotator.css';
@@ -28,7 +28,7 @@ export const TextAnnotator = <I extends TextAnnotation = TextAnnotation, E exten
 
   const { className, children, ...opts } = props;
 
-  const { style, filter, user, annotatingEnabled, annotatingMode } = opts;
+  const { style, filter, user, annotatingEnabled, userSelectAction, annotatingMode } = opts;
 
   const { anno, setAnno } = useContext(AnnotoriousContext);
 
@@ -48,6 +48,8 @@ export const TextAnnotator = <I extends TextAnnotation = TextAnnotation, E exten
   useEffect(() => anno?.setFilter(filter), [anno, filter]);
 
   useEffect(() => anno?.setUser(user), [anno, user]);
+
+  useEffect(() => anno?.setUserSelectAction(userSelectAction), [anno, userSelectAction]);
 
   useEffect(() => anno?.setAnnotatingEnabled(annotatingEnabled), [anno, annotatingEnabled]);
 
