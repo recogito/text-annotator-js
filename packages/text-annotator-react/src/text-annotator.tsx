@@ -28,7 +28,7 @@ export const TextAnnotator = <I extends TextAnnotation = TextAnnotation, E exten
 
   const { className, children, ...opts } = props;
 
-  const { style, filter, user, annotatingEnabled, annotatingMode } = opts;
+  const { style, filter, user, annotatingEnabled, userSelectAction, annotatingMode } = opts;
 
   const { anno, setAnno } = useContext(AnnotoriousContext);
 
@@ -48,6 +48,8 @@ export const TextAnnotator = <I extends TextAnnotation = TextAnnotation, E exten
   useEffect(() => anno?.setFilter(filter), [anno, filter]);
 
   useEffect(() => anno?.setUser(user), [anno, user]);
+
+  useEffect(() => anno?.setUserSelectAction(userSelectAction), [anno, userSelectAction]);
 
   useEffect(() => anno?.setAnnotatingEnabled(annotatingEnabled), [anno, annotatingEnabled]);
 
