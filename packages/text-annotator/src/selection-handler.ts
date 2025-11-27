@@ -183,7 +183,22 @@ export const createSelectionHandler = (
       }
     }
 
-    if (!currentTarget) onSelectStart();
+    /*
+     Let's assume the user drags the selection from outside the annotatable area
+     over the annotatable area (intersection!). Then drags it out again
+     (no intersection!), then in again (intersection). Because the
+     currentTarget will have been cleared, meanwhile, execution will stop.
+
+     But we don't want this - instead, processing should continue as normal,
+     and a new currentTarget should be computed when the user drags the
+     selection into the annotatable area a second time.
+    */
+    if (!currentTarget) {
+      onSelectStart();
+
+      // If the currentTarget is still missing -> bail out
+      if (!currentTarget) return;
+    }
 
     if (sel.isCollapsed) {
       /**
