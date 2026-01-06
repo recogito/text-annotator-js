@@ -1,5 +1,3 @@
-import { UAParser } from 'ua-parser-js';
-import { OSName } from 'ua-parser-js/enums';
-
-const ua = UAParser();
-export const isMac = ua.os.is(OSName.MACOS);
+// Simple macOS detection without external dependencies
+// navigator.platform returns "MacIntel" or "MacPPC" on macOS
+export const isMac = typeof navigator !== 'undefined' && navigator.platform.startsWith('Mac');
