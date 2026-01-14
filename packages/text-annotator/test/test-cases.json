@@ -406,7 +406,7 @@
       "lines": "301-308",
       "category": "SelectionHandler/onPointerUp",
       "description": "clickSelect should handle dismissOnNotAnnotatable='ALWAYS' by clearing selection",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-ptr-up-004",

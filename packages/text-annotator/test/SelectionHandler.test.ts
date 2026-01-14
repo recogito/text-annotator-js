@@ -2578,5 +2578,52 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should handle dismissOnNotAnnotatable=ALWAYS by clearing selection (sh-ptr-up-003)', async () => {
+      // Create handler with dismissOnNotAnnotatable='ALWAYS'
+      const optionsWithDismiss = {
+        ...mockOptions,
+        dismissOnNotAnnotatable: 'ALWAYS' as const
+      };
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, optionsWithDismiss);
+
+      // Create a not-annotatable element inside the container
+      const notAnnotatableElement = document.createElement('span');
+      notAnnotatableElement.setAttribute('data-not-annotatable', 'true');
+      notAnnotatableElement.textContent = 'Not annotatable';
+      container.appendChild(notAnnotatableElement);
+
+      // Dispatch a left click pointer down event
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 10,
+        clientY: 10
+      });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Dispatch a pointer up event on the not-annotatable element
+      const pointerUpEvent = new (global.PointerEvent || MouseEvent)('pointerup', {
+        bubbles: true,
+        button: 0,
+        clientX: 10,
+        clientY: 10
+      });
+      Object.defineProperty(pointerUpEvent, 'target', { value: notAnnotatableElement });
+      document.dispatchEvent(pointerUpEvent);
+
+      // Wait for async operations
+      await new Promise(resolve => setTimeout(resolve, 60));
+
+      // At lines 301-308: when clicking on a not-annotatable element
+      // and dismissOnNotAnnotatable === 'ALWAYS', selection.clear() should be called
+      expect(mockState.selection.clear).toHaveBeenCalled();
+
+      // Remove the not-annotatable element
+      notAnnotatableElement.remove();
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });
