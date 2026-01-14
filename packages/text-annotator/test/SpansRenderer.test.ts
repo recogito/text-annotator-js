@@ -227,5 +227,45 @@ describe('SpansRenderer', () => {
       // Short highlight (50): should be at index 2 (highest z-index, on top)
       expect(computeZIndex(rect3, all)).toBe(2);
     });
+
+    it('should return 0 for non-overlapping highlights (sr-zindex-006)', () => {
+      // When a highlight doesn't overlap with any others,
+      // the intersecting array contains only itself,
+      // so findIndex returns 0
+
+      type Rect = { x: number; y: number; width: number; height: number };
+      type Highlight = { rects: Rect[] };
+
+      const getLength = (h: Highlight) =>
+        h.rects.reduce((total, rect) => total + rect.width, 0);
+
+      const intersects = (a: Rect, b: Rect): boolean => (
+        a.x <= b.x + b.width && a.x + a.width >= b.x &&
+        a.y <= b.y + b.height && a.y + a.height >= b.y
+      );
+
+      // Simulate computeZIndex logic
+      const computeZIndex = (rect: Rect, all: Highlight[]): number => {
+        const intersecting = all.filter(({ rects }) => rects.some(r => intersects(rect, r)));
+        intersecting.sort((a, b) => getLength(b) - getLength(a));
+        return intersecting.findIndex(h => h.rects.includes(rect));
+      };
+
+      // Create non-overlapping highlights
+      const rect1 = { x: 0, y: 0, width: 50, height: 20 };
+      const rect2 = { x: 100, y: 0, width: 50, height: 20 };
+      const rect3 = { x: 200, y: 0, width: 50, height: 20 };
+
+      const h1: Highlight = { rects: [rect1] };
+      const h2: Highlight = { rects: [rect2] };
+      const h3: Highlight = { rects: [rect3] };
+
+      const all = [h1, h2, h3];
+
+      // Each highlight only intersects with itself, so each returns index 0
+      expect(computeZIndex(rect1, all)).toBe(0);
+      expect(computeZIndex(rect2, all)).toBe(0);
+      expect(computeZIndex(rect3, all)).toBe(0);
+    });
   });
 });

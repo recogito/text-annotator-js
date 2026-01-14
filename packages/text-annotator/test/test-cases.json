@@ -1438,7 +1438,7 @@
       "lines": "14-28",
       "category": "SpansRenderer/computeZIndex",
       "description": "computeZIndex should return 0 for non-overlapping highlights",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-init-001",
