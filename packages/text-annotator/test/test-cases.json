@@ -1462,7 +1462,7 @@
       "lines": "37",
       "category": "SpansRenderer/Initialization",
       "description": "createRenderer should insert highlight layer as first child of container",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-redraw-001",

@@ -339,5 +339,48 @@ describe('SpansRenderer', () => {
 
       renderer.destroy();
     });
+
+    it('should insert highlight layer as first child of container (sr-init-003)', async () => {
+      // At line 37: container.insertBefore(highlightLayer, container.firstChild)
+      const { createSpansRenderer } = await import('../src/highlight/span/spansRenderer');
+
+      // Add some existing content to the container
+      const existingChild = document.createElement('p');
+      existingChild.textContent = 'Existing content';
+      container.appendChild(existingChild);
+
+      const mockState = {
+        store: {
+          observe: vi.fn(),
+          unobserve: vi.fn(),
+          getAt: vi.fn().mockReturnValue(null),
+          getIntersecting: vi.fn().mockReturnValue([]),
+          recalculatePositions: vi.fn()
+        },
+        selection: {
+          selected: [],
+          subscribe: vi.fn().mockReturnValue(vi.fn()),
+          evalSelectAction: vi.fn().mockReturnValue('NONE')
+        },
+        hover: {
+          current: null,
+          set: vi.fn(),
+          subscribe: vi.fn().mockReturnValue(vi.fn())
+        }
+      };
+
+      const mockViewport = {};
+
+      const renderer = createSpansRenderer(container, mockState as any, mockViewport as any);
+
+      // The highlight layer should be the first child
+      expect(container.firstChild?.nodeName.toLowerCase()).toBe('div');
+      expect((container.firstChild as HTMLElement).classList.contains('r6o-span-highlight-layer')).toBe(true);
+
+      // The existing content should now be the second child
+      expect(container.children[1]).toBe(existingChild);
+
+      renderer.destroy();
+    });
   });
 });
