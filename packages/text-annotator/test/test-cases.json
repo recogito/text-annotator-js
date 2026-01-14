@@ -1670,7 +1670,7 @@
       "lines": "129-133",
       "category": "SpansRenderer/Factory",
       "description": "createSpansRenderer should call createBaseRenderer with container, state, viewport, and renderer",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-factory-002",
