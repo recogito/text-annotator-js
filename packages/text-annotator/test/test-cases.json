@@ -1318,7 +1318,7 @@
       "lines": "193",
       "category": "Renderer/destroy",
       "description": "destroy should remove scroll listener from document",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-destroy-007",
