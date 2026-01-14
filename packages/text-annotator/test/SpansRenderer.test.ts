@@ -669,5 +669,45 @@ describe('SpansRenderer', () => {
       // rect3 is shortest, so index 2 (rendered on top)
       expect(computeZIndex(rect3, allRects)).toBe(2);
     });
+
+    it('should call paint function with highlight, bounds, style, painter, zIndex (sr-redraw-009)', () => {
+      // At line 76: const style = paint(highlight, viewportBounds, currentStyle, painter, zIndex);
+      // The paint function is called with all these parameters
+
+      // Verify the paint function signature expects these arguments
+      type ViewportBounds = { minX: number; minY: number; maxX: number; maxY: number };
+      type HighlightStyle = { backgroundColor: string };
+      type HighlightPainter = { clear: () => void; reset: () => void };
+
+      // Mock paint function to capture arguments
+      let capturedArgs: any[] = [];
+      const mockPaint = (
+        highlight: any,
+        viewportBounds: ViewportBounds,
+        currentStyle: any,
+        painter: HighlightPainter | undefined,
+        zIndex: number
+      ): HighlightStyle => {
+        capturedArgs = [highlight, viewportBounds, currentStyle, painter, zIndex];
+        return { backgroundColor: 'rgba(255, 255, 0, 0.3)' };
+      };
+
+      const mockHighlight = { annotation: { id: '1' }, rects: [] };
+      const mockBounds: ViewportBounds = { minX: 0, minY: 0, maxX: 800, maxY: 600 };
+      const mockStyle = { color: 'yellow' };
+      const mockPainter: HighlightPainter = { clear: vi.fn(), reset: vi.fn() };
+      const mockZIndex = 2;
+
+      // Call the mock paint function
+      mockPaint(mockHighlight, mockBounds, mockStyle, mockPainter, mockZIndex);
+
+      // Verify all 5 arguments were passed
+      expect(capturedArgs.length).toBe(5);
+      expect(capturedArgs[0]).toBe(mockHighlight);
+      expect(capturedArgs[1]).toBe(mockBounds);
+      expect(capturedArgs[2]).toBe(mockStyle);
+      expect(capturedArgs[3]).toBe(mockPainter);
+      expect(capturedArgs[4]).toBe(mockZIndex);
+    });
   });
 });

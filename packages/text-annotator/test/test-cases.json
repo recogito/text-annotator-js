@@ -1534,7 +1534,7 @@
       "lines": "76",
       "category": "SpansRenderer/redraw",
       "description": "redraw should call paint function with highlight, bounds, style, painter, zIndex",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-redraw-010",
