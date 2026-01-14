@@ -86,7 +86,7 @@
       "lines": "90-92",
       "category": "SelectionHandler/isAddToCurrentSelect",
       "description": "isAddToCurrentSelect should return true on metaKey when allowModifierSelect and Mac",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-add-to-current-004",
