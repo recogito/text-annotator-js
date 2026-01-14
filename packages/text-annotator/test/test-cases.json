@@ -254,7 +254,7 @@
       "lines": "216",
       "category": "SelectionHandler/onSelectionChange",
       "description": "onSelectionChange should clear selection before deleting annotation on collapse",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-sel-change-012",

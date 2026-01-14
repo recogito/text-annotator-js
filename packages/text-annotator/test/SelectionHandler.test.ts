@@ -1545,5 +1545,78 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should clear selection before deleting annotation on collapse (sh-sel-change-011)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Ensure we're in CREATE_NEW mode (not modify mode)
+      handler.setAnnotatingMode('CREATE_NEW');
+
+      // Set up mock selection state
+      (mockState.selection as any).selected = [];
+
+      // Track the order of calls
+      const callOrder: string[] = [];
+      (mockState.selection.clear as any).mockImplementation(() => {
+        callOrder.push('selection.clear');
+      });
+      (mockState.store.deleteAnnotation as any).mockImplementation(() => {
+        callOrder.push('store.deleteAnnotation');
+      });
+
+      // Trigger pointerdown to set lastDownEvent
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 10,
+        clientY: 10
+      });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Trigger selectstart to set up currentTarget
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // Create a collapsed range
+      const collapsedRange = document.createRange();
+      const textNode = container.querySelector('p')?.firstChild;
+      if (textNode) {
+        collapsedRange.setStart(textNode, 3);
+        collapsedRange.setEnd(textNode, 3);
+      }
+
+      // Mock store.getAnnotation to return an existing annotation
+      const mockAnnotation = {
+        id: 'temp-annotation-id',
+        target: { selector: [] }
+      };
+      (mockState.store.getAnnotation as any).mockReturnValue(mockAnnotation);
+
+      // Mock document.getSelection to return a collapsed selection
+      const mockSelection = {
+        anchorNode: textNode,
+        rangeCount: 1,
+        isCollapsed: true,
+        getRangeAt: vi.fn().mockReturnValue(collapsedRange)
+      };
+      const originalGetSelection = document.getSelection;
+      document.getSelection = vi.fn().mockReturnValue(mockSelection);
+
+      // Trigger selectionchange
+      const selectionChangeEvent = new Event('selectionchange', { bubbles: true });
+      document.dispatchEvent(selectionChangeEvent);
+
+      // Wait for debounce timeout
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // Verify that selection.clear is called BEFORE store.deleteAnnotation (line 216-217)
+      expect(callOrder).toEqual(['selection.clear', 'store.deleteAnnotation']);
+
+      // Restore original getSelection
+      document.getSelection = originalGetSelection;
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });
