@@ -1246,7 +1246,7 @@
       "lines": "174-175",
       "category": "Renderer/MutationObserver",
       "description": "MutationObserver should detect internal mutations (target is container or descendant)",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-mutation-003",

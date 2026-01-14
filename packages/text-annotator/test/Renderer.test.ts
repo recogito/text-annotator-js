@@ -1045,5 +1045,40 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should detect internal mutations (target is container or descendant) (r-mutation-002)', async () => {
+      // Capture the MutationObserver callback
+      let mutationCallback: MutationCallback | undefined;
+      class MockMutationObserver {
+        observe = vi.fn();
+        disconnect = vi.fn();
+        constructor(callback: MutationCallback) {
+          mutationCallback = callback;
+        }
+      }
+      global.MutationObserver = MockMutationObserver as unknown as typeof MutationObserver;
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // Reset any calls from initialization
+      vi.clearAllMocks();
+
+      // At lines 174-175: isInternal = records.every(record => record.target === container || container.contains(record.target))
+      // Create a mock mutation record where the target IS the container (internal mutation)
+      const mockInternalRecord = {
+        target: container
+      } as MutationRecord;
+
+      // Trigger the callback with internal mutation
+      mutationCallback!([ mockInternalRecord ], {} as MutationObserver);
+
+      // Wait for debounce to complete
+      await new Promise(resolve => setTimeout(resolve, 180));
+
+      // redraw should NOT be called for internal mutations (isInternal is true)
+      expect(mockRendererImpl.redraw).not.toHaveBeenCalled();
+
+      renderer.destroy();
+    });
   });
 });
