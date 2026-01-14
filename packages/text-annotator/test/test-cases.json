@@ -678,7 +678,7 @@
       "lines": "460-463",
       "category": "SelectionHandler/Hotkeys",
       "description": "SELECTION_KEYS hotkey should store lastDownEvent on non-repeat keydown",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-hotkeys-002",
@@ -686,7 +686,7 @@
       "lines": "461",
       "category": "SelectionHandler/Hotkeys",
       "description": "SELECTION_KEYS hotkey should ignore repeat events",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-hotkeys-003",
@@ -694,7 +694,7 @@
       "lines": "465-468",
       "category": "SelectionHandler/Hotkeys",
       "description": "SELECT_ALL hotkey should store lastDownEvent and call onSelectAll",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-arrow-001",
