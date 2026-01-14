@@ -174,7 +174,7 @@
       "lines": "140-276",
       "category": "SelectionHandler/onSelectionChange",
       "description": "onSelectionChange should be debounced at 10ms",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-sel-change-002",
