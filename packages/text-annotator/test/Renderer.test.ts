@@ -1,5 +1,6 @@
 import { JSDOM } from 'jsdom';
 import { describe, it, beforeEach, afterEach, expect, vi } from 'vitest';
+import { UserSelectAction } from '@annotorious/core';
 import { createBaseRenderer } from '../src/highlight/Renderer';
 import type { TextAnnotatorState } from '../src/state';
 import type { TextAnnotation } from '../src/model';
@@ -151,6 +152,32 @@ describe('Renderer', () => {
 
       // At line 78: store.getAt passes currentFilter as the 4th parameter
       expect(mockState.store.getAt).toHaveBeenCalledWith(50, 50, false, testFilter);
+
+      renderer.destroy();
+    });
+
+    it('should check evalSelectAction is not NONE before hovering (r-hover-003)', () => {
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // Mock store.getAt to return a hit
+      const mockAnnotation = { id: 'test-annotation', target: {} } as TextAnnotation;
+      (mockState.store.getAt as any).mockReturnValue(mockAnnotation);
+
+      // Mock evalSelectAction to return NONE
+      (mockState.selection.evalSelectAction as any).mockReturnValue(UserSelectAction.NONE);
+
+      const pointerMoveEvent = new (global.PointerEvent || MouseEvent)('pointermove', {
+        bubbles: true,
+        clientX: 150,
+        clientY: 100
+      });
+      container.dispatchEvent(pointerMoveEvent);
+
+      // At line 79: if (hit && state.selection.evalSelectAction(hit) !== UserSelectAction.NONE)
+      // When evalSelectAction returns NONE, hover.set should NOT be called
+      expect(mockState.selection.evalSelectAction).toHaveBeenCalledWith(mockAnnotation);
+      expect(mockState.hover.set).not.toHaveBeenCalled();
+      expect(container.classList.contains('hovered')).toBe(false);
 
       renderer.destroy();
     });

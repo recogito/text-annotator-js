@@ -958,7 +958,7 @@
       "lines": "79",
       "category": "Renderer/onPointerMove",
       "description": "onPointerMove should check evalSelectAction is not NONE before hovering",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-hover-004",
