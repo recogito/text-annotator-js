@@ -1287,5 +1287,13 @@ describe('Renderer', () => {
       expect(renderer).toHaveProperty('destroy');
       expect(typeof renderer.destroy).toBe('function');
     });
+
+    it('should return object with redraw method (r-return-002)', () => {
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // At lines 202-209: return { redraw, ... }
+      expect(renderer).toHaveProperty('redraw');
+      expect(typeof renderer.redraw).toBe('function');
+    });
   });
 });
