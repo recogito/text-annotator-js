@@ -598,7 +598,7 @@
       "lines": "423",
       "category": "SelectionHandler/onKeyup",
       "description": "onKeyup should only process Shift key release",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-keyup-003",

@@ -3805,5 +3805,69 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should only process Shift key release (sh-keyup-002)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Set up mock selection state
+      (mockState.selection as any).selected = [];
+
+      // Create a range for selection
+      const range = document.createRange();
+      const textNode = container.querySelector('p')?.firstChild;
+      if (textNode) {
+        range.setStart(textNode, 0);
+        range.setEnd(textNode, 4);
+      }
+
+      // Mock document.getSelection to return a non-collapsed selection
+      const mockSelection = {
+        anchorNode: textNode,
+        rangeCount: 1,
+        isCollapsed: false,
+        getRangeAt: vi.fn().mockReturnValue(range)
+      };
+      const originalGetSelection = document.getSelection;
+      document.getSelection = vi.fn().mockReturnValue(mockSelection);
+
+      // Mock store.getAnnotation to return undefined
+      (mockState.store.getAnnotation as any).mockReturnValue(undefined);
+
+      // Simulate pointerdown and selectstart to create currentTarget
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(pointerDownEvent, 'target', { value: container });
+      document.dispatchEvent(pointerDownEvent);
+
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // Wait for currentTarget to be created
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // Dispatch a non-Shift keyup event (e.g., 'a')
+      const keyupEventA = new KeyboardEvent('keyup', {
+        bubbles: true,
+        key: 'a'
+      });
+      container.dispatchEvent(keyupEventA);
+
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // At line 423: if (evt.key === 'Shift' && currentTarget)
+      // Non-Shift keys should be ignored, so no store operations
+      expect(mockState.store.addAnnotation).not.toHaveBeenCalled();
+      expect(mockState.selection.userSelect).not.toHaveBeenCalled();
+
+      // Restore original getSelection
+      document.getSelection = originalGetSelection;
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });
