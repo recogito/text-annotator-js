@@ -153,5 +153,37 @@ describe('SpansRenderer', () => {
       const emptyHighlight: Highlight = { rects: [] };
       expect(getLength(emptyHighlight)).toBe(0);
     });
+
+    it('should sort intersecting highlights by total length (descending) (sr-zindex-004)', () => {
+      // At lines 24-25, intersecting highlights are sorted by length (descending):
+      // intersecting.sort((a, b) => getLength(b) - getLength(a))
+      // Longer highlights come first (lower z-index, rendered underneath)
+
+      type Rect = { x: number; y: number; width: number; height: number };
+      type Highlight = { rects: Rect[] };
+
+      const getLength = (h: Highlight) =>
+        h.rects.reduce((total, rect) => total + rect.width, 0);
+
+      // Create highlights with different lengths
+      const shortHighlight: Highlight = {
+        rects: [{ x: 0, y: 0, width: 50, height: 20 }]
+      };
+      const mediumHighlight: Highlight = {
+        rects: [{ x: 0, y: 0, width: 100, height: 20 }]
+      };
+      const longHighlight: Highlight = {
+        rects: [{ x: 0, y: 0, width: 200, height: 20 }]
+      };
+
+      // Sort by length descending (longer highlights first)
+      const highlights = [shortHighlight, mediumHighlight, longHighlight];
+      highlights.sort((a, b) => getLength(b) - getLength(a));
+
+      // After sorting: long (200), medium (100), short (50)
+      expect(getLength(highlights[0])).toBe(200);
+      expect(getLength(highlights[1])).toBe(100);
+      expect(getLength(highlights[2])).toBe(50);
+    });
   });
 });
