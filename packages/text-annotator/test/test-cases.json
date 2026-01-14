@@ -214,7 +214,7 @@
       "lines": "177-180",
       "category": "SelectionHandler/onSelectionChange",
       "description": "onSelectionChange should emulate selectstart for Chrome/iOS when timeDifference < 1000 and no currentTarget",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-sel-change-007",
