@@ -1808,5 +1808,68 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should skip whitespace-only selections (sh-sel-change-015)', async () => {
+      // Update container to have whitespace-only text node
+      container.innerHTML = '<p>   </p>';
+
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Set up mock selection state
+      (mockState.selection as any).selected = [];
+
+      // Trigger pointerdown to set lastDownEvent
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 10,
+        clientY: 10
+      });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Trigger selectstart to set up currentTarget
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // Create a range that selects only whitespace
+      const range = document.createRange();
+      const textNode = container.querySelector('p')?.firstChild;
+      if (textNode) {
+        range.setStart(textNode, 0);
+        range.setEnd(textNode, 3); // "   " (whitespace only)
+      }
+
+      // Mock document.getSelection to return a non-collapsed selection of whitespace
+      const mockSelection = {
+        anchorNode: textNode,
+        rangeCount: 1,
+        isCollapsed: false,
+        getRangeAt: vi.fn().mockReturnValue(range)
+      };
+      const originalGetSelection = document.getSelection;
+      document.getSelection = vi.fn().mockReturnValue(mockSelection);
+
+      // Trigger selectionchange
+      const selectionChangeEvent = new Event('selectionchange', { bubbles: true });
+      document.dispatchEvent(selectionChangeEvent);
+
+      // Wait for debounce timeout
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // When all containedRanges are whitespace or empty (line 227),
+      // the handler should return early and not process the selection.
+      // No annotations should be added or updated.
+      expect(mockState.store.addAnnotation).not.toHaveBeenCalled();
+      expect(mockState.store.updateTarget).not.toHaveBeenCalled();
+
+      // Restore original getSelection
+      document.getSelection = originalGetSelection;
+
+      // Restore container content
+      container.innerHTML = '<p>Some text content for annotation.</p>';
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });

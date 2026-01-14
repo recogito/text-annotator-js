@@ -286,7 +286,7 @@
       "lines": "227",
       "category": "SelectionHandler/onSelectionChange",
       "description": "onSelectionChange should skip whitespace-only selections",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-sel-change-016",
