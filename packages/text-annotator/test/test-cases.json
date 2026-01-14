@@ -950,7 +950,7 @@
       "lines": "78",
       "category": "Renderer/onPointerMove",
       "description": "onPointerMove should pass currentFilter to store.getAt",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-hover-003",

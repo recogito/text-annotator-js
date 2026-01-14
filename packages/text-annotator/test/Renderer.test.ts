@@ -134,5 +134,25 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should pass currentFilter to store.getAt (r-hover-002)', () => {
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // Set a filter
+      const testFilter = (annotation: TextAnnotation) => annotation.id === 'test';
+      renderer.setFilter(testFilter);
+
+      const pointerMoveEvent = new (global.PointerEvent || MouseEvent)('pointermove', {
+        bubbles: true,
+        clientX: 150,
+        clientY: 100
+      });
+      container.dispatchEvent(pointerMoveEvent);
+
+      // At line 78: store.getAt passes currentFilter as the 4th parameter
+      expect(mockState.store.getAt).toHaveBeenCalledWith(50, 50, false, testFilter);
+
+      renderer.destroy();
+    });
   });
 });
