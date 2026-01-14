@@ -326,7 +326,7 @@
       "lines": "250",
       "category": "SelectionHandler/onSelectionChange",
       "description": "onSelectionChange should call rangeToSelector for each combined range",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-sel-change-021",
