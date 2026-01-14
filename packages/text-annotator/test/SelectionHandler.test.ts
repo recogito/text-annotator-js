@@ -4662,5 +4662,15 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should return object with setFilter method (sh-return-002)', () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      expect(handler.setFilter).toBeDefined();
+      expect(typeof handler.setFilter).toBe('function');
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });

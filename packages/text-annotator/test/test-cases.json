@@ -910,7 +910,7 @@
       "lines": "542-548",
       "category": "SelectionHandler/ReturnValue",
       "description": "createSelectionHandler should return object with setFilter method",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-return-003",
