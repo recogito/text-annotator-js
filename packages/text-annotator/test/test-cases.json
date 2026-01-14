@@ -110,7 +110,7 @@
       "lines": "101",
       "category": "SelectionHandler/onSelectStart",
       "description": "onSelectStart should return early when isLeftClick is false (right-click)",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-select-start-003",

@@ -639,5 +639,45 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should return early when isLeftClick is false (right-click) (sh-select-start-002)', () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Set up a mock selected annotation to verify the code path doesn't proceed
+      const mockAnnotation = {
+        id: 'existing-annotation-id',
+        target: {
+          selector: [{ type: 'TextQuoteSelector', exact: 'test' }]
+        }
+      };
+      (mockState.selection as any).selected = [{ id: 'existing-annotation-id', editable: true }];
+      (mockState.store.getAnnotation as any).mockReturnValue(mockAnnotation);
+
+      // Set annotating mode to ADD_TO_CURRENT so that IF onSelectStart proceeded,
+      // it would call store.getAnnotation
+      handler.setAnnotatingMode('ADD_TO_CURRENT');
+
+      // Trigger pointerdown with button=2 (right-click)
+      // This sets isLeftClick to false (since button !== 0)
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 2,  // Right-click
+        clientX: 10,
+        clientY: 10
+      });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Trigger selectstart - onSelectStart should return early at line 101
+      // because isLeftClick is false
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // Verify that store.getAnnotation was NOT called
+      // This proves onSelectStart returned early due to isLeftClick being false
+      expect(mockState.store.getAnnotation).not.toHaveBeenCalled();
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });
