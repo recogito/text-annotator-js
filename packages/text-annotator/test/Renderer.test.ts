@@ -952,5 +952,23 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should trigger redraw (r-resize-004)', async () => {
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // Reset any calls from initialization
+      vi.clearAllMocks();
+
+      // At line 160: redraw() is called in onResize
+      const resizeEvent = new Event('resize');
+      window.dispatchEvent(resizeEvent);
+
+      // Wait for debounce to complete
+      await new Promise(resolve => setTimeout(resolve, 30));
+
+      expect(mockRendererImpl.redraw).toHaveBeenCalled();
+
+      renderer.destroy();
+    });
   });
 });

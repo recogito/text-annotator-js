@@ -1214,7 +1214,7 @@
       "lines": "160",
       "category": "Renderer/Resize",
       "description": "onResize should trigger redraw",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-resize-005",
