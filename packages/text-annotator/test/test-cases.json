@@ -182,7 +182,7 @@
       "lines": "141",
       "category": "SelectionHandler/onSelectionChange",
       "description": "onSelectionChange should return early when annotating is disabled",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-sel-change-003",

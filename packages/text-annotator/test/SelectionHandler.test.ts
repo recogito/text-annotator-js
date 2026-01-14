@@ -1040,5 +1040,39 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should return early when annotating is disabled (sh-sel-change-002)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Disable annotating
+      handler.setAnnotatingEnabled(false);
+
+      // Set up pointerdown first (to set lastDownEvent)
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 10,
+        clientY: 10
+      });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Trigger selectionchange - should return early at line 141
+      const selectionChangeEvent = new Event('selectionchange', { bubbles: true });
+      document.dispatchEvent(selectionChangeEvent);
+
+      // Wait for debounce timeout
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // Since annotating is disabled, the handler should return early
+      // and not proceed to any store operations or selection processing.
+      // The key verification: no store operations should occur because
+      // the handler returns at line 141 before doing anything.
+      expect(mockState.store.addAnnotation).not.toHaveBeenCalled();
+      expect(mockState.store.updateTarget).not.toHaveBeenCalled();
+      expect(mockState.selection.clear).not.toHaveBeenCalled();
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });
