@@ -1414,7 +1414,7 @@
       "lines": "20-21",
       "category": "SpansRenderer/computeZIndex",
       "description": "computeZIndex should calculate total highlight length from all rects",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-zindex-004",

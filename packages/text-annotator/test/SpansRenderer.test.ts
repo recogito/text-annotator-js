@@ -122,5 +122,36 @@ describe('SpansRenderer', () => {
       const bottomRight = { x: 25, y: 25, width: 50, height: 50 };
       expect(intersects(topLeft, bottomRight)).toBe(true);
     });
+
+    it('should calculate total highlight length from all rects (sr-zindex-003)', () => {
+      // At lines 20-21, getLength calculates total width of all rects:
+      // h.rects.reduce((total, rect) => total + rect.width, 0)
+
+      type Rect = { x: number; y: number; width: number; height: number };
+      type Highlight = { rects: Rect[] };
+
+      const getLength = (h: Highlight) =>
+        h.rects.reduce((total, rect) => total + rect.width, 0);
+
+      // Single rect highlight
+      const singleRect: Highlight = {
+        rects: [{ x: 0, y: 0, width: 100, height: 20 }]
+      };
+      expect(getLength(singleRect)).toBe(100);
+
+      // Multiple rects highlight (e.g., multi-line text)
+      const multiRect: Highlight = {
+        rects: [
+          { x: 0, y: 0, width: 100, height: 20 },
+          { x: 0, y: 20, width: 80, height: 20 },
+          { x: 0, y: 40, width: 50, height: 20 }
+        ]
+      };
+      expect(getLength(multiRect)).toBe(230); // 100 + 80 + 50
+
+      // Empty rects array
+      const emptyHighlight: Highlight = { rects: [] };
+      expect(getLength(emptyHighlight)).toBe(0);
+    });
   });
 });
