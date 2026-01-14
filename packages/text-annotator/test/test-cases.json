@@ -558,7 +558,7 @@
       "lines": "407-409",
       "category": "SelectionHandler/onContextMenu",
       "description": "onContextMenu should call onSelectionChange when currentTarget missing (Chrome Android workaround)",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-ctx-menu-003",

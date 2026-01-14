@@ -3487,5 +3487,73 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should emulate selectstart when currentTarget has no selectors (sh-ctx-menu-002)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Set up mock selection state - no selected annotations
+      (mockState.selection as any).selected = [];
+
+      // Create a range for selection within the container
+      const range = document.createRange();
+      const textNode = container.querySelector('p')?.firstChild;
+      if (textNode) {
+        range.setStart(textNode, 0);
+        range.setEnd(textNode, 4); // "Some"
+      }
+
+      // Mock document.getSelection to return a non-collapsed selection
+      const mockSelection = {
+        anchorNode: textNode,
+        rangeCount: 1,
+        isCollapsed: false,
+        getRangeAt: vi.fn().mockReturnValue(range)
+      };
+      const originalGetSelection = document.getSelection;
+      document.getSelection = vi.fn().mockReturnValue(mockSelection);
+
+      // Mock store.getAnnotation to return undefined (new annotation)
+      (mockState.store.getAnnotation as any).mockReturnValue(undefined);
+
+      // Step 1: Simulate pointerdown to set lastDownEvent and isLeftClick
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0, // left click
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(pointerDownEvent, 'target', { value: container });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Step 2: Trigger selectstart to create currentTarget with empty selectors
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // Step 3: Dispatch contextmenu event BEFORE selectionchange completes
+      // This simulates Chrome Android behavior
+      const contextMenuEvent = new (global.PointerEvent || MouseEvent)('contextmenu', {
+        bubbles: true,
+        button: 2,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(contextMenuEvent, 'target', { value: container });
+      document.dispatchEvent(contextMenuEvent);
+
+      // At lines 407-409: when currentTarget.selector.length === 0,
+      // onSelectionChange(evt) is called to emulate the missing selectionchange
+      // Wait for debounced onSelectionChange (10ms debounce)
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // After onSelectionChange runs, it populates currentTarget.selector
+      // Then upsertCurrentTarget() at line 415 adds the annotation
+      expect(mockState.store.addAnnotation).toHaveBeenCalled();
+
+      // Restore original getSelection
+      document.getSelection = originalGetSelection;
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });
