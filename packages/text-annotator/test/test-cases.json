@@ -1630,7 +1630,7 @@
       "lines": "110-115",
       "category": "SpansRenderer/setVisible",
       "description": "setVisible(false) should add hidden class to highlightLayer",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-destroy-001",
