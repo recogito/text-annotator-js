@@ -1135,5 +1135,26 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should use attributes, childList, subtree config (r-mutation-005)', () => {
+      // Track MutationObserver observe calls
+      const mockObserve = vi.fn();
+      class MockMutationObserver {
+        observe = mockObserve;
+        disconnect = vi.fn();
+        constructor(callback: MutationCallback) {}
+      }
+      global.MutationObserver = MockMutationObserver as unknown as typeof MutationObserver;
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // At line 171: const config: MutationObserverInit = { attributes: true, childList: true, subtree: true }
+      expect(mockObserve).toHaveBeenCalledWith(
+        expect.any(Object),
+        { attributes: true, childList: true, subtree: true }
+      );
+
+      renderer.destroy();
+    });
   });
 });

@@ -1270,7 +1270,7 @@
       "lines": "171",
       "category": "Renderer/MutationObserver",
       "description": "MutationObserver should use attributes, childList, subtree config",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-destroy-001",
