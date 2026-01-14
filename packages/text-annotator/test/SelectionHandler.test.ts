@@ -3754,4 +3754,56 @@ describe('SelectionHandler', () => {
       handler.destroy();
     });
   });
+
+  describe('onKeyup', () => {
+    it('should return early when annotating is disabled (sh-keyup-001)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Disable annotating
+      handler.setAnnotatingEnabled(false);
+
+      // Set up a valid selection scenario
+      (mockState.selection as any).selected = [];
+
+      // Create a range for selection
+      const range = document.createRange();
+      const textNode = container.querySelector('p')?.firstChild;
+      if (textNode) {
+        range.setStart(textNode, 0);
+        range.setEnd(textNode, 4);
+      }
+
+      // Mock document.getSelection to return a non-collapsed selection
+      const mockSelection = {
+        anchorNode: textNode,
+        rangeCount: 1,
+        isCollapsed: false,
+        getRangeAt: vi.fn().mockReturnValue(range)
+      };
+      const originalGetSelection = document.getSelection;
+      document.getSelection = vi.fn().mockReturnValue(mockSelection);
+
+      // Dispatch Shift keyup event
+      const keyupEvent = new KeyboardEvent('keyup', {
+        bubbles: true,
+        key: 'Shift'
+      });
+      container.dispatchEvent(keyupEvent);
+
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // At line 421: if (!currentAnnotatingEnabled) return;
+      // When annotating is disabled, onKeyup should return early
+      // upsertCurrentTarget should NOT be called
+      expect(mockState.store.addAnnotation).not.toHaveBeenCalled();
+      expect(mockState.store.updateTarget).not.toHaveBeenCalled();
+      expect(mockState.selection.userSelect).not.toHaveBeenCalled();
+
+      // Restore original getSelection
+      document.getSelection = originalGetSelection;
+
+      // Clean up
+      handler.destroy();
+    });
+  });
 });

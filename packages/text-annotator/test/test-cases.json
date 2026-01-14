@@ -590,7 +590,7 @@
       "lines": "420-421",
       "category": "SelectionHandler/onKeyup",
       "description": "onKeyup should return early when annotating is disabled",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-keyup-002",
