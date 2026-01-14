@@ -766,7 +766,7 @@
       "lines": "506-507",
       "category": "SelectionHandler/upsertCurrentTarget",
       "description": "upsertCurrentTarget should update target when existing has no updated timestamp",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-upsert-005",
@@ -774,7 +774,7 @@
       "lines": "508",
       "category": "SelectionHandler/upsertCurrentTarget",
       "description": "upsertCurrentTarget should NOT update target when existing is newer",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-events-001",

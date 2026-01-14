@@ -4274,5 +4274,172 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should update target when existing has no updated timestamp (sh-upsert-004)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Set up an existing editable annotation WITHOUT updated timestamp
+      const existingAnnotationId = 'existing-annotation-no-updated';
+      const existingTarget = {
+        annotation: existingAnnotationId,
+        selector: [{
+          type: 'TextQuoteSelector',
+          exact: 'Some',
+          quote: 'Some',
+          range: document.createRange()
+        }],
+        created: new Date(Date.now() - 10000)
+        // Note: no 'updated' field
+      };
+
+      // Set up selection to point to the existing annotation
+      (mockState.selection as any).selected = [{ id: existingAnnotationId, editable: true }];
+
+      // Create a range for selection
+      const range = document.createRange();
+      const textNode = container.querySelector('p')?.firstChild;
+      if (textNode) {
+        range.setStart(textNode, 0);
+        range.setEnd(textNode, 4);
+      }
+
+      // Mock document.getSelection
+      const mockSelection = {
+        anchorNode: textNode,
+        rangeCount: 1,
+        isCollapsed: false,
+        getRangeAt: vi.fn().mockReturnValue(range)
+      };
+      const originalGetSelection = document.getSelection;
+      document.getSelection = vi.fn().mockReturnValue(mockSelection);
+
+      // Mock store.getAnnotation to return existing annotation (WITHOUT updated timestamp)
+      (mockState.store.getAnnotation as any).mockReturnValue({
+        id: existingAnnotationId,
+        bodies: [],
+        target: existingTarget
+      });
+
+      handler.setAnnotatingMode('REPLACE_CURRENT');
+
+      // Simulate pointerdown and selectstart
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(pointerDownEvent, 'target', { value: container });
+      document.dispatchEvent(pointerDownEvent);
+
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // Dispatch contextmenu to trigger upsertCurrentTarget
+      const contextMenuEvent = new (global.PointerEvent || MouseEvent)('contextmenu', {
+        bubbles: true,
+        button: 2,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(contextMenuEvent, 'target', { value: container });
+      document.dispatchEvent(contextMenuEvent);
+
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // At lines 506-507: when existingTargetUpdated is falsy, updateTarget is called
+      expect(mockState.store.updateTarget).toHaveBeenCalled();
+
+      // Restore original getSelection
+      document.getSelection = originalGetSelection;
+
+      // Clean up
+      handler.destroy();
+    });
+
+    it('should NOT update target when existing is newer (sh-upsert-005)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Set up an existing editable annotation WITH a NEWER updated timestamp
+      const existingAnnotationId = 'existing-annotation-newer';
+      const futureDate = new Date(Date.now() + 10000); // 10 seconds in the future
+      const existingTarget = {
+        annotation: existingAnnotationId,
+        selector: [{
+          type: 'TextQuoteSelector',
+          exact: 'Some',
+          quote: 'Some',
+          range: document.createRange()
+        }],
+        created: new Date(Date.now() - 10000),
+        updated: futureDate // Newer than currentTarget's updated will be
+      };
+
+      // Set up selection to point to the existing annotation
+      (mockState.selection as any).selected = [{ id: existingAnnotationId, editable: true }];
+
+      // Create a range for selection
+      const range = document.createRange();
+      const textNode = container.querySelector('p')?.firstChild;
+      if (textNode) {
+        range.setStart(textNode, 0);
+        range.setEnd(textNode, 4);
+      }
+
+      // Mock document.getSelection
+      const mockSelection = {
+        anchorNode: textNode,
+        rangeCount: 1,
+        isCollapsed: false,
+        getRangeAt: vi.fn().mockReturnValue(range)
+      };
+      const originalGetSelection = document.getSelection;
+      document.getSelection = vi.fn().mockReturnValue(mockSelection);
+
+      // Mock store.getAnnotation to return existing annotation (with NEWER timestamp)
+      (mockState.store.getAnnotation as any).mockReturnValue({
+        id: existingAnnotationId,
+        bodies: [],
+        target: existingTarget
+      });
+
+      handler.setAnnotatingMode('REPLACE_CURRENT');
+
+      // Simulate pointerdown and selectstart
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(pointerDownEvent, 'target', { value: container });
+      document.dispatchEvent(pointerDownEvent);
+
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // Dispatch contextmenu to trigger upsertCurrentTarget
+      const contextMenuEvent = new (global.PointerEvent || MouseEvent)('contextmenu', {
+        bubbles: true,
+        button: 2,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(contextMenuEvent, 'target', { value: container });
+      document.dispatchEvent(contextMenuEvent);
+
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // At line 508: when existingTargetUpdated >= currentTargetUpdated,
+      // updateTarget should NOT be called
+      expect(mockState.store.updateTarget).not.toHaveBeenCalled();
+      expect(mockState.store.addAnnotation).not.toHaveBeenCalled();
+
+      // Restore original getSelection
+      document.getSelection = originalGetSelection;
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });
