@@ -1078,7 +1078,7 @@
       "lines": "110",
       "category": "Renderer/redraw",
       "description": "redraw should set hovered state based on hover.current",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-redraw-011",
