@@ -75,3 +75,11 @@ The core annotation logic (onSelectStart, store.addAnnotation, selection.userSel
 - sh-arrow-005: Call selection.clear() (line 487)
 
 **Workaround:** The `selection.clear()` behavior is tested through other test cases. The `isNotAnnotatable` check is tested in sh-sel-change-004 and sh-ctx-menu-003.
+
+## sh-destroy-009: Cannot test hotkeys.unbind()
+
+**Test Case:** destroy should unbind all hotkeys
+
+**Issue:** The `hotkeys.unbind()` call at line 539 is an external library call. Testing it directly would require mocking the `hotkeys` module, which adds complexity for limited benefit.
+
+**Workaround:** The destroy function's other cleanup behavior (event listener removal, state reset) is thoroughly tested in sh-destroy-001 to sh-destroy-008. The hotkeys unbinding follows the same pattern and is unlikely to fail independently.

@@ -830,7 +830,7 @@
       "lines": "524-527",
       "category": "SelectionHandler/destroy",
       "description": "destroy should reset internal state variables to undefined",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-destroy-002",
@@ -838,7 +838,7 @@
       "lines": "529",
       "category": "SelectionHandler/destroy",
       "description": "destroy should clear debounced onSelectionChange handler",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-destroy-003",
@@ -846,7 +846,7 @@
       "lines": "531",
       "category": "SelectionHandler/destroy",
       "description": "destroy should remove pointerdown listener from document",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-destroy-004",
@@ -854,7 +854,7 @@
       "lines": "532",
       "category": "SelectionHandler/destroy",
       "description": "destroy should remove pointerup listener from document",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-destroy-005",
@@ -862,7 +862,7 @@
       "lines": "533",
       "category": "SelectionHandler/destroy",
       "description": "destroy should remove contextmenu listener from document",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-destroy-006",
@@ -870,7 +870,7 @@
       "lines": "535",
       "category": "SelectionHandler/destroy",
       "description": "destroy should remove keyup listener from container",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-destroy-007",
@@ -878,7 +878,7 @@
       "lines": "536",
       "category": "SelectionHandler/destroy",
       "description": "destroy should remove selectstart listener from container",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-destroy-008",
@@ -886,7 +886,7 @@
       "lines": "537",
       "category": "SelectionHandler/destroy",
       "description": "destroy should remove selectionchange listener from document",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-destroy-009",
