@@ -925,5 +925,32 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should call painter.reset when painter exists (r-resize-003)', async () => {
+      const mockPainter = {
+        clear: vi.fn(),
+        reset: vi.fn()
+      };
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // Set the painter
+      renderer.setPainter(mockPainter as any);
+
+      // Reset any calls from setPainter
+      vi.clearAllMocks();
+      mockPainter.reset.mockClear();
+
+      // At line 158: currentPainter?.reset() is called in onResize
+      const resizeEvent = new Event('resize');
+      window.dispatchEvent(resizeEvent);
+
+      // Wait for debounce to complete
+      await new Promise(resolve => setTimeout(resolve, 30));
+
+      expect(mockPainter.reset).toHaveBeenCalled();
+
+      renderer.destroy();
+    });
   });
 });

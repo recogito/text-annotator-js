@@ -1206,7 +1206,7 @@
       "lines": "158",
       "category": "Renderer/Resize",
       "description": "onResize should call painter.reset when painter exists",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-resize-004",
