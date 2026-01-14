@@ -14,3 +14,11 @@ To properly test Mac-specific behavior (metaKey instead of ctrlKey), we would ne
 This test case is skipped for now as it requires significant test infrastructure changes.
 
 **Workaround:** The logic for Mac vs non-Mac is a simple ternary (`isMac ? asPtr.metaKey : asPtr.ctrlKey`), and the non-Mac path (ctrlKey) is tested in sh-add-to-current-002. The Mac path follows the same pattern, just with a different key.
+
+## sh-ptr-up-004: Cannot reliably test dismissOnNotAnnotatable function callback
+
+**Test Case:** clickSelect should call dismissOnNotAnnotatable function when provided
+
+**Issue:** The `dismissOnNotAnnotatable` function callback at lines 302-303 is called inside `clickSelect`, which is invoked asynchronously after `pollSelectionCollapsed()` completes. The complex timing requirements and conditions for `clickSelect` to be triggered (including `timeDifference < CLICK_TIMEOUT`, proper target setting, and `isCollapsed` state) make it difficult to reliably reproduce in JSDOM.
+
+**Workaround:** The `dismissOnNotAnnotatable='ALWAYS'` path is tested in sh-ptr-up-003, which verifies the same code path (lines 301-308) is executed. The function callback follows the same pattern as the 'ALWAYS' check, just with a function evaluation instead of string comparison.
