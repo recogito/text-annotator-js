@@ -1086,7 +1086,7 @@
       "lines": "119",
       "category": "Renderer/redraw",
       "description": "redraw should call renderer.redraw with highlights, bounds, style, painter, lazy",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-redraw-012",

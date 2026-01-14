@@ -565,5 +565,43 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should call renderer.redraw with highlights, bounds, style, painter, lazy (r-redraw-011)', async () => {
+      const mockAnnotation = { annotation: { id: 'ann-1', target: {} }, rects: [] };
+      (mockState.store.getIntersecting as any).mockReturnValue([mockAnnotation]);
+
+      const mockPainter = { clear: vi.fn(), reset: vi.fn() };
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      renderer.setPainter(mockPainter as any);
+      renderer.setStyle({ fill: 'blue' } as any);
+
+      // Reset any calls from initialization
+      vi.clearAllMocks();
+
+      renderer.redraw();
+
+      // Wait for debounce + requestAnimationFrame
+      await new Promise(resolve => setTimeout(resolve, 30));
+
+      // At line 119: renderer.redraw(highlights, bounds, currentStyle, currentPainter, lazy)
+      expect(mockRendererImpl.redraw).toHaveBeenCalled();
+      const call = (mockRendererImpl.redraw as any).mock.calls[0];
+
+      // First arg: highlights array
+      expect(Array.isArray(call[0])).toBe(true);
+      // Second arg: bounds object
+      expect(call[1]).toBeDefined();
+      expect(call[1].minX).toBeDefined();
+      expect(call[1].maxX).toBeDefined();
+      // Third arg: style
+      expect(call[2]).toEqual({ fill: 'blue' });
+      // Fourth arg: painter
+      expect(call[3]).toBe(mockPainter);
+      // Fifth arg: lazy flag (default false)
+      expect(typeof call[4]).toBe('boolean');
+
+      renderer.destroy();
+    });
   });
 });
