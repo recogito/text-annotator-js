@@ -1190,7 +1190,7 @@
       "lines": "155-161",
       "category": "Renderer/Resize",
       "description": "onResize should be debounced at 10ms",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-resize-002",

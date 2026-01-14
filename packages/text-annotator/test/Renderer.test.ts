@@ -876,4 +876,36 @@ describe('Renderer', () => {
       renderer.destroy();
     });
   });
+
+  describe('Resize', () => {
+    it('should be debounced at 10ms (r-resize-001)', async () => {
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // Reset any calls from initialization
+      vi.clearAllMocks();
+
+      // At lines 155-161: onResize is debounced at 10ms
+      // Dispatch multiple resize events in rapid succession
+      const resizeEvent1 = new Event('resize');
+      const resizeEvent2 = new Event('resize');
+      const resizeEvent3 = new Event('resize');
+      window.dispatchEvent(resizeEvent1);
+      window.dispatchEvent(resizeEvent2);
+      window.dispatchEvent(resizeEvent3);
+
+      // Wait a short time (less than debounce)
+      await new Promise(resolve => setTimeout(resolve, 5));
+
+      // store.recalculatePositions should not have been called yet (still debouncing)
+      expect(mockState.store.recalculatePositions).not.toHaveBeenCalled();
+
+      // Wait for debounce to complete (10ms debounce + requestAnimationFrame)
+      await new Promise(resolve => setTimeout(resolve, 30));
+
+      // Now it should have been called exactly once (debounced to single call)
+      expect(mockState.store.recalculatePositions).toHaveBeenCalledTimes(1);
+
+      renderer.destroy();
+    });
+  });
 });
