@@ -836,4 +836,28 @@ describe('Renderer', () => {
       renderer.destroy();
     });
   });
+
+  describe('Scroll', () => {
+    it('should trigger lazy redraw (true) on scroll (r-scroll-001)', async () => {
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // Reset any calls from initialization
+      vi.clearAllMocks();
+
+      // At lines 149-150: onScroll calls redraw(true)
+      // Dispatch a scroll event on document
+      const scrollEvent = new Event('scroll', { bubbles: true });
+      document.dispatchEvent(scrollEvent);
+
+      // Wait for debounce + requestAnimationFrame
+      await new Promise(resolve => setTimeout(resolve, 30));
+
+      expect(mockRendererImpl.redraw).toHaveBeenCalled();
+      // Check that the lazy flag (5th argument) is true
+      const call = (mockRendererImpl.redraw as any).mock.calls.pop();
+      expect(call[4]).toBe(true);
+
+      renderer.destroy();
+    });
+  });
 });

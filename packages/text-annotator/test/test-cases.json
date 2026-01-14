@@ -1174,7 +1174,7 @@
       "lines": "149-150",
       "category": "Renderer/Scroll",
       "description": "onScroll should trigger lazy redraw (true)",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-scroll-002",
