@@ -118,7 +118,7 @@
       "lines": "106-109",
       "category": "SelectionHandler/onSelectStart",
       "description": "onSelectStart should detect modify-existing mode when ADD_TO_CURRENT and single editable selection",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-select-start-004",
