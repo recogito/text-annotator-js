@@ -559,5 +559,49 @@ describe('SpansRenderer', () => {
       expect(sorted[1]).toBe(middle);
       expect(sorted[2]).toBe(newest);
     });
+
+    it('should handle missing created dates (return 0) (sr-redraw-006)', () => {
+      // At line 70: return createdA && createdB ? createdA.getTime() - createdB.getTime() : 0;
+      // When either created date is missing/null/undefined, return 0 (keep original order)
+
+      type Highlight = {
+        annotation: {
+          target: {
+            created?: Date | null;
+          };
+        };
+      };
+
+      const sortHighlights = (highlights: Highlight[]): Highlight[] => {
+        return [...highlights].sort((highlightA, highlightB) => {
+          const createdA = highlightA.annotation.target.created;
+          const createdB = highlightB.annotation.target.created;
+          return createdA && createdB ? createdA.getTime() - createdB.getTime() : 0;
+        });
+      };
+
+      const withDate: Highlight = {
+        annotation: { target: { created: new Date('2024-06-15') } }
+      };
+      const withoutDate: Highlight = {
+        annotation: { target: { created: undefined } }
+      };
+      const withNullDate: Highlight = {
+        annotation: { target: { created: null } }
+      };
+
+      // When one has no date, compare returns 0 (keeps original order)
+      const arr1 = [withoutDate, withDate];
+      const sorted1 = sortHighlights(arr1);
+      // Original order preserved because compare returns 0
+      expect(sorted1[0]).toBe(withoutDate);
+      expect(sorted1[1]).toBe(withDate);
+
+      // Same with null
+      const arr2 = [withNullDate, withDate];
+      const sorted2 = sortHighlights(arr2);
+      expect(sorted2[0]).toBe(withNullDate);
+      expect(sorted2[1]).toBe(withDate);
+    });
   });
 });

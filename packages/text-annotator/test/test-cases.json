@@ -1510,7 +1510,7 @@
       "lines": "70",
       "category": "SpansRenderer/redraw",
       "description": "redraw should handle missing created dates (return 0)",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-redraw-007",
