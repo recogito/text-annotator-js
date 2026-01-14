@@ -156,6 +156,53 @@ describe('SelectionHandler', () => {
         // Clean up
         handler.destroy();
       });
+
+      it('should reset targetToModify, currentTarget, isLeftClick, lastDownEvent to undefined (sh-config-003)', async () => {
+        const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+        // First, set up internal state by triggering a pointerdown event
+        // This sets isLeftClick and lastDownEvent
+        const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+          bubbles: true,
+          button: 0,
+          clientX: 10,
+          clientY: 10
+        });
+        document.dispatchEvent(pointerDownEvent);
+
+        // Trigger selectstart to set up currentTarget (this happens in onSelectStart)
+        const selectStartEvent = new Event('selectstart', { bubbles: true });
+        container.dispatchEvent(selectStartEvent);
+
+        // Now disable annotating - this should reset all internal state
+        handler.setAnnotatingEnabled(false);
+
+        // Re-enable annotating to verify the state was reset
+        handler.setAnnotatingEnabled(true);
+
+        // Now trigger a pointerup - since isLeftClick was reset to undefined,
+        // the onPointerUp handler should return early (line 292-293)
+        const pointerUpEvent = new (global.PointerEvent || MouseEvent)('pointerup', {
+          bubbles: true,
+          button: 0,
+          clientX: 10,
+          clientY: 10
+        });
+        document.dispatchEvent(pointerUpEvent);
+
+        // Since isLeftClick is undefined after setAnnotatingEnabled(false),
+        // onPointerUp returns early without doing anything.
+        // This means no clickSelect or annotation operations should occur.
+        expect(mockState.store.getAt).not.toHaveBeenCalled();
+        expect(mockState.selection.userSelect).not.toHaveBeenCalled();
+
+        // Additionally verify that currentTarget was cleared by checking
+        // that no annotation was added (since currentTarget would be undefined)
+        expect(mockState.store.addAnnotation).not.toHaveBeenCalled();
+
+        // Clean up
+        handler.destroy();
+      });
     });
   });
 });

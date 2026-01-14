@@ -22,7 +22,7 @@
       "lines": "72-77",
       "category": "SelectionHandler/Configuration",
       "description": "setAnnotatingEnabled(false) should reset targetToModify, currentTarget, isLeftClick, lastDownEvent to undefined",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-config-004",
