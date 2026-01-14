@@ -292,4 +292,32 @@ describe('Renderer', () => {
       renderer.destroy();
     });
   });
+
+  describe('redraw', () => {
+    it('should be debounced at 10ms (r-redraw-001)', async () => {
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // Reset any calls from initialization
+      vi.clearAllMocks();
+
+      // Call redraw multiple times rapidly
+      renderer.redraw();
+      renderer.redraw();
+      renderer.redraw();
+
+      // Wait a short time (less than debounce)
+      await new Promise(resolve => setTimeout(resolve, 5));
+
+      // rendererImpl.redraw should not have been called yet (still debouncing)
+      expect(mockRendererImpl.redraw).not.toHaveBeenCalled();
+
+      // Wait for debounce to complete (10ms debounce + requestAnimationFrame)
+      await new Promise(resolve => setTimeout(resolve, 30));
+
+      // Now it should have been called exactly once (debounced to single call)
+      expect(mockRendererImpl.redraw).toHaveBeenCalledTimes(1);
+
+      renderer.destroy();
+    });
+  });
 });

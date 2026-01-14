@@ -1006,7 +1006,7 @@
       "lines": "94-122",
       "category": "Renderer/redraw",
       "description": "redraw should be debounced at 10ms",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-redraw-002",
