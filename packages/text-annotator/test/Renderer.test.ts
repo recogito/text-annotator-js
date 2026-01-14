@@ -1278,4 +1278,14 @@ describe('Renderer', () => {
       expect(mockDisconnect).toHaveBeenCalled();
     });
   });
+
+  describe('ReturnValue', () => {
+    it('should return object with destroy method (r-return-001)', () => {
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // At lines 202-209: return { destroy, ... }
+      expect(renderer).toHaveProperty('destroy');
+      expect(typeof renderer.destroy).toBe('function');
+    });
+  });
 });
