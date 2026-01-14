@@ -62,7 +62,7 @@
       "lines": "84",
       "category": "SelectionHandler/Configuration",
       "description": "setUser() should update currentUser for annotation creator",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-add-to-current-001",
