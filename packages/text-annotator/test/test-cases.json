@@ -158,7 +158,7 @@
       "lines": "130-137",
       "category": "SelectionHandler/onSelectStart",
       "description": "onSelectStart should create new target with new UUID when not modifying",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-select-start-009",

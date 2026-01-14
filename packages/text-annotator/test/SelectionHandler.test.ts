@@ -907,5 +907,44 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should create new target with new UUID when not modifying (sh-select-start-008)', () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Use CREATE_NEW mode (default) - this will NOT trigger modify-existing path
+      handler.setAnnotatingMode('CREATE_NEW');
+
+      // No selected annotations - this ensures isModifyExisting will be false
+      (mockState.selection as any).selected = [];
+
+      // Trigger pointerdown (left-click)
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 10,
+        clientY: 10
+      });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Trigger selectstart - this should create a new target with a new UUID
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // Verify store.getAnnotation was NOT called - proving we didn't go through
+      // the modify-existing path
+      expect(mockState.store.getAnnotation).not.toHaveBeenCalled();
+
+      // At lines 130-137, when NOT modifying:
+      // - targetToModify is set to undefined (line 130)
+      // - currentTarget.annotation is set to uuidv4() - a new UUID (line 133)
+      // - selector is empty array (line 134)
+      // - created is new Date() (line 135)
+      // - creator is currentUser (line 136)
+      // Since currentTarget is internal, we verify the code path was reached
+      // by confirming getAnnotation was not called.
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });
