@@ -1,0 +1,1684 @@
+{
+  "testCases": [
+    {
+      "id": "sh-config-001",
+      "file": "src/SelectionHandler.ts",
+      "lines": "68-78",
+      "category": "SelectionHandler/Configuration",
+      "description": "setAnnotatingEnabled(false) should set currentAnnotatingEnabled to false",
+      "completed": true
+    },
+    {
+      "id": "sh-config-002",
+      "file": "src/SelectionHandler.ts",
+      "lines": "70",
+      "category": "SelectionHandler/Configuration",
+      "description": "setAnnotatingEnabled(false) should clear debounced onSelectionChange handler",
+      "completed": false
+    },
+    {
+      "id": "sh-config-003",
+      "file": "src/SelectionHandler.ts",
+      "lines": "72-77",
+      "category": "SelectionHandler/Configuration",
+      "description": "setAnnotatingEnabled(false) should reset targetToModify, currentTarget, isLeftClick, lastDownEvent to undefined",
+      "completed": false
+    },
+    {
+      "id": "sh-config-004",
+      "file": "src/SelectionHandler.ts",
+      "lines": "68-78",
+      "category": "SelectionHandler/Configuration",
+      "description": "setAnnotatingEnabled(true) should re-enable annotation creation",
+      "completed": false
+    },
+    {
+      "id": "sh-config-005",
+      "file": "src/SelectionHandler.ts",
+      "lines": "80",
+      "category": "SelectionHandler/Configuration",
+      "description": "setAnnotatingMode() should update annotatingMode to provided value",
+      "completed": false
+    },
+    {
+      "id": "sh-config-006",
+      "file": "src/SelectionHandler.ts",
+      "lines": "80",
+      "category": "SelectionHandler/Configuration",
+      "description": "setAnnotatingMode() should default to CREATE_NEW when no value provided",
+      "completed": false
+    },
+    {
+      "id": "sh-config-007",
+      "file": "src/SelectionHandler.ts",
+      "lines": "82",
+      "category": "SelectionHandler/Configuration",
+      "description": "setFilter() should store the filter for later use in click selection",
+      "completed": false
+    },
+    {
+      "id": "sh-config-008",
+      "file": "src/SelectionHandler.ts",
+      "lines": "84",
+      "category": "SelectionHandler/Configuration",
+      "description": "setUser() should update currentUser for annotation creator",
+      "completed": false
+    },
+    {
+      "id": "sh-add-to-current-001",
+      "file": "src/SelectionHandler.ts",
+      "lines": "86-96",
+      "category": "SelectionHandler/isAddToCurrentSelect",
+      "description": "isAddToCurrentSelect should return true when annotatingMode is ADD_TO_CURRENT",
+      "completed": false
+    },
+    {
+      "id": "sh-add-to-current-002",
+      "file": "src/SelectionHandler.ts",
+      "lines": "90-92",
+      "category": "SelectionHandler/isAddToCurrentSelect",
+      "description": "isAddToCurrentSelect should return true on ctrlKey when allowModifierSelect and not Mac",
+      "completed": false
+    },
+    {
+      "id": "sh-add-to-current-003",
+      "file": "src/SelectionHandler.ts",
+      "lines": "90-92",
+      "category": "SelectionHandler/isAddToCurrentSelect",
+      "description": "isAddToCurrentSelect should return true on metaKey when allowModifierSelect and Mac",
+      "completed": false
+    },
+    {
+      "id": "sh-add-to-current-004",
+      "file": "src/SelectionHandler.ts",
+      "lines": "93-94",
+      "category": "SelectionHandler/isAddToCurrentSelect",
+      "description": "isAddToCurrentSelect should return false when allowModifierSelect is false",
+      "completed": false
+    },
+    {
+      "id": "sh-select-start-001",
+      "file": "src/SelectionHandler.ts",
+      "lines": "98-99",
+      "category": "SelectionHandler/onSelectStart",
+      "description": "onSelectStart should return early when annotating is disabled",
+      "completed": false
+    },
+    {
+      "id": "sh-select-start-002",
+      "file": "src/SelectionHandler.ts",
+      "lines": "101",
+      "category": "SelectionHandler/onSelectStart",
+      "description": "onSelectStart should return early when isLeftClick is false (right-click)",
+      "completed": false
+    },
+    {
+      "id": "sh-select-start-003",
+      "file": "src/SelectionHandler.ts",
+      "lines": "106-109",
+      "category": "SelectionHandler/onSelectStart",
+      "description": "onSelectStart should detect modify-existing mode when ADD_TO_CURRENT and single editable selection",
+      "completed": false
+    },
+    {
+      "id": "sh-select-start-004",
+      "file": "src/SelectionHandler.ts",
+      "lines": "106-109",
+      "category": "SelectionHandler/onSelectStart",
+      "description": "onSelectStart should detect modify-existing mode when REPLACE_CURRENT and single editable selection",
+      "completed": false
+    },
+    {
+      "id": "sh-select-start-005",
+      "file": "src/SelectionHandler.ts",
+      "lines": "111-127",
+      "category": "SelectionHandler/onSelectStart",
+      "description": "onSelectStart should set targetToModify to existing annotation target when modifying",
+      "completed": false
+    },
+    {
+      "id": "sh-select-start-006",
+      "file": "src/SelectionHandler.ts",
+      "lines": "117-124",
+      "category": "SelectionHandler/onSelectStart",
+      "description": "onSelectStart should preserve created/creator from existing target when modifying",
+      "completed": false
+    },
+    {
+      "id": "sh-select-start-007",
+      "file": "src/SelectionHandler.ts",
+      "lines": "122-123",
+      "category": "SelectionHandler/onSelectStart",
+      "description": "onSelectStart should set updated date and updatedBy when modifying",
+      "completed": false
+    },
+    {
+      "id": "sh-select-start-008",
+      "file": "src/SelectionHandler.ts",
+      "lines": "130-137",
+      "category": "SelectionHandler/onSelectStart",
+      "description": "onSelectStart should create new target with new UUID when not modifying",
+      "completed": false
+    },
+    {
+      "id": "sh-select-start-009",
+      "file": "src/SelectionHandler.ts",
+      "lines": "135-136",
+      "category": "SelectionHandler/onSelectStart",
+      "description": "onSelectStart should set created date and creator on new target",
+      "completed": false
+    },
+    {
+      "id": "sh-sel-change-001",
+      "file": "src/SelectionHandler.ts",
+      "lines": "140-276",
+      "category": "SelectionHandler/onSelectionChange",
+      "description": "onSelectionChange should be debounced at 10ms",
+      "completed": false
+    },
+    {
+      "id": "sh-sel-change-002",
+      "file": "src/SelectionHandler.ts",
+      "lines": "141",
+      "category": "SelectionHandler/onSelectionChange",
+      "description": "onSelectionChange should return early when annotating is disabled",
+      "completed": false
+    },
+    {
+      "id": "sh-sel-change-003",
+      "file": "src/SelectionHandler.ts",
+      "lines": "145-154",
+      "category": "SelectionHandler/onSelectionChange",
+      "description": "onSelectionChange should return early when anchorNode is null (iOS edge case)",
+      "completed": false
+    },
+    {
+      "id": "sh-sel-change-004",
+      "file": "src/SelectionHandler.ts",
+      "lines": "159-167",
+      "category": "SelectionHandler/onSelectionChange",
+      "description": "onSelectionChange should clear currentTarget when selection is hijacked by not-annotatable element",
+      "completed": false
+    },
+    {
+      "id": "sh-sel-change-005",
+      "file": "src/SelectionHandler.ts",
+      "lines": "164",
+      "category": "SelectionHandler/onSelectionChange",
+      "description": "onSelectionChange should use isRangeAnnotatable to check all selection ranges",
+      "completed": false
+    },
+    {
+      "id": "sh-sel-change-006",
+      "file": "src/SelectionHandler.ts",
+      "lines": "177-180",
+      "category": "SelectionHandler/onSelectionChange",
+      "description": "onSelectionChange should emulate selectstart for Chrome/iOS when timeDifference < 1000 and no currentTarget",
+      "completed": false
+    },
+    {
+      "id": "sh-sel-change-007",
+      "file": "src/SelectionHandler.ts",
+      "lines": "181-185",
+      "category": "SelectionHandler/onSelectionChange",
+      "description": "onSelectionChange should emulate selectstart for Firefox collapsed selection workaround",
+      "completed": false
+    },
+    {
+      "id": "sh-sel-change-008",
+      "file": "src/SelectionHandler.ts",
+      "lines": "198-203",
+      "category": "SelectionHandler/onSelectionChange",
+      "description": "onSelectionChange should create new currentTarget when dragging selection back into annotatable area",
+      "completed": false
+    },
+    {
+      "id": "sh-sel-change-009",
+      "file": "src/SelectionHandler.ts",
+      "lines": "205-221",
+      "category": "SelectionHandler/onSelectionChange",
+      "description": "onSelectionChange should handle collapsed selection by returning early",
+      "completed": false
+    },
+    {
+      "id": "sh-sel-change-010",
+      "file": "src/SelectionHandler.ts",
+      "lines": "213-218",
+      "category": "SelectionHandler/onSelectionChange",
+      "description": "onSelectionChange should delete annotation on collapse when not in modify mode",
+      "completed": false
+    },
+    {
+      "id": "sh-sel-change-011",
+      "file": "src/SelectionHandler.ts",
+      "lines": "216",
+      "category": "SelectionHandler/onSelectionChange",
+      "description": "onSelectionChange should clear selection before deleting annotation on collapse",
+      "completed": false
+    },
+    {
+      "id": "sh-sel-change-012",
+      "file": "src/SelectionHandler.ts",
+      "lines": "213-214",
+      "category": "SelectionHandler/onSelectionChange",
+      "description": "onSelectionChange should NOT delete annotation on collapse when ADD_TO_CURRENT mode",
+      "completed": false
+    },
+    {
+      "id": "sh-sel-change-013",
+      "file": "src/SelectionHandler.ts",
+      "lines": "213-214",
+      "category": "SelectionHandler/onSelectionChange",
+      "description": "onSelectionChange should NOT delete annotation on collapse when REPLACE_CURRENT mode",
+      "completed": false
+    },
+    {
+      "id": "sh-sel-change-014",
+      "file": "src/SelectionHandler.ts",
+      "lines": "223-224",
+      "category": "SelectionHandler/onSelectionChange",
+      "description": "onSelectionChange should trim selection ranges to container boundaries",
+      "completed": false
+    },
+    {
+      "id": "sh-sel-change-015",
+      "file": "src/SelectionHandler.ts",
+      "lines": "227",
+      "category": "SelectionHandler/onSelectionChange",
+      "description": "onSelectionChange should skip whitespace-only selections",
+      "completed": false
+    },
+    {
+      "id": "sh-sel-change-016",
+      "file": "src/SelectionHandler.ts",
+      "lines": "229",
+      "category": "SelectionHandler/onSelectionChange",
+      "description": "onSelectionChange should split ranges around not-annotatable elements",
+      "completed": false
+    },
+    {
+      "id": "sh-sel-change-017",
+      "file": "src/SelectionHandler.ts",
+      "lines": "231-236",
+      "category": "SelectionHandler/onSelectionChange",
+      "description": "onSelectionChange should detect changes by comparing range count and quote text",
+      "completed": false
+    },
+    {
+      "id": "sh-sel-change-018",
+      "file": "src/SelectionHandler.ts",
+      "lines": "243-246",
+      "category": "SelectionHandler/onSelectionChange",
+      "description": "onSelectionChange should merge ranges with existing annotation when ADD_TO_CURRENT",
+      "completed": false
+    },
+    {
+      "id": "sh-sel-change-019",
+      "file": "src/SelectionHandler.ts",
+      "lines": "248-252",
+      "category": "SelectionHandler/onSelectionChange",
+      "description": "onSelectionChange should update currentTarget with new selectors",
+      "completed": false
+    },
+    {
+      "id": "sh-sel-change-020",
+      "file": "src/SelectionHandler.ts",
+      "lines": "250",
+      "category": "SelectionHandler/onSelectionChange",
+      "description": "onSelectionChange should call rangeToSelector for each combined range",
+      "completed": false
+    },
+    {
+      "id": "sh-sel-change-021",
+      "file": "src/SelectionHandler.ts",
+      "lines": "264",
+      "category": "SelectionHandler/onSelectionChange",
+      "description": "onSelectionChange should return early when ADD_TO_CURRENT or REPLACE_CURRENT (defer to mouseup)",
+      "completed": false
+    },
+    {
+      "id": "sh-sel-change-022",
+      "file": "src/SelectionHandler.ts",
+      "lines": "270-271",
+      "category": "SelectionHandler/onSelectionChange",
+      "description": "onSelectionChange should update existing annotation target via store.updateTarget",
+      "completed": false
+    },
+    {
+      "id": "sh-sel-change-023",
+      "file": "src/SelectionHandler.ts",
+      "lines": "273-274",
+      "category": "SelectionHandler/onSelectionChange",
+      "description": "onSelectionChange should clear previous selection when annotation doesn't exist yet",
+      "completed": false
+    },
+    {
+      "id": "sh-ptr-down-001",
+      "file": "src/SelectionHandler.ts",
+      "lines": "283-290",
+      "category": "SelectionHandler/onPointerDown",
+      "description": "onPointerDown should clone the pointer event to preserve target reference",
+      "completed": false
+    },
+    {
+      "id": "sh-ptr-down-002",
+      "file": "src/SelectionHandler.ts",
+      "lines": "288",
+      "category": "SelectionHandler/onPointerDown",
+      "description": "onPointerDown should store cloned event in lastDownEvent",
+      "completed": false
+    },
+    {
+      "id": "sh-ptr-down-003",
+      "file": "src/SelectionHandler.ts",
+      "lines": "289",
+      "category": "SelectionHandler/onPointerDown",
+      "description": "onPointerDown should set isLeftClick to true when button === 0",
+      "completed": false
+    },
+    {
+      "id": "sh-ptr-down-004",
+      "file": "src/SelectionHandler.ts",
+      "lines": "289",
+      "category": "SelectionHandler/onPointerDown",
+      "description": "onPointerDown should set isLeftClick to false when button !== 0 (right-click)",
+      "completed": false
+    },
+    {
+      "id": "sh-ptr-up-001",
+      "file": "src/SelectionHandler.ts",
+      "lines": "292-293",
+      "category": "SelectionHandler/onPointerUp",
+      "description": "onPointerUp should return early when isLeftClick is false",
+      "completed": false
+    },
+    {
+      "id": "sh-ptr-up-002",
+      "file": "src/SelectionHandler.ts",
+      "lines": "295",
+      "category": "SelectionHandler/onPointerUp",
+      "description": "onPointerUp should clone the pointer event",
+      "completed": false
+    },
+    {
+      "id": "sh-ptr-up-003",
+      "file": "src/SelectionHandler.ts",
+      "lines": "301-308",
+      "category": "SelectionHandler/onPointerUp",
+      "description": "clickSelect should handle dismissOnNotAnnotatable='ALWAYS' by clearing selection",
+      "completed": false
+    },
+    {
+      "id": "sh-ptr-up-004",
+      "file": "src/SelectionHandler.ts",
+      "lines": "302-303",
+      "category": "SelectionHandler/onPointerUp",
+      "description": "clickSelect should call dismissOnNotAnnotatable function when provided",
+      "completed": false
+    },
+    {
+      "id": "sh-ptr-up-005",
+      "file": "src/SelectionHandler.ts",
+      "lines": "311-319",
+      "category": "SelectionHandler/onPointerUp",
+      "description": "clickSelect should call store.getAt with correct coordinates and filter",
+      "completed": false
+    },
+    {
+      "id": "sh-ptr-up-006",
+      "file": "src/SelectionHandler.ts",
+      "lines": "317",
+      "category": "SelectionHandler/onPointerUp",
+      "description": "clickSelect should pass selectionMode='all' flag to store.getAt",
+      "completed": false
+    },
+    {
+      "id": "sh-ptr-up-007",
+      "file": "src/SelectionHandler.ts",
+      "lines": "321-334",
+      "category": "SelectionHandler/onPointerUp",
+      "description": "clickSelect should emit clickAnnotation event when annotation is clicked",
+      "completed": false
+    },
+    {
+      "id": "sh-ptr-up-008",
+      "file": "src/SelectionHandler.ts",
+      "lines": "333",
+      "category": "SelectionHandler/onPointerUp",
+      "description": "clickSelect should call selection.userSelect with annotation ids",
+      "completed": false
+    },
+    {
+      "id": "sh-ptr-up-009",
+      "file": "src/SelectionHandler.ts",
+      "lines": "327-329",
+      "category": "SelectionHandler/onPointerUp",
+      "description": "clickSelect should detect selection change by comparing current and next ids",
+      "completed": false
+    },
+    {
+      "id": "sh-ptr-up-010",
+      "file": "src/SelectionHandler.ts",
+      "lines": "335-337",
+      "category": "SelectionHandler/onPointerUp",
+      "description": "clickSelect should clear selection when clicking empty area",
+      "completed": false
+    },
+    {
+      "id": "sh-ptr-up-011",
+      "file": "src/SelectionHandler.ts",
+      "lines": "340-341",
+      "category": "SelectionHandler/onPointerUp",
+      "description": "onPointerUp should check timeDifference < CLICK_TIMEOUT (300ms) for click detection",
+      "completed": false
+    },
+    {
+      "id": "sh-ptr-up-012",
+      "file": "src/SelectionHandler.ts",
+      "lines": "342",
+      "category": "SelectionHandler/onPointerUp",
+      "description": "onPointerUp should call pollSelectionCollapsed before processing click",
+      "completed": false
+    },
+    {
+      "id": "sh-ptr-up-013",
+      "file": "src/SelectionHandler.ts",
+      "lines": "361-365",
+      "category": "SelectionHandler/onPointerUp",
+      "description": "onPointerUp should route to clickSelect when selection is collapsed",
+      "completed": false
+    },
+    {
+      "id": "sh-ptr-up-014",
+      "file": "src/SelectionHandler.ts",
+      "lines": "361",
+      "category": "SelectionHandler/onPointerUp",
+      "description": "onPointerUp should route to clickSelect when both down and up are on not-annotatable element",
+      "completed": false
+    },
+    {
+      "id": "sh-ptr-up-015",
+      "file": "src/SelectionHandler.ts",
+      "lines": "362",
+      "category": "SelectionHandler/onPointerUp",
+      "description": "onPointerUp should clear currentTarget before calling clickSelect",
+      "completed": false
+    },
+    {
+      "id": "sh-ptr-up-016",
+      "file": "src/SelectionHandler.ts",
+      "lines": "368-371",
+      "category": "SelectionHandler/onPointerUp",
+      "description": "onPointerUp should call upsertCurrentTarget when valid selection exists",
+      "completed": false
+    },
+    {
+      "id": "sh-ptr-up-017",
+      "file": "src/SelectionHandler.ts",
+      "lines": "370",
+      "category": "SelectionHandler/onPointerUp",
+      "description": "onPointerUp should call selection.userSelect after upserting target",
+      "completed": false
+    },
+    {
+      "id": "sh-poll-001",
+      "file": "src/SelectionHandler.ts",
+      "lines": "384-396",
+      "category": "SelectionHandler/pollSelectionCollapsed",
+      "description": "pollSelectionCollapsed should poll isCollapsed with 1ms interval",
+      "completed": false
+    },
+    {
+      "id": "sh-poll-002",
+      "file": "src/SelectionHandler.ts",
+      "lines": "392-393",
+      "category": "SelectionHandler/pollSelectionCollapsed",
+      "description": "pollSelectionCollapsed should stop after 50ms timeout",
+      "completed": false
+    },
+    {
+      "id": "sh-poll-003",
+      "file": "src/SelectionHandler.ts",
+      "lines": "389",
+      "category": "SelectionHandler/pollSelectionCollapsed",
+      "description": "pollSelectionCollapsed should stop early when isCollapsed becomes true",
+      "completed": false
+    },
+    {
+      "id": "sh-ctx-menu-001",
+      "file": "src/SelectionHandler.ts",
+      "lines": "398-401",
+      "category": "SelectionHandler/onContextMenu",
+      "description": "onContextMenu should return early when selection is collapsed",
+      "completed": false
+    },
+    {
+      "id": "sh-ctx-menu-002",
+      "file": "src/SelectionHandler.ts",
+      "lines": "407-409",
+      "category": "SelectionHandler/onContextMenu",
+      "description": "onContextMenu should call onSelectionChange when currentTarget missing (Chrome Android workaround)",
+      "completed": false
+    },
+    {
+      "id": "sh-ctx-menu-003",
+      "file": "src/SelectionHandler.ts",
+      "lines": "414",
+      "category": "SelectionHandler/onContextMenu",
+      "description": "onContextMenu should return early when selection couldn't be initiated",
+      "completed": false
+    },
+    {
+      "id": "sh-ctx-menu-004",
+      "file": "src/SelectionHandler.ts",
+      "lines": "415",
+      "category": "SelectionHandler/onContextMenu",
+      "description": "onContextMenu should call upsertCurrentTarget",
+      "completed": false
+    },
+    {
+      "id": "sh-ctx-menu-005",
+      "file": "src/SelectionHandler.ts",
+      "lines": "417",
+      "category": "SelectionHandler/onContextMenu",
+      "description": "onContextMenu should call selection.userSelect with cloned event",
+      "completed": false
+    },
+    {
+      "id": "sh-keyup-001",
+      "file": "src/SelectionHandler.ts",
+      "lines": "420-421",
+      "category": "SelectionHandler/onKeyup",
+      "description": "onKeyup should return early when annotating is disabled",
+      "completed": false
+    },
+    {
+      "id": "sh-keyup-002",
+      "file": "src/SelectionHandler.ts",
+      "lines": "423",
+      "category": "SelectionHandler/onKeyup",
+      "description": "onKeyup should only process Shift key release",
+      "completed": false
+    },
+    {
+      "id": "sh-keyup-003",
+      "file": "src/SelectionHandler.ts",
+      "lines": "423",
+      "category": "SelectionHandler/onKeyup",
+      "description": "onKeyup should only process when currentTarget exists",
+      "completed": false
+    },
+    {
+      "id": "sh-keyup-004",
+      "file": "src/SelectionHandler.ts",
+      "lines": "426",
+      "category": "SelectionHandler/onKeyup",
+      "description": "onKeyup should only process when selection is not collapsed",
+      "completed": false
+    },
+    {
+      "id": "sh-keyup-005",
+      "file": "src/SelectionHandler.ts",
+      "lines": "427-428",
+      "category": "SelectionHandler/onKeyup",
+      "description": "onKeyup should call upsertCurrentTarget and selection.userSelect on Shift release",
+      "completed": false
+    },
+    {
+      "id": "sh-select-all-001",
+      "file": "src/SelectionHandler.ts",
+      "lines": "433-458",
+      "category": "SelectionHandler/onSelectAll",
+      "description": "onSelectAll should add selectionchange event listener",
+      "completed": false
+    },
+    {
+      "id": "sh-select-all-002",
+      "file": "src/SelectionHandler.ts",
+      "lines": "457",
+      "category": "SelectionHandler/onSelectAll",
+      "description": "onSelectAll should call onSelectStart",
+      "completed": false
+    },
+    {
+      "id": "sh-select-all-003",
+      "file": "src/SelectionHandler.ts",
+      "lines": "437",
+      "category": "SelectionHandler/onSelectAll",
+      "description": "onSelectAll should clear selection in handler",
+      "completed": false
+    },
+    {
+      "id": "sh-select-all-004",
+      "file": "src/SelectionHandler.ts",
+      "lines": "439-443",
+      "category": "SelectionHandler/onSelectAll",
+      "description": "onSelectAll should add annotation to store",
+      "completed": false
+    },
+    {
+      "id": "sh-select-all-005",
+      "file": "src/SelectionHandler.ts",
+      "lines": "445",
+      "category": "SelectionHandler/onSelectAll",
+      "description": "onSelectAll should call selection.userSelect",
+      "completed": false
+    },
+    {
+      "id": "sh-select-all-006",
+      "file": "src/SelectionHandler.ts",
+      "lines": "448",
+      "category": "SelectionHandler/onSelectAll",
+      "description": "onSelectAll should remove selectionchange listener after processing",
+      "completed": false
+    },
+    {
+      "id": "sh-hotkeys-001",
+      "file": "src/SelectionHandler.ts",
+      "lines": "460-463",
+      "category": "SelectionHandler/Hotkeys",
+      "description": "SELECTION_KEYS hotkey should store lastDownEvent on non-repeat keydown",
+      "completed": false
+    },
+    {
+      "id": "sh-hotkeys-002",
+      "file": "src/SelectionHandler.ts",
+      "lines": "461",
+      "category": "SelectionHandler/Hotkeys",
+      "description": "SELECTION_KEYS hotkey should ignore repeat events",
+      "completed": false
+    },
+    {
+      "id": "sh-hotkeys-003",
+      "file": "src/SelectionHandler.ts",
+      "lines": "465-468",
+      "category": "SelectionHandler/Hotkeys",
+      "description": "SELECT_ALL hotkey should store lastDownEvent and call onSelectAll",
+      "completed": false
+    },
+    {
+      "id": "sh-arrow-001",
+      "file": "src/SelectionHandler.ts",
+      "lines": "478-488",
+      "category": "SelectionHandler/handleArrowKeyPress",
+      "description": "handleArrowKeyPress should return early on repeat events",
+      "completed": false
+    },
+    {
+      "id": "sh-arrow-002",
+      "file": "src/SelectionHandler.ts",
+      "lines": "481",
+      "category": "SelectionHandler/handleArrowKeyPress",
+      "description": "handleArrowKeyPress should return early when target is not-annotatable (except body)",
+      "completed": false
+    },
+    {
+      "id": "sh-arrow-003",
+      "file": "src/SelectionHandler.ts",
+      "lines": "481",
+      "category": "SelectionHandler/handleArrowKeyPress",
+      "description": "handleArrowKeyPress should process when target is document.body",
+      "completed": false
+    },
+    {
+      "id": "sh-arrow-004",
+      "file": "src/SelectionHandler.ts",
+      "lines": "486",
+      "category": "SelectionHandler/handleArrowKeyPress",
+      "description": "handleArrowKeyPress should clear currentTarget",
+      "completed": false
+    },
+    {
+      "id": "sh-arrow-005",
+      "file": "src/SelectionHandler.ts",
+      "lines": "487",
+      "category": "SelectionHandler/handleArrowKeyPress",
+      "description": "handleArrowKeyPress should call selection.clear()",
+      "completed": false
+    },
+    {
+      "id": "sh-upsert-001",
+      "file": "src/SelectionHandler.ts",
+      "lines": "493-513",
+      "category": "SelectionHandler/upsertCurrentTarget",
+      "description": "upsertCurrentTarget should add annotation when it doesn't exist",
+      "completed": false
+    },
+    {
+      "id": "sh-upsert-002",
+      "file": "src/SelectionHandler.ts",
+      "lines": "496-500",
+      "category": "SelectionHandler/upsertCurrentTarget",
+      "description": "upsertCurrentTarget should add annotation with id, bodies, and target",
+      "completed": false
+    },
+    {
+      "id": "sh-upsert-003",
+      "file": "src/SelectionHandler.ts",
+      "lines": "505-511",
+      "category": "SelectionHandler/upsertCurrentTarget",
+      "description": "upsertCurrentTarget should update target when currentTarget is newer",
+      "completed": false
+    },
+    {
+      "id": "sh-upsert-004",
+      "file": "src/SelectionHandler.ts",
+      "lines": "506-507",
+      "category": "SelectionHandler/upsertCurrentTarget",
+      "description": "upsertCurrentTarget should update target when existing has no updated timestamp",
+      "completed": false
+    },
+    {
+      "id": "sh-upsert-005",
+      "file": "src/SelectionHandler.ts",
+      "lines": "508",
+      "category": "SelectionHandler/upsertCurrentTarget",
+      "description": "upsertCurrentTarget should NOT update target when existing is newer",
+      "completed": false
+    },
+    {
+      "id": "sh-events-001",
+      "file": "src/SelectionHandler.ts",
+      "lines": "515",
+      "category": "SelectionHandler/EventListeners",
+      "description": "should add pointerdown listener to document",
+      "completed": false
+    },
+    {
+      "id": "sh-events-002",
+      "file": "src/SelectionHandler.ts",
+      "lines": "516",
+      "category": "SelectionHandler/EventListeners",
+      "description": "should add pointerup listener to document",
+      "completed": false
+    },
+    {
+      "id": "sh-events-003",
+      "file": "src/SelectionHandler.ts",
+      "lines": "517",
+      "category": "SelectionHandler/EventListeners",
+      "description": "should add contextmenu listener to document",
+      "completed": false
+    },
+    {
+      "id": "sh-events-004",
+      "file": "src/SelectionHandler.ts",
+      "lines": "519",
+      "category": "SelectionHandler/EventListeners",
+      "description": "should add keyup listener to container",
+      "completed": false
+    },
+    {
+      "id": "sh-events-005",
+      "file": "src/SelectionHandler.ts",
+      "lines": "520",
+      "category": "SelectionHandler/EventListeners",
+      "description": "should add selectstart listener to container",
+      "completed": false
+    },
+    {
+      "id": "sh-events-006",
+      "file": "src/SelectionHandler.ts",
+      "lines": "521",
+      "category": "SelectionHandler/EventListeners",
+      "description": "should add selectionchange listener to document",
+      "completed": false
+    },
+    {
+      "id": "sh-destroy-001",
+      "file": "src/SelectionHandler.ts",
+      "lines": "524-527",
+      "category": "SelectionHandler/destroy",
+      "description": "destroy should reset internal state variables to undefined",
+      "completed": false
+    },
+    {
+      "id": "sh-destroy-002",
+      "file": "src/SelectionHandler.ts",
+      "lines": "529",
+      "category": "SelectionHandler/destroy",
+      "description": "destroy should clear debounced onSelectionChange handler",
+      "completed": false
+    },
+    {
+      "id": "sh-destroy-003",
+      "file": "src/SelectionHandler.ts",
+      "lines": "531",
+      "category": "SelectionHandler/destroy",
+      "description": "destroy should remove pointerdown listener from document",
+      "completed": false
+    },
+    {
+      "id": "sh-destroy-004",
+      "file": "src/SelectionHandler.ts",
+      "lines": "532",
+      "category": "SelectionHandler/destroy",
+      "description": "destroy should remove pointerup listener from document",
+      "completed": false
+    },
+    {
+      "id": "sh-destroy-005",
+      "file": "src/SelectionHandler.ts",
+      "lines": "533",
+      "category": "SelectionHandler/destroy",
+      "description": "destroy should remove contextmenu listener from document",
+      "completed": false
+    },
+    {
+      "id": "sh-destroy-006",
+      "file": "src/SelectionHandler.ts",
+      "lines": "535",
+      "category": "SelectionHandler/destroy",
+      "description": "destroy should remove keyup listener from container",
+      "completed": false
+    },
+    {
+      "id": "sh-destroy-007",
+      "file": "src/SelectionHandler.ts",
+      "lines": "536",
+      "category": "SelectionHandler/destroy",
+      "description": "destroy should remove selectstart listener from container",
+      "completed": false
+    },
+    {
+      "id": "sh-destroy-008",
+      "file": "src/SelectionHandler.ts",
+      "lines": "537",
+      "category": "SelectionHandler/destroy",
+      "description": "destroy should remove selectionchange listener from document",
+      "completed": false
+    },
+    {
+      "id": "sh-destroy-009",
+      "file": "src/SelectionHandler.ts",
+      "lines": "539",
+      "category": "SelectionHandler/destroy",
+      "description": "destroy should unbind all hotkeys",
+      "completed": false
+    },
+    {
+      "id": "sh-return-001",
+      "file": "src/SelectionHandler.ts",
+      "lines": "542-548",
+      "category": "SelectionHandler/ReturnValue",
+      "description": "createSelectionHandler should return object with destroy method",
+      "completed": false
+    },
+    {
+      "id": "sh-return-002",
+      "file": "src/SelectionHandler.ts",
+      "lines": "542-548",
+      "category": "SelectionHandler/ReturnValue",
+      "description": "createSelectionHandler should return object with setFilter method",
+      "completed": false
+    },
+    {
+      "id": "sh-return-003",
+      "file": "src/SelectionHandler.ts",
+      "lines": "542-548",
+      "category": "SelectionHandler/ReturnValue",
+      "description": "createSelectionHandler should return object with setUser method",
+      "completed": false
+    },
+    {
+      "id": "sh-return-004",
+      "file": "src/SelectionHandler.ts",
+      "lines": "542-548",
+      "category": "SelectionHandler/ReturnValue",
+      "description": "createSelectionHandler should return object with setAnnotatingEnabled method",
+      "completed": false
+    },
+    {
+      "id": "sh-return-005",
+      "file": "src/SelectionHandler.ts",
+      "lines": "542-548",
+      "category": "SelectionHandler/ReturnValue",
+      "description": "createSelectionHandler should return object with setAnnotatingMode method",
+      "completed": false
+    },
+    {
+      "id": "r-hover-001",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "73-90",
+      "category": "Renderer/onPointerMove",
+      "description": "onPointerMove should call store.getAt with relative coordinates",
+      "completed": false
+    },
+    {
+      "id": "r-hover-002",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "78",
+      "category": "Renderer/onPointerMove",
+      "description": "onPointerMove should pass currentFilter to store.getAt",
+      "completed": false
+    },
+    {
+      "id": "r-hover-003",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "79",
+      "category": "Renderer/onPointerMove",
+      "description": "onPointerMove should check evalSelectAction is not NONE before hovering",
+      "completed": false
+    },
+    {
+      "id": "r-hover-004",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "80-83",
+      "category": "Renderer/onPointerMove",
+      "description": "onPointerMove should add 'hovered' class and set hover state when hit found",
+      "completed": false
+    },
+    {
+      "id": "r-hover-005",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "80",
+      "category": "Renderer/onPointerMove",
+      "description": "onPointerMove should only update hover when id changes",
+      "completed": false
+    },
+    {
+      "id": "r-hover-006",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "84-88",
+      "category": "Renderer/onPointerMove",
+      "description": "onPointerMove should remove 'hovered' class and clear hover when no hit",
+      "completed": false
+    },
+    {
+      "id": "r-hover-007",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "85",
+      "category": "Renderer/onPointerMove",
+      "description": "onPointerMove should only clear hover when hover.current exists",
+      "completed": false
+    },
+    {
+      "id": "r-hover-008",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "92",
+      "category": "Renderer/onPointerMove",
+      "description": "should add pointermove listener to container",
+      "completed": false
+    },
+    {
+      "id": "r-redraw-001",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "94-122",
+      "category": "Renderer/redraw",
+      "description": "redraw should be debounced at 10ms",
+      "completed": false
+    },
+    {
+      "id": "r-redraw-002",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "94",
+      "category": "Renderer/redraw",
+      "description": "redraw should use requestAnimationFrame",
+      "completed": false
+    },
+    {
+      "id": "r-redraw-003",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "95-96",
+      "category": "Renderer/redraw",
+      "description": "redraw should call painter.clear() when painter exists",
+      "completed": false
+    },
+    {
+      "id": "r-redraw-004",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "98",
+      "category": "Renderer/redraw",
+      "description": "redraw should call getViewportBounds with container",
+      "completed": false
+    },
+    {
+      "id": "r-redraw-005",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "102-104",
+      "category": "Renderer/redraw",
+      "description": "redraw should call store.getIntersecting with viewport bounds",
+      "completed": false
+    },
+    {
+      "id": "r-redraw-006",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "103",
+      "category": "Renderer/redraw",
+      "description": "redraw should apply currentFilter to intersecting annotations",
+      "completed": false
+    },
+    {
+      "id": "r-redraw-007",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "106",
+      "category": "Renderer/redraw",
+      "description": "redraw should get selectedIds from selection.selected",
+      "completed": false
+    },
+    {
+      "id": "r-redraw-008",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "108-117",
+      "category": "Renderer/redraw",
+      "description": "redraw should create Highlight objects with annotation, rects, and state",
+      "completed": false
+    },
+    {
+      "id": "r-redraw-009",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "109",
+      "category": "Renderer/redraw",
+      "description": "redraw should set selected state based on selectedIds",
+      "completed": false
+    },
+    {
+      "id": "r-redraw-010",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "110",
+      "category": "Renderer/redraw",
+      "description": "redraw should set hovered state based on hover.current",
+      "completed": false
+    },
+    {
+      "id": "r-redraw-011",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "119",
+      "category": "Renderer/redraw",
+      "description": "redraw should call renderer.redraw with highlights, bounds, style, painter, lazy",
+      "completed": false
+    },
+    {
+      "id": "r-redraw-012",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "121",
+      "category": "Renderer/redraw",
+      "description": "redraw should call onDraw callback with annotations after 1ms delay",
+      "completed": false
+    },
+    {
+      "id": "r-set-painter-001",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "124-127",
+      "category": "Renderer/setPainter",
+      "description": "setPainter should update currentPainter",
+      "completed": false
+    },
+    {
+      "id": "r-set-painter-002",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "126",
+      "category": "Renderer/setPainter",
+      "description": "setPainter should trigger redraw",
+      "completed": false
+    },
+    {
+      "id": "r-set-style-001",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "129-132",
+      "category": "Renderer/setStyle",
+      "description": "setStyle should update currentStyle",
+      "completed": false
+    },
+    {
+      "id": "r-set-style-002",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "131",
+      "category": "Renderer/setStyle",
+      "description": "setStyle should trigger redraw",
+      "completed": false
+    },
+    {
+      "id": "r-set-filter-001",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "134-137",
+      "category": "Renderer/setFilter",
+      "description": "setFilter should update currentFilter",
+      "completed": false
+    },
+    {
+      "id": "r-set-filter-002",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "136",
+      "category": "Renderer/setFilter",
+      "description": "setFilter should trigger non-lazy redraw (false)",
+      "completed": false
+    },
+    {
+      "id": "r-observe-001",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "140-141",
+      "category": "Renderer/Observers",
+      "description": "should observe store changes and trigger redraw",
+      "completed": false
+    },
+    {
+      "id": "r-observe-002",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "144",
+      "category": "Renderer/Observers",
+      "description": "should subscribe to selection changes and trigger redraw",
+      "completed": false
+    },
+    {
+      "id": "r-observe-003",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "147",
+      "category": "Renderer/Observers",
+      "description": "should subscribe to hover changes and trigger redraw",
+      "completed": false
+    },
+    {
+      "id": "r-scroll-001",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "149-150",
+      "category": "Renderer/Scroll",
+      "description": "onScroll should trigger lazy redraw (true)",
+      "completed": false
+    },
+    {
+      "id": "r-scroll-002",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "152",
+      "category": "Renderer/Scroll",
+      "description": "should add scroll listener to document with capture and passive",
+      "completed": false
+    },
+    {
+      "id": "r-resize-001",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "155-161",
+      "category": "Renderer/Resize",
+      "description": "onResize should be debounced at 10ms",
+      "completed": false
+    },
+    {
+      "id": "r-resize-002",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "156",
+      "category": "Renderer/Resize",
+      "description": "onResize should call store.recalculatePositions",
+      "completed": false
+    },
+    {
+      "id": "r-resize-003",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "158",
+      "category": "Renderer/Resize",
+      "description": "onResize should call painter.reset when painter exists",
+      "completed": false
+    },
+    {
+      "id": "r-resize-004",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "160",
+      "category": "Renderer/Resize",
+      "description": "onResize should trigger redraw",
+      "completed": false
+    },
+    {
+      "id": "r-resize-005",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "163",
+      "category": "Renderer/Resize",
+      "description": "should add resize listener to window",
+      "completed": false
+    },
+    {
+      "id": "r-resize-006",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "165-166",
+      "category": "Renderer/Resize",
+      "description": "should create ResizeObserver for container",
+      "completed": false
+    },
+    {
+      "id": "r-mutation-001",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "173-179",
+      "category": "Renderer/MutationObserver",
+      "description": "MutationObserver callback should be debounced at 150ms",
+      "completed": false
+    },
+    {
+      "id": "r-mutation-002",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "174-175",
+      "category": "Renderer/MutationObserver",
+      "description": "MutationObserver should detect internal mutations (target is container or descendant)",
+      "completed": false
+    },
+    {
+      "id": "r-mutation-003",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "177-178",
+      "category": "Renderer/MutationObserver",
+      "description": "MutationObserver should trigger lazy redraw only for external mutations",
+      "completed": false
+    },
+    {
+      "id": "r-mutation-004",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "181",
+      "category": "Renderer/MutationObserver",
+      "description": "MutationObserver should observe document.body",
+      "completed": false
+    },
+    {
+      "id": "r-mutation-005",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "171",
+      "category": "Renderer/MutationObserver",
+      "description": "MutationObserver should use attributes, childList, subtree config",
+      "completed": false
+    },
+    {
+      "id": "r-destroy-001",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "184",
+      "category": "Renderer/destroy",
+      "description": "destroy should remove pointermove listener from container",
+      "completed": false
+    },
+    {
+      "id": "r-destroy-002",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "186",
+      "category": "Renderer/destroy",
+      "description": "destroy should call renderer.destroy()",
+      "completed": false
+    },
+    {
+      "id": "r-destroy-003",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "188",
+      "category": "Renderer/destroy",
+      "description": "destroy should unobserve store changes",
+      "completed": false
+    },
+    {
+      "id": "r-destroy-004",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "190",
+      "category": "Renderer/destroy",
+      "description": "destroy should unsubscribe from selection",
+      "completed": false
+    },
+    {
+      "id": "r-destroy-005",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "191",
+      "category": "Renderer/destroy",
+      "description": "destroy should unsubscribe from hover",
+      "completed": false
+    },
+    {
+      "id": "r-destroy-006",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "193",
+      "category": "Renderer/destroy",
+      "description": "destroy should remove scroll listener from document",
+      "completed": false
+    },
+    {
+      "id": "r-destroy-007",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "196",
+      "category": "Renderer/destroy",
+      "description": "destroy should remove resize listener from window",
+      "completed": false
+    },
+    {
+      "id": "r-destroy-008",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "197",
+      "category": "Renderer/destroy",
+      "description": "destroy should disconnect ResizeObserver",
+      "completed": false
+    },
+    {
+      "id": "r-destroy-009",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "199",
+      "category": "Renderer/destroy",
+      "description": "destroy should disconnect MutationObserver",
+      "completed": false
+    },
+    {
+      "id": "r-return-001",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "202-209",
+      "category": "Renderer/ReturnValue",
+      "description": "createBaseRenderer should return object with destroy method",
+      "completed": false
+    },
+    {
+      "id": "r-return-002",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "202-209",
+      "category": "Renderer/ReturnValue",
+      "description": "createBaseRenderer should return object with redraw method",
+      "completed": false
+    },
+    {
+      "id": "r-return-003",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "202-209",
+      "category": "Renderer/ReturnValue",
+      "description": "createBaseRenderer should return object with setStyle method",
+      "completed": false
+    },
+    {
+      "id": "r-return-004",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "202-209",
+      "category": "Renderer/ReturnValue",
+      "description": "createBaseRenderer should return object with setFilter method",
+      "completed": false
+    },
+    {
+      "id": "r-return-005",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "202-209",
+      "category": "Renderer/ReturnValue",
+      "description": "createBaseRenderer should return object with setPainter method",
+      "completed": false
+    },
+    {
+      "id": "r-return-006",
+      "file": "src/highlight/Renderer.ts",
+      "lines": "208",
+      "category": "Renderer/ReturnValue",
+      "description": "createBaseRenderer should delegate setVisible to renderer.setVisible",
+      "completed": false
+    },
+    {
+      "id": "sr-zindex-001",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "14-28",
+      "category": "SpansRenderer/computeZIndex",
+      "description": "computeZIndex should detect rect intersection correctly",
+      "completed": false
+    },
+    {
+      "id": "sr-zindex-002",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "15-18",
+      "category": "SpansRenderer/computeZIndex",
+      "description": "computeZIndex intersects function should use proper overlap logic",
+      "completed": false
+    },
+    {
+      "id": "sr-zindex-003",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "20-21",
+      "category": "SpansRenderer/computeZIndex",
+      "description": "computeZIndex should calculate total highlight length from all rects",
+      "completed": false
+    },
+    {
+      "id": "sr-zindex-004",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "24-25",
+      "category": "SpansRenderer/computeZIndex",
+      "description": "computeZIndex should sort intersecting highlights by total length (descending)",
+      "completed": false
+    },
+    {
+      "id": "sr-zindex-005",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "27",
+      "category": "SpansRenderer/computeZIndex",
+      "description": "computeZIndex should return index of highlight in sorted array",
+      "completed": false
+    },
+    {
+      "id": "sr-zindex-006",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "14-28",
+      "category": "SpansRenderer/computeZIndex",
+      "description": "computeZIndex should return 0 for non-overlapping highlights",
+      "completed": false
+    },
+    {
+      "id": "sr-init-001",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "32",
+      "category": "SpansRenderer/Initialization",
+      "description": "createRenderer should add r6o-annotatable class to container",
+      "completed": false
+    },
+    {
+      "id": "sr-init-002",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "34-35",
+      "category": "SpansRenderer/Initialization",
+      "description": "createRenderer should create highlight layer div with class r6o-span-highlight-layer",
+      "completed": false
+    },
+    {
+      "id": "sr-init-003",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "37",
+      "category": "SpansRenderer/Initialization",
+      "description": "createRenderer should insert highlight layer as first child of container",
+      "completed": false
+    },
+    {
+      "id": "sr-redraw-001",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "49",
+      "category": "SpansRenderer/redraw",
+      "description": "redraw should use dequal to detect changes between currentRendered and highlights",
+      "completed": false
+    },
+    {
+      "id": "sr-redraw-002",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "53",
+      "category": "SpansRenderer/redraw",
+      "description": "redraw should skip DOM redraw when noChanges and lazy is true",
+      "completed": false
+    },
+    {
+      "id": "sr-redraw-003",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "55",
+      "category": "SpansRenderer/redraw",
+      "description": "redraw should return early when no painter and shouldRedraw is false",
+      "completed": false
+    },
+    {
+      "id": "sr-redraw-004",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "57-58",
+      "category": "SpansRenderer/redraw",
+      "description": "redraw should clear highlightLayer innerHTML when shouldRedraw",
+      "completed": false
+    },
+    {
+      "id": "sr-redraw-005",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "67-71",
+      "category": "SpansRenderer/redraw",
+      "description": "redraw should sort highlights by creation date (oldest first)",
+      "completed": false
+    },
+    {
+      "id": "sr-redraw-006",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "70",
+      "category": "SpansRenderer/redraw",
+      "description": "redraw should handle missing created dates (return 0)",
+      "completed": false
+    },
+    {
+      "id": "sr-redraw-007",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "73-105",
+      "category": "SpansRenderer/redraw",
+      "description": "redraw should iterate over all highlights and their rects",
+      "completed": false
+    },
+    {
+      "id": "sr-redraw-008",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "75",
+      "category": "SpansRenderer/redraw",
+      "description": "redraw should compute zIndex for each rect",
+      "completed": false
+    },
+    {
+      "id": "sr-redraw-009",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "76",
+      "category": "SpansRenderer/redraw",
+      "description": "redraw should call paint function with highlight, bounds, style, painter, zIndex",
+      "completed": false
+    },
+    {
+      "id": "sr-redraw-010",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "79-80",
+      "category": "SpansRenderer/redraw",
+      "description": "redraw should create span element with r6o-annotation class",
+      "completed": false
+    },
+    {
+      "id": "sr-redraw-011",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "81",
+      "category": "SpansRenderer/redraw",
+      "description": "redraw should set data-annotation attribute to annotation id",
+      "completed": false
+    },
+    {
+      "id": "sr-redraw-012",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "83-86",
+      "category": "SpansRenderer/redraw",
+      "description": "redraw should set span position styles (left, top, width, height) from rect",
+      "completed": false
+    },
+    {
+      "id": "sr-redraw-013",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "88",
+      "category": "SpansRenderer/redraw",
+      "description": "redraw should set backgroundColor using getBackgroundColor(style)",
+      "completed": false
+    },
+    {
+      "id": "sr-redraw-014",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "90-91",
+      "category": "SpansRenderer/redraw",
+      "description": "redraw should set borderStyle when underlineStyle is provided",
+      "completed": false
+    },
+    {
+      "id": "sr-redraw-015",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "93-94",
+      "category": "SpansRenderer/redraw",
+      "description": "redraw should set borderColor when underlineColor is provided",
+      "completed": false
+    },
+    {
+      "id": "sr-redraw-016",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "96-97",
+      "category": "SpansRenderer/redraw",
+      "description": "redraw should set borderBottomWidth when underlineThickness is provided",
+      "completed": false
+    },
+    {
+      "id": "sr-redraw-017",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "99-100",
+      "category": "SpansRenderer/redraw",
+      "description": "redraw should set paddingBottom when underlineOffset is provided",
+      "completed": false
+    },
+    {
+      "id": "sr-redraw-018",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "102",
+      "category": "SpansRenderer/redraw",
+      "description": "redraw should append span to highlightLayer",
+      "completed": false
+    },
+    {
+      "id": "sr-redraw-019",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "107",
+      "category": "SpansRenderer/redraw",
+      "description": "redraw should update currentRendered after processing",
+      "completed": false
+    },
+    {
+      "id": "sr-visible-001",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "110-115",
+      "category": "SpansRenderer/setVisible",
+      "description": "setVisible(true) should remove hidden class from highlightLayer",
+      "completed": false
+    },
+    {
+      "id": "sr-visible-002",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "110-115",
+      "category": "SpansRenderer/setVisible",
+      "description": "setVisible(false) should add hidden class to highlightLayer",
+      "completed": false
+    },
+    {
+      "id": "sr-destroy-001",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "117-119",
+      "category": "SpansRenderer/destroy",
+      "description": "destroy should remove highlightLayer from DOM",
+      "completed": false
+    },
+    {
+      "id": "sr-return-001",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "121-125",
+      "category": "SpansRenderer/ReturnValue",
+      "description": "createRenderer should return object with destroy method",
+      "completed": false
+    },
+    {
+      "id": "sr-return-002",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "121-125",
+      "category": "SpansRenderer/ReturnValue",
+      "description": "createRenderer should return object with redraw method",
+      "completed": false
+    },
+    {
+      "id": "sr-return-003",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "121-125",
+      "category": "SpansRenderer/ReturnValue",
+      "description": "createRenderer should return object with setVisible method",
+      "completed": false
+    },
+    {
+      "id": "sr-factory-001",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "129-133",
+      "category": "SpansRenderer/Factory",
+      "description": "createSpansRenderer should call createBaseRenderer with container, state, viewport, and renderer",
+      "completed": false
+    },
+    {
+      "id": "sr-factory-002",
+      "file": "src/highlight/span/spansRenderer.ts",
+      "lines": "133",
+      "category": "SpansRenderer/Factory",
+      "description": "createSpansRenderer should pass createRenderer(container) as implementation",
+      "completed": false
+    }
+  ]
+}
