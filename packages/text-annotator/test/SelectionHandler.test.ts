@@ -4121,5 +4121,74 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should add annotation with id, bodies, and target (sh-upsert-002)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Set up mock selection state
+      (mockState.selection as any).selected = [];
+
+      // Create a range for selection
+      const range = document.createRange();
+      const textNode = container.querySelector('p')?.firstChild;
+      if (textNode) {
+        range.setStart(textNode, 0);
+        range.setEnd(textNode, 4);
+      }
+
+      // Mock document.getSelection
+      const mockSelection = {
+        anchorNode: textNode,
+        rangeCount: 1,
+        isCollapsed: false,
+        getRangeAt: vi.fn().mockReturnValue(range)
+      };
+      const originalGetSelection = document.getSelection;
+      document.getSelection = vi.fn().mockReturnValue(mockSelection);
+
+      // Mock store.getAnnotation to return undefined (annotation doesn't exist)
+      (mockState.store.getAnnotation as any).mockReturnValue(undefined);
+
+      // Simulate pointerdown and selectstart to create currentTarget
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(pointerDownEvent, 'target', { value: container });
+      document.dispatchEvent(pointerDownEvent);
+
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // Dispatch contextmenu to trigger upsertCurrentTarget
+      const contextMenuEvent = new (global.PointerEvent || MouseEvent)('contextmenu', {
+        bubbles: true,
+        button: 2,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(contextMenuEvent, 'target', { value: container });
+      document.dispatchEvent(contextMenuEvent);
+
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // At lines 496-500: addAnnotation is called with { id, bodies: [], target }
+      expect(mockState.store.addAnnotation).toHaveBeenCalled();
+      const addAnnotationCall = (mockState.store.addAnnotation as any).mock.calls[0][0];
+      expect(addAnnotationCall).toHaveProperty('id');
+      expect(addAnnotationCall).toHaveProperty('bodies');
+      expect(addAnnotationCall.bodies).toEqual([]);
+      expect(addAnnotationCall).toHaveProperty('target');
+      expect(addAnnotationCall.target).toHaveProperty('annotation');
+      expect(addAnnotationCall.target).toHaveProperty('selector');
+
+      // Restore original getSelection
+      document.getSelection = originalGetSelection;
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });

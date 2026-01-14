@@ -750,7 +750,7 @@
       "lines": "496-500",
       "category": "SelectionHandler/upsertCurrentTarget",
       "description": "upsertCurrentTarget should add annotation with id, bodies, and target",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-upsert-003",
