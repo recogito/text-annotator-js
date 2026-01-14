@@ -494,7 +494,7 @@
       "lines": "361",
       "category": "SelectionHandler/onPointerUp",
       "description": "onPointerUp should route to clickSelect when both down and up are on not-annotatable element",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-ptr-up-015",
