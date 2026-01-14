@@ -418,5 +418,38 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should apply currentFilter to intersecting annotations (r-redraw-006)', async () => {
+      const mockAnnotation1 = { annotation: { id: 'ann-1', target: {} }, rects: [] };
+      const mockAnnotation2 = { annotation: { id: 'ann-2', target: {} }, rects: [] };
+      (mockState.store.getIntersecting as any).mockReturnValue([mockAnnotation1, mockAnnotation2]);
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // Set a filter that only allows ann-1
+      const testFilter = vi.fn((annotation: TextAnnotation) => annotation.id === 'ann-1');
+      renderer.setFilter(testFilter);
+
+      // Reset any calls from setFilter
+      vi.clearAllMocks();
+      testFilter.mockClear();
+
+      renderer.redraw();
+
+      // Wait for debounce + requestAnimationFrame
+      await new Promise(resolve => setTimeout(resolve, 30));
+
+      // At line 103: filter is applied via .filter(({ annotation }) => currentFilter(annotation))
+      // Filter should have been called for each annotation
+      expect(testFilter).toHaveBeenCalled();
+
+      // renderer.redraw should receive filtered results (only ann-1)
+      const redrawCall = (mockRendererImpl.redraw as any).mock.calls[0];
+      const highlights = redrawCall[0];
+      expect(highlights.length).toBe(1);
+      expect(highlights[0].annotation.id).toBe('ann-1');
+
+      renderer.destroy();
+    });
   });
 });

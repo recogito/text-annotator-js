@@ -1046,7 +1046,7 @@
       "lines": "103",
       "category": "Renderer/redraw",
       "description": "redraw should apply currentFilter to intersecting annotations",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-redraw-007",
