@@ -1622,7 +1622,7 @@
       "lines": "110-115",
       "category": "SpansRenderer/setVisible",
       "description": "setVisible(true) should remove hidden class from highlightLayer",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-visible-002",
