@@ -3449,4 +3449,43 @@ describe('SelectionHandler', () => {
       handler.destroy();
     });
   });
+
+  describe('onContextMenu', () => {
+    it('should return early when selection is collapsed (sh-ctx-menu-001)', () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Mock document.getSelection to return a collapsed selection
+      const mockSelection = {
+        isCollapsed: true,
+        anchorNode: container,
+        rangeCount: 0,
+        getRangeAt: vi.fn()
+      };
+      const originalGetSelection = document.getSelection;
+      document.getSelection = vi.fn().mockReturnValue(mockSelection);
+
+      // Dispatch contextmenu event
+      const contextMenuEvent = new (global.PointerEvent || MouseEvent)('contextmenu', {
+        bubbles: true,
+        button: 2, // Right click
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(contextMenuEvent, 'target', { value: container });
+      document.dispatchEvent(contextMenuEvent);
+
+      // At line 401: if (sel?.isCollapsed) return;
+      // When selection is collapsed, onContextMenu should return early.
+      // This means upsertCurrentTarget should NOT be called
+      expect(mockState.store.addAnnotation).not.toHaveBeenCalled();
+      expect(mockState.store.updateTarget).not.toHaveBeenCalled();
+      expect(mockState.selection.userSelect).not.toHaveBeenCalled();
+
+      // Restore original getSelection
+      document.getSelection = originalGetSelection;
+
+      // Clean up
+      handler.destroy();
+    });
+  });
 });

@@ -550,7 +550,7 @@
       "lines": "398-401",
       "category": "SelectionHandler/onContextMenu",
       "description": "onContextMenu should return early when selection is collapsed",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-ctx-menu-002",
