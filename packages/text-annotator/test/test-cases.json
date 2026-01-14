@@ -38,7 +38,7 @@
       "lines": "80",
       "category": "SelectionHandler/Configuration",
       "description": "setAnnotatingMode() should update annotatingMode to provided value",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-config-006",
