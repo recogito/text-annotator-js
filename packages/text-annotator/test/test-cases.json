@@ -198,7 +198,7 @@
       "lines": "159-167",
       "category": "SelectionHandler/onSelectionChange",
       "description": "onSelectionChange should clear currentTarget when selection is hijacked by not-annotatable element",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-sel-change-005",

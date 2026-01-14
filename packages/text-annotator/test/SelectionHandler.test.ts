@@ -1116,5 +1116,64 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should clear currentTarget when selection is hijacked by not-annotatable element (sh-sel-change-004)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // First, set up a valid selection scenario to establish currentTarget
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 10,
+        clientY: 10
+      });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Trigger selectstart to set up currentTarget
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // Create a not-annotatable element outside the container
+      const notAnnotatableElement = document.createElement('div');
+      notAnnotatableElement.setAttribute('data-not-annotatable', 'true');
+      document.body.appendChild(notAnnotatableElement);
+      notAnnotatableElement.textContent = 'Not annotatable text';
+
+      // Create a range inside the not-annotatable element
+      const range = document.createRange();
+      range.selectNodeContents(notAnnotatableElement);
+
+      // Mock document.getSelection to return a selection with all ranges in not-annotatable area
+      const mockSelection = {
+        anchorNode: notAnnotatableElement.firstChild,
+        rangeCount: 1,
+        isCollapsed: false,
+        getRangeAt: vi.fn().mockReturnValue(range)
+      };
+      const originalGetSelection = document.getSelection;
+      document.getSelection = vi.fn().mockReturnValue(mockSelection);
+
+      // Trigger selectionchange - should clear currentTarget at line 165
+      const selectionChangeEvent = new Event('selectionchange', { bubbles: true });
+      document.dispatchEvent(selectionChangeEvent);
+
+      // Wait for debounce timeout
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // Since all selection ranges are not annotatable (isRangeAnnotatable returns false),
+      // the handler should clear currentTarget (line 165) and return early (line 166).
+      // No store operations should occur after this point.
+      expect(mockState.store.addAnnotation).not.toHaveBeenCalled();
+      expect(mockState.store.updateTarget).not.toHaveBeenCalled();
+
+      // Restore original getSelection
+      document.getSelection = originalGetSelection;
+
+      // Remove the not-annotatable element
+      notAnnotatableElement.remove();
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });
