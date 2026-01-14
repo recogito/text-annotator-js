@@ -256,5 +256,28 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should only clear hover when hover.current exists (r-hover-007)', () => {
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // Ensure hover.current is undefined (no current hover)
+      (mockState.hover as any).current = undefined;
+
+      // Mock store.getAt to return null (no hit)
+      (mockState.store.getAt as any).mockReturnValue(null);
+
+      const pointerMoveEvent = new (global.PointerEvent || MouseEvent)('pointermove', {
+        bubbles: true,
+        clientX: 150,
+        clientY: 100
+      });
+      container.dispatchEvent(pointerMoveEvent);
+
+      // At line 85: if (hover.current)
+      // Since hover.current is undefined, hover.set should NOT be called
+      expect(mockState.hover.set).not.toHaveBeenCalled();
+
+      renderer.destroy();
+    });
   });
 });
