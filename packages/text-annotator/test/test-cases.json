@@ -270,7 +270,7 @@
       "lines": "213-214",
       "category": "SelectionHandler/onSelectionChange",
       "description": "onSelectionChange should NOT delete annotation on collapse when REPLACE_CURRENT mode",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-sel-change-014",

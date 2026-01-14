@@ -1684,5 +1684,71 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should NOT delete annotation on collapse when REPLACE_CURRENT mode (sh-sel-change-013)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Set REPLACE_CURRENT mode - annotations should NOT be deleted on collapse
+      handler.setAnnotatingMode('REPLACE_CURRENT');
+
+      // Set up mock selection state
+      (mockState.selection as any).selected = [];
+
+      // Trigger pointerdown to set lastDownEvent
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 10,
+        clientY: 10
+      });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Trigger selectstart to set up currentTarget
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // Create a collapsed range
+      const collapsedRange = document.createRange();
+      const textNode = container.querySelector('p')?.firstChild;
+      if (textNode) {
+        collapsedRange.setStart(textNode, 3);
+        collapsedRange.setEnd(textNode, 3);
+      }
+
+      // Mock store.getAnnotation to return an existing annotation
+      const mockAnnotation = {
+        id: 'temp-annotation-id',
+        target: { selector: [] }
+      };
+      (mockState.store.getAnnotation as any).mockReturnValue(mockAnnotation);
+
+      // Mock document.getSelection to return a collapsed selection
+      const mockSelection = {
+        anchorNode: textNode,
+        rangeCount: 1,
+        isCollapsed: true,
+        getRangeAt: vi.fn().mockReturnValue(collapsedRange)
+      };
+      const originalGetSelection = document.getSelection;
+      document.getSelection = vi.fn().mockReturnValue(mockSelection);
+
+      // Trigger selectionchange
+      const selectionChangeEvent = new Event('selectionchange', { bubbles: true });
+      document.dispatchEvent(selectionChangeEvent);
+
+      // Wait for debounce timeout
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // When annotatingMode is REPLACE_CURRENT, the annotation should NOT be deleted
+      // even though the selection collapsed (lines 213-214)
+      // The condition checks: !(isAddToCurrentSelect || annotatingMode === 'REPLACE_CURRENT')
+      expect(mockState.store.deleteAnnotation).not.toHaveBeenCalled();
+
+      // Restore original getSelection
+      document.getSelection = originalGetSelection;
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });
