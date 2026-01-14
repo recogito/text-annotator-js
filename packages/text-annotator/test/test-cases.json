@@ -430,7 +430,7 @@
       "lines": "317",
       "category": "SelectionHandler/onPointerUp",
       "description": "clickSelect should pass selectionMode='all' flag to store.getAt",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-ptr-up-007",

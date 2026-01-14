@@ -2671,5 +2671,46 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should pass selectionMode=all flag to store.getAt (sh-ptr-up-006)', async () => {
+      // Create handler with selectionMode='all'
+      const optionsWithAllMode = {
+        ...mockOptions,
+        selectionMode: 'all' as const
+      };
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, optionsWithAllMode);
+
+      // Dispatch a left click pointer down event on the container
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(pointerDownEvent, 'target', { value: container });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Dispatch a pointer up event on the container
+      const pointerUpEvent = new (global.PointerEvent || MouseEvent)('pointerup', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(pointerUpEvent, 'target', { value: container });
+      document.dispatchEvent(pointerUpEvent);
+
+      // Wait for async operations
+      await new Promise(resolve => setTimeout(resolve, 80));
+
+      // At line 317: store.getAt should be called with selectionMode === 'all'
+      // The third argument should be true when selectionMode is 'all'
+      expect(mockState.store.getAt).toHaveBeenCalled();
+      const callArgs = (mockState.store.getAt as any).mock.calls[0];
+      expect(callArgs[2]).toBe(true); // Third argument is selectionMode === 'all'
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });
