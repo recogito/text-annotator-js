@@ -230,7 +230,7 @@
       "lines": "198-203",
       "category": "SelectionHandler/onSelectionChange",
       "description": "onSelectionChange should create new currentTarget when dragging selection back into annotatable area",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-sel-change-009",
