@@ -1646,7 +1646,7 @@
       "lines": "121-125",
       "category": "SpansRenderer/ReturnValue",
       "description": "createRenderer should return object with destroy method",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-return-002",
