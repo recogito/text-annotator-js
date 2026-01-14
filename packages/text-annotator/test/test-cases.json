@@ -438,7 +438,7 @@
       "lines": "321-334",
       "category": "SelectionHandler/onPointerUp",
       "description": "clickSelect should emit clickAnnotation event when annotation is clicked",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-ptr-up-008",

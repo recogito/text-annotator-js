@@ -2712,5 +2712,52 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should emit clickAnnotation event when annotation is clicked (sh-ptr-up-007)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Create a mock annotation to return from store.getAt
+      const mockAnnotation = {
+        id: 'test-annotation-id',
+        target: {
+          annotation: 'test-annotation-id',
+          selector: []
+        },
+        bodies: []
+      };
+
+      // Mock store.getAt to return the annotation when clicked
+      (mockState.store.getAt as any).mockReturnValue(mockAnnotation);
+
+      // Dispatch a left click pointer down event on the container
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(pointerDownEvent, 'target', { value: container });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Dispatch a pointer up event on the container
+      const pointerUpEvent = new (global.PointerEvent || MouseEvent)('pointerup', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(pointerUpEvent, 'target', { value: container });
+      document.dispatchEvent(pointerUpEvent);
+
+      // Wait for async operations (pollSelectionCollapsed)
+      await new Promise(resolve => setTimeout(resolve, 80));
+
+      // At line 332: lifecycle.emit('clickAnnotation', hovered) should be called
+      // when an annotation is clicked and the selection has changed
+      expect(mockLifecycle.emit).toHaveBeenCalledWith('clickAnnotation', mockAnnotation);
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });
