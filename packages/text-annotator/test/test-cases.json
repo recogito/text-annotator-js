@@ -518,7 +518,7 @@
       "lines": "370",
       "category": "SelectionHandler/onPointerUp",
       "description": "onPointerUp should call selection.userSelect after upserting target",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-poll-001",
