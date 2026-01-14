@@ -966,7 +966,7 @@
       "lines": "80-83",
       "category": "Renderer/onPointerMove",
       "description": "onPointerMove should add 'hovered' class and set hover state when hit found",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-hover-005",

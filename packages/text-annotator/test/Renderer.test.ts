@@ -181,5 +181,30 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should add hovered class and set hover state when hit found (r-hover-004)', () => {
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // Mock store.getAt to return a hit
+      const mockAnnotation = { id: 'test-annotation', target: {} } as TextAnnotation;
+      (mockState.store.getAt as any).mockReturnValue(mockAnnotation);
+
+      // Mock evalSelectAction to return something other than NONE
+      (mockState.selection.evalSelectAction as any).mockReturnValue(UserSelectAction.SELECT);
+
+      const pointerMoveEvent = new (global.PointerEvent || MouseEvent)('pointermove', {
+        bubbles: true,
+        clientX: 150,
+        clientY: 100
+      });
+      container.dispatchEvent(pointerMoveEvent);
+
+      // At lines 80-83: When hit found and evalSelectAction is not NONE
+      // container.classList.add('hovered') and hover.set(hit.id)
+      expect(container.classList.contains('hovered')).toBe(true);
+      expect(mockState.hover.set).toHaveBeenCalledWith('test-annotation');
+
+      renderer.destroy();
+    });
   });
 });
