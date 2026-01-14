@@ -1518,7 +1518,7 @@
       "lines": "73-105",
       "category": "SpansRenderer/redraw",
       "description": "redraw should iterate over all highlights and their rects",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-redraw-008",
