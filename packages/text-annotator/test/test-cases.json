@@ -1574,7 +1574,7 @@
       "lines": "90-91",
       "category": "SpansRenderer/redraw",
       "description": "redraw should set borderStyle when underlineStyle is provided",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-redraw-015",
