@@ -664,4 +664,23 @@ describe('Renderer', () => {
       renderer.destroy();
     });
   });
+
+  describe('setStyle', () => {
+    it('should update currentStyle (r-set-style-001)', async () => {
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // At lines 129-132: setStyle updates currentStyle
+      const testStyle = { fill: 'red', opacity: 0.5 };
+      renderer.setStyle(testStyle as any);
+
+      // Wait for debounce + requestAnimationFrame
+      await new Promise(resolve => setTimeout(resolve, 30));
+
+      // The style should be passed to renderer.redraw
+      const call = (mockRendererImpl.redraw as any).mock.calls.pop();
+      expect(call[2]).toEqual(testStyle);
+
+      renderer.destroy();
+    });
+  });
 });

@@ -1118,7 +1118,7 @@
       "lines": "129-132",
       "category": "Renderer/setStyle",
       "description": "setStyle should update currentStyle",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-set-style-002",
