@@ -701,4 +701,30 @@ describe('Renderer', () => {
       renderer.destroy();
     });
   });
+
+  describe('setFilter', () => {
+    it('should update currentFilter (r-set-filter-001)', async () => {
+      const mockAnnotation1 = { annotation: { id: 'ann-1', target: {} }, rects: [] };
+      const mockAnnotation2 = { annotation: { id: 'ann-2', target: {} }, rects: [] };
+      (mockState.store.getIntersecting as any).mockReturnValue([mockAnnotation1, mockAnnotation2]);
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // At lines 134-137: setFilter updates currentFilter
+      // Set a filter that only allows ann-2
+      const testFilter = (annotation: TextAnnotation) => annotation.id === 'ann-2';
+      renderer.setFilter(testFilter);
+
+      // Wait for debounce + requestAnimationFrame
+      await new Promise(resolve => setTimeout(resolve, 30));
+
+      // The filter should be applied during redraw, filtering out ann-1
+      const call = (mockRendererImpl.redraw as any).mock.calls.pop();
+      const highlights = call[0];
+      expect(highlights.length).toBe(1);
+      expect(highlights[0].annotation.id).toBe('ann-2');
+
+      renderer.destroy();
+    });
+  });
 });

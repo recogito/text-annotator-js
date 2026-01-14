@@ -1134,7 +1134,7 @@
       "lines": "134-137",
       "category": "Renderer/setFilter",
       "description": "setFilter should update currentFilter",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-set-filter-002",
