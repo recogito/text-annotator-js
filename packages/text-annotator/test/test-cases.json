@@ -278,7 +278,7 @@
       "lines": "223-224",
       "category": "SelectionHandler/onSelectionChange",
       "description": "onSelectionChange should trim selection ranges to container boundaries",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-sel-change-015",
