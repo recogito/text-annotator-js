@@ -1342,7 +1342,7 @@
       "lines": "199",
       "category": "Renderer/destroy",
       "description": "destroy should disconnect MutationObserver",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-return-001",
