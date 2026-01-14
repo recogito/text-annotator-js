@@ -231,5 +231,30 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should remove hovered class and clear hover when no hit (r-hover-006)', () => {
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // Set initial hovered state
+      container.classList.add('hovered');
+      (mockState.hover as any).current = 'some-annotation';
+
+      // Mock store.getAt to return null (no hit)
+      (mockState.store.getAt as any).mockReturnValue(null);
+
+      const pointerMoveEvent = new (global.PointerEvent || MouseEvent)('pointermove', {
+        bubbles: true,
+        clientX: 150,
+        clientY: 100
+      });
+      container.dispatchEvent(pointerMoveEvent);
+
+      // At lines 84-88: When no hit and hover.current exists
+      // container.classList.remove('hovered') and hover.set(null)
+      expect(container.classList.contains('hovered')).toBe(false);
+      expect(mockState.hover.set).toHaveBeenCalledWith(null);
+
+      renderer.destroy();
+    });
   });
 });

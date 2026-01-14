@@ -982,7 +982,7 @@
       "lines": "84-88",
       "category": "Renderer/onPointerMove",
       "description": "onPointerMove should remove 'hovered' class and clear hover when no hit",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-hover-007",
