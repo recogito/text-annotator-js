@@ -1678,7 +1678,7 @@
       "lines": "133",
       "category": "SpansRenderer/Factory",
       "description": "createSpansRenderer should pass createRenderer(container) as implementation",
-      "completed": false
+      "completed": true
     }
   ]
 }
