@@ -382,7 +382,7 @@
       "lines": "289",
       "category": "SelectionHandler/onPointerDown",
       "description": "onPointerDown should set isLeftClick to false when button !== 0 (right-click)",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-ptr-up-001",

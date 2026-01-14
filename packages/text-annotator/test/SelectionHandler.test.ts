@@ -2479,5 +2479,36 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should set isLeftClick to false when button !== 0 (sh-ptr-down-004)', () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Set up mock selection state
+      (mockState.selection as any).selected = [];
+
+      // Dispatch a right click pointer down event (button === 2)
+      const rightClickEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 2, // Right click
+        clientX: 10,
+        clientY: 10
+      });
+      document.dispatchEvent(rightClickEvent);
+
+      // Trigger selectstart - since isLeftClick is false (button !== 0),
+      // the selectstart handler should return early at line 101
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // At line 289: isLeftClick = lastDownEvent.button === 0
+      // When button is 2, isLeftClick should be false, blocking selection.
+      // The onSelectStart returns early at line 101: if (isLeftClick === false) return;
+
+      // No annotation operations should have occurred because of early return
+      expect(mockState.store.getAnnotation).not.toHaveBeenCalled();
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });
