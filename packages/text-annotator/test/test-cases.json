@@ -934,7 +934,7 @@
       "lines": "542-548",
       "category": "SelectionHandler/ReturnValue",
       "description": "createSelectionHandler should return object with setAnnotatingMode method",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-hover-001",
