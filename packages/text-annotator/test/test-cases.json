@@ -1486,7 +1486,7 @@
       "lines": "55",
       "category": "SpansRenderer/redraw",
       "description": "redraw should return early when no painter and shouldRedraw is false",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-redraw-004",

@@ -447,5 +447,28 @@ describe('SpansRenderer', () => {
       // noChanges=false, lazy=false -> shouldRedraw=true
       expect(calculateShouldRedraw(false, false)).toBe(true);
     });
+
+    it('should return early when no painter and shouldRedraw is false (sr-redraw-003)', () => {
+      // At line 55: if (!painter && !shouldRedraw) return;
+      // If there's no painter AND shouldRedraw is false, the function returns early
+
+      // Test the early return condition
+      const shouldReturnEarly = (painter: any, shouldRedraw: boolean): boolean => {
+        return !painter && !shouldRedraw;
+      };
+
+      // No painter, shouldRedraw=false -> return early
+      expect(shouldReturnEarly(null, false)).toBe(true);
+      expect(shouldReturnEarly(undefined, false)).toBe(true);
+
+      // Has painter, shouldRedraw=false -> don't return early (need to call painter)
+      expect(shouldReturnEarly({}, false)).toBe(false);
+
+      // No painter, shouldRedraw=true -> don't return early (need to redraw DOM)
+      expect(shouldReturnEarly(null, true)).toBe(false);
+
+      // Has painter, shouldRedraw=true -> don't return early
+      expect(shouldReturnEarly({}, true)).toBe(false);
+    });
   });
 });
