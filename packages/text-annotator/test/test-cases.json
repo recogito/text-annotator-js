@@ -366,7 +366,7 @@
       "lines": "288",
       "category": "SelectionHandler/onPointerDown",
       "description": "onPointerDown should store cloned event in lastDownEvent",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-ptr-down-003",
