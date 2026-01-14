@@ -4672,5 +4672,15 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should return object with setUser method (sh-return-003)', () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      expect(handler.setUser).toBeDefined();
+      expect(typeof handler.setUser).toBe('function');
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });
