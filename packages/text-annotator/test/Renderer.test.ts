@@ -279,5 +279,17 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should add pointermove listener to container (r-hover-008)', () => {
+      const addEventListenerSpy = vi.spyOn(container, 'addEventListener');
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // At line 92: container.addEventListener('pointermove', onPointerMove)
+      expect(addEventListenerSpy).toHaveBeenCalledWith('pointermove', expect.any(Function));
+
+      addEventListenerSpy.mockRestore();
+      renderer.destroy();
+    });
   });
 });

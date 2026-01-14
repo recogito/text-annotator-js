@@ -998,7 +998,7 @@
       "lines": "92",
       "category": "Renderer/onPointerMove",
       "description": "should add pointermove listener to container",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-redraw-001",
