@@ -758,7 +758,7 @@
       "lines": "505-511",
       "category": "SelectionHandler/upsertCurrentTarget",
       "description": "upsertCurrentTarget should update target when currentTarget is newer",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-upsert-004",
