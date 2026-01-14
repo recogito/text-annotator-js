@@ -1230,7 +1230,7 @@
       "lines": "165-166",
       "category": "Renderer/Resize",
       "description": "should create ResizeObserver for container",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-mutation-001",

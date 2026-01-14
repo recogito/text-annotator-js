@@ -982,5 +982,23 @@ describe('Renderer', () => {
       addEventListenerSpy.mockRestore();
       renderer.destroy();
     });
+
+    it('should create ResizeObserver for container (r-resize-006)', () => {
+      // Track ResizeObserver constructor calls
+      const mockObserve = vi.fn();
+      class MockResizeObserver {
+        observe = mockObserve;
+        disconnect = vi.fn();
+        unobserve = vi.fn();
+      }
+      global.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // At lines 165-166: new ResizeObserver(onResize) and resizeObserver.observe(container)
+      expect(mockObserve).toHaveBeenCalledWith(container);
+
+      renderer.destroy();
+    });
   });
 });
