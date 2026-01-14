@@ -1171,5 +1171,14 @@ describe('Renderer', () => {
 
       removeEventListenerSpy.mockRestore();
     });
+
+    it('should call renderer.destroy() (r-destroy-002)', () => {
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      renderer.destroy();
+
+      // At line 186: renderer.destroy()
+      expect(mockRendererImpl.destroy).toHaveBeenCalled();
+    });
   });
 });

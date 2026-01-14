@@ -1286,7 +1286,7 @@
       "lines": "186",
       "category": "Renderer/destroy",
       "description": "destroy should call renderer.destroy()",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-destroy-003",
