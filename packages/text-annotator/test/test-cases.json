@@ -190,7 +190,7 @@
       "lines": "145-154",
       "category": "SelectionHandler/onSelectionChange",
       "description": "onSelectionChange should return early when anchorNode is null (iOS edge case)",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-sel-change-004",
