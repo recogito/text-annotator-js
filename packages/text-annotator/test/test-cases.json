@@ -446,7 +446,7 @@
       "lines": "333",
       "category": "SelectionHandler/onPointerUp",
       "description": "clickSelect should call selection.userSelect with annotation ids",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-ptr-up-009",
