@@ -394,5 +394,29 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should call store.getIntersecting with viewport bounds (r-redraw-005)', async () => {
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // Reset any calls from initialization
+      vi.clearAllMocks();
+
+      renderer.redraw();
+
+      // Wait for debounce + requestAnimationFrame
+      await new Promise(resolve => setTimeout(resolve, 30));
+
+      // At lines 102-104: store.getIntersecting(minX, minY, maxX, maxY)
+      expect(mockState.store.getIntersecting).toHaveBeenCalled();
+      const call = (mockState.store.getIntersecting as any).mock.calls[0];
+      // Should have 4 arguments: minX, minY, maxX, maxY
+      expect(call.length).toBe(4);
+      expect(typeof call[0]).toBe('number'); // minX
+      expect(typeof call[1]).toBe('number'); // minY
+      expect(typeof call[2]).toBe('number'); // maxX
+      expect(typeof call[3]).toBe('number'); // maxY
+
+      renderer.destroy();
+    });
   });
 });

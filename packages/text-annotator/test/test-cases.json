@@ -1038,7 +1038,7 @@
       "lines": "102-104",
       "category": "Renderer/redraw",
       "description": "redraw should call store.getIntersecting with viewport bounds",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-redraw-006",
