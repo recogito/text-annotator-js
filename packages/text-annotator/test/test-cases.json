@@ -342,7 +342,7 @@
       "lines": "270-271",
       "category": "SelectionHandler/onSelectionChange",
       "description": "onSelectionChange should update existing annotation target via store.updateTarget",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-sel-change-023",
