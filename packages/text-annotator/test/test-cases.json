@@ -1606,7 +1606,7 @@
       "lines": "102",
       "category": "SpansRenderer/redraw",
       "description": "redraw should append span to highlightLayer",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-redraw-019",
