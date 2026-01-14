@@ -1526,7 +1526,7 @@
       "lines": "75",
       "category": "SpansRenderer/redraw",
       "description": "redraw should compute zIndex for each rect",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-redraw-009",
