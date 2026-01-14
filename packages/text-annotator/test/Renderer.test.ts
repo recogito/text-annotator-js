@@ -777,5 +777,34 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should subscribe to selection changes and trigger redraw (r-observe-002)', async () => {
+      // Capture the callback passed to selection.subscribe
+      let selectionCallback: (() => void) | undefined;
+      (mockState.selection.subscribe as any).mockImplementation((cb: () => void) => {
+        selectionCallback = cb;
+        return () => {}; // unsubscribe function
+      });
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // At line 144: selection.subscribe(() => redraw()) registers the callback
+      expect(mockState.selection.subscribe).toHaveBeenCalled();
+      expect(selectionCallback).toBeDefined();
+
+      // Reset any calls from initialization
+      vi.clearAllMocks();
+
+      // Trigger the selection change callback
+      selectionCallback!();
+
+      // Wait for debounce + requestAnimationFrame
+      await new Promise(resolve => setTimeout(resolve, 30));
+
+      // redraw should have been called
+      expect(mockRendererImpl.redraw).toHaveBeenCalled();
+
+      renderer.destroy();
+    });
   });
 });

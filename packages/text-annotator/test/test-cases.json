@@ -1158,7 +1158,7 @@
       "lines": "144",
       "category": "Renderer/Observers",
       "description": "should subscribe to selection changes and trigger redraw",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-observe-003",
