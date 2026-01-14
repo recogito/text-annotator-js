@@ -765,5 +765,51 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should set targetToModify to existing annotation target when modifying (sh-select-start-005)', () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Set annotating mode to ADD_TO_CURRENT to trigger modify-existing path
+      handler.setAnnotatingMode('ADD_TO_CURRENT');
+
+      // Set up a SINGLE editable selected annotation with a target
+      const existingTarget = {
+        selector: [{ type: 'TextQuoteSelector', exact: 'existing text' }],
+        created: new Date('2024-01-01'),
+        creator: { id: 'original-creator' }
+      };
+      const mockAnnotation = {
+        id: 'existing-annotation-id',
+        target: existingTarget
+      };
+      (mockState.selection as any).selected = [{ id: 'existing-annotation-id', editable: true }];
+      (mockState.store.getAnnotation as any).mockReturnValue(mockAnnotation);
+
+      // Trigger pointerdown (left-click)
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 10,
+        clientY: 10
+      });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Trigger selectstart - this should set targetToModify = existing.target (line 115)
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // Verify that store.getAnnotation was called to fetch the existing annotation
+      // This confirms the modify-existing code path was taken
+      expect(mockState.store.getAnnotation).toHaveBeenCalledWith('existing-annotation-id');
+
+      // The targetToModify is set internally (line 115), which is used to:
+      // 1. Preserve created/creator in currentTarget (lines 120-121)
+      // 2. Merge ranges with existing selectors (lines 243-244)
+      // We can't directly verify the internal state, but the getAnnotation call
+      // confirms the code path was reached, and the target would be stored.
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });

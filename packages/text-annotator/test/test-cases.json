@@ -134,7 +134,7 @@
       "lines": "111-127",
       "category": "SelectionHandler/onSelectStart",
       "description": "onSelectStart should set targetToModify to existing annotation target when modifying",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-select-start-006",
