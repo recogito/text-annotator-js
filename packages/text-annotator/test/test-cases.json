@@ -1638,7 +1638,7 @@
       "lines": "117-119",
       "category": "SpansRenderer/destroy",
       "description": "destroy should remove highlightLayer from DOM",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-return-001",
