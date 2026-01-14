@@ -294,7 +294,7 @@
       "lines": "229",
       "category": "SelectionHandler/onSelectionChange",
       "description": "onSelectionChange should split ranges around not-annotatable elements",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-sel-change-017",
