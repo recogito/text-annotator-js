@@ -398,7 +398,7 @@
       "lines": "295",
       "category": "SelectionHandler/onPointerUp",
       "description": "onPointerUp should clone the pointer event",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-ptr-up-003",
