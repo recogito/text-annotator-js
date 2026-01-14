@@ -1382,7 +1382,7 @@
       "lines": "202-209",
       "category": "Renderer/ReturnValue",
       "description": "createBaseRenderer should return object with setPainter method",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-return-006",
