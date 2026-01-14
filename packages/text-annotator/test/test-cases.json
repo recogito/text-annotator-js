@@ -1254,7 +1254,7 @@
       "lines": "177-178",
       "category": "Renderer/MutationObserver",
       "description": "MutationObserver should trigger lazy redraw only for external mutations",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-mutation-004",

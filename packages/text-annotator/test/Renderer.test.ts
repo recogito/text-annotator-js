@@ -1080,5 +1080,42 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should trigger lazy redraw only for external mutations (r-mutation-003)', async () => {
+      // Capture the MutationObserver callback
+      let mutationCallback: MutationCallback | undefined;
+      class MockMutationObserver {
+        observe = vi.fn();
+        disconnect = vi.fn();
+        constructor(callback: MutationCallback) {
+          mutationCallback = callback;
+        }
+      }
+      global.MutationObserver = MockMutationObserver as unknown as typeof MutationObserver;
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // Reset any calls from initialization
+      vi.clearAllMocks();
+
+      // At lines 177-178: if (!isInternal) redraw(true)
+      // Create a mock mutation record where the target is NOT the container (external mutation)
+      const mockExternalRecord = {
+        target: document.body
+      } as MutationRecord;
+
+      // Trigger the callback with external mutation
+      mutationCallback!([ mockExternalRecord ], {} as MutationObserver);
+
+      // Wait for debounce to complete (150ms debounce + requestAnimationFrame)
+      await new Promise(resolve => setTimeout(resolve, 180));
+
+      // redraw should be called with lazy=true for external mutations
+      expect(mockRendererImpl.redraw).toHaveBeenCalled();
+      const call = (mockRendererImpl.redraw as any).mock.calls.pop();
+      expect(call[4]).toBe(true); // lazy flag should be true
+
+      renderer.destroy();
+    });
   });
 });
