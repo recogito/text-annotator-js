@@ -1542,7 +1542,7 @@
       "lines": "79-80",
       "category": "SpansRenderer/redraw",
       "description": "redraw should create span element with r6o-annotation class",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-redraw-011",

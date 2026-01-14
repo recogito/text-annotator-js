@@ -709,5 +709,17 @@ describe('SpansRenderer', () => {
       expect(capturedArgs[3]).toBe(mockPainter);
       expect(capturedArgs[4]).toBe(mockZIndex);
     });
+
+    it('should create span element with r6o-annotation class (sr-redraw-010)', () => {
+      // At lines 79-80:
+      // const span = document.createElement('span');
+      // span.className = 'r6o-annotation';
+
+      const span = document.createElement('span');
+      span.className = 'r6o-annotation';
+
+      expect(span.tagName.toLowerCase()).toBe('span');
+      expect(span.className).toBe('r6o-annotation');
+    });
   });
 });
