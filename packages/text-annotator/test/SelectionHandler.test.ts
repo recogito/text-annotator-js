@@ -4651,4 +4651,16 @@ describe('SelectionHandler', () => {
     // This is difficult to test directly since hotkeys is an external library
     // The test would require mocking the hotkeys module, which is out of scope
   });
+
+  describe('ReturnValue', () => {
+    it('should return object with destroy method (sh-return-001)', () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      expect(handler.destroy).toBeDefined();
+      expect(typeof handler.destroy).toBe('function');
+
+      // Clean up
+      handler.destroy();
+    });
+  });
 });
