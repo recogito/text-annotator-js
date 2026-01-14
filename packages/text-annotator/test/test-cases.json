@@ -1310,7 +1310,7 @@
       "lines": "191",
       "category": "Renderer/destroy",
       "description": "destroy should unsubscribe from hover",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-destroy-006",
