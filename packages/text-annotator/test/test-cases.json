@@ -1326,7 +1326,7 @@
       "lines": "196",
       "category": "Renderer/destroy",
       "description": "destroy should remove resize listener from window",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-destroy-008",
