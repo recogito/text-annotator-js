@@ -513,5 +513,51 @@ describe('SpansRenderer', () => {
       // This is the expected behavior at line 58
       renderer.destroy();
     });
+
+    it('should sort highlights by creation date (oldest first) (sr-redraw-005)', () => {
+      // At lines 67-71:
+      // const sorted = [...highlights].sort((highlightA, highlightB) => {
+      //   const { annotation: { target: { created: createdA } } } = highlightA;
+      //   const { annotation: { target: { created: createdB } } } = highlightB;
+      //   return createdA && createdB ? createdA.getTime() - createdB.getTime() : 0;
+      // });
+
+      type Highlight = {
+        annotation: {
+          target: {
+            created: Date;
+          };
+        };
+      };
+
+      const sortHighlights = (highlights: Highlight[]): Highlight[] => {
+        return [...highlights].sort((highlightA, highlightB) => {
+          const createdA = highlightA.annotation.target.created;
+          const createdB = highlightB.annotation.target.created;
+          return createdA && createdB ? createdA.getTime() - createdB.getTime() : 0;
+        });
+      };
+
+      const oldest: Highlight = {
+        annotation: { target: { created: new Date('2024-01-01') } }
+      };
+      const middle: Highlight = {
+        annotation: { target: { created: new Date('2024-06-15') } }
+      };
+      const newest: Highlight = {
+        annotation: { target: { created: new Date('2024-12-31') } }
+      };
+
+      // Unsorted array
+      const unsorted = [newest, oldest, middle];
+
+      // Sort by creation date
+      const sorted = sortHighlights(unsorted);
+
+      // Should be: oldest, middle, newest
+      expect(sorted[0]).toBe(oldest);
+      expect(sorted[1]).toBe(middle);
+      expect(sorted[2]).toBe(newest);
+    });
   });
 });

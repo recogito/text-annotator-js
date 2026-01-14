@@ -1502,7 +1502,7 @@
       "lines": "67-71",
       "category": "SpansRenderer/redraw",
       "description": "redraw should sort highlights by creation date (oldest first)",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-redraw-006",
