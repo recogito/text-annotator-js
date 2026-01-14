@@ -1262,7 +1262,7 @@
       "lines": "181",
       "category": "Renderer/MutationObserver",
       "description": "MutationObserver should observe document.body",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-mutation-005",

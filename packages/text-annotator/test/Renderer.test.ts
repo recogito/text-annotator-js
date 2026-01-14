@@ -1117,5 +1117,23 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should observe document.body (r-mutation-004)', () => {
+      // Track MutationObserver observe calls
+      const mockObserve = vi.fn();
+      class MockMutationObserver {
+        observe = mockObserve;
+        disconnect = vi.fn();
+        constructor(callback: MutationCallback) {}
+      }
+      global.MutationObserver = MockMutationObserver as unknown as typeof MutationObserver;
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // At line 181: mutationObserver.observe(document.body, config)
+      expect(mockObserve).toHaveBeenCalledWith(document.body, expect.any(Object));
+
+      renderer.destroy();
+    });
   });
 });
