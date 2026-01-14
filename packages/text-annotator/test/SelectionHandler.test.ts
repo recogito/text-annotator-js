@@ -3977,5 +3977,73 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should call upsertCurrentTarget and selection.userSelect on Shift release (sh-keyup-005)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Set up mock selection state
+      (mockState.selection as any).selected = [];
+
+      // Create a range for selection
+      const range = document.createRange();
+      const textNode = container.querySelector('p')?.firstChild;
+      if (textNode) {
+        range.setStart(textNode, 0);
+        range.setEnd(textNode, 4);
+      }
+
+      // Mock document.getSelection to return a non-collapsed selection
+      const mockSelection = {
+        anchorNode: textNode,
+        rangeCount: 1,
+        isCollapsed: false,
+        getRangeAt: vi.fn().mockReturnValue(range)
+      };
+      const originalGetSelection = document.getSelection;
+      document.getSelection = vi.fn().mockReturnValue(mockSelection);
+
+      // Mock store.getAnnotation to return undefined (new annotation)
+      (mockState.store.getAnnotation as any).mockReturnValue(undefined);
+
+      // Simulate pointerdown and selectstart to create currentTarget
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(pointerDownEvent, 'target', { value: container });
+      document.dispatchEvent(pointerDownEvent);
+
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // Wait for currentTarget to be created
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // Dispatch Shift keyup event
+      const keyupEvent = new KeyboardEvent('keyup', {
+        bubbles: true,
+        key: 'Shift'
+      });
+      container.dispatchEvent(keyupEvent);
+
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // At lines 427-428: upsertCurrentTarget() and selection.userSelect() are called
+      expect(mockState.store.addAnnotation).toHaveBeenCalled();
+      expect(mockState.selection.userSelect).toHaveBeenCalled();
+
+      // Verify the cloned keyboard event is passed to userSelect
+      const userSelectCall = (mockState.selection.userSelect as any).mock.calls[0];
+      const clonedEvent = userSelectCall[1];
+      expect(clonedEvent.key).toBe('Shift');
+
+      // Restore original getSelection
+      document.getSelection = originalGetSelection;
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });

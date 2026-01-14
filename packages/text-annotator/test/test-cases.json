@@ -622,7 +622,7 @@
       "lines": "427-428",
       "category": "SelectionHandler/onKeyup",
       "description": "onKeyup should call upsertCurrentTarget and selection.userSelect on Shift release",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-select-all-001",
