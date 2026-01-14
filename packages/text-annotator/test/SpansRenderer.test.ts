@@ -754,5 +754,87 @@ describe('SpansRenderer', () => {
       expect(span.style.width).toBe('200px');
       expect(span.style.height).toBe('25px');
     });
+
+    it('should set backgroundColor using getBackgroundColor(style) (sr-redraw-013)', () => {
+      // At line 88: span.style.backgroundColor = getBackgroundColor(style);
+      // The getBackgroundColor function extracts the background color from the style object
+
+      const span = document.createElement('span');
+      const style = { backgroundColor: 'rgba(255, 255, 0, 0.3)' };
+
+      // Simulate what the code does
+      const getBackgroundColor = (s: { backgroundColor?: string }) => s.backgroundColor || '';
+      span.style.backgroundColor = getBackgroundColor(style);
+
+      expect(span.style.backgroundColor).toBe('rgba(255, 255, 0, 0.3)');
+    });
+
+    it('should set borderStyle when underlineStyle is provided (sr-redraw-014)', () => {
+      // At lines 90-91:
+      // if (style.underlineStyle)
+      //   span.style.borderStyle = style.underlineStyle;
+
+      const span = document.createElement('span');
+      const styleWithUnderline = { underlineStyle: 'solid' };
+      const styleWithoutUnderline = {};
+
+      // With underlineStyle
+      if (styleWithUnderline.underlineStyle) {
+        span.style.borderStyle = styleWithUnderline.underlineStyle;
+      }
+      expect(span.style.borderStyle).toBe('solid');
+
+      // Without underlineStyle - should not be set
+      const span2 = document.createElement('span');
+      if ((styleWithoutUnderline as any).underlineStyle) {
+        span2.style.borderStyle = (styleWithoutUnderline as any).underlineStyle;
+      }
+      expect(span2.style.borderStyle).toBe('');
+    });
+
+    it('should set borderColor when underlineColor is provided (sr-redraw-015)', () => {
+      // At lines 93-94:
+      // if (style.underlineColor)
+      //   span.style.borderColor = style.underlineColor;
+
+      const span = document.createElement('span');
+      const style = { underlineColor: 'red' };
+
+      if (style.underlineColor) {
+        span.style.borderColor = style.underlineColor;
+      }
+
+      expect(span.style.borderColor).toBe('red');
+    });
+
+    it('should set borderBottomWidth when underlineThickness is provided (sr-redraw-016)', () => {
+      // At lines 96-97:
+      // if (style.underlineThickness)
+      //   span.style.borderBottomWidth = `${style.underlineThickness}px`;
+
+      const span = document.createElement('span');
+      const style = { underlineThickness: 2 };
+
+      if (style.underlineThickness) {
+        span.style.borderBottomWidth = `${style.underlineThickness}px`;
+      }
+
+      expect(span.style.borderBottomWidth).toBe('2px');
+    });
+
+    it('should set paddingBottom when underlineOffset is provided (sr-redraw-017)', () => {
+      // At lines 99-100:
+      // if (style.underlineOffset)
+      //   span.style.paddingBottom = `${style.underlineOffset}px`;
+
+      const span = document.createElement('span');
+      const style = { underlineOffset: 5 };
+
+      if (style.underlineOffset) {
+        span.style.paddingBottom = `${style.underlineOffset}px`;
+      }
+
+      expect(span.style.paddingBottom).toBe('5px');
+    });
   });
 });

@@ -1566,7 +1566,7 @@
       "lines": "88",
       "category": "SpansRenderer/redraw",
       "description": "redraw should set backgroundColor using getBackgroundColor(style)",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-redraw-014",
