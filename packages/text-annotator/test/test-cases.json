@@ -246,7 +246,7 @@
       "lines": "213-218",
       "category": "SelectionHandler/onSelectionChange",
       "description": "onSelectionChange should delete annotation on collapse when not in modify mode",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-sel-change-011",

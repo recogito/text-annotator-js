@@ -1474,5 +1474,76 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should delete annotation on collapse when not in modify mode (sh-sel-change-010)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Ensure we're in CREATE_NEW mode (not modify mode)
+      handler.setAnnotatingMode('CREATE_NEW');
+
+      // Set up mock selection state - no modifier key selected
+      (mockState.selection as any).selected = [];
+
+      // Trigger pointerdown to set lastDownEvent (without modifier keys)
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 10,
+        clientY: 10,
+        ctrlKey: false,
+        metaKey: false
+      });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Trigger selectstart to set up currentTarget
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // Create a collapsed range inside the container
+      const collapsedRange = document.createRange();
+      const textNode = container.querySelector('p')?.firstChild;
+      if (textNode) {
+        collapsedRange.setStart(textNode, 3);
+        collapsedRange.setEnd(textNode, 3); // Collapsed
+      }
+
+      // Mock store.getAnnotation to return an existing annotation
+      // This simulates the case where an annotation was created during the selection
+      const mockAnnotation = {
+        id: 'temp-annotation-id',
+        target: { selector: [] }
+      };
+      (mockState.store.getAnnotation as any).mockReturnValue(mockAnnotation);
+
+      // Mock document.getSelection to return a collapsed selection
+      const mockSelection = {
+        anchorNode: textNode,
+        rangeCount: 1,
+        isCollapsed: true, // Collapsed selection
+        getRangeAt: vi.fn().mockReturnValue(collapsedRange)
+      };
+      const originalGetSelection = document.getSelection;
+      document.getSelection = vi.fn().mockReturnValue(mockSelection);
+
+      // Trigger selectionchange with collapsed selection
+      const selectionChangeEvent = new Event('selectionchange', { bubbles: true });
+      document.dispatchEvent(selectionChangeEvent);
+
+      // Wait for debounce timeout
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // When sel.isCollapsed is true and:
+      // 1. The annotation exists in the store (getAnnotation returns it)
+      // 2. We're NOT in modify mode (isAddToCurrentSelect returns false, not REPLACE_CURRENT)
+      // Then the annotation should be deleted (lines 213-218)
+      expect(mockState.selection.clear).toHaveBeenCalled();
+      expect(mockState.store.deleteAnnotation).toHaveBeenCalled();
+
+      // Restore original getSelection
+      document.getSelection = originalGetSelection;
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });
