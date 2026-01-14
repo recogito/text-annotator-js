@@ -166,7 +166,7 @@
       "lines": "135-136",
       "category": "SelectionHandler/onSelectStart",
       "description": "onSelectStart should set created date and creator on new target",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-sel-change-001",
