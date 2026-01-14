@@ -505,5 +505,35 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should set selected state based on selectedIds (r-redraw-009)', async () => {
+      const mockAnnotation1 = { annotation: { id: 'ann-1', target: {} }, rects: [] };
+      const mockAnnotation2 = { annotation: { id: 'ann-2', target: {} }, rects: [] };
+      (mockState.store.getIntersecting as any).mockReturnValue([mockAnnotation1, mockAnnotation2]);
+      // Only ann-1 is selected
+      (mockState.selection as any).selected = [{ id: 'ann-1' }];
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // Reset any calls from initialization
+      vi.clearAllMocks();
+
+      renderer.redraw();
+
+      // Wait for debounce + requestAnimationFrame
+      await new Promise(resolve => setTimeout(resolve, 30));
+
+      // At line 109: const selected = selectedIds.includes(annotation.id)
+      const redrawCall = (mockRendererImpl.redraw as any).mock.calls[0];
+      const highlights = redrawCall[0];
+
+      const highlight1 = highlights.find((h: any) => h.annotation.id === 'ann-1');
+      const highlight2 = highlights.find((h: any) => h.annotation.id === 'ann-2');
+
+      expect(highlight1.state.selected).toBe(true);
+      expect(highlight2.state.selected).toBe(false);
+
+      renderer.destroy();
+    });
   });
 });

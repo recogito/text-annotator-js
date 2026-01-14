@@ -1070,7 +1070,7 @@
       "lines": "109",
       "category": "Renderer/redraw",
       "description": "redraw should set selected state based on selectedIds",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-redraw-010",
