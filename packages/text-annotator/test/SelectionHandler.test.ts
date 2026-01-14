@@ -495,5 +495,54 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should return true on ctrlKey when allowModifierSelect and not Mac (sh-add-to-current-002)', () => {
+      // Create options with allowModifierSelect enabled
+      const optionsWithModifier = {
+        ...mockOptions,
+        allowModifierSelect: true
+      };
+
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, optionsWithModifier);
+
+      // Make sure annotatingMode is CREATE_NEW (default), so isAddToCurrentSelect
+      // doesn't return true based on mode - it should only return true based on ctrlKey
+      handler.setAnnotatingMode('CREATE_NEW');
+
+      // Set up a mock selected annotation (single editable annotation)
+      const mockAnnotation = {
+        id: 'existing-annotation-id',
+        target: {
+          selector: [{ type: 'TextQuoteSelector', exact: 'test' }],
+          created: new Date('2024-01-01'),
+          creator: { id: 'original-creator' }
+        }
+      };
+      (mockState.selection as any).selected = [{ id: 'existing-annotation-id', editable: true }];
+      (mockState.store.getAnnotation as any).mockReturnValue(mockAnnotation);
+
+      // Trigger pointerdown WITH ctrlKey pressed (not Mac, so ctrlKey is the modifier)
+      // In JSDOM, navigator.platform defaults to a non-Mac value, so isMac is false
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 10,
+        clientY: 10,
+        ctrlKey: true  // This is the key modifier for non-Mac
+      });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Trigger selectstart - when isAddToCurrentSelect returns true (because ctrlKey is pressed
+      // and allowModifierSelect is true and it's not Mac), the modify-existing code path is taken
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // Verify that store.getAnnotation was called with the selected annotation's ID
+      // This proves isAddToCurrentSelect returned true due to ctrlKey
+      expect(mockState.store.getAnnotation).toHaveBeenCalledWith('existing-annotation-id');
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });

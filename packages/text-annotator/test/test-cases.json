@@ -78,7 +78,7 @@
       "lines": "90-92",
       "category": "SelectionHandler/isAddToCurrentSelect",
       "description": "isAddToCurrentSelect should return true on ctrlKey when allowModifierSelect and not Mac",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-add-to-current-003",
