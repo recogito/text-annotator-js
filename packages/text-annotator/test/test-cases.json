@@ -238,7 +238,7 @@
       "lines": "205-221",
       "category": "SelectionHandler/onSelectionChange",
       "description": "onSelectionChange should handle collapsed selection by returning early",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-sel-change-010",
