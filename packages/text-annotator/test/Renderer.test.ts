@@ -370,5 +370,29 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should call getViewportBounds with container (r-redraw-004)', async () => {
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // Reset any calls from initialization
+      vi.clearAllMocks();
+
+      renderer.redraw();
+
+      // Wait for debounce + requestAnimationFrame
+      await new Promise(resolve => setTimeout(resolve, 30));
+
+      // At line 98: const bounds = getViewportBounds(container)
+      // The bounds are then used to call store.getIntersecting
+      // getViewportBounds uses: minX = -left, minY = -top, maxX = innerWidth - left, maxY = innerHeight - top
+      // Container is at left: 100, top: 50 (from mock getBoundingClientRect)
+      // So minX = -100, minY = -50
+      expect(mockState.store.getIntersecting).toHaveBeenCalled();
+      const call = (mockState.store.getIntersecting as any).mock.calls[0];
+      expect(call[0]).toBe(-100); // minX = -left
+      expect(call[1]).toBe(-50);  // minY = -top
+
+      renderer.destroy();
+    });
   });
 });

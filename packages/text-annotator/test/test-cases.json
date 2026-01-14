@@ -1030,7 +1030,7 @@
       "lines": "98",
       "category": "Renderer/redraw",
       "description": "redraw should call getViewportBounds with container",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-redraw-005",
