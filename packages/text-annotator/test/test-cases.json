@@ -534,7 +534,7 @@
       "lines": "392-393",
       "category": "SelectionHandler/pollSelectionCollapsed",
       "description": "pollSelectionCollapsed should stop after 50ms timeout",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-poll-003",

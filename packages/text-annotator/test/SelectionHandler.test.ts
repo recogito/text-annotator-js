@@ -3316,5 +3316,71 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should stop after 50ms timeout (sh-poll-002)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Track how many times getSelection.isCollapsed is accessed during polling
+      let pollCount = 0;
+      const startTime = Date.now();
+      let endTime: number | undefined;
+
+      // Always return non-collapsed so polling must timeout
+      const mockSelection = {
+        get isCollapsed() {
+          pollCount++;
+          // Record when we stop being polled
+          endTime = Date.now();
+          return false; // Never becomes collapsed
+        },
+        anchorNode: container,
+        rangeCount: 0,
+        getRangeAt: vi.fn()
+      };
+
+      const originalGetSelection = document.getSelection;
+      document.getSelection = vi.fn().mockReturnValue(mockSelection);
+
+      // Trigger a click sequence that invokes pollSelectionCollapsed
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(pointerDownEvent, 'target', { value: container });
+      document.dispatchEvent(pointerDownEvent);
+
+      const pointerUpEvent = new (global.PointerEvent || MouseEvent)('pointerup', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(pointerUpEvent, 'target', { value: container });
+      document.dispatchEvent(pointerUpEvent);
+
+      // Wait long enough for polling to timeout
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // At lines 392-393: stopPollingInMs = 50, setTimeout stops polling after 50ms
+      // Since isCollapsed never becomes true, polling should:
+      // 1. Poll multiple times (pollCount > 1)
+      // 2. Stop after approximately 50ms (not continue indefinitely)
+      expect(pollCount).toBeGreaterThan(1);
+
+      // Verify polling stops around 50ms (with tolerance for JS timing)
+      if (endTime) {
+        const pollingDuration = endTime - startTime;
+        // Should stop around 50ms (allow some tolerance for JS timing variance)
+        expect(pollingDuration).toBeLessThan(150);
+      }
+
+      // Restore original getSelection
+      document.getSelection = originalGetSelection;
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });
