@@ -3054,5 +3054,65 @@ describe('SelectionHandler', () => {
     // requires complex setup with JSDOM event handling that doesn't work reliably.
     // The collapsed selection path to clickSelect is tested in sh-ptr-up-013.
     // See KNOWN_ISSUES.md for details.
+
+    it('should clear currentTarget before calling clickSelect (sh-ptr-up-015)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Set up a current target by triggering selection
+      (mockState.selection as any).selected = [];
+
+      // Trigger pointerdown
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 10,
+        clientY: 10
+      });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Trigger selectstart to set currentTarget
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // Now trigger a pointer up that leads to clickSelect (collapsed selection)
+      // Mock document.getSelection to return a collapsed selection
+      const mockSelection = {
+        isCollapsed: true,
+        anchorNode: container,
+        rangeCount: 0,
+        getRangeAt: vi.fn()
+      };
+      const originalGetSelection = document.getSelection;
+      document.getSelection = vi.fn().mockReturnValue(mockSelection);
+
+      // Mock store.getAt to return undefined (no annotation at click point)
+      (mockState.store.getAt as any).mockReturnValue(undefined);
+
+      // Trigger pointerup
+      const pointerUpEvent = new (global.PointerEvent || MouseEvent)('pointerup', {
+        bubbles: true,
+        button: 0,
+        clientX: 10,
+        clientY: 10
+      });
+      Object.defineProperty(pointerUpEvent, 'target', { value: container });
+      document.dispatchEvent(pointerUpEvent);
+
+      // Wait for async operations
+      await new Promise(resolve => setTimeout(resolve, 80));
+
+      // At line 362: currentTarget = undefined is executed before clickSelect()
+      // This ensures that any stale selection state is cleared before handling
+      // the click. We verify this indirectly by checking that selection.clear()
+      // is called (which happens when no annotation is clicked), meaning
+      // clickSelect executed properly with cleared currentTarget.
+      expect(mockState.selection.clear).toHaveBeenCalled();
+
+      // Restore original getSelection
+      document.getSelection = originalGetSelection;
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });

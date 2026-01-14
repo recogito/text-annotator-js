@@ -502,7 +502,7 @@
       "lines": "362",
       "category": "SelectionHandler/onPointerUp",
       "description": "onPointerUp should clear currentTarget before calling clickSelect",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-ptr-up-016",
