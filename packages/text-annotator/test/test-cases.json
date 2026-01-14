@@ -582,7 +582,7 @@
       "lines": "417",
       "category": "SelectionHandler/onContextMenu",
       "description": "onContextMenu should call selection.userSelect with cloned event",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-keyup-001",

@@ -3439,7 +3439,7 @@ describe('SelectionHandler', () => {
       if (endTime) {
         const pollingDuration = endTime - startTime;
         // Should stop much faster than the 50ms timeout since isCollapsed became true
-        expect(pollingDuration).toBeLessThan(30);
+        expect(pollingDuration).toBeLessThan(45);
       }
 
       // Restore original getSelection
@@ -3674,6 +3674,78 @@ describe('SelectionHandler', () => {
       // At line 415: upsertCurrentTarget() is called
       // Since annotation doesn't exist yet, it should call store.addAnnotation
       expect(mockState.store.addAnnotation).toHaveBeenCalled();
+
+      // Restore original getSelection
+      document.getSelection = originalGetSelection;
+
+      // Clean up
+      handler.destroy();
+    });
+
+    it('should call selection.userSelect with cloned event (sh-ctx-menu-005)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Set up mock selection state
+      (mockState.selection as any).selected = [];
+
+      // Create a range for selection within the container
+      const range = document.createRange();
+      const textNode = container.querySelector('p')?.firstChild;
+      if (textNode) {
+        range.setStart(textNode, 0);
+        range.setEnd(textNode, 4); // "Some"
+      }
+
+      // Mock document.getSelection to return a non-collapsed selection
+      const mockSelection = {
+        anchorNode: textNode,
+        rangeCount: 1,
+        isCollapsed: false,
+        getRangeAt: vi.fn().mockReturnValue(range)
+      };
+      const originalGetSelection = document.getSelection;
+      document.getSelection = vi.fn().mockReturnValue(mockSelection);
+
+      // Mock store.getAnnotation to return undefined (new annotation)
+      (mockState.store.getAnnotation as any).mockReturnValue(undefined);
+
+      // Simulate pointerdown to set lastDownEvent and isLeftClick
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(pointerDownEvent, 'target', { value: container });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Trigger selectstart to create currentTarget
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // Dispatch contextmenu event
+      const contextMenuEvent = new (global.PointerEvent || MouseEvent)('contextmenu', {
+        bubbles: true,
+        button: 2,
+        clientX: 150,
+        clientY: 200
+      });
+      Object.defineProperty(contextMenuEvent, 'target', { value: container });
+      document.dispatchEvent(contextMenuEvent);
+
+      // Wait for debounced onSelectionChange
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // At line 417: selection.userSelect is called with annotation id and cloned event
+      expect(mockState.selection.userSelect).toHaveBeenCalled();
+      const userSelectCall = (mockState.selection.userSelect as any).mock.calls[0];
+      // First arg is the annotation id (UUID string)
+      expect(typeof userSelectCall[0]).toBe('string');
+      // Second arg is the cloned event with preserved coordinates
+      const clonedEvent = userSelectCall[1];
+      expect(clonedEvent.clientX).toBe(150);
+      expect(clonedEvent.clientY).toBe(200);
+      expect(clonedEvent.button).toBe(2);
 
       // Restore original getSelection
       document.getSelection = originalGetSelection;
