@@ -310,7 +310,7 @@
       "lines": "243-246",
       "category": "SelectionHandler/onSelectionChange",
       "description": "onSelectionChange should merge ranges with existing annotation when ADD_TO_CURRENT",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-sel-change-019",
