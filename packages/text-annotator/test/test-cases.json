@@ -1182,7 +1182,7 @@
       "lines": "152",
       "category": "Renderer/Scroll",
       "description": "should add scroll listener to document with capture and passive",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-resize-001",

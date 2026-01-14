@@ -859,5 +859,21 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should add scroll listener to document with capture and passive (r-scroll-002)', () => {
+      const addEventListenerSpy = vi.spyOn(document, 'addEventListener');
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // At line 152: document.addEventListener('scroll', onScroll, { capture: true, passive: true })
+      expect(addEventListenerSpy).toHaveBeenCalledWith(
+        'scroll',
+        expect.any(Function),
+        { capture: true, passive: true }
+      );
+
+      addEventListenerSpy.mockRestore();
+      renderer.destroy();
+    });
   });
 });
