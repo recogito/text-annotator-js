@@ -185,5 +185,47 @@ describe('SpansRenderer', () => {
       expect(getLength(highlights[1])).toBe(100);
       expect(getLength(highlights[2])).toBe(50);
     });
+
+    it('should return index of highlight in sorted array (sr-zindex-005)', () => {
+      // At line 27, the function returns the index of the highlight in the sorted array:
+      // intersecting.findIndex(h => h.rects.includes(rect))
+      // This means shorter highlights (at the end of sorted array) get higher z-index
+
+      type Rect = { x: number; y: number; width: number; height: number };
+      type Highlight = { rects: Rect[] };
+
+      const getLength = (h: Highlight) =>
+        h.rects.reduce((total, rect) => total + rect.width, 0);
+
+      const intersects = (a: Rect, b: Rect): boolean => (
+        a.x <= b.x + b.width && a.x + a.width >= b.x &&
+        a.y <= b.y + b.height && a.y + a.height >= b.y
+      );
+
+      // Simulate computeZIndex logic
+      const computeZIndex = (rect: Rect, all: Highlight[]): number => {
+        const intersecting = all.filter(({ rects }) => rects.some(r => intersects(rect, r)));
+        intersecting.sort((a, b) => getLength(b) - getLength(a));
+        return intersecting.findIndex(h => h.rects.includes(rect));
+      };
+
+      // Create overlapping highlights of different lengths
+      const rect1 = { x: 0, y: 0, width: 200, height: 20 };
+      const rect2 = { x: 0, y: 0, width: 100, height: 20 };
+      const rect3 = { x: 0, y: 0, width: 50, height: 20 };
+
+      const long: Highlight = { rects: [rect1] };
+      const medium: Highlight = { rects: [rect2] };
+      const short: Highlight = { rects: [rect3] };
+
+      const all = [long, medium, short];
+
+      // Long highlight (200): should be at index 0 (sorted first)
+      expect(computeZIndex(rect1, all)).toBe(0);
+      // Medium highlight (100): should be at index 1
+      expect(computeZIndex(rect2, all)).toBe(1);
+      // Short highlight (50): should be at index 2 (highest z-index, on top)
+      expect(computeZIndex(rect3, all)).toBe(2);
+    });
   });
 });

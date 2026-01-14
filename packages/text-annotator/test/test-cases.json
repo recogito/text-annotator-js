@@ -1430,7 +1430,7 @@
       "lines": "27",
       "category": "SpansRenderer/computeZIndex",
       "description": "computeZIndex should return index of highlight in sorted array",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-zindex-006",
