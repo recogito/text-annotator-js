@@ -478,7 +478,7 @@
       "lines": "342",
       "category": "SelectionHandler/onPointerUp",
       "description": "onPointerUp should call pollSelectionCollapsed before processing click",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-ptr-up-013",

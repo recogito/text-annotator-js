@@ -2946,5 +2946,51 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should call pollSelectionCollapsed before processing click (sh-ptr-up-012)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Mock store.getAt to return an annotation
+      const mockAnnotation = {
+        id: 'test-annotation',
+        target: { annotation: 'test-annotation', selector: [] },
+        bodies: []
+      };
+      (mockState.store.getAt as any).mockReturnValue(mockAnnotation);
+
+      // Dispatch a left click pointer down event
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(pointerDownEvent, 'target', { value: container });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Dispatch a pointer up event
+      const pointerUpEvent = new (global.PointerEvent || MouseEvent)('pointerup', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(pointerUpEvent, 'target', { value: container });
+      document.dispatchEvent(pointerUpEvent);
+
+      // pollSelectionCollapsed polls every 1ms for up to 50ms
+      // After pointerup, we should NOT see store.getAt called immediately
+      // because pollSelectionCollapsed must complete first (line 342)
+      expect(mockState.store.getAt).not.toHaveBeenCalled();
+
+      // Wait for pollSelectionCollapsed to complete (max 50ms + buffer)
+      await new Promise(resolve => setTimeout(resolve, 80));
+
+      // Now store.getAt should have been called after polling completed
+      expect(mockState.store.getAt).toHaveBeenCalled();
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });
