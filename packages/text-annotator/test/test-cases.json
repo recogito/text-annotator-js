@@ -1222,7 +1222,7 @@
       "lines": "163",
       "category": "Renderer/Resize",
       "description": "should add resize listener to window",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-resize-006",

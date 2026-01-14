@@ -970,5 +970,17 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should add resize listener to window (r-resize-005)', () => {
+      const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // At line 163: window.addEventListener('resize', onResize)
+      expect(addEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function));
+
+      addEventListenerSpy.mockRestore();
+      renderer.destroy();
+    });
   });
 });
