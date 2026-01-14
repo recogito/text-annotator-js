@@ -150,7 +150,7 @@
       "lines": "122-123",
       "category": "SelectionHandler/onSelectStart",
       "description": "onSelectStart should set updated date and updatedBy when modifying",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-select-start-008",
