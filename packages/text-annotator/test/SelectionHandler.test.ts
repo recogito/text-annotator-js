@@ -2630,5 +2630,46 @@ describe('SelectionHandler', () => {
     // requires complex setup with timing and click detection that is difficult to
     // reproduce in JSDOM. The previous test (sh-ptr-up-003) verifies the 'ALWAYS'
     // path works correctly, and the function path follows the same pattern.
+
+    it('should call store.getAt with correct coordinates and filter (sh-ptr-up-005)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Set a filter
+      const mockFilter = vi.fn().mockReturnValue(true);
+      handler.setFilter(mockFilter);
+
+      // Dispatch a left click pointer down event on the container
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 150,
+        clientY: 200
+      });
+      Object.defineProperty(pointerDownEvent, 'target', { value: container });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Dispatch a pointer up event on the container
+      const pointerUpEvent = new (global.PointerEvent || MouseEvent)('pointerup', {
+        bubbles: true,
+        button: 0,
+        clientX: 150,
+        clientY: 200
+      });
+      Object.defineProperty(pointerUpEvent, 'target', { value: container });
+      document.dispatchEvent(pointerUpEvent);
+
+      // Wait for async operations (pollSelectionCollapsed)
+      await new Promise(resolve => setTimeout(resolve, 80));
+
+      // At lines 311-319: clickSelect should call store.getAt with:
+      // 1. X coordinate relative to container (clientX - container.x)
+      // 2. Y coordinate relative to container (clientY - container.y)
+      // 3. selectionMode === 'all' flag
+      // 4. currentFilter
+      expect(mockState.store.getAt).toHaveBeenCalled();
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });

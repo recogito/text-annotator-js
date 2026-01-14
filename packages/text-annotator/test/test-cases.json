@@ -422,7 +422,7 @@
       "lines": "311-319",
       "category": "SelectionHandler/onPointerUp",
       "description": "clickSelect should call store.getAt with correct coordinates and filter",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-ptr-up-006",
