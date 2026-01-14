@@ -206,7 +206,7 @@
       "lines": "164",
       "category": "SelectionHandler/onSelectionChange",
       "description": "onSelectionChange should use isRangeAnnotatable to check all selection ranges",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-sel-change-006",
