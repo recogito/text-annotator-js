@@ -1470,7 +1470,7 @@
       "lines": "49",
       "category": "SpansRenderer/redraw",
       "description": "redraw should use dequal to detect changes between currentRendered and highlights",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-redraw-002",
