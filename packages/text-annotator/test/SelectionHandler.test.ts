@@ -4442,4 +4442,78 @@ describe('SelectionHandler', () => {
       handler.destroy();
     });
   });
+
+  describe('EventListeners', () => {
+    it('should add pointerdown listener to document (sh-events-001)', () => {
+      const addEventListenerSpy = vi.spyOn(document, 'addEventListener');
+
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // At line 515: document.addEventListener('pointerdown', onPointerDown)
+      expect(addEventListenerSpy).toHaveBeenCalledWith('pointerdown', expect.any(Function));
+
+      addEventListenerSpy.mockRestore();
+      handler.destroy();
+    });
+
+    it('should add pointerup listener to document (sh-events-002)', () => {
+      const addEventListenerSpy = vi.spyOn(document, 'addEventListener');
+
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // At line 516: document.addEventListener('pointerup', onPointerUp)
+      expect(addEventListenerSpy).toHaveBeenCalledWith('pointerup', expect.any(Function));
+
+      addEventListenerSpy.mockRestore();
+      handler.destroy();
+    });
+
+    it('should add contextmenu listener to document (sh-events-003)', () => {
+      const addEventListenerSpy = vi.spyOn(document, 'addEventListener');
+
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // At line 517: document.addEventListener('contextmenu', onContextMenu)
+      expect(addEventListenerSpy).toHaveBeenCalledWith('contextmenu', expect.any(Function));
+
+      addEventListenerSpy.mockRestore();
+      handler.destroy();
+    });
+
+    it('should add keyup listener to container (sh-events-004)', () => {
+      const addEventListenerSpy = vi.spyOn(container, 'addEventListener');
+
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // At line 519: container.addEventListener('keyup', onKeyup)
+      expect(addEventListenerSpy).toHaveBeenCalledWith('keyup', expect.any(Function));
+
+      addEventListenerSpy.mockRestore();
+      handler.destroy();
+    });
+
+    it('should add selectstart listener to container (sh-events-005)', () => {
+      const addEventListenerSpy = vi.spyOn(container, 'addEventListener');
+
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // At line 520: container.addEventListener('selectstart', onSelectStart)
+      expect(addEventListenerSpy).toHaveBeenCalledWith('selectstart', expect.any(Function));
+
+      addEventListenerSpy.mockRestore();
+      handler.destroy();
+    });
+
+    it('should add selectionchange listener to document (sh-events-006)', () => {
+      const addEventListenerSpy = vi.spyOn(document, 'addEventListener');
+
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // At line 521: document.addEventListener('selectionchange', onSelectionChange)
+      expect(addEventListenerSpy).toHaveBeenCalledWith('selectionchange', expect.any(Function));
+
+      addEventListenerSpy.mockRestore();
+      handler.destroy();
+    });
+  });
 });

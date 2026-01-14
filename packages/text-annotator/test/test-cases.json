@@ -782,7 +782,7 @@
       "lines": "515",
       "category": "SelectionHandler/EventListeners",
       "description": "should add pointerdown listener to document",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-events-002",
@@ -790,7 +790,7 @@
       "lines": "516",
       "category": "SelectionHandler/EventListeners",
       "description": "should add pointerup listener to document",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-events-003",
@@ -798,7 +798,7 @@
       "lines": "517",
       "category": "SelectionHandler/EventListeners",
       "description": "should add contextmenu listener to document",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-events-004",
@@ -806,7 +806,7 @@
       "lines": "519",
       "category": "SelectionHandler/EventListeners",
       "description": "should add keyup listener to container",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-events-005",
@@ -814,7 +814,7 @@
       "lines": "520",
       "category": "SelectionHandler/EventListeners",
       "description": "should add selectstart listener to container",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-events-006",
@@ -822,7 +822,7 @@
       "lines": "521",
       "category": "SelectionHandler/EventListeners",
       "description": "should add selectionchange listener to document",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-destroy-001",
