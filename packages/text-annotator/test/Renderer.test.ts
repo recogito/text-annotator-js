@@ -1303,5 +1303,13 @@ describe('Renderer', () => {
       expect(renderer).toHaveProperty('setStyle');
       expect(typeof renderer.setStyle).toBe('function');
     });
+
+    it('should return object with setFilter method (r-return-004)', () => {
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // At lines 202-209: return { setFilter, ... }
+      expect(renderer).toHaveProperty('setFilter');
+      expect(typeof renderer.setFilter).toBe('function');
+    });
   });
 });
