@@ -206,5 +206,30 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should only update hover when id changes (r-hover-005)', () => {
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // Mock store.getAt to return a hit
+      const mockAnnotation = { id: 'test-annotation', target: {} } as TextAnnotation;
+      (mockState.store.getAt as any).mockReturnValue(mockAnnotation);
+      (mockState.selection.evalSelectAction as any).mockReturnValue(UserSelectAction.SELECT);
+
+      // Set hover.current to the same id as the annotation
+      (mockState.hover as any).current = 'test-annotation';
+
+      const pointerMoveEvent = new (global.PointerEvent || MouseEvent)('pointermove', {
+        bubbles: true,
+        clientX: 150,
+        clientY: 100
+      });
+      container.dispatchEvent(pointerMoveEvent);
+
+      // At line 80: if (hover.current !== hit.id)
+      // Since hover.current already equals the hit id, hover.set should NOT be called
+      expect(mockState.hover.set).not.toHaveBeenCalled();
+
+      renderer.destroy();
+    });
   });
 });

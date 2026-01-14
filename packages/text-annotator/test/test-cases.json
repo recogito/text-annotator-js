@@ -974,7 +974,7 @@
       "lines": "80",
       "category": "Renderer/onPointerMove",
       "description": "onPointerMove should only update hover when id changes",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-hover-006",
