@@ -1398,7 +1398,7 @@
       "lines": "14-28",
       "category": "SpansRenderer/computeZIndex",
       "description": "computeZIndex should detect rect intersection correctly",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-zindex-002",
