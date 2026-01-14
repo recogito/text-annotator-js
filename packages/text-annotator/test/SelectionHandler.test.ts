@@ -3555,5 +3555,66 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should return early when selection couldn\'t be initiated (sh-ctx-menu-003)', async () => {
+      // Add a not-annotatable element to the container
+      const notAnnotatable = document.createElement('div');
+      notAnnotatable.className = 'not-annotatable';
+      notAnnotatable.textContent = 'Not annotatable text';
+      container.appendChild(notAnnotatable);
+
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Set up mock selection state
+      (mockState.selection as any).selected = [];
+
+      // Create a range within the not-annotatable element
+      const range = document.createRange();
+      const textNode = notAnnotatable.firstChild;
+      if (textNode) {
+        range.setStart(textNode, 0);
+        range.setEnd(textNode, 5); // "Not a"
+      }
+
+      // Mock document.getSelection to return a non-collapsed selection in not-annotatable area
+      const mockSelection = {
+        anchorNode: textNode,
+        rangeCount: 1,
+        isCollapsed: false,
+        getRangeAt: vi.fn().mockReturnValue(range)
+      };
+      const originalGetSelection = document.getSelection;
+      document.getSelection = vi.fn().mockReturnValue(mockSelection);
+
+      // Dispatch contextmenu event
+      // At line 407-409: onSelectionChange is called (debounced)
+      // But since the selection is in a not-annotatable area,
+      // onSelectionChange will set currentTarget = undefined at line 165
+      const contextMenuEvent = new (global.PointerEvent || MouseEvent)('contextmenu', {
+        bubbles: true,
+        button: 2,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(contextMenuEvent, 'target', { value: notAnnotatable });
+      document.dispatchEvent(contextMenuEvent);
+
+      // Wait for debounced onSelectionChange
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // At line 414: if (!currentTarget) return;
+      // Since selection was in not-annotatable area, currentTarget remains undefined
+      // So onContextMenu should return early, not calling upsertCurrentTarget
+      expect(mockState.store.addAnnotation).not.toHaveBeenCalled();
+      expect(mockState.store.updateTarget).not.toHaveBeenCalled();
+      expect(mockState.selection.userSelect).not.toHaveBeenCalled();
+
+      // Restore original getSelection
+      document.getSelection = originalGetSelection;
+
+      // Clean up
+      handler.destroy();
+      notAnnotatable.remove();
+    });
   });
 });

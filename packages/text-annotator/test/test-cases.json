@@ -566,7 +566,7 @@
       "lines": "414",
       "category": "SelectionHandler/onContextMenu",
       "description": "onContextMenu should return early when selection couldn't be initiated",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-ctx-menu-004",
