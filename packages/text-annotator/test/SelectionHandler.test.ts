@@ -722,5 +722,48 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should detect modify-existing mode when REPLACE_CURRENT and single editable selection (sh-select-start-004)', () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Set annotating mode to REPLACE_CURRENT
+      handler.setAnnotatingMode('REPLACE_CURRENT');
+
+      // Set up a SINGLE editable selected annotation
+      const mockAnnotation = {
+        id: 'existing-annotation-id',
+        target: {
+          selector: [{ type: 'TextQuoteSelector', exact: 'test' }],
+          created: new Date('2024-01-01'),
+          creator: { id: 'original-creator' }
+        }
+      };
+      // Single selection that is editable
+      (mockState.selection as any).selected = [{ id: 'existing-annotation-id', editable: true }];
+      (mockState.store.getAnnotation as any).mockReturnValue(mockAnnotation);
+
+      // Trigger pointerdown (left-click)
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 10,
+        clientY: 10
+      });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Trigger selectstart
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // Verify that store.getAnnotation was called - this proves isModifyExisting was true
+      // The conditions for isModifyExisting (lines 106-109) are:
+      // 1. annotatingMode === 'REPLACE_CURRENT' (true in this case)
+      // 2. selected.length === 1 (we have one selection)
+      // 3. selected[0].editable is true
+      expect(mockState.store.getAnnotation).toHaveBeenCalledWith('existing-annotation-id');
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });
