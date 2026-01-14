@@ -1550,7 +1550,7 @@
       "lines": "81",
       "category": "SpansRenderer/redraw",
       "description": "redraw should set data-annotation attribute to annotation id",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-redraw-012",
@@ -1558,7 +1558,7 @@
       "lines": "83-86",
       "category": "SpansRenderer/redraw",
       "description": "redraw should set span position styles (left, top, width, height) from rect",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-redraw-013",

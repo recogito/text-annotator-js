@@ -721,5 +721,38 @@ describe('SpansRenderer', () => {
       expect(span.tagName.toLowerCase()).toBe('span');
       expect(span.className).toBe('r6o-annotation');
     });
+
+    it('should set data-annotation attribute to annotation id (sr-redraw-011)', () => {
+      // At line 81: span.dataset.annotation = highlight.annotation.id;
+
+      const span = document.createElement('span');
+      const annotationId = 'test-annotation-123';
+
+      span.dataset.annotation = annotationId;
+
+      expect(span.dataset.annotation).toBe(annotationId);
+      expect(span.getAttribute('data-annotation')).toBe(annotationId);
+    });
+
+    it('should set span position styles (left, top, width, height) from rect (sr-redraw-012)', () => {
+      // At lines 83-86:
+      // span.style.left = `${rect.x}px`;
+      // span.style.top = `${rect.y}px`;
+      // span.style.width = `${rect.width}px`;
+      // span.style.height = `${rect.height}px`;
+
+      const span = document.createElement('span');
+      const rect = { x: 100, y: 50, width: 200, height: 25 };
+
+      span.style.left = `${rect.x}px`;
+      span.style.top = `${rect.y}px`;
+      span.style.width = `${rect.width}px`;
+      span.style.height = `${rect.height}px`;
+
+      expect(span.style.left).toBe('100px');
+      expect(span.style.top).toBe('50px');
+      expect(span.style.width).toBe('200px');
+      expect(span.style.height).toBe('25px');
+    });
   });
 });
