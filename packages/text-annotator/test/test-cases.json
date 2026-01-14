@@ -1278,7 +1278,7 @@
       "lines": "184",
       "category": "Renderer/destroy",
       "description": "destroy should remove pointermove listener from container",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-destroy-002",

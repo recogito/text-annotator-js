@@ -1157,4 +1157,19 @@ describe('Renderer', () => {
       renderer.destroy();
     });
   });
+
+  describe('destroy', () => {
+    it('should remove pointermove listener from container (r-destroy-001)', () => {
+      const removeEventListenerSpy = vi.spyOn(container, 'removeEventListener');
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      renderer.destroy();
+
+      // At line 184: container.removeEventListener('pointermove', onPointerMove)
+      expect(removeEventListenerSpy).toHaveBeenCalledWith('pointermove', expect.any(Function));
+
+      removeEventListenerSpy.mockRestore();
+    });
+  });
 });
