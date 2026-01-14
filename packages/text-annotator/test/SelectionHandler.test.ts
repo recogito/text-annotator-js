@@ -4046,4 +4046,12 @@ describe('SelectionHandler', () => {
       handler.destroy();
     });
   });
+
+  // NOTE: onSelectAll tests are skipped because the hotkeys library doesn't
+  // respond to synthetic KeyboardEvents in JSDOM. See KNOWN_ISSUES.md for details.
+  // Tests for sh-select-all-001 through sh-select-all-006 would verify:
+  // - Line 454: Adding selectionchange event listener
+  // - Line 435-446: onSelected callback behavior
+  // - Line 448: Removing the event listener
+  // - Line 457: Calling onSelectStart
 });

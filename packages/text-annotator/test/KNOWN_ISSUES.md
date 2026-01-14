@@ -35,3 +35,43 @@ The test is challenging because:
 3. Multiple async conditions must align: `timeDifference < CLICK_TIMEOUT`, `pollSelectionCollapsed` completion, and both `isDownOnNotAnnotatable` and `isUpOnNotAnnotatable` returning true
 
 **Workaround:** The collapsed selection path to `clickSelect` is tested in sh-ptr-up-013. The `isNotAnnotatable` check is implicitly verified via the dismissOnNotAnnotatable test (sh-ptr-up-003) which also clicks on a not-annotatable element. The condition logic at line 361 is a simple OR with two branches - both are fundamentally working paths.
+
+## sh-select-all-001 to sh-select-all-006: Cannot test onSelectAll functionality
+
+**Test Cases:** onSelectAll tests (adding selectionchange listener, onSelected callback, event listener cleanup, calling onSelectStart)
+
+**Issue:** The `onSelectAll` function is triggered by the `hotkeys` library which listens for Ctrl+A / Cmd+A key combinations. The `hotkeys` library doesn't respond to synthetic KeyboardEvents dispatched in the JSDOM testing environment.
+
+The hotkeys library uses its own internal event handling that requires real browser key events to trigger the registered callbacks. Synthetic events created with `new KeyboardEvent()` and dispatched via `element.dispatchEvent()` don't trigger the hotkeys handlers.
+
+**Workaround:** The `onSelectAll` function's internal logic is straightforward:
+1. It registers a one-time selectionchange listener (line 454)
+2. Calls `onSelectStart()` to initialize currentTarget (line 457)
+3. When selectionchange fires, it waits 100ms then adds the annotation (lines 435-446)
+4. The listener is removed after it fires (line 448)
+
+The core annotation logic (onSelectStart, store.addAnnotation, selection.userSelect) is thoroughly tested in other test cases. The hotkeys-specific behavior would need integration testing with real browser events.
+
+## sh-hotkeys-001 to sh-hotkeys-003: Cannot test hotkeys-based handlers
+
+**Test Cases:** SELECTION_KEYS and SELECT_ALL hotkey handlers
+
+**Issue:** Same as above - the `hotkeys` library doesn't respond to synthetic KeyboardEvents in JSDOM. These tests would verify:
+- sh-hotkeys-001: SELECTION_KEYS hotkey stores lastDownEvent on non-repeat keydown (lines 460-463)
+- sh-hotkeys-002: SELECTION_KEYS hotkey ignores repeat events (line 461)
+- sh-hotkeys-003: SELECT_ALL hotkey stores lastDownEvent and calls onSelectAll (lines 465-468)
+
+**Workaround:** The `lastDownEvent` cloning logic uses `cloneKeyboardEvent`, which is verified indirectly through keyboard selection tests (onKeyup tests). The `onSelectAll` function itself is documented above.
+
+## sh-arrow-001 to sh-arrow-005: Cannot test handleArrowKeyPress function
+
+**Test Cases:** handleArrowKeyPress tests (arrow key behavior for clearing selection)
+
+**Issue:** Same as above - `handleArrowKeyPress` is called via the `hotkeys` library (line 490). The tests would verify:
+- sh-arrow-001: Return early on repeat events (line 480)
+- sh-arrow-002: Return early when target is not-annotatable (except body) (line 481)
+- sh-arrow-003: Process when target is document.body (line 481)
+- sh-arrow-004: Clear currentTarget (line 486)
+- sh-arrow-005: Call selection.clear() (line 487)
+
+**Workaround:** The `selection.clear()` behavior is tested through other test cases. The `isNotAnnotatable` check is tested in sh-sel-change-004 and sh-ctx-menu-003.
