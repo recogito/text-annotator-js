@@ -3869,5 +3869,56 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should only process when currentTarget exists (sh-keyup-003)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Set up mock selection state
+      (mockState.selection as any).selected = [];
+
+      // Create a range for selection
+      const range = document.createRange();
+      const textNode = container.querySelector('p')?.firstChild;
+      if (textNode) {
+        range.setStart(textNode, 0);
+        range.setEnd(textNode, 4);
+      }
+
+      // Mock document.getSelection to return a non-collapsed selection
+      const mockSelection = {
+        anchorNode: textNode,
+        rangeCount: 1,
+        isCollapsed: false,
+        getRangeAt: vi.fn().mockReturnValue(range)
+      };
+      const originalGetSelection = document.getSelection;
+      document.getSelection = vi.fn().mockReturnValue(mockSelection);
+
+      // Mock store.getAnnotation to return undefined
+      (mockState.store.getAnnotation as any).mockReturnValue(undefined);
+
+      // NOTE: We do NOT simulate pointerdown/selectstart, so currentTarget is NOT created
+
+      // Dispatch Shift keyup event
+      const keyupEvent = new KeyboardEvent('keyup', {
+        bubbles: true,
+        key: 'Shift'
+      });
+      container.dispatchEvent(keyupEvent);
+
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // At line 423: if (evt.key === 'Shift' && currentTarget)
+      // Since currentTarget is undefined (no selectstart was triggered),
+      // the condition fails and no store operations occur
+      expect(mockState.store.addAnnotation).not.toHaveBeenCalled();
+      expect(mockState.selection.userSelect).not.toHaveBeenCalled();
+
+      // Restore original getSelection
+      document.getSelection = originalGetSelection;
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });
