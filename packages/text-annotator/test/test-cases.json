@@ -102,7 +102,7 @@
       "lines": "98-99",
       "category": "SelectionHandler/onSelectStart",
       "description": "onSelectStart should return early when annotating is disabled",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-select-start-002",

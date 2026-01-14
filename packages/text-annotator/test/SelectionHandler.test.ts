@@ -596,4 +596,48 @@ describe('SelectionHandler', () => {
       handler.destroy();
     });
   });
+
+  describe('onSelectStart', () => {
+    it('should return early when annotating is disabled (sh-select-start-001)', () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Disable annotating
+      handler.setAnnotatingEnabled(false);
+
+      // Set up a mock selected annotation to verify the code path doesn't proceed
+      const mockAnnotation = {
+        id: 'existing-annotation-id',
+        target: {
+          selector: [{ type: 'TextQuoteSelector', exact: 'test' }]
+        }
+      };
+      (mockState.selection as any).selected = [{ id: 'existing-annotation-id', editable: true }];
+      (mockState.store.getAnnotation as any).mockReturnValue(mockAnnotation);
+
+      // Set annotating mode to ADD_TO_CURRENT so that IF onSelectStart proceeded,
+      // it would call store.getAnnotation
+      handler.setAnnotatingMode('ADD_TO_CURRENT');
+
+      // Trigger pointerdown to set up lastDownEvent and isLeftClick
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 10,
+        clientY: 10
+      });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Trigger selectstart - onSelectStart should return early at line 99
+      // because currentAnnotatingEnabled is false
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // Verify that store.getAnnotation was NOT called
+      // This proves onSelectStart returned early before reaching the modify-existing logic
+      expect(mockState.store.getAnnotation).not.toHaveBeenCalled();
+
+      // Clean up
+      handler.destroy();
+    });
+  });
 });
