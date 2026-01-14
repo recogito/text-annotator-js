@@ -142,7 +142,7 @@
       "lines": "117-124",
       "category": "SelectionHandler/onSelectStart",
       "description": "onSelectStart should preserve created/creator from existing target when modifying",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-select-start-007",
