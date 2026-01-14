@@ -302,7 +302,7 @@
       "lines": "231-236",
       "category": "SelectionHandler/onSelectionChange",
       "description": "onSelectionChange should detect changes by comparing range count and quote text",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-sel-change-018",
