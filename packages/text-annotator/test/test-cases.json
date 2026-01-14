@@ -486,7 +486,7 @@
       "lines": "361-365",
       "category": "SelectionHandler/onPointerUp",
       "description": "onPointerUp should route to clickSelect when selection is collapsed",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-ptr-up-014",

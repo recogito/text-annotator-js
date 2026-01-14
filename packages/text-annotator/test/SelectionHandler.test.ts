@@ -2992,5 +2992,62 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should route to clickSelect when selection is collapsed (sh-ptr-up-013)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Mock store.getAt to return an annotation
+      const mockAnnotation = {
+        id: 'test-annotation',
+        target: { annotation: 'test-annotation', selector: [] },
+        bodies: []
+      };
+      (mockState.store.getAt as any).mockReturnValue(mockAnnotation);
+
+      // Mock document.getSelection to return a collapsed selection
+      const mockSelection = {
+        isCollapsed: true,
+        anchorNode: container,
+        rangeCount: 0,
+        getRangeAt: vi.fn()
+      };
+      const originalGetSelection = document.getSelection;
+      document.getSelection = vi.fn().mockReturnValue(mockSelection);
+
+      // Dispatch a left click pointer down event
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(pointerDownEvent, 'target', { value: container });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Dispatch a pointer up event
+      const pointerUpEvent = new (global.PointerEvent || MouseEvent)('pointerup', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(pointerUpEvent, 'target', { value: container });
+      document.dispatchEvent(pointerUpEvent);
+
+      // Wait for async operations
+      await new Promise(resolve => setTimeout(resolve, 80));
+
+      // At line 361: if sel?.isCollapsed is true, clickSelect() is called
+      // clickSelect calls store.getAt, lifecycle.emit, and selection.userSelect
+      expect(mockState.store.getAt).toHaveBeenCalled();
+      expect(mockLifecycle.emit).toHaveBeenCalledWith('clickAnnotation', mockAnnotation);
+      expect(mockState.selection.userSelect).toHaveBeenCalled();
+
+      // Restore original getSelection
+      document.getSelection = originalGetSelection;
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });
