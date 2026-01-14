@@ -626,4 +626,42 @@ describe('Renderer', () => {
       renderer.destroy();
     });
   });
+
+  describe('setPainter', () => {
+    it('should update currentPainter (r-set-painter-001)', async () => {
+      const mockPainter = { clear: vi.fn(), reset: vi.fn() };
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // At line 124-127: setPainter updates currentPainter
+      renderer.setPainter(mockPainter as any);
+
+      // Wait for debounce + requestAnimationFrame
+      await new Promise(resolve => setTimeout(resolve, 30));
+
+      // The painter should be passed to renderer.redraw
+      const call = (mockRendererImpl.redraw as any).mock.calls.pop();
+      expect(call[3]).toBe(mockPainter);
+
+      renderer.destroy();
+    });
+
+    it('should trigger redraw (r-set-painter-002)', async () => {
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // Reset any calls from initialization
+      vi.clearAllMocks();
+
+      const mockPainter = { clear: vi.fn(), reset: vi.fn() };
+      // At line 126: redraw() is called after setPainter
+      renderer.setPainter(mockPainter as any);
+
+      // Wait for debounce + requestAnimationFrame
+      await new Promise(resolve => setTimeout(resolve, 30));
+
+      expect(mockRendererImpl.redraw).toHaveBeenCalled();
+
+      renderer.destroy();
+    });
+  });
 });

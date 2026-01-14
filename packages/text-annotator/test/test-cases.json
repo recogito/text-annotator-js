@@ -1102,7 +1102,7 @@
       "lines": "124-127",
       "category": "Renderer/setPainter",
       "description": "setPainter should update currentPainter",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-set-painter-002",
@@ -1110,7 +1110,7 @@
       "lines": "126",
       "category": "Renderer/setPainter",
       "description": "setPainter should trigger redraw",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-set-style-001",
