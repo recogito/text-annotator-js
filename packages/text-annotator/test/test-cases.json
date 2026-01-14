@@ -1294,7 +1294,7 @@
       "lines": "188",
       "category": "Renderer/destroy",
       "description": "destroy should unobserve store changes",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-destroy-004",

@@ -1180,5 +1180,14 @@ describe('Renderer', () => {
       // At line 186: renderer.destroy()
       expect(mockRendererImpl.destroy).toHaveBeenCalled();
     });
+
+    it('should unobserve store changes (r-destroy-003)', () => {
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      renderer.destroy();
+
+      // At line 188: store.unobserve(onStoreChange)
+      expect(mockState.store.unobserve).toHaveBeenCalled();
+    });
   });
 });
