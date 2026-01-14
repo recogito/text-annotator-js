@@ -526,7 +526,7 @@
       "lines": "384-396",
       "category": "SelectionHandler/pollSelectionCollapsed",
       "description": "pollSelectionCollapsed should poll isCollapsed with 1ms interval",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-poll-002",

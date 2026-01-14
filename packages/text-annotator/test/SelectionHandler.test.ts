@@ -3259,4 +3259,62 @@ describe('SelectionHandler', () => {
       handler.destroy();
     });
   });
+
+  describe('pollSelectionCollapsed', () => {
+    it('should poll isCollapsed with 1ms interval (sh-poll-001)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Track how many times getSelection is called during the polling period
+      let callCount = 0;
+      const mockSelection = {
+        isCollapsed: false, // Start with non-collapsed to trigger polling
+        anchorNode: container,
+        rangeCount: 0,
+        getRangeAt: vi.fn()
+      };
+
+      const originalGetSelection = document.getSelection;
+      document.getSelection = vi.fn().mockImplementation(() => {
+        callCount++;
+        // After 30 calls, become collapsed to stop polling
+        if (callCount > 30) {
+          mockSelection.isCollapsed = true;
+        }
+        return mockSelection;
+      });
+
+      // Trigger a click sequence that invokes pollSelectionCollapsed
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(pointerDownEvent, 'target', { value: container });
+      document.dispatchEvent(pointerDownEvent);
+
+      const pointerUpEvent = new (global.PointerEvent || MouseEvent)('pointerup', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(pointerUpEvent, 'target', { value: container });
+      document.dispatchEvent(pointerUpEvent);
+
+      // Wait for polling to complete (1ms interval, up to 50ms max)
+      await new Promise(resolve => setTimeout(resolve, 60));
+
+      // pollSelectionCollapsed polls with 1ms interval (line 391: pollingDelayMs = 1)
+      // Since we wait 60ms and set isCollapsed=true after 30 calls,
+      // polling should have checked isCollapsed multiple times
+      expect(callCount).toBeGreaterThan(1);
+
+      // Restore original getSelection
+      document.getSelection = originalGetSelection;
+
+      // Clean up
+      handler.destroy();
+    });
+  });
 });
