@@ -894,7 +894,7 @@
       "lines": "539",
       "category": "SelectionHandler/destroy",
       "description": "destroy should unbind all hotkeys",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-return-001",
