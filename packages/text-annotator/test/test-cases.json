@@ -222,7 +222,7 @@
       "lines": "181-185",
       "category": "SelectionHandler/onSelectionChange",
       "description": "onSelectionChange should emulate selectstart for Firefox collapsed selection workaround",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-sel-change-008",

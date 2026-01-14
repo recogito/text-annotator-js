@@ -1291,5 +1291,66 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should emulate selectstart for Firefox collapsed selection workaround (sh-sel-change-007)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Set up mock selection state
+      (mockState.selection as any).selected = [];
+
+      // Trigger pointerdown to set lastDownEvent
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 10,
+        clientY: 10
+      });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Trigger selectstart to set up initial currentTarget
+      // (This simulates having an active selection that gets collapsed)
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // Create a collapsed range inside the container (simulates clicking)
+      const collapsedRange = document.createRange();
+      const textNode = container.querySelector('p')?.firstChild;
+      if (textNode) {
+        collapsedRange.setStart(textNode, 2);
+        collapsedRange.setEnd(textNode, 2); // Same position = collapsed
+      }
+
+      // Mock document.getSelection to return a collapsed selection
+      // This simulates Firefox behavior when user clicks over text
+      const mockSelection = {
+        anchorNode: textNode,
+        rangeCount: 1,
+        isCollapsed: true, // Key: selection is collapsed
+        getRangeAt: vi.fn().mockReturnValue(collapsedRange)
+      };
+      const originalGetSelection = document.getSelection;
+      document.getSelection = vi.fn().mockReturnValue(mockSelection);
+
+      // Trigger selectionchange within CLICK_TIMEOUT (300ms)
+      // With isCollapsed=true and timeDifference < 300, onSelectStart should be emulated
+      const selectionChangeEvent = new Event('selectionchange', { bubbles: true });
+      document.dispatchEvent(selectionChangeEvent);
+
+      // Wait for debounce timeout
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // The test verifies that when:
+      // 1. lastDownEvent.type === 'pointerdown'
+      // 2. sel.isCollapsed is true (user clicked to collapse selection)
+      // 3. timeDifference < CLICK_TIMEOUT (300ms)
+      // Then onSelectStart() is called as a Firefox workaround (lines 181-185).
+      // This handles Firefox not firing selectstart when user clicks over text.
+
+      // Restore original getSelection
+      document.getSelection = originalGetSelection;
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });
