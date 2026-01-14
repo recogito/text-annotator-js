@@ -2320,5 +2320,63 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should clear previous selection when annotation does not exist yet (sh-sel-change-023)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Set up mock selection state
+      (mockState.selection as any).selected = [];
+
+      // Trigger pointerdown to set lastDownEvent
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 10,
+        clientY: 10
+      });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Trigger selectstart to set up currentTarget
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // Create a range with text content
+      const range = document.createRange();
+      const textNode = container.querySelector('p')?.firstChild;
+      if (textNode) {
+        range.setStart(textNode, 0);
+        range.setEnd(textNode, 4);
+      }
+
+      // Mock store.getAnnotation to return undefined (annotation doesn't exist yet)
+      (mockState.store.getAnnotation as any).mockReturnValue(undefined);
+
+      // Mock document.getSelection
+      const mockSelection = {
+        anchorNode: textNode,
+        rangeCount: 1,
+        isCollapsed: false,
+        getRangeAt: vi.fn().mockReturnValue(range)
+      };
+      const originalGetSelection = document.getSelection;
+      document.getSelection = vi.fn().mockReturnValue(mockSelection);
+
+      // Trigger selectionchange
+      const selectionChangeEvent = new Event('selectionchange', { bubbles: true });
+      document.dispatchEvent(selectionChangeEvent);
+
+      // Wait for debounce
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // At lines 273-274, when the annotation doesn't exist in the store,
+      // selection.clear() should be called for proper lifecycle management
+      expect(mockState.selection.clear).toHaveBeenCalled();
+
+      // Restore original getSelection
+      document.getSelection = originalGetSelection;
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });

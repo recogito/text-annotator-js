@@ -350,7 +350,7 @@
       "lines": "273-274",
       "category": "SelectionHandler/onSelectionChange",
       "description": "onSelectionChange should clear previous selection when annotation doesn't exist yet",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-ptr-down-001",
