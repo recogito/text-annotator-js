@@ -1295,5 +1295,13 @@ describe('Renderer', () => {
       expect(renderer).toHaveProperty('redraw');
       expect(typeof renderer.redraw).toBe('function');
     });
+
+    it('should return object with setStyle method (r-return-003)', () => {
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // At lines 202-209: return { setStyle, ... }
+      expect(renderer).toHaveProperty('setStyle');
+      expect(typeof renderer.setStyle).toBe('function');
+    });
   });
 });
