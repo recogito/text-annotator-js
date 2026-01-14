@@ -630,7 +630,7 @@
       "lines": "433-458",
       "category": "SelectionHandler/onSelectAll",
       "description": "onSelectAll should add selectionchange event listener",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-select-all-002",
@@ -638,7 +638,7 @@
       "lines": "457",
       "category": "SelectionHandler/onSelectAll",
       "description": "onSelectAll should call onSelectStart",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-select-all-003",
@@ -646,7 +646,7 @@
       "lines": "437",
       "category": "SelectionHandler/onSelectAll",
       "description": "onSelectAll should clear selection in handler",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-select-all-004",
@@ -654,7 +654,7 @@
       "lines": "439-443",
       "category": "SelectionHandler/onSelectAll",
       "description": "onSelectAll should add annotation to store",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-select-all-005",
@@ -662,7 +662,7 @@
       "lines": "445",
       "category": "SelectionHandler/onSelectAll",
       "description": "onSelectAll should call selection.userSelect",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-select-all-006",
@@ -670,7 +670,7 @@
       "lines": "448",
       "category": "SelectionHandler/onSelectAll",
       "description": "onSelectAll should remove selectionchange listener after processing",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-hotkeys-001",
