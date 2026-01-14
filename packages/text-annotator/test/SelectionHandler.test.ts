@@ -3920,5 +3920,62 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should only process when selection is not collapsed (sh-keyup-004)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Set up mock selection state
+      (mockState.selection as any).selected = [];
+
+      // Mock document.getSelection to return a COLLAPSED selection
+      const mockSelection = {
+        anchorNode: container,
+        rangeCount: 0,
+        isCollapsed: true,
+        getRangeAt: vi.fn()
+      };
+      const originalGetSelection = document.getSelection;
+      document.getSelection = vi.fn().mockReturnValue(mockSelection);
+
+      // Mock store.getAnnotation to return undefined
+      (mockState.store.getAnnotation as any).mockReturnValue(undefined);
+
+      // Simulate pointerdown and selectstart to create currentTarget
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(pointerDownEvent, 'target', { value: container });
+      document.dispatchEvent(pointerDownEvent);
+
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // Wait for currentTarget to be created
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // Dispatch Shift keyup event
+      const keyupEvent = new KeyboardEvent('keyup', {
+        bubbles: true,
+        key: 'Shift'
+      });
+      container.dispatchEvent(keyupEvent);
+
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // At line 426: if (!sel.isCollapsed)
+      // Since selection is collapsed, the condition fails
+      // and upsertCurrentTarget/userSelect are NOT called
+      expect(mockState.store.addAnnotation).not.toHaveBeenCalled();
+      expect(mockState.selection.userSelect).not.toHaveBeenCalled();
+
+      // Restore original getSelection
+      document.getSelection = originalGetSelection;
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });

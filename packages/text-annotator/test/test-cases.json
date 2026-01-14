@@ -614,7 +614,7 @@
       "lines": "426",
       "category": "SelectionHandler/onKeyup",
       "description": "onKeyup should only process when selection is not collapsed",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-keyup-005",
