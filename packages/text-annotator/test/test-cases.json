@@ -1598,7 +1598,7 @@
       "lines": "99-100",
       "category": "SpansRenderer/redraw",
       "description": "redraw should set paddingBottom when underlineOffset is provided",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-redraw-018",
