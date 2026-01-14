@@ -1302,7 +1302,7 @@
       "lines": "190",
       "category": "Renderer/destroy",
       "description": "destroy should unsubscribe from selection",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-destroy-005",

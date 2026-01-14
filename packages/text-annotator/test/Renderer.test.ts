@@ -1189,5 +1189,93 @@ describe('Renderer', () => {
       // At line 188: store.unobserve(onStoreChange)
       expect(mockState.store.unobserve).toHaveBeenCalled();
     });
+
+    it('should unsubscribe from selection (r-destroy-004)', () => {
+      // Track unsubscribe function
+      const mockUnsubscribe = vi.fn();
+      (mockState.selection.subscribe as any).mockReturnValue(mockUnsubscribe);
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      renderer.destroy();
+
+      // At line 190: unsubscribeSelection()
+      expect(mockUnsubscribe).toHaveBeenCalled();
+    });
+
+    it('should unsubscribe from hover (r-destroy-005)', () => {
+      // Track unsubscribe function
+      const mockUnsubscribe = vi.fn();
+      (mockState.hover.subscribe as any).mockReturnValue(mockUnsubscribe);
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      renderer.destroy();
+
+      // At line 191: unsubscribeHover()
+      expect(mockUnsubscribe).toHaveBeenCalled();
+    });
+
+    it('should remove scroll listener from document (r-destroy-006)', () => {
+      const removeEventListenerSpy = vi.spyOn(document, 'removeEventListener');
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      renderer.destroy();
+
+      // At line 193: document.removeEventListener('scroll', onScroll)
+      expect(removeEventListenerSpy).toHaveBeenCalledWith('scroll', expect.any(Function));
+
+      removeEventListenerSpy.mockRestore();
+    });
+
+    it('should remove resize listener from window (r-destroy-007)', () => {
+      const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      renderer.destroy();
+
+      // At line 196: window.removeEventListener('resize', onResize)
+      expect(removeEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function));
+
+      removeEventListenerSpy.mockRestore();
+    });
+
+    it('should disconnect ResizeObserver (r-destroy-008)', () => {
+      // Track ResizeObserver disconnect
+      const mockDisconnect = vi.fn();
+      class MockResizeObserver {
+        observe = vi.fn();
+        disconnect = mockDisconnect;
+        unobserve = vi.fn();
+      }
+      global.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      renderer.destroy();
+
+      // At line 197: resizeObserver.disconnect()
+      expect(mockDisconnect).toHaveBeenCalled();
+    });
+
+    it('should disconnect MutationObserver (r-destroy-009)', () => {
+      // Track MutationObserver disconnect
+      const mockDisconnect = vi.fn();
+      class MockMutationObserver {
+        observe = vi.fn();
+        disconnect = mockDisconnect;
+        constructor(callback: MutationCallback) {}
+      }
+      global.MutationObserver = MockMutationObserver as unknown as typeof MutationObserver;
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      renderer.destroy();
+
+      // At line 199: mutationObserver.disconnect()
+      expect(mockDisconnect).toHaveBeenCalled();
+    });
   });
 });
