@@ -726,5 +726,26 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should trigger non-lazy redraw (false) (r-set-filter-002)', async () => {
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // Reset any calls from initialization
+      vi.clearAllMocks();
+
+      // At line 136: redraw(false) is called after setFilter - lazy flag is false
+      const testFilter = (annotation: TextAnnotation) => annotation.id === 'test';
+      renderer.setFilter(testFilter);
+
+      // Wait for debounce + requestAnimationFrame
+      await new Promise(resolve => setTimeout(resolve, 30));
+
+      expect(mockRendererImpl.redraw).toHaveBeenCalled();
+      // Check that the lazy flag (5th argument) is false
+      const call = (mockRendererImpl.redraw as any).mock.calls.pop();
+      expect(call[4]).toBe(false);
+
+      renderer.destroy();
+    });
   });
 });

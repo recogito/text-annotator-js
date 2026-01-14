@@ -1142,7 +1142,7 @@
       "lines": "136",
       "category": "Renderer/setFilter",
       "description": "setFilter should trigger non-lazy redraw (false)",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-observe-001",
