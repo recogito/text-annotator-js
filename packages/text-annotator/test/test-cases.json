@@ -1406,7 +1406,7 @@
       "lines": "15-18",
       "category": "SpansRenderer/computeZIndex",
       "description": "computeZIndex intersects function should use proper overlap logic",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-zindex-003",

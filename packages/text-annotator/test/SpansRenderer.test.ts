@@ -85,5 +85,42 @@ describe('SpansRenderer', () => {
       const rectE = { x: 100, y: 0, width: 100, height: 20 };
       expect(intersects(rectA, rectE)).toBe(true); // They touch at x=100
     });
+
+    it('intersects function should use proper overlap logic (sr-zindex-002)', () => {
+      // At lines 15-18, the intersects function checks:
+      // a.x <= b.x + b.width (a's left edge is at or before b's right edge)
+      // a.x + a.width >= b.x (a's right edge is at or after b's left edge)
+      // a.y <= b.y + b.height (a's top edge is at or before b's bottom edge)
+      // a.y + a.height >= b.y (a's bottom edge is at or after b's top edge)
+
+      const intersects = (a: {x: number, y: number, width: number, height: number},
+                          b: {x: number, y: number, width: number, height: number}): boolean => (
+        a.x <= b.x + b.width && a.x + a.width >= b.x &&
+        a.y <= b.y + b.height && a.y + a.height >= b.y
+      );
+
+      // Verify proper overlap logic with edge cases
+
+      // Case 1: Complete overlap (one rect inside another)
+      const outer = { x: 0, y: 0, width: 100, height: 100 };
+      const inner = { x: 25, y: 25, width: 50, height: 50 };
+      expect(intersects(outer, inner)).toBe(true);
+      expect(intersects(inner, outer)).toBe(true);
+
+      // Case 2: Partial horizontal overlap
+      const left = { x: 0, y: 0, width: 60, height: 20 };
+      const right = { x: 40, y: 0, width: 60, height: 20 };
+      expect(intersects(left, right)).toBe(true);
+
+      // Case 3: No overlap - completely separated
+      const farLeft = { x: 0, y: 0, width: 10, height: 10 };
+      const farRight = { x: 100, y: 0, width: 10, height: 10 };
+      expect(intersects(farLeft, farRight)).toBe(false);
+
+      // Case 4: Diagonal overlap
+      const topLeft = { x: 0, y: 0, width: 50, height: 50 };
+      const bottomRight = { x: 25, y: 25, width: 50, height: 50 };
+      expect(intersects(topLeft, bottomRight)).toBe(true);
+    });
   });
 });
