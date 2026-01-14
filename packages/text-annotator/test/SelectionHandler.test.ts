@@ -4054,4 +4054,72 @@ describe('SelectionHandler', () => {
   // - Line 435-446: onSelected callback behavior
   // - Line 448: Removing the event listener
   // - Line 457: Calling onSelectStart
+
+  // NOTE: sh-hotkeys-001 to sh-hotkeys-003 and sh-arrow-001 to sh-arrow-005 are
+  // also skipped due to hotkeys library limitations. See KNOWN_ISSUES.md.
+
+  describe('upsertCurrentTarget', () => {
+    it('should add annotation when it doesn\'t exist (sh-upsert-001)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Set up mock selection state
+      (mockState.selection as any).selected = [];
+
+      // Create a range for selection
+      const range = document.createRange();
+      const textNode = container.querySelector('p')?.firstChild;
+      if (textNode) {
+        range.setStart(textNode, 0);
+        range.setEnd(textNode, 4);
+      }
+
+      // Mock document.getSelection
+      const mockSelection = {
+        anchorNode: textNode,
+        rangeCount: 1,
+        isCollapsed: false,
+        getRangeAt: vi.fn().mockReturnValue(range)
+      };
+      const originalGetSelection = document.getSelection;
+      document.getSelection = vi.fn().mockReturnValue(mockSelection);
+
+      // Mock store.getAnnotation to return undefined (annotation doesn't exist)
+      (mockState.store.getAnnotation as any).mockReturnValue(undefined);
+
+      // Simulate pointerdown and selectstart to create currentTarget
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(pointerDownEvent, 'target', { value: container });
+      document.dispatchEvent(pointerDownEvent);
+
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // Dispatch contextmenu to trigger upsertCurrentTarget
+      const contextMenuEvent = new (global.PointerEvent || MouseEvent)('contextmenu', {
+        bubbles: true,
+        button: 2,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(contextMenuEvent, 'target', { value: container });
+      document.dispatchEvent(contextMenuEvent);
+
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // At line 495-500: when annotation doesn't exist, store.addAnnotation is called
+      expect(mockState.store.addAnnotation).toHaveBeenCalled();
+      expect(mockState.store.updateTarget).not.toHaveBeenCalled();
+
+      // Restore original getSelection
+      document.getSelection = originalGetSelection;
+
+      // Clean up
+      handler.destroy();
+    });
+  });
 });

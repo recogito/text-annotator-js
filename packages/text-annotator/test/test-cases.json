@@ -742,7 +742,7 @@
       "lines": "493-513",
       "category": "SelectionHandler/upsertCurrentTarget",
       "description": "upsertCurrentTarget should add annotation when it doesn't exist",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-upsert-002",
