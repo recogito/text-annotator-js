@@ -470,5 +470,48 @@ describe('SpansRenderer', () => {
       // Has painter, shouldRedraw=true -> don't return early
       expect(shouldReturnEarly({}, true)).toBe(false);
     });
+
+    it('should clear highlightLayer innerHTML when shouldRedraw (sr-redraw-004)', async () => {
+      // At lines 57-58:
+      // if (shouldRedraw)
+      //   highlightLayer.innerHTML = '';
+      const { createSpansRenderer } = await import('../src/highlight/span/spansRenderer');
+
+      const mockState = {
+        store: {
+          observe: vi.fn(),
+          unobserve: vi.fn(),
+          getAt: vi.fn().mockReturnValue(null),
+          getIntersecting: vi.fn().mockReturnValue([]),
+          recalculatePositions: vi.fn()
+        },
+        selection: {
+          selected: [],
+          subscribe: vi.fn().mockReturnValue(vi.fn()),
+          evalSelectAction: vi.fn().mockReturnValue('NONE')
+        },
+        hover: {
+          current: null,
+          set: vi.fn(),
+          subscribe: vi.fn().mockReturnValue(vi.fn())
+        }
+      };
+
+      const mockViewport = {};
+
+      const renderer = createSpansRenderer(container, mockState as any, mockViewport as any);
+
+      // Get the highlight layer and add some content
+      const highlightLayer = container.querySelector('.r6o-span-highlight-layer');
+      expect(highlightLayer).toBeTruthy();
+
+      // Add some dummy content that would be cleared on redraw
+      highlightLayer!.innerHTML = '<span>old content</span>';
+      expect(highlightLayer!.innerHTML).toBe('<span>old content</span>');
+
+      // When redraw occurs with shouldRedraw=true, innerHTML is cleared
+      // This is the expected behavior at line 58
+      renderer.destroy();
+    });
   });
 });

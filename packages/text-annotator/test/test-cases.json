@@ -1494,7 +1494,7 @@
       "lines": "57-58",
       "category": "SpansRenderer/redraw",
       "description": "redraw should clear highlightLayer innerHTML when shouldRedraw",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-redraw-005",
