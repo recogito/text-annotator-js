@@ -2861,5 +2861,42 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should clear selection when clicking empty area (sh-ptr-up-010)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Mock store.getAt to return undefined (no annotation at click point)
+      (mockState.store.getAt as any).mockReturnValue(undefined);
+
+      // Dispatch a left click pointer down event on the container
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(pointerDownEvent, 'target', { value: container });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Dispatch a pointer up event on the container
+      const pointerUpEvent = new (global.PointerEvent || MouseEvent)('pointerup', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(pointerUpEvent, 'target', { value: container });
+      document.dispatchEvent(pointerUpEvent);
+
+      // Wait for async operations (pollSelectionCollapsed)
+      await new Promise(resolve => setTimeout(resolve, 80));
+
+      // At lines 335-337: when hovered is falsy (no annotation at click point),
+      // selection.clear() should be called
+      expect(mockState.selection.clear).toHaveBeenCalled();
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });

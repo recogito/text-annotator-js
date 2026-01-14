@@ -1,7 +1,7 @@
 ---
 active: true
 iteration: 18
-max_iterations: 150
+max_iterations: 220
 completion_promise: "tested"
 started_at: "2026-01-14T14:08:28Z"
 ---

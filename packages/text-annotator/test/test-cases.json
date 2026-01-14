@@ -462,7 +462,7 @@
       "lines": "335-337",
       "category": "SelectionHandler/onPointerUp",
       "description": "clickSelect should clear selection when clicking empty area",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-ptr-up-011",
