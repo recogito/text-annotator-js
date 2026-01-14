@@ -94,7 +94,7 @@
       "lines": "93-94",
       "category": "SelectionHandler/isAddToCurrentSelect",
       "description": "isAddToCurrentSelect should return false when allowModifierSelect is false",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-select-start-001",

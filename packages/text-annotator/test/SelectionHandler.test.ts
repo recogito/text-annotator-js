@@ -544,5 +544,56 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should return false when allowModifierSelect is false (sh-add-to-current-004)', () => {
+      // Create options WITHOUT allowModifierSelect (or explicitly false)
+      const optionsWithoutModifier = {
+        ...mockOptions,
+        allowModifierSelect: false
+      };
+
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, optionsWithoutModifier);
+
+      // Make sure annotatingMode is CREATE_NEW (default), so isAddToCurrentSelect
+      // doesn't return true based on mode
+      handler.setAnnotatingMode('CREATE_NEW');
+
+      // Set up a mock selected annotation (single editable annotation)
+      const mockAnnotation = {
+        id: 'existing-annotation-id',
+        target: {
+          selector: [{ type: 'TextQuoteSelector', exact: 'test' }],
+          created: new Date('2024-01-01'),
+          creator: { id: 'original-creator' }
+        }
+      };
+      (mockState.selection as any).selected = [{ id: 'existing-annotation-id', editable: true }];
+      (mockState.store.getAnnotation as any).mockReturnValue(mockAnnotation);
+
+      // Trigger pointerdown WITH ctrlKey pressed
+      // Even though ctrlKey is pressed, allowModifierSelect is false, so
+      // isAddToCurrentSelect should return false
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 10,
+        clientY: 10,
+        ctrlKey: true  // Modifier key pressed, but allowModifierSelect is false
+      });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Trigger selectstart - isAddToCurrentSelect should return false because
+      // allowModifierSelect is false, so the modify-existing code path is NOT taken
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // Verify that store.getAnnotation was NOT called
+      // This proves isAddToCurrentSelect returned false, so a new annotation is being created
+      // instead of modifying the existing one
+      expect(mockState.store.getAnnotation).not.toHaveBeenCalled();
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });
