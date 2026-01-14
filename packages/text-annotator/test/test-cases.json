@@ -1446,7 +1446,7 @@
       "lines": "32",
       "category": "SpansRenderer/Initialization",
       "description": "createRenderer should add r6o-annotatable class to container",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-init-002",

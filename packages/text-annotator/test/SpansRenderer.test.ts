@@ -268,4 +268,39 @@ describe('SpansRenderer', () => {
       expect(computeZIndex(rect3, all)).toBe(0);
     });
   });
+
+  describe('Initialization', () => {
+    it('should add r6o-annotatable class to container (sr-init-001)', async () => {
+      // At line 32: container.classList.add('r6o-annotatable')
+      const { createSpansRenderer } = await import('../src/highlight/span/spansRenderer');
+
+      const mockState = {
+        store: {
+          observe: vi.fn(),
+          unobserve: vi.fn(),
+          getAt: vi.fn().mockReturnValue(null),
+          getIntersecting: vi.fn().mockReturnValue([]),
+          recalculatePositions: vi.fn()
+        },
+        selection: {
+          selected: [],
+          subscribe: vi.fn().mockReturnValue(vi.fn()),
+          evalSelectAction: vi.fn().mockReturnValue('NONE')
+        },
+        hover: {
+          current: null,
+          set: vi.fn(),
+          subscribe: vi.fn().mockReturnValue(vi.fn())
+        }
+      };
+
+      const mockViewport = {};
+
+      const renderer = createSpansRenderer(container, mockState as any, mockViewport as any);
+
+      expect(container.classList.contains('r6o-annotatable')).toBe(true);
+
+      renderer.destroy();
+    });
+  });
 });
