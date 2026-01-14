@@ -1014,7 +1014,7 @@
       "lines": "94",
       "category": "Renderer/redraw",
       "description": "redraw should use requestAnimationFrame",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-redraw-003",

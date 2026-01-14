@@ -319,5 +319,30 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should use requestAnimationFrame (r-redraw-002)', async () => {
+      // Mock requestAnimationFrame since JSDOM doesn't have it
+      const rafMock = vi.fn((cb: FrameRequestCallback) => {
+        setTimeout(() => cb(Date.now()), 0);
+        return 1;
+      });
+      global.requestAnimationFrame = rafMock;
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // Reset any calls from initialization
+      vi.clearAllMocks();
+      rafMock.mockClear();
+
+      renderer.redraw();
+
+      // Wait for debounce to complete
+      await new Promise(resolve => setTimeout(resolve, 15));
+
+      // At line 94: requestAnimationFrame is called after debounce
+      expect(rafMock).toHaveBeenCalled();
+
+      renderer.destroy();
+    });
   });
 });
