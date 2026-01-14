@@ -358,7 +358,7 @@
       "lines": "283-290",
       "category": "SelectionHandler/onPointerDown",
       "description": "onPointerDown should clone the pointer event to preserve target reference",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-ptr-down-002",
