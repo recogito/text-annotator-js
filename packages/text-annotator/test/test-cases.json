@@ -1590,7 +1590,7 @@
       "lines": "96-97",
       "category": "SpansRenderer/redraw",
       "description": "redraw should set borderBottomWidth when underlineThickness is provided",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-redraw-017",
