@@ -348,5 +348,66 @@ describe('SelectionHandler', () => {
         handler.destroy();
       });
     });
+
+    describe('setFilter', () => {
+      it('should store the filter for later use in click selection (sh-config-007)', async () => {
+        const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+        // Create a filter function
+        const testFilter = (annotation: any) => annotation.id === 'filtered-id';
+
+        // Set the filter
+        handler.setFilter(testFilter);
+
+        // Mock store.getAt to return an annotation
+        const mockAnnotation = {
+          id: 'test-annotation-1',
+          target: {
+            selector: [{ type: 'TextQuoteSelector', exact: 'test' }]
+          }
+        };
+        (mockState.store.getAt as any).mockReturnValue(mockAnnotation);
+
+        // Trigger a click sequence (pointerdown followed by pointerup within CLICK_TIMEOUT)
+        // The click must happen on the container for clickSelect to call store.getAt
+        const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+          bubbles: true,
+          button: 0,
+          clientX: 10,
+          clientY: 10
+        });
+        // Set the target to be inside the container
+        Object.defineProperty(pointerDownEvent, 'target', { value: container, writable: false });
+        document.dispatchEvent(pointerDownEvent);
+
+        // Trigger pointerup quickly (within 300ms CLICK_TIMEOUT)
+        const pointerUpEvent = new (global.PointerEvent || MouseEvent)('pointerup', {
+          bubbles: true,
+          button: 0,
+          clientX: 10,
+          clientY: 10
+        });
+        Object.defineProperty(pointerUpEvent, 'target', { value: container, writable: false });
+        document.dispatchEvent(pointerUpEvent);
+
+        // Wait for pollSelectionCollapsed to complete (polls for up to 50ms)
+        await new Promise(resolve => setTimeout(resolve, 60));
+
+        // Verify that store.getAt was called with the filter as the 4th argument
+        // The filter is passed to clickSelect which calls store.getAt
+        expect(mockState.store.getAt).toHaveBeenCalled();
+
+        // Check that the filter was passed (4th argument)
+        const getAtCalls = (mockState.store.getAt as any).mock.calls;
+        if (getAtCalls.length > 0) {
+          const lastCall = getAtCalls[getAtCalls.length - 1];
+          // The filter should be the 4th argument (index 3)
+          expect(lastCall[3]).toBe(testFilter);
+        }
+
+        // Clean up
+        handler.destroy();
+      });
+    });
   });
 });

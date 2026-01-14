@@ -54,7 +54,7 @@
       "lines": "82",
       "category": "SelectionHandler/Configuration",
       "description": "setFilter() should store the filter for later use in click selection",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-config-008",
