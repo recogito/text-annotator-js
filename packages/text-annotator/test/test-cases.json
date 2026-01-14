@@ -510,7 +510,7 @@
       "lines": "368-371",
       "category": "SelectionHandler/onPointerUp",
       "description": "onPointerUp should call upsertCurrentTarget when valid selection exists",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-ptr-up-017",

@@ -3114,5 +3114,76 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should call upsertCurrentTarget when valid selection exists (sh-ptr-up-016)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Set up mock selection state
+      (mockState.selection as any).selected = [];
+
+      // Trigger pointerdown to set lastDownEvent
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 10,
+        clientY: 10
+      });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Trigger selectstart to create currentTarget
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // Create a range for selection
+      const range = document.createRange();
+      const textNode = container.querySelector('p')?.firstChild;
+      if (textNode) {
+        range.setStart(textNode, 0);
+        range.setEnd(textNode, 4); // "Some"
+      }
+
+      // Mock document.getSelection to return a non-collapsed selection
+      const mockSelection = {
+        anchorNode: textNode,
+        rangeCount: 1,
+        isCollapsed: false,
+        getRangeAt: vi.fn().mockReturnValue(range)
+      };
+      const originalGetSelection = document.getSelection;
+      document.getSelection = vi.fn().mockReturnValue(mockSelection);
+
+      // Trigger selectionchange to populate currentTarget.selector
+      const selectionChangeEvent = new Event('selectionchange', { bubbles: true });
+      document.dispatchEvent(selectionChangeEvent);
+
+      // Wait for debounce
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // Mock store.getAnnotation to return undefined (new annotation)
+      (mockState.store.getAnnotation as any).mockReturnValue(undefined);
+
+      // Trigger pointerup - this should trigger upsertCurrentTarget
+      // since currentTarget && currentTarget.selector.length > 0
+      const pointerUpEvent = new (global.PointerEvent || MouseEvent)('pointerup', {
+        bubbles: true,
+        button: 0,
+        clientX: 10,
+        clientY: 10
+      });
+      Object.defineProperty(pointerUpEvent, 'timeStamp', { value: Date.now() + 400 }); // > CLICK_TIMEOUT
+      Object.defineProperty(pointerUpEvent, 'target', { value: container });
+      document.dispatchEvent(pointerUpEvent);
+
+      // At lines 368-369: if (currentTarget && currentTarget.selector.length > 0)
+      // upsertCurrentTarget() is called, which calls store.addAnnotation
+      // for new annotations
+      expect(mockState.store.addAnnotation).toHaveBeenCalled();
+
+      // Restore original getSelection
+      document.getSelection = originalGetSelection;
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });
