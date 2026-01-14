@@ -574,7 +574,7 @@
       "lines": "415",
       "category": "SelectionHandler/onContextMenu",
       "description": "onContextMenu should call upsertCurrentTarget",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-ctx-menu-005",
