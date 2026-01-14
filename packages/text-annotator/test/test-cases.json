@@ -1062,7 +1062,7 @@
       "lines": "108-117",
       "category": "Renderer/redraw",
       "description": "redraw should create Highlight objects with annotation, rects, and state",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-redraw-009",

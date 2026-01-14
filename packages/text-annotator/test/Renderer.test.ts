@@ -475,5 +475,35 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should create Highlight objects with annotation, rects, and state (r-redraw-008)', async () => {
+      const mockRects = [{ x: 0, y: 0, width: 100, height: 20 }];
+      const mockAnnotation = { annotation: { id: 'ann-1', target: {} }, rects: mockRects };
+      (mockState.store.getIntersecting as any).mockReturnValue([mockAnnotation]);
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // Reset any calls from initialization
+      vi.clearAllMocks();
+
+      renderer.redraw();
+
+      // Wait for debounce + requestAnimationFrame
+      await new Promise(resolve => setTimeout(resolve, 30));
+
+      // At lines 108-117: Highlight objects are created with annotation, rects, and state
+      const redrawCall = (mockRendererImpl.redraw as any).mock.calls[0];
+      const highlights = redrawCall[0];
+
+      expect(highlights.length).toBe(1);
+      expect(highlights[0].annotation).toBeDefined();
+      expect(highlights[0].annotation.id).toBe('ann-1');
+      expect(highlights[0].rects).toEqual(mockRects);
+      expect(highlights[0].state).toBeDefined();
+      expect(highlights[0].state.selected).toBeDefined();
+      expect(highlights[0].state.hovered).toBeDefined();
+
+      renderer.destroy();
+    });
   });
 });
