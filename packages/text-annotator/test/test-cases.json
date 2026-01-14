@@ -70,7 +70,7 @@
       "lines": "86-96",
       "category": "SelectionHandler/isAddToCurrentSelect",
       "description": "isAddToCurrentSelect should return true when annotatingMode is ADD_TO_CURRENT",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-add-to-current-002",

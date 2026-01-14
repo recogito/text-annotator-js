@@ -453,4 +453,47 @@ describe('SelectionHandler', () => {
       });
     });
   });
+
+  describe('isAddToCurrentSelect', () => {
+    it('should return true when annotatingMode is ADD_TO_CURRENT (sh-add-to-current-001)', () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Set annotating mode to ADD_TO_CURRENT
+      handler.setAnnotatingMode('ADD_TO_CURRENT');
+
+      // Set up a mock selected annotation (single editable annotation)
+      const mockAnnotation = {
+        id: 'existing-annotation-id',
+        target: {
+          selector: [{ type: 'TextQuoteSelector', exact: 'test' }],
+          created: new Date('2024-01-01'),
+          creator: { id: 'original-creator' }
+        }
+      };
+      (mockState.selection as any).selected = [{ id: 'existing-annotation-id', editable: true }];
+      (mockState.store.getAnnotation as any).mockReturnValue(mockAnnotation);
+
+      // Trigger pointerdown to set up lastDownEvent
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 10,
+        clientY: 10
+      });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Trigger selectstart - when isAddToCurrentSelect returns true (because mode is ADD_TO_CURRENT)
+      // and there's a single editable selected annotation, onSelectStart will call
+      // store.getAnnotation to get the existing annotation (line 112)
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // Verify that store.getAnnotation was called with the selected annotation's ID
+      // This proves isAddToCurrentSelect returned true, triggering the modify-existing code path
+      expect(mockState.store.getAnnotation).toHaveBeenCalledWith('existing-annotation-id');
+
+      // Clean up
+      handler.destroy();
+    });
+  });
 });
