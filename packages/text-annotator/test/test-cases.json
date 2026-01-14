@@ -414,7 +414,7 @@
       "lines": "302-303",
       "category": "SelectionHandler/onPointerUp",
       "description": "clickSelect should call dismissOnNotAnnotatable function when provided",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-ptr-up-005",
