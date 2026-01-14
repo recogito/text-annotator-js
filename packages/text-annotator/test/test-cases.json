@@ -1334,7 +1334,7 @@
       "lines": "197",
       "category": "Renderer/destroy",
       "description": "destroy should disconnect ResizeObserver",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-destroy-009",
