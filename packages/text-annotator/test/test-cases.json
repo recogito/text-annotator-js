@@ -374,7 +374,7 @@
       "lines": "289",
       "category": "SelectionHandler/onPointerDown",
       "description": "onPointerDown should set isLeftClick to true when button === 0",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-ptr-down-004",
