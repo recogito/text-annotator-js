@@ -1614,7 +1614,7 @@
       "lines": "107",
       "category": "SpansRenderer/redraw",
       "description": "redraw should update currentRendered after processing",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-visible-001",
