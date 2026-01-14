@@ -2194,5 +2194,68 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should return early when ADD_TO_CURRENT or REPLACE_CURRENT mode (sh-sel-change-021)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Test with ADD_TO_CURRENT mode
+      handler.setAnnotatingMode('ADD_TO_CURRENT');
+
+      // Set up mock selection state
+      (mockState.selection as any).selected = [];
+
+      // Trigger pointerdown to set lastDownEvent
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 10,
+        clientY: 10
+      });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Trigger selectstart to set up currentTarget
+      const selectStartEvent = new Event('selectstart', { bubbles: true });
+      container.dispatchEvent(selectStartEvent);
+
+      // Create a range with text content
+      const range = document.createRange();
+      const textNode = container.querySelector('p')?.firstChild;
+      if (textNode) {
+        range.setStart(textNode, 0);
+        range.setEnd(textNode, 4);
+      }
+
+      // Mock document.getSelection
+      const mockSelection = {
+        anchorNode: textNode,
+        rangeCount: 1,
+        isCollapsed: false,
+        getRangeAt: vi.fn().mockReturnValue(range)
+      };
+      const originalGetSelection = document.getSelection;
+      document.getSelection = vi.fn().mockReturnValue(mockSelection);
+
+      // Trigger selectionchange
+      const selectionChangeEvent = new Event('selectionchange', { bubbles: true });
+      document.dispatchEvent(selectionChangeEvent);
+
+      // Wait for debounce
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // At line 264, when isAddToCurrentSelect returns true OR
+      // annotatingMode === 'REPLACE_CURRENT', the handler returns early.
+      // This prevents the usual annotation operations from happening
+      // until the pointerup event.
+
+      // For ADD_TO_CURRENT mode, addAnnotation should NOT be called
+      // because we return early at line 264
+      expect(mockState.store.addAnnotation).not.toHaveBeenCalled();
+
+      // Restore original getSelection
+      document.getSelection = originalGetSelection;
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });

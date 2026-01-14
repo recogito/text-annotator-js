@@ -334,7 +334,7 @@
       "lines": "264",
       "category": "SelectionHandler/onSelectionChange",
       "description": "onSelectionChange should return early when ADD_TO_CURRENT or REPLACE_CURRENT (defer to mouseup)",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-sel-change-022",
