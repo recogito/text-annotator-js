@@ -702,7 +702,7 @@
       "lines": "478-488",
       "category": "SelectionHandler/handleArrowKeyPress",
       "description": "handleArrowKeyPress should return early on repeat events",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-arrow-002",
@@ -710,7 +710,7 @@
       "lines": "481",
       "category": "SelectionHandler/handleArrowKeyPress",
       "description": "handleArrowKeyPress should return early when target is not-annotatable (except body)",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-arrow-003",
@@ -718,7 +718,7 @@
       "lines": "481",
       "category": "SelectionHandler/handleArrowKeyPress",
       "description": "handleArrowKeyPress should process when target is document.body",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-arrow-004",
@@ -726,7 +726,7 @@
       "lines": "486",
       "category": "SelectionHandler/handleArrowKeyPress",
       "description": "handleArrowKeyPress should clear currentTarget",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-arrow-005",
@@ -734,7 +734,7 @@
       "lines": "487",
       "category": "SelectionHandler/handleArrowKeyPress",
       "description": "handleArrowKeyPress should call selection.clear()",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-upsert-001",
