@@ -682,5 +682,23 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should trigger redraw (r-set-style-002)', async () => {
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // Reset any calls from initialization
+      vi.clearAllMocks();
+
+      const testStyle = { fill: 'green', opacity: 0.8 };
+      // At line 131: redraw() is called after setStyle
+      renderer.setStyle(testStyle as any);
+
+      // Wait for debounce + requestAnimationFrame
+      await new Promise(resolve => setTimeout(resolve, 30));
+
+      expect(mockRendererImpl.redraw).toHaveBeenCalled();
+
+      renderer.destroy();
+    });
   });
 });

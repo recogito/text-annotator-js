@@ -1126,7 +1126,7 @@
       "lines": "131",
       "category": "Renderer/setStyle",
       "description": "setStyle should trigger redraw",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-set-filter-001",
