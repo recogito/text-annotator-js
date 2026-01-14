@@ -4682,5 +4682,15 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should return object with setAnnotatingEnabled method (sh-return-004)', () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      expect(handler.setAnnotatingEnabled).toBeDefined();
+      expect(typeof handler.setAnnotatingEnabled).toBe('function');
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });
