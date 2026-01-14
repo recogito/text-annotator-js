@@ -344,5 +344,31 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should call painter.clear() when painter exists (r-redraw-003)', async () => {
+      const mockPainter = {
+        clear: vi.fn(),
+        reset: vi.fn()
+      };
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // Set the painter
+      renderer.setPainter(mockPainter as any);
+
+      // Reset any calls from setPainter
+      vi.clearAllMocks();
+      mockPainter.clear.mockClear();
+
+      renderer.redraw();
+
+      // Wait for debounce + requestAnimationFrame
+      await new Promise(resolve => setTimeout(resolve, 30));
+
+      // At lines 95-96: if (currentPainter) currentPainter.clear()
+      expect(mockPainter.clear).toHaveBeenCalled();
+
+      renderer.destroy();
+    });
   });
 });

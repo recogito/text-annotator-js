@@ -1022,7 +1022,7 @@
       "lines": "95-96",
       "category": "Renderer/redraw",
       "description": "redraw should call painter.clear() when painter exists",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-redraw-004",
