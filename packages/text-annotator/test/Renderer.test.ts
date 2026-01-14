@@ -907,5 +907,23 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should call store.recalculatePositions (r-resize-002)', async () => {
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // Reset any calls from initialization
+      vi.clearAllMocks();
+
+      // At line 156: store.recalculatePositions() is called in onResize
+      const resizeEvent = new Event('resize');
+      window.dispatchEvent(resizeEvent);
+
+      // Wait for debounce to complete
+      await new Promise(resolve => setTimeout(resolve, 30));
+
+      expect(mockState.store.recalculatePositions).toHaveBeenCalled();
+
+      renderer.destroy();
+    });
   });
 });

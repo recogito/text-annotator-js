@@ -1198,7 +1198,7 @@
       "lines": "156",
       "category": "Renderer/Resize",
       "description": "onResize should call store.recalculatePositions",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-resize-003",
