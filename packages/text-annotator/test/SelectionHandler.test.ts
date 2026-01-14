@@ -2511,4 +2511,38 @@ describe('SelectionHandler', () => {
       handler.destroy();
     });
   });
+
+  describe('onPointerUp', () => {
+    it('should return early when isLeftClick is false (sh-ptr-up-001)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Dispatch a right click pointer down event (button === 2)
+      // This sets isLeftClick to false
+      const rightClickDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 2, // Right click
+        clientX: 10,
+        clientY: 10
+      });
+      document.dispatchEvent(rightClickDownEvent);
+
+      // Dispatch a pointer up event
+      const pointerUpEvent = new (global.PointerEvent || MouseEvent)('pointerup', {
+        bubbles: true,
+        button: 2,
+        clientX: 10,
+        clientY: 10
+      });
+      document.dispatchEvent(pointerUpEvent);
+
+      // At line 293: if (!isLeftClick) return;
+      // Since isLeftClick is false (right-click), onPointerUp should return early.
+      // No annotation operations should occur.
+      expect(mockState.store.getAt).not.toHaveBeenCalled();
+      expect(mockState.store.addAnnotation).not.toHaveBeenCalled();
+
+      // Clean up
+      handler.destroy();
+    });
+  });
 });

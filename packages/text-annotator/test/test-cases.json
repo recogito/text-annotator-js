@@ -390,7 +390,7 @@
       "lines": "292-293",
       "category": "SelectionHandler/onPointerUp",
       "description": "onPointerUp should return early when isLeftClick is false",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-ptr-up-002",
