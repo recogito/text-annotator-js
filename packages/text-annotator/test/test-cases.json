@@ -942,7 +942,7 @@
       "lines": "73-90",
       "category": "Renderer/onPointerMove",
       "description": "onPointerMove should call store.getAt with relative coordinates",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-hover-002",
