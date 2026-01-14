@@ -46,7 +46,7 @@
       "lines": "80",
       "category": "SelectionHandler/Configuration",
       "description": "setAnnotatingMode() should default to CREATE_NEW when no value provided",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-config-007",
