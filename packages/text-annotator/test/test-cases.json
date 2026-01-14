@@ -454,7 +454,7 @@
       "lines": "327-329",
       "category": "SelectionHandler/onPointerUp",
       "description": "clickSelect should detect selection change by comparing current and next ids",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-ptr-up-010",

@@ -2808,5 +2808,58 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should detect selection change by comparing current and next ids (sh-ptr-up-009)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Create a mock annotation to return from store.getAt
+      const mockAnnotation = {
+        id: 'annotation-1',
+        target: {
+          annotation: 'annotation-1',
+          selector: []
+        },
+        bodies: []
+      };
+
+      // Set the current selection to the same annotation
+      // This means hasChanged should be false (no change in selection)
+      (mockState.selection as any).selected = [{ id: 'annotation-1' }];
+
+      // Mock store.getAt to return the same annotation
+      (mockState.store.getAt as any).mockReturnValue(mockAnnotation);
+
+      // Dispatch a left click pointer down event on the container
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(pointerDownEvent, 'target', { value: container });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Dispatch a pointer up event on the container
+      const pointerUpEvent = new (global.PointerEvent || MouseEvent)('pointerup', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(pointerUpEvent, 'target', { value: container });
+      document.dispatchEvent(pointerUpEvent);
+
+      // Wait for async operations (pollSelectionCollapsed)
+      await new Promise(resolve => setTimeout(resolve, 80));
+
+      // At lines 327-329: hasChanged checks if current and next ids differ
+      // Since they're the same, hasChanged should be false and
+      // userSelect should NOT be called
+      expect(mockState.selection.userSelect).not.toHaveBeenCalled();
+      expect(mockLifecycle.emit).not.toHaveBeenCalledWith('clickAnnotation', expect.anything());
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });
