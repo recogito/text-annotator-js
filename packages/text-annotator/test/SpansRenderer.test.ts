@@ -302,5 +302,42 @@ describe('SpansRenderer', () => {
 
       renderer.destroy();
     });
+
+    it('should create highlight layer div with class r6o-span-highlight-layer (sr-init-002)', async () => {
+      // At lines 34-35:
+      // const highlightLayer = document.createElement('div');
+      // highlightLayer.className = 'r6o-span-highlight-layer';
+      const { createSpansRenderer } = await import('../src/highlight/span/spansRenderer');
+
+      const mockState = {
+        store: {
+          observe: vi.fn(),
+          unobserve: vi.fn(),
+          getAt: vi.fn().mockReturnValue(null),
+          getIntersecting: vi.fn().mockReturnValue([]),
+          recalculatePositions: vi.fn()
+        },
+        selection: {
+          selected: [],
+          subscribe: vi.fn().mockReturnValue(vi.fn()),
+          evalSelectAction: vi.fn().mockReturnValue('NONE')
+        },
+        hover: {
+          current: null,
+          set: vi.fn(),
+          subscribe: vi.fn().mockReturnValue(vi.fn())
+        }
+      };
+
+      const mockViewport = {};
+
+      const renderer = createSpansRenderer(container, mockState as any, mockViewport as any);
+
+      const highlightLayer = container.querySelector('.r6o-span-highlight-layer');
+      expect(highlightLayer).toBeTruthy();
+      expect(highlightLayer?.tagName.toLowerCase()).toBe('div');
+
+      renderer.destroy();
+    });
   });
 });

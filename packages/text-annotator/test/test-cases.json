@@ -1454,7 +1454,7 @@
       "lines": "34-35",
       "category": "SpansRenderer/Initialization",
       "description": "createRenderer should create highlight layer div with class r6o-span-highlight-layer",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-init-003",
