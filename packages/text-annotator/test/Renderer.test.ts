@@ -451,5 +451,29 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should get selectedIds from selection.selected (r-redraw-007)', async () => {
+      const mockAnnotation = { annotation: { id: 'ann-1', target: {} }, rects: [] };
+      (mockState.store.getIntersecting as any).mockReturnValue([mockAnnotation]);
+      (mockState.selection as any).selected = [{ id: 'ann-1' }];
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // Reset any calls from initialization
+      vi.clearAllMocks();
+
+      renderer.redraw();
+
+      // Wait for debounce + requestAnimationFrame
+      await new Promise(resolve => setTimeout(resolve, 30));
+
+      // At line 106: const selectedIds = selection.selected.map(({ id }) => id)
+      // The highlight should have selected: true since its id is in selectedIds
+      const redrawCall = (mockRendererImpl.redraw as any).mock.calls[0];
+      const highlights = redrawCall[0];
+      expect(highlights[0].state.selected).toBe(true);
+
+      renderer.destroy();
+    });
   });
 });

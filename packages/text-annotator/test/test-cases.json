@@ -1054,7 +1054,7 @@
       "lines": "106",
       "category": "Renderer/redraw",
       "description": "redraw should get selectedIds from selection.selected",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-redraw-008",
