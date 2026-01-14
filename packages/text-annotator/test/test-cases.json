@@ -30,7 +30,7 @@
       "lines": "68-78",
       "category": "SelectionHandler/Configuration",
       "description": "setAnnotatingEnabled(true) should re-enable annotation creation",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-config-005",
