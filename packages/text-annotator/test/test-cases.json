@@ -14,7 +14,7 @@
       "lines": "70",
       "category": "SelectionHandler/Configuration",
       "description": "setAnnotatingEnabled(false) should clear debounced onSelectionChange handler",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-config-003",

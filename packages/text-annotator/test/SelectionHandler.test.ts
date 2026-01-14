@@ -125,6 +125,37 @@ describe('SelectionHandler', () => {
         // Clean up
         handler.destroy();
       });
+
+      it('should clear debounced onSelectionChange handler when called with false (sh-config-002)', async () => {
+        const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+        // Trigger a pointerdown to set up lastDownEvent
+        const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+          bubbles: true,
+          button: 0,
+          clientX: 10,
+          clientY: 10
+        });
+        document.dispatchEvent(pointerDownEvent);
+
+        // Trigger a selectionchange event - this will be debounced
+        const selectionChangeEvent = new Event('selectionchange', { bubbles: true });
+        document.dispatchEvent(selectionChangeEvent);
+
+        // Immediately disable annotating - this should clear any pending debounced calls
+        handler.setAnnotatingEnabled(false);
+
+        // Wait longer than the debounce timeout (10ms)
+        await new Promise(resolve => setTimeout(resolve, 20));
+
+        // The debounced handler should have been cleared, so no store operations should occur
+        // even after the debounce timeout has passed
+        expect(mockState.store.addAnnotation).not.toHaveBeenCalled();
+        expect(mockState.store.updateTarget).not.toHaveBeenCalled();
+
+        // Clean up
+        handler.destroy();
+      });
     });
   });
 });
