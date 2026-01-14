@@ -1001,4 +1001,49 @@ describe('Renderer', () => {
       renderer.destroy();
     });
   });
+
+  describe('MutationObserver', () => {
+    it('should be debounced at 150ms (r-mutation-001)', async () => {
+      // Capture the MutationObserver callback
+      let mutationCallback: MutationCallback | undefined;
+      class MockMutationObserver {
+        observe = vi.fn();
+        disconnect = vi.fn();
+        constructor(callback: MutationCallback) {
+          mutationCallback = callback;
+        }
+      }
+      global.MutationObserver = MockMutationObserver as unknown as typeof MutationObserver;
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // Reset any calls from initialization
+      vi.clearAllMocks();
+
+      // At lines 173-179: MutationObserver callback is debounced at 150ms
+      // Create a mock mutation record (external mutation - not from container)
+      const mockRecord = {
+        target: document.body
+      } as MutationRecord;
+
+      // Trigger the callback multiple times
+      mutationCallback!([ mockRecord ], {} as MutationObserver);
+      mutationCallback!([ mockRecord ], {} as MutationObserver);
+      mutationCallback!([ mockRecord ], {} as MutationObserver);
+
+      // Wait a short time (less than 150ms debounce)
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      // rendererImpl.redraw should not have been called yet (still debouncing)
+      expect(mockRendererImpl.redraw).not.toHaveBeenCalled();
+
+      // Wait for debounce to complete (150ms debounce + requestAnimationFrame)
+      await new Promise(resolve => setTimeout(resolve, 130));
+
+      // Now it should have been called exactly once (debounced to single call)
+      expect(mockRendererImpl.redraw).toHaveBeenCalledTimes(1);
+
+      renderer.destroy();
+    });
+  });
 });

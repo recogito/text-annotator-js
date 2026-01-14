@@ -1238,7 +1238,7 @@
       "lines": "173-179",
       "category": "Renderer/MutationObserver",
       "description": "MutationObserver callback should be debounced at 150ms",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-mutation-002",
