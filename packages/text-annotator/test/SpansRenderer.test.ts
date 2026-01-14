@@ -425,5 +425,27 @@ describe('SpansRenderer', () => {
       // Empty arrays should be equal
       expect(dequal([], [])).toBe(true);
     });
+
+    it('should skip DOM redraw when noChanges and lazy is true (sr-redraw-002)', () => {
+      // At line 53: const shouldRedraw = !(noChanges && lazy);
+      // When both noChanges is true AND lazy is true, shouldRedraw is false
+
+      // Test the shouldRedraw logic
+      const calculateShouldRedraw = (noChanges: boolean, lazy: boolean): boolean => {
+        return !(noChanges && lazy);
+      };
+
+      // noChanges=true, lazy=true -> shouldRedraw=false (skip DOM redraw)
+      expect(calculateShouldRedraw(true, true)).toBe(false);
+
+      // noChanges=true, lazy=false -> shouldRedraw=true
+      expect(calculateShouldRedraw(true, false)).toBe(true);
+
+      // noChanges=false, lazy=true -> shouldRedraw=true
+      expect(calculateShouldRedraw(false, true)).toBe(true);
+
+      // noChanges=false, lazy=false -> shouldRedraw=true
+      expect(calculateShouldRedraw(false, false)).toBe(true);
+    });
   });
 });

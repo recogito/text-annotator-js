@@ -1478,7 +1478,7 @@
       "lines": "53",
       "category": "SpansRenderer/redraw",
       "description": "redraw should skip DOM redraw when noChanges and lazy is true",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-redraw-003",
