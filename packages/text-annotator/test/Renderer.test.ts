@@ -748,4 +748,34 @@ describe('Renderer', () => {
       renderer.destroy();
     });
   });
+
+  describe('Observers', () => {
+    it('should observe store changes and trigger redraw (r-observe-001)', async () => {
+      // Capture the callback passed to store.observe
+      let storeObserveCallback: (() => void) | undefined;
+      (mockState.store.observe as any).mockImplementation((cb: () => void) => {
+        storeObserveCallback = cb;
+      });
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // At lines 140-141: store.observe(onStoreChange) registers the callback
+      expect(mockState.store.observe).toHaveBeenCalled();
+      expect(storeObserveCallback).toBeDefined();
+
+      // Reset any calls from initialization
+      vi.clearAllMocks();
+
+      // Trigger the store change callback
+      storeObserveCallback!();
+
+      // Wait for debounce + requestAnimationFrame
+      await new Promise(resolve => setTimeout(resolve, 30));
+
+      // redraw should have been called
+      expect(mockRendererImpl.redraw).toHaveBeenCalled();
+
+      renderer.destroy();
+    });
+  });
 });
