@@ -542,7 +542,7 @@
       "lines": "389",
       "category": "SelectionHandler/pollSelectionCollapsed",
       "description": "pollSelectionCollapsed should stop early when isCollapsed becomes true",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-ctx-menu-001",

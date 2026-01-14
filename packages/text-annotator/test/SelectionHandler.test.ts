@@ -3382,5 +3382,71 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should stop immediately when isCollapsed becomes true (sh-poll-003)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Track polling behavior
+      let pollCount = 0;
+      const startTime = Date.now();
+      let endTime: number | undefined;
+
+      // Mock selection that becomes collapsed after a few polls
+      const mockSelection = {
+        get isCollapsed() {
+          pollCount++;
+          endTime = Date.now();
+          // Become collapsed after 5 polls (simulating quick collapse)
+          return pollCount > 5;
+        },
+        anchorNode: container,
+        rangeCount: 0,
+        getRangeAt: vi.fn()
+      };
+
+      const originalGetSelection = document.getSelection;
+      document.getSelection = vi.fn().mockReturnValue(mockSelection);
+
+      // Trigger a click sequence that invokes pollSelectionCollapsed
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(pointerDownEvent, 'target', { value: container });
+      document.dispatchEvent(pointerDownEvent);
+
+      const pointerUpEvent = new (global.PointerEvent || MouseEvent)('pointerup', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      Object.defineProperty(pointerUpEvent, 'target', { value: container });
+      document.dispatchEvent(pointerUpEvent);
+
+      // Wait for polling to complete (should be quick since isCollapsed becomes true)
+      await new Promise(resolve => setTimeout(resolve, 60));
+
+      // At line 389: shouldStopPolling returns true when isCollapsed becomes true
+      // This causes polling to stop immediately rather than waiting for 50ms timeout
+      // Poll count should be limited (stopped early)
+      expect(pollCount).toBeGreaterThan(1);
+      expect(pollCount).toBeLessThan(50); // Should stop well before 50 iterations
+
+      // Verify it stopped quickly (well before 50ms timeout)
+      if (endTime) {
+        const pollingDuration = endTime - startTime;
+        // Should stop much faster than the 50ms timeout since isCollapsed became true
+        expect(pollingDuration).toBeLessThan(30);
+      }
+
+      // Restore original getSelection
+      document.getSelection = originalGetSelection;
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });
