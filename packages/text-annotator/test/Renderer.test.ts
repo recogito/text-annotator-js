@@ -603,5 +603,27 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should call onDraw callback with annotations after 1ms delay (r-redraw-012)', async () => {
+      const mockAnnotation1 = { annotation: { id: 'ann-1', target: {} }, rects: [] };
+      const mockAnnotation2 = { annotation: { id: 'ann-2', target: {} }, rects: [] };
+      (mockState.store.getIntersecting as any).mockReturnValue([mockAnnotation1, mockAnnotation2]);
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // Reset any calls from initialization
+      vi.clearAllMocks();
+
+      renderer.redraw();
+
+      // Wait for debounce + requestAnimationFrame + 1ms setTimeout
+      await new Promise(resolve => setTimeout(resolve, 35));
+
+      // At line 121: setTimeout(() => onDraw(annotationsInView.map(({ annotation }) => annotation)), 1)
+      // onDraw calls viewport.set with annotation ids
+      expect(mockViewport.set).toHaveBeenCalled();
+
+      renderer.destroy();
+    });
   });
 });

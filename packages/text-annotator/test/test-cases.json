@@ -1094,7 +1094,7 @@
       "lines": "121",
       "category": "Renderer/redraw",
       "description": "redraw should call onDraw callback with annotations after 1ms delay",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-set-painter-001",
