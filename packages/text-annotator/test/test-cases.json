@@ -1166,7 +1166,7 @@
       "lines": "147",
       "category": "Renderer/Observers",
       "description": "should subscribe to hover changes and trigger redraw",
-      "completed": false
+      "completed": true
     },
     {
       "id": "r-scroll-001",

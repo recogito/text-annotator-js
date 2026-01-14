@@ -806,5 +806,34 @@ describe('Renderer', () => {
 
       renderer.destroy();
     });
+
+    it('should subscribe to hover changes and trigger redraw (r-observe-003)', async () => {
+      // Capture the callback passed to hover.subscribe
+      let hoverCallback: (() => void) | undefined;
+      (mockState.hover.subscribe as any).mockImplementation((cb: () => void) => {
+        hoverCallback = cb;
+        return () => {}; // unsubscribe function
+      });
+
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // At line 147: hover.subscribe(() => redraw()) registers the callback
+      expect(mockState.hover.subscribe).toHaveBeenCalled();
+      expect(hoverCallback).toBeDefined();
+
+      // Reset any calls from initialization
+      vi.clearAllMocks();
+
+      // Trigger the hover change callback
+      hoverCallback!();
+
+      // Wait for debounce + requestAnimationFrame
+      await new Promise(resolve => setTimeout(resolve, 30));
+
+      // redraw should have been called
+      expect(mockRendererImpl.redraw).toHaveBeenCalled();
+
+      renderer.destroy();
+    });
   });
 });
