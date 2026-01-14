@@ -1390,7 +1390,7 @@
       "lines": "208",
       "category": "Renderer/ReturnValue",
       "description": "createBaseRenderer should delegate setVisible to renderer.setVisible",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sr-zindex-001",

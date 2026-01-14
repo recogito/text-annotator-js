@@ -1319,5 +1319,13 @@ describe('Renderer', () => {
       expect(renderer).toHaveProperty('setPainter');
       expect(typeof renderer.setPainter).toBe('function');
     });
+
+    it('should delegate setVisible to renderer.setVisible (r-return-006)', () => {
+      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+
+      // At line 208: setVisible: renderer.setVisible
+      expect(renderer).toHaveProperty('setVisible');
+      expect(renderer.setVisible).toBe(mockRendererImpl.setVisible);
+    });
   });
 });
