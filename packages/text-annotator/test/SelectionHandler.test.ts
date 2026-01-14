@@ -2898,5 +2898,53 @@ describe('SelectionHandler', () => {
       // Clean up
       handler.destroy();
     });
+
+    it('should check timeDifference < CLICK_TIMEOUT (300ms) for click detection (sh-ptr-up-011)', async () => {
+      const handler = createSelectionHandler(container, mockState, mockLifecycle, mockOptions);
+
+      // Mock store.getAt to return an annotation
+      const mockAnnotation = {
+        id: 'test-annotation',
+        target: { annotation: 'test-annotation', selector: [] },
+        bodies: []
+      };
+      (mockState.store.getAt as any).mockReturnValue(mockAnnotation);
+
+      // Create pointerdown event with a specific timestamp
+      const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      // Override timeStamp to simulate specific timing
+      Object.defineProperty(pointerDownEvent, 'timeStamp', { value: 1000 });
+      Object.defineProperty(pointerDownEvent, 'target', { value: container });
+      document.dispatchEvent(pointerDownEvent);
+
+      // Create pointerup event with timestamp > 300ms after pointerdown
+      // This means timeDifference >= CLICK_TIMEOUT, so clickSelect should NOT be called
+      const pointerUpEvent = new (global.PointerEvent || MouseEvent)('pointerup', {
+        bubbles: true,
+        button: 0,
+        clientX: 100,
+        clientY: 100
+      });
+      // Set timeStamp to 1400ms (400ms after pointerdown, > CLICK_TIMEOUT of 300ms)
+      Object.defineProperty(pointerUpEvent, 'timeStamp', { value: 1400 });
+      Object.defineProperty(pointerUpEvent, 'target', { value: container });
+      document.dispatchEvent(pointerUpEvent);
+
+      // Wait for async operations
+      await new Promise(resolve => setTimeout(resolve, 80));
+
+      // At line 341: if timeDifference < CLICK_TIMEOUT (300ms), clickSelect is called
+      // Since our timeDifference is 400ms (>= 300ms), clickSelect should NOT be called.
+      // This means store.getAt should NOT be called (clickSelect calls store.getAt)
+      expect(mockState.store.getAt).not.toHaveBeenCalled();
+
+      // Clean up
+      handler.destroy();
+    });
   });
 });

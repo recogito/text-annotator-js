@@ -470,7 +470,7 @@
       "lines": "340-341",
       "category": "SelectionHandler/onPointerUp",
       "description": "onPointerUp should check timeDifference < CLICK_TIMEOUT (300ms) for click detection",
-      "completed": false
+      "completed": true
     },
     {
       "id": "sh-ptr-up-012",
