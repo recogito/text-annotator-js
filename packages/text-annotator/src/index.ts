@@ -7,6 +7,7 @@ export * from './utils';
 export * from './SelectionHandler';
 export * from './TextAnnotator';
 export * from './TextAnnotatorOptions';
+export * from './TextAnnotatorWithCallbacks';
 
 // Essential re-exports from @annotorious/core
 export type {
