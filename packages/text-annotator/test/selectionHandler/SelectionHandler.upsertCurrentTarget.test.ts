@@ -14,7 +14,7 @@ describe('SelectionHandler - upsertCurrentTarget', () => {
   });
 
   it('should add annotation when it doesn\'t exist (sh-upsert-001)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     (ctx.mockState.selection as any).selected = [];
 
@@ -68,7 +68,7 @@ describe('SelectionHandler - upsertCurrentTarget', () => {
   });
 
   it('should add annotation with id, bodies, and target (sh-upsert-002)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     (ctx.mockState.selection as any).selected = [];
 
@@ -128,7 +128,7 @@ describe('SelectionHandler - upsertCurrentTarget', () => {
   });
 
   it('should update target when currentTarget is newer (sh-upsert-003)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     const existingAnnotationId = 'existing-annotation-123';
     const existingTarget = {
@@ -200,7 +200,7 @@ describe('SelectionHandler - upsertCurrentTarget', () => {
   });
 
   it('should update target when existing has no updated timestamp (sh-upsert-004)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     const existingAnnotationId = 'existing-annotation-no-updated';
     const existingTarget = {
@@ -271,7 +271,7 @@ describe('SelectionHandler - upsertCurrentTarget', () => {
   });
 
   it('should NOT update target when existing is newer (sh-upsert-005)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     const existingAnnotationId = 'existing-annotation-newer';
     const futureDate = new Date(Date.now() + 10000);

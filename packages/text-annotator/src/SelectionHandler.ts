@@ -4,7 +4,7 @@ import hotkeys from 'hotkeys-js';
 import { poll } from 'poll';
 import { Origin } from '@annotorious/core';
 import type { Filter, Lifecycle, Selection, User } from '@annotorious/core';
-import type { TextAnnotatorState, StoreProxy } from './state';
+import type { SelectionProxy, StoreProxy } from './state';
 import type { TextAnnotation, TextAnnotationTarget } from './model';
 import type { AnnotatingMode } from './TextAnnotator';
 import type { TextAnnotatorOptions } from './TextAnnotatorOptions';
@@ -34,12 +34,11 @@ const SELECTION_KEYS = [
 
 export const createSelectionHandler = (
   container: HTMLElement,
-  state: TextAnnotatorState<TextAnnotation, unknown>,
+  selectionProxy: SelectionProxy,
   lifecycle: Lifecycle<TextAnnotation, unknown>,
   options: TextAnnotatorOptions<TextAnnotation, unknown>,
   storeProxy: StoreProxy<TextAnnotation>
 ) => {
-  const { selection } = state;
 
   let currentUser: User | undefined;
 
@@ -101,7 +100,7 @@ export const createSelectionHandler = (
 
     if (isLeftClick === false) return;
 
-    const { selected } = selection;
+    const selected = selectionProxy.getSelected();
 
     // Will this selection modify an existing annotation?
     const isModifyExisting = (
@@ -214,7 +213,7 @@ export const createSelectionHandler = (
       if (storeProxy.getAnnotation(currentTarget.annotation) && !(
         isAddToCurrentSelect(lastDownEvent) || annotatingMode === 'REPLACE_CURRENT'
       )) {
-        selection.clear();
+        selectionProxy.clear();
         storeProxy.deleteAnnotation(currentTarget.annotation);
       }
 
@@ -272,7 +271,7 @@ export const createSelectionHandler = (
       storeProxy.updateTarget(currentTarget, Origin.LOCAL);
     } else {
       // Proper lifecycle management: clear the previous selection first
-      selection.clear();
+      selectionProxy.clear();
     }
   }, 10);
 
@@ -304,7 +303,7 @@ export const createSelectionHandler = (
           ? dismissOnNotAnnotatable(lastUpEvent, container)
           : dismissOnNotAnnotatable === 'ALWAYS';
         if (shouldDismissSelection) {
-          selection.clear();
+          selectionProxy.clear();
         }
         return;
       }
@@ -320,7 +319,7 @@ export const createSelectionHandler = (
         );
 
       if (hovered) {
-        const { selected } = selection;
+        const selected = selectionProxy.getSelected();
 
         const currentIds = new Set(selected.map(s => s.id));
         const nextIds = Array.isArray(hovered) ? hovered.map(a => a.id) : [hovered.id];
@@ -331,10 +330,10 @@ export const createSelectionHandler = (
 
         if (hasChanged) {
           lifecycle.emit('clickAnnotation', hovered);
-          selection.userSelect(nextIds, lastUpEvent);
+          selectionProxy.userSelect(nextIds, lastUpEvent);
         }
       } else {
-        selection.clear();
+        selectionProxy.clear();
       }
     };
 
@@ -368,7 +367,7 @@ export const createSelectionHandler = (
 
     if (currentTarget && currentTarget.selector.length > 0) {
       upsertCurrentTarget();
-      selection.userSelect(currentTarget.annotation, lastUpEvent);
+      selectionProxy.userSelect(currentTarget.annotation, lastUpEvent);
     }
   }
 
@@ -415,7 +414,7 @@ export const createSelectionHandler = (
     if (!currentTarget) return;
     upsertCurrentTarget();
 
-    selection.userSelect(currentTarget.annotation, clonePointerEvent(evt));
+    selectionProxy.userSelect(currentTarget.annotation, clonePointerEvent(evt));
   }
 
   const onKeyup = (evt: KeyboardEvent) => {
@@ -426,7 +425,7 @@ export const createSelectionHandler = (
 
       if (!sel.isCollapsed) {
         upsertCurrentTarget();
-        selection.userSelect(currentTarget.annotation, cloneKeyboardEvent(evt));
+        selectionProxy.userSelect(currentTarget.annotation, cloneKeyboardEvent(evt));
       }
     }
   }
@@ -435,7 +434,7 @@ export const createSelectionHandler = (
 
     const onSelected = () => setTimeout(() => {
       if (currentTarget?.selector.length > 0) {
-        selection.clear();
+        selectionProxy.clear();
 
         storeProxy.addAnnotation({
           id: currentTarget.annotation,
@@ -443,7 +442,7 @@ export const createSelectionHandler = (
           target: currentTarget
         });
 
-        selection.userSelect(currentTarget.annotation, cloneKeyboardEvent(evt));
+        selectionProxy.userSelect(currentTarget.annotation, cloneKeyboardEvent(evt));
       }
       
       document.removeEventListener('selectionchange', onSelected);
@@ -485,7 +484,7 @@ export const createSelectionHandler = (
     }
 
     currentTarget = undefined;
-    selection.clear();
+    selectionProxy.clear();
   };
 
   hotkeys(ARROW_KEYS.join(','), { keydown: true, keyup: false }, handleArrowKeyPress);

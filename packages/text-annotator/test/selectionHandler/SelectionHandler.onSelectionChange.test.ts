@@ -14,7 +14,7 @@ describe('SelectionHandler - onSelectionChange', () => {
   });
 
   it('should return early when currentTarget is undefined (sh-sel-change-001)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     const selectionChangeEvent = new Event('selectionchange', { bubbles: true });
     document.dispatchEvent(selectionChangeEvent);
@@ -28,7 +28,7 @@ describe('SelectionHandler - onSelectionChange', () => {
   });
 
   it('should return early when no selection exists (sh-sel-change-002)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
       bubbles: true,
@@ -58,7 +58,7 @@ describe('SelectionHandler - onSelectionChange', () => {
   });
 
   it('should return early when selection has no anchorNode (sh-sel-change-003)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
       bubbles: true,
@@ -94,7 +94,7 @@ describe('SelectionHandler - onSelectionChange', () => {
   });
 
   it('should return early when anchorNode is outside container (sh-sel-change-004)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     const outsideElement = document.createElement('div');
     outsideElement.textContent = 'Outside content';
@@ -135,7 +135,7 @@ describe('SelectionHandler - onSelectionChange', () => {
   });
 
   it('should clear currentTarget when selection outside container on first change (sh-sel-change-005)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     (ctx.mockState.selection as any).selected = [];
 
@@ -175,7 +175,7 @@ describe('SelectionHandler - onSelectionChange', () => {
   });
 
   it('should delete annotation when selection is collapsed in CREATE_NEW mode (sh-sel-change-010)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     handler.setAnnotatingMode('CREATE_NEW');
 
@@ -230,7 +230,7 @@ describe('SelectionHandler - onSelectionChange', () => {
   });
 
   it('should clear selection before deleting annotation on collapse (sh-sel-change-011)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     handler.setAnnotatingMode('CREATE_NEW');
 
@@ -290,7 +290,7 @@ describe('SelectionHandler - onSelectionChange', () => {
   });
 
   it('should NOT delete annotation on collapse when ADD_TO_CURRENT mode (sh-sel-change-012)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     handler.setAnnotatingMode('ADD_TO_CURRENT');
 
@@ -342,7 +342,7 @@ describe('SelectionHandler - onSelectionChange', () => {
   });
 
   it('should NOT delete annotation on collapse when REPLACE_CURRENT mode (sh-sel-change-013)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     handler.setAnnotatingMode('REPLACE_CURRENT');
 
@@ -394,7 +394,7 @@ describe('SelectionHandler - onSelectionChange', () => {
   });
 
   it('should trim selection ranges to container boundaries (sh-sel-change-014)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     (ctx.mockState.selection as any).selected = [];
 
@@ -438,7 +438,7 @@ describe('SelectionHandler - onSelectionChange', () => {
   it('should skip whitespace-only selections (sh-sel-change-015)', async () => {
     ctx.container.innerHTML = '<p>   </p>';
 
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     (ctx.mockState.selection as any).selected = [];
 
@@ -487,7 +487,7 @@ describe('SelectionHandler - onSelectionChange', () => {
   it('should split ranges around not-annotatable elements (sh-sel-change-016)', async () => {
     ctx.container.innerHTML = '<p>Some <span data-not-annotatable="true">skip</span> text content.</p>';
 
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     (ctx.mockState.selection as any).selected = [];
 
@@ -531,7 +531,7 @@ describe('SelectionHandler - onSelectionChange', () => {
   });
 
   it('should detect changes by comparing range count and quote text (sh-sel-change-017)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     (ctx.mockState.selection as any).selected = [];
 
@@ -578,7 +578,7 @@ describe('SelectionHandler - onSelectionChange', () => {
   });
 
   it('should merge ranges with existing annotation when ADD_TO_CURRENT (sh-sel-change-018)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     handler.setAnnotatingMode('ADD_TO_CURRENT');
 
@@ -641,7 +641,7 @@ describe('SelectionHandler - onSelectionChange', () => {
   });
 
   it('should update currentTarget with new selectors (sh-sel-change-019)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     (ctx.mockState.selection as any).selected = [];
 
@@ -683,7 +683,7 @@ describe('SelectionHandler - onSelectionChange', () => {
   });
 
   it('should call rangeToSelector for each combined range (sh-sel-change-020)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     (ctx.mockState.selection as any).selected = [];
 
@@ -725,7 +725,7 @@ describe('SelectionHandler - onSelectionChange', () => {
   });
 
   it('should return early when ADD_TO_CURRENT or REPLACE_CURRENT mode (sh-sel-change-021)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     handler.setAnnotatingMode('ADD_TO_CURRENT');
 
@@ -771,7 +771,7 @@ describe('SelectionHandler - onSelectionChange', () => {
   });
 
   it('should update existing annotation target via store.updateTarget (sh-sel-change-022)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     (ctx.mockState.selection as any).selected = [];
 
@@ -821,7 +821,7 @@ describe('SelectionHandler - onSelectionChange', () => {
   });
 
   it('should clear previous selection when annotation does not exist yet (sh-sel-change-023)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     (ctx.mockState.selection as any).selected = [];
 

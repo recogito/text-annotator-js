@@ -15,7 +15,7 @@ describe('SelectionHandler - Configuration', () => {
 
   describe('setAnnotatingEnabled', () => {
     it('should set currentAnnotatingEnabled to false when called with false (sh-config-001)', () => {
-      const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+      const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
       handler.setAnnotatingEnabled(false);
 
@@ -37,7 +37,7 @@ describe('SelectionHandler - Configuration', () => {
     });
 
     it('should clear debounced onSelectionChange handler when called with false (sh-config-002)', async () => {
-      const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+      const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
       const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
         bubbles: true,
@@ -61,7 +61,7 @@ describe('SelectionHandler - Configuration', () => {
     });
 
     it('should reset targetToModify, currentTarget, isLeftClick, lastDownEvent to undefined (sh-config-003)', async () => {
-      const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+      const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
       const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
         bubbles: true,
@@ -93,7 +93,7 @@ describe('SelectionHandler - Configuration', () => {
     });
 
     it('should re-enable annotation creation when called with true (sh-config-004)', () => {
-      const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+      const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
       handler.setAnnotatingEnabled(false);
 
@@ -121,7 +121,7 @@ describe('SelectionHandler - Configuration', () => {
 
   describe('setAnnotatingMode', () => {
     it('should update annotatingMode to provided value (sh-config-005)', () => {
-      const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+      const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
       handler.setAnnotatingMode('ADD_TO_CURRENT');
 
@@ -149,7 +149,7 @@ describe('SelectionHandler - Configuration', () => {
     });
 
     it('should default to CREATE_NEW when no value provided (sh-config-006)', () => {
-      const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+      const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
       handler.setAnnotatingMode('ADD_TO_CURRENT');
       handler.setAnnotatingMode();
@@ -180,7 +180,7 @@ describe('SelectionHandler - Configuration', () => {
 
   describe('setFilter', () => {
     it('should store the filter for later use in click selection (sh-config-007)', async () => {
-      const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+      const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
       const testFilter = (annotation: any) => annotation.id === 'filtered-id';
       handler.setFilter(testFilter);
@@ -227,7 +227,7 @@ describe('SelectionHandler - Configuration', () => {
 
   describe('setUser', () => {
     it('should update currentUser for annotation creator (sh-config-008)', () => {
-      const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+      const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
       const testUser = {
         id: 'user-123',

@@ -14,7 +14,7 @@ describe('SelectionHandler - onKeyup', () => {
   });
 
   it('should return early when annotating is disabled (sh-keyup-001)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     handler.setAnnotatingEnabled(false);
 
@@ -54,7 +54,7 @@ describe('SelectionHandler - onKeyup', () => {
   });
 
   it('should only process Shift key release (sh-keyup-002)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     (ctx.mockState.selection as any).selected = [];
 
@@ -107,7 +107,7 @@ describe('SelectionHandler - onKeyup', () => {
   });
 
   it('should only process when currentTarget exists (sh-keyup-003)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     (ctx.mockState.selection as any).selected = [];
 
@@ -146,7 +146,7 @@ describe('SelectionHandler - onKeyup', () => {
   });
 
   it('should only process when selection is not collapsed (sh-keyup-004)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     (ctx.mockState.selection as any).selected = [];
 
@@ -192,7 +192,7 @@ describe('SelectionHandler - onKeyup', () => {
   });
 
   it('should call upsertCurrentTarget and selection.userSelect on Shift release (sh-keyup-005)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     (ctx.mockState.selection as any).selected = [];
 

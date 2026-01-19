@@ -1,6 +1,6 @@
 import { JSDOM } from 'jsdom';
 import { vi } from 'vitest';
-import type { TextAnnotatorState, StoreProxy } from '../../src/state';
+import type { TextAnnotatorState, StoreProxy, SelectionProxy } from '../../src/state';
 import type { TextAnnotation } from '../../src/model';
 import type { Lifecycle } from '@annotorious/core';
 import type { TextAnnotatorOptions } from '../../src/TextAnnotatorOptions';
@@ -11,6 +11,7 @@ export interface SelectionHandlerTestContext {
   mockLifecycle: Lifecycle<TextAnnotation, unknown>;
   mockOptions: TextAnnotatorOptions<TextAnnotation, unknown>;
   mockStoreProxy: StoreProxy<TextAnnotation>;
+  mockSelectionProxy: SelectionProxy;
 }
 
 export function setupSelectionHandlerTest(): SelectionHandlerTestContext {
@@ -102,5 +103,17 @@ export function setupSelectionHandlerTest(): SelectionHandlerTestContext {
     on: vi.fn()
   } as unknown as StoreProxy<TextAnnotation>;
 
-  return { container, mockState, mockLifecycle, mockOptions, mockStoreProxy };
+  // Create mock selection proxy that delegates to mockState.selection
+  const mockSelectionProxy = {
+    // Data Down (reads) - pull-based
+    getSelected: vi.fn(() => mockState.selection.selected),
+
+    // Actions Up (writes)
+    clear: vi.fn(() => mockState.selection.clear()),
+    userSelect: vi.fn((idOrIds: string | string[], event?: any) => {
+      mockState.selection.userSelect(idOrIds, event);
+    })
+  } as unknown as SelectionProxy;
+
+  return { container, mockState, mockLifecycle, mockOptions, mockStoreProxy, mockSelectionProxy };
 }
