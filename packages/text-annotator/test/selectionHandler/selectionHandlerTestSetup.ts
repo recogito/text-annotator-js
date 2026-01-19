@@ -82,17 +82,23 @@ export function setupSelectionHandlerTest(): SelectionHandlerTestContext {
     annotatingEnabled: true
   };
 
-  // Create mock store proxy that forwards emit calls to the store methods
+  // Create mock store proxy that delegates to the store
   const mockStoreProxy = {
-    emit: vi.fn((event: string, ...args: any[]) => {
-      if (event === 'addAnnotation') {
-        mockState.store.addAnnotation(args[0], args[1]);
-      } else if (event === 'updateTarget') {
-        mockState.store.updateTarget(args[0], args[1]);
-      } else if (event === 'deleteAnnotation') {
-        mockState.store.deleteAnnotation(args[0]);
-      }
+    // Data Down (reads) - delegate to store
+    getAnnotation: vi.fn((id: string) => mockState.store.getAnnotation(id)),
+    getAt: vi.fn((x: number, y: number, all?: boolean, filter?: any) => mockState.store.getAt(x, y, all, filter)),
+
+    // Actions Up (writes) - forward to store
+    addAnnotation: vi.fn((annotation: any, origin?: any) => {
+      mockState.store.addAnnotation(annotation, origin);
     }),
+    updateTarget: vi.fn((target: any, origin?: any) => {
+      mockState.store.updateTarget(target, origin);
+    }),
+    deleteAnnotation: vi.fn((id: string) => {
+      mockState.store.deleteAnnotation(id);
+    }),
+
     on: vi.fn()
   } as unknown as StoreProxy<TextAnnotation>;
 

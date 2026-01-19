@@ -39,7 +39,7 @@ export const createSelectionHandler = (
   options: TextAnnotatorOptions<TextAnnotation, unknown>,
   storeProxy: StoreProxy<TextAnnotation>
 ) => {
-  const { store, selection } = state;
+  const { selection } = state;
 
   let currentUser: User | undefined;
 
@@ -110,7 +110,7 @@ export const createSelectionHandler = (
       && selected[0].editable;
 
     if (isModifyExisting) {
-      const existing = store.getAnnotation(selected[0].id);
+      const existing = storeProxy.getAnnotation(selected[0].id);
 
       if (existing?.target) {
         targetToModify = existing.target;
@@ -211,11 +211,11 @@ export const createSelectionHandler = (
        *
        * @see https://github.com/recogito/text-annotator-js/issues/139
        */
-      if (store.getAnnotation(currentTarget.annotation) && !(
+      if (storeProxy.getAnnotation(currentTarget.annotation) && !(
         isAddToCurrentSelect(lastDownEvent) || annotatingMode === 'REPLACE_CURRENT'
       )) {
         selection.clear();
-        storeProxy.emit('deleteAnnotation', currentTarget.annotation);
+        storeProxy.deleteAnnotation(currentTarget.annotation);
       }
 
       return;
@@ -268,8 +268,8 @@ export const createSelectionHandler = (
      * During mouse selection on the desktop, the annotation won't usually exist while the selection is being edited.
      * But it'll be typical during selection via the keyboard or mobile's handlebars.
      */
-    if (store.getAnnotation(currentTarget.annotation)) {
-      storeProxy.emit('updateTarget', currentTarget, Origin.LOCAL);
+    if (storeProxy.getAnnotation(currentTarget.annotation)) {
+      storeProxy.updateTarget(currentTarget, Origin.LOCAL);
     } else {
       // Proper lifecycle management: clear the previous selection first
       selection.clear();
@@ -312,7 +312,7 @@ export const createSelectionHandler = (
       const hovered =
         lastUpEvent.target instanceof Node &&
         container.contains(lastUpEvent.target) &&
-        store.getAt(
+        storeProxy.getAt(
           lastUpEvent.clientX - x,
           lastUpEvent.clientY - y,
           selectionMode === 'all',
@@ -437,7 +437,7 @@ export const createSelectionHandler = (
       if (currentTarget?.selector.length > 0) {
         selection.clear();
 
-        storeProxy.emit('addAnnotation', {
+        storeProxy.addAnnotation({
           id: currentTarget.annotation,
           bodies: [],
           target: currentTarget
@@ -492,9 +492,9 @@ export const createSelectionHandler = (
 
   // Helper
   const upsertCurrentTarget = () => {
-    const existingAnnotation = store.getAnnotation(currentTarget.annotation);
+    const existingAnnotation = storeProxy.getAnnotation(currentTarget.annotation);
     if (!existingAnnotation) {
-      storeProxy.emit('addAnnotation', {
+      storeProxy.addAnnotation({
         id: currentTarget.annotation,
         bodies: [],
         target: currentTarget
@@ -508,7 +508,7 @@ export const createSelectionHandler = (
         !currentTargetUpdated ||
         existingTargetUpdated < currentTargetUpdated
       ) {
-        storeProxy.emit('updateTarget', currentTarget);
+        storeProxy.updateTarget(currentTarget);
       }
     }
   };
