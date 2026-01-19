@@ -1024,7 +1024,7 @@ describe('Renderer', () => {
       // Create a mock mutation record (external mutation - not from container)
       const mockRecord = {
         target: document.body
-      } as MutationRecord;
+      } as unknown as MutationRecord;
 
       // Trigger the callback multiple times
       mutationCallback!([ mockRecord ], {} as MutationObserver);
@@ -1067,7 +1067,7 @@ describe('Renderer', () => {
       // Create a mock mutation record where the target IS the container (internal mutation)
       const mockInternalRecord = {
         target: container
-      } as MutationRecord;
+      } as unknown as MutationRecord;
 
       // Trigger the callback with internal mutation
       mutationCallback!([ mockInternalRecord ], {} as MutationObserver);
@@ -1102,7 +1102,7 @@ describe('Renderer', () => {
       // Create a mock mutation record where the target is NOT the container (external mutation)
       const mockExternalRecord = {
         target: document.body
-      } as MutationRecord;
+      } as unknown as MutationRecord;
 
       // Trigger the callback with external mutation
       mutationCallback!([ mockExternalRecord ], {} as MutationObserver);

@@ -35,8 +35,7 @@ export interface TextAnnotatorWithCallbacks<
   I extends TextAnnotation = TextAnnotation,
   E extends unknown = TextAnnotation
 > extends TextAnnotator<I, E> {
-  // Additional method for external state management
-  setAnnotations(annotations: I[]): void;
+  // Inherits setAnnotations from TextAnnotator
 }
 
 export const createTextAnnotatorWithCallbacks = <
@@ -66,7 +65,7 @@ export const createTextAnnotatorWithCallbacks = <
 
   // Load initial annotations if provided
   if (props.annotations && props.annotations.length > 0) {
-    annotator.addAnnotation(props.annotations);
+    annotator.setAnnotations(props.annotations as unknown as Partial<E>[]);
   }
 
   // Wire lifecycle events to callbacks
@@ -98,16 +97,7 @@ export const createTextAnnotatorWithCallbacks = <
     annotator.on('mouseLeaveAnnotation', props.onMouseLeave);
   }
 
-  // Add setAnnotations method for external state sync
-  const setAnnotations = (annotations: I[]) => {
-    annotator.clearAnnotations();
-    if (annotations.length > 0) {
-      annotator.addAnnotation(annotations);
-    }
-  };
-
   return {
-    ...annotator,
-    setAnnotations
+    ...annotator
   };
 };

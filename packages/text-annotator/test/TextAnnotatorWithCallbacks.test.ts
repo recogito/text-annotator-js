@@ -262,7 +262,7 @@ describe('TextAnnotatorWithCallbacks', () => {
     });
 
     it('should apply style when provided (tawc-config-002)', () => {
-      const style = { fill: '#ff0000' };
+      const style = { fill: '#ff0000' as const };
       const annotator = createTextAnnotatorWithCallbacks({
         container,
         style
