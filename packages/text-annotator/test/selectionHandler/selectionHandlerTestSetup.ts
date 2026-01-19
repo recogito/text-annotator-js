@@ -2,13 +2,12 @@ import { JSDOM } from 'jsdom';
 import { vi } from 'vitest';
 import type { TextAnnotatorState, StoreProxy, SelectionProxy } from '../../src/state';
 import type { TextAnnotation } from '../../src/model';
-import type { Lifecycle } from '@annotorious/core';
 import type { TextAnnotatorOptions } from '../../src/TextAnnotatorOptions';
 
 export interface SelectionHandlerTestContext {
   container: HTMLElement;
   mockState: TextAnnotatorState<TextAnnotation, unknown>;
-  mockLifecycle: Lifecycle<TextAnnotation, unknown>;
+  mockOnClickAnnotation: ReturnType<typeof vi.fn>;
   mockOptions: TextAnnotatorOptions<TextAnnotation, unknown>;
   mockStoreProxy: StoreProxy<TextAnnotation>;
   mockSelectionProxy: SelectionProxy;
@@ -74,10 +73,7 @@ export function setupSelectionHandlerTest(): SelectionHandlerTestContext {
     }
   } as unknown as TextAnnotatorState<TextAnnotation, unknown>;
 
-  const mockLifecycle = {
-    emit: vi.fn(),
-    on: vi.fn()
-  } as unknown as Lifecycle<TextAnnotation, unknown>;
+  const mockOnClickAnnotation = vi.fn();
 
   const mockOptions: TextAnnotatorOptions<TextAnnotation, unknown> = {
     annotatingEnabled: true
@@ -115,5 +111,5 @@ export function setupSelectionHandlerTest(): SelectionHandlerTestContext {
     })
   } as unknown as SelectionProxy;
 
-  return { container, mockState, mockLifecycle, mockOptions, mockStoreProxy, mockSelectionProxy };
+  return { container, mockState, mockOnClickAnnotation, mockOptions, mockStoreProxy, mockSelectionProxy };
 }

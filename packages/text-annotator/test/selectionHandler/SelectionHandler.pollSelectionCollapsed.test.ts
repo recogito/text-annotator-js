@@ -14,7 +14,7 @@ describe('SelectionHandler - pollSelectionCollapsed', () => {
   });
 
   it('should poll isCollapsed with 1ms interval (sh-poll-001)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockOnClickAnnotation, ctx.mockOptions, ctx.mockStoreProxy);
 
     let callCount = 0;
     const mockSelection = {
@@ -61,7 +61,7 @@ describe('SelectionHandler - pollSelectionCollapsed', () => {
   });
 
   it('should stop after 50ms timeout (sh-poll-002)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockOnClickAnnotation, ctx.mockOptions, ctx.mockStoreProxy);
 
     let pollCount = 0;
     const startTime = Date.now();
@@ -114,7 +114,7 @@ describe('SelectionHandler - pollSelectionCollapsed', () => {
   });
 
   it('should stop immediately when isCollapsed becomes true (sh-poll-003)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockOnClickAnnotation, ctx.mockOptions, ctx.mockStoreProxy);
 
     let pollCount = 0;
     const startTime = Date.now();

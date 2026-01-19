@@ -16,7 +16,7 @@ describe('SelectionHandler - EventListeners', () => {
   it('should add pointerdown listener to document (sh-events-001)', () => {
     const addEventListenerSpy = vi.spyOn(document, 'addEventListener');
 
-    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockOnClickAnnotation, ctx.mockOptions, ctx.mockStoreProxy);
 
     expect(addEventListenerSpy).toHaveBeenCalledWith('pointerdown', expect.any(Function));
 
@@ -27,7 +27,7 @@ describe('SelectionHandler - EventListeners', () => {
   it('should add pointerup listener to document (sh-events-002)', () => {
     const addEventListenerSpy = vi.spyOn(document, 'addEventListener');
 
-    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockOnClickAnnotation, ctx.mockOptions, ctx.mockStoreProxy);
 
     expect(addEventListenerSpy).toHaveBeenCalledWith('pointerup', expect.any(Function));
 
@@ -38,7 +38,7 @@ describe('SelectionHandler - EventListeners', () => {
   it('should add contextmenu listener to document (sh-events-003)', () => {
     const addEventListenerSpy = vi.spyOn(document, 'addEventListener');
 
-    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockOnClickAnnotation, ctx.mockOptions, ctx.mockStoreProxy);
 
     expect(addEventListenerSpy).toHaveBeenCalledWith('contextmenu', expect.any(Function));
 
@@ -49,7 +49,7 @@ describe('SelectionHandler - EventListeners', () => {
   it('should add keyup listener to container (sh-events-004)', () => {
     const addEventListenerSpy = vi.spyOn(ctx.container, 'addEventListener');
 
-    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockOnClickAnnotation, ctx.mockOptions, ctx.mockStoreProxy);
 
     expect(addEventListenerSpy).toHaveBeenCalledWith('keyup', expect.any(Function));
 
@@ -60,7 +60,7 @@ describe('SelectionHandler - EventListeners', () => {
   it('should add selectstart listener to container (sh-events-005)', () => {
     const addEventListenerSpy = vi.spyOn(ctx.container, 'addEventListener');
 
-    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockOnClickAnnotation, ctx.mockOptions, ctx.mockStoreProxy);
 
     expect(addEventListenerSpy).toHaveBeenCalledWith('selectstart', expect.any(Function));
 
@@ -71,7 +71,7 @@ describe('SelectionHandler - EventListeners', () => {
   it('should add selectionchange listener to document (sh-events-006)', () => {
     const addEventListenerSpy = vi.spyOn(document, 'addEventListener');
 
-    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockOnClickAnnotation, ctx.mockOptions, ctx.mockStoreProxy);
 
     expect(addEventListenerSpy).toHaveBeenCalledWith('selectionchange', expect.any(Function));
 

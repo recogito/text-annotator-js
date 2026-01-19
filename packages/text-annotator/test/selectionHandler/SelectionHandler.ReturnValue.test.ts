@@ -14,7 +14,7 @@ describe('SelectionHandler - ReturnValue', () => {
   });
 
   it('should return object with destroy method (sh-return-001)', () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockOnClickAnnotation, ctx.mockOptions, ctx.mockStoreProxy);
 
     expect(handler.destroy).toBeDefined();
     expect(typeof handler.destroy).toBe('function');
@@ -23,7 +23,7 @@ describe('SelectionHandler - ReturnValue', () => {
   });
 
   it('should return object with setFilter method (sh-return-002)', () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockOnClickAnnotation, ctx.mockOptions, ctx.mockStoreProxy);
 
     expect(handler.setFilter).toBeDefined();
     expect(typeof handler.setFilter).toBe('function');
@@ -32,7 +32,7 @@ describe('SelectionHandler - ReturnValue', () => {
   });
 
   it('should return object with setUser method (sh-return-003)', () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockOnClickAnnotation, ctx.mockOptions, ctx.mockStoreProxy);
 
     expect(handler.setUser).toBeDefined();
     expect(typeof handler.setUser).toBe('function');
@@ -41,7 +41,7 @@ describe('SelectionHandler - ReturnValue', () => {
   });
 
   it('should return object with setAnnotatingEnabled method (sh-return-004)', () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockOnClickAnnotation, ctx.mockOptions, ctx.mockStoreProxy);
 
     expect(handler.setAnnotatingEnabled).toBeDefined();
     expect(typeof handler.setAnnotatingEnabled).toBe('function');
@@ -50,7 +50,7 @@ describe('SelectionHandler - ReturnValue', () => {
   });
 
   it('should return object with setAnnotatingMode method (sh-return-005)', () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
+    const handler = createSelectionHandler(ctx.container, ctx.mockSelectionProxy, ctx.mockOnClickAnnotation, ctx.mockOptions, ctx.mockStoreProxy);
 
     expect(handler.setAnnotatingMode).toBeDefined();
     expect(typeof handler.setAnnotatingMode).toBe('function');

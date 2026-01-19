@@ -91,7 +91,8 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
 
   const storeProxy = createStoreProxy(store);
   const selectionProxy = createSelectionProxy(state.selection);
-  const selectionHandler = createSelectionHandler(container, selectionProxy, lifecycle, opts, storeProxy);
+  const onClickAnnotation = (annotation: I | I[]) => lifecycle.emit('clickAnnotation', annotation);
+  const selectionHandler = createSelectionHandler(container, selectionProxy, onClickAnnotation, opts, storeProxy);
   selectionHandler.setUser(currentUser);
 
   /*************************/

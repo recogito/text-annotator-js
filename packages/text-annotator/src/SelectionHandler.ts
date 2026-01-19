@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import hotkeys from 'hotkeys-js';
 import { poll } from 'poll';
 import { Origin } from '@annotorious/core';
-import type { Filter, Lifecycle, Selection, User } from '@annotorious/core';
+import type { Filter, Selection, User } from '@annotorious/core';
 import type { SelectionProxy, StoreProxy } from './state';
 import type { TextAnnotation, TextAnnotationTarget } from './model';
 import type { AnnotatingMode } from './TextAnnotator';
@@ -35,7 +35,7 @@ const SELECTION_KEYS = [
 export const createSelectionHandler = (
   container: HTMLElement,
   selectionProxy: SelectionProxy,
-  lifecycle: Lifecycle<TextAnnotation, unknown>,
+  onClickAnnotation: (annotation: TextAnnotation | TextAnnotation[]) => void,
   options: TextAnnotatorOptions<TextAnnotation, unknown>,
   storeProxy: StoreProxy<TextAnnotation>
 ) => {
@@ -329,7 +329,7 @@ export const createSelectionHandler = (
           !nextIds.every(id => currentIds.has(id));
 
         if (hasChanged) {
-          lifecycle.emit('clickAnnotation', hovered);
+          onClickAnnotation(hovered);
           selectionProxy.userSelect(nextIds, lastUpEvent);
         }
       } else {
