@@ -14,7 +14,7 @@ describe('SelectionHandler - onSelectStart', () => {
   });
 
   it('should return early when annotating is disabled (sh-select-start-001)', () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     handler.setAnnotatingEnabled(false);
 
@@ -46,7 +46,7 @@ describe('SelectionHandler - onSelectStart', () => {
   });
 
   it('should return early when isLeftClick is false (right-click) (sh-select-start-002)', () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     const mockAnnotation = {
       id: 'existing-annotation-id',
@@ -76,7 +76,7 @@ describe('SelectionHandler - onSelectStart', () => {
   });
 
   it('should detect modify-existing mode when ADD_TO_CURRENT and single editable selection (sh-select-start-003)', () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     handler.setAnnotatingMode('ADD_TO_CURRENT');
 
@@ -108,7 +108,7 @@ describe('SelectionHandler - onSelectStart', () => {
   });
 
   it('should detect modify-existing mode when REPLACE_CURRENT and single editable selection (sh-select-start-004)', () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     handler.setAnnotatingMode('REPLACE_CURRENT');
 
@@ -140,7 +140,7 @@ describe('SelectionHandler - onSelectStart', () => {
   });
 
   it('should set targetToModify to existing annotation target when modifying (sh-select-start-005)', () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     handler.setAnnotatingMode('ADD_TO_CURRENT');
 
@@ -173,7 +173,7 @@ describe('SelectionHandler - onSelectStart', () => {
   });
 
   it('should preserve created/creator from existing target when modifying (sh-select-start-006)', () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     handler.setAnnotatingMode('ADD_TO_CURRENT');
 
@@ -208,7 +208,7 @@ describe('SelectionHandler - onSelectStart', () => {
   });
 
   it('should set updated date and updatedBy when modifying (sh-select-start-007)', () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     handler.setAnnotatingMode('ADD_TO_CURRENT');
 
@@ -244,7 +244,7 @@ describe('SelectionHandler - onSelectStart', () => {
   });
 
   it('should create new target with new UUID when not modifying (sh-select-start-008)', () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     handler.setAnnotatingMode('CREATE_NEW');
 
@@ -267,7 +267,7 @@ describe('SelectionHandler - onSelectStart', () => {
   });
 
   it('should set created date and creator on new target (sh-select-start-009)', () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     handler.setAnnotatingMode('CREATE_NEW');
 

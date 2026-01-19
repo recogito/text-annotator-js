@@ -14,7 +14,7 @@ describe('SelectionHandler - onContextMenu', () => {
   });
 
   it('should return early when selection is collapsed (sh-ctx-menu-001)', () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     const mockSelection = {
       isCollapsed: true,
@@ -44,7 +44,7 @@ describe('SelectionHandler - onContextMenu', () => {
   });
 
   it('should emulate selectstart when currentTarget has no selectors (sh-ctx-menu-002)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     (ctx.mockState.selection as any).selected = [];
 
@@ -102,7 +102,7 @@ describe('SelectionHandler - onContextMenu', () => {
     notAnnotatable.textContent = 'Not annotatable text';
     ctx.container.appendChild(notAnnotatable);
 
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     (ctx.mockState.selection as any).selected = [];
 
@@ -144,7 +144,7 @@ describe('SelectionHandler - onContextMenu', () => {
   });
 
   it('should call upsertCurrentTarget (sh-ctx-menu-004)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     (ctx.mockState.selection as any).selected = [];
 
@@ -197,7 +197,7 @@ describe('SelectionHandler - onContextMenu', () => {
   });
 
   it('should call selection.userSelect with cloned event (sh-ctx-menu-005)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     (ctx.mockState.selection as any).selected = [];
 

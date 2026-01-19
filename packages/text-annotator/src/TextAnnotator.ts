@@ -5,7 +5,7 @@ import { createCanvasRenderer, createHighlightsRenderer, createSpansRenderer } f
 import type { HighlightStyleExpression, RendererFactory } from './highlight';
 import type { TextAnnotation } from './model';
 import { createPresencePainter } from './presence';
-import { type TextAnnotationStore, type TextAnnotatorState, createTextAnnotatorState } from './state';
+import { type TextAnnotationStore, type TextAnnotatorState, createTextAnnotatorState, createStoreProxy } from './state';
 import { cancelSingleClickEvents, programmaticallyFocusable } from './utils';
 import { createSelectionHandler } from './SelectionHandler';
 import { fillDefaults, type RendererType, type TextAnnotatorOptions } from './TextAnnotatorOptions';
@@ -89,7 +89,8 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
   if (opts.style)
     highlightRenderer.setStyle(opts.style);
 
-  const selectionHandler = createSelectionHandler(container, state, lifecycle, opts);
+  const storeProxy = createStoreProxy(store);
+  const selectionHandler = createSelectionHandler(container, state, lifecycle, opts, storeProxy);
   selectionHandler.setUser(currentUser);
 
   /*************************/

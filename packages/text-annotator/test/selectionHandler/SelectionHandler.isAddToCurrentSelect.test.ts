@@ -14,7 +14,7 @@ describe('SelectionHandler - isAddToCurrentSelect', () => {
   });
 
   it('should return true when annotatingMode is ADD_TO_CURRENT (sh-add-to-current-001)', () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     handler.setAnnotatingMode('ADD_TO_CURRENT');
 
@@ -51,7 +51,7 @@ describe('SelectionHandler - isAddToCurrentSelect', () => {
       allowModifierSelect: true
     };
 
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, optionsWithModifier);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, optionsWithModifier, ctx.mockStoreProxy);
 
     handler.setAnnotatingMode('CREATE_NEW');
 
@@ -89,7 +89,7 @@ describe('SelectionHandler - isAddToCurrentSelect', () => {
       allowModifierSelect: false
     };
 
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, optionsWithoutModifier);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, optionsWithoutModifier, ctx.mockStoreProxy);
 
     handler.setAnnotatingMode('CREATE_NEW');
 

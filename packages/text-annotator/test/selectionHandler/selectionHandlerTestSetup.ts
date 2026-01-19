@@ -1,6 +1,6 @@
 import { JSDOM } from 'jsdom';
 import { vi } from 'vitest';
-import type { TextAnnotatorState } from '../../src/state';
+import type { TextAnnotatorState, StoreProxy } from '../../src/state';
 import type { TextAnnotation } from '../../src/model';
 import type { Lifecycle } from '@annotorious/core';
 import type { TextAnnotatorOptions } from '../../src/TextAnnotatorOptions';
@@ -10,6 +10,7 @@ export interface SelectionHandlerTestContext {
   mockState: TextAnnotatorState<TextAnnotation, unknown>;
   mockLifecycle: Lifecycle<TextAnnotation, unknown>;
   mockOptions: TextAnnotatorOptions<TextAnnotation, unknown>;
+  mockStoreProxy: StoreProxy<TextAnnotation>;
 }
 
 export function setupSelectionHandlerTest(): SelectionHandlerTestContext {
@@ -81,5 +82,19 @@ export function setupSelectionHandlerTest(): SelectionHandlerTestContext {
     annotatingEnabled: true
   };
 
-  return { container, mockState, mockLifecycle, mockOptions };
+  // Create mock store proxy that forwards emit calls to the store methods
+  const mockStoreProxy = {
+    emit: vi.fn((event: string, ...args: any[]) => {
+      if (event === 'addAnnotation') {
+        mockState.store.addAnnotation(args[0], args[1]);
+      } else if (event === 'updateTarget') {
+        mockState.store.updateTarget(args[0], args[1]);
+      } else if (event === 'deleteAnnotation') {
+        mockState.store.deleteAnnotation(args[0]);
+      }
+    }),
+    on: vi.fn()
+  } as unknown as StoreProxy<TextAnnotation>;
+
+  return { container, mockState, mockLifecycle, mockOptions, mockStoreProxy };
 }

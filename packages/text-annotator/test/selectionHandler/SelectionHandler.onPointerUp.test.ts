@@ -14,7 +14,7 @@ describe('SelectionHandler - onPointerUp', () => {
   });
 
   it('should return early when isLeftClick is false (sh-ptr-up-001)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     const rightClickDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
       bubbles: true,
@@ -39,7 +39,7 @@ describe('SelectionHandler - onPointerUp', () => {
   });
 
   it('should clone the pointer event (sh-ptr-up-002)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
       bubbles: true,
@@ -68,7 +68,7 @@ describe('SelectionHandler - onPointerUp', () => {
       ...ctx.mockOptions,
       dismissOnNotAnnotatable: 'ALWAYS' as const
     };
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, optionsWithDismiss);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, optionsWithDismiss, ctx.mockStoreProxy);
 
     const notAnnotatableElement = document.createElement('span');
     notAnnotatableElement.setAttribute('data-not-annotatable', 'true');
@@ -102,7 +102,7 @@ describe('SelectionHandler - onPointerUp', () => {
   });
 
   it('should call store.getAt with correct coordinates and filter (sh-ptr-up-005)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     const mockFilter = vi.fn().mockReturnValue(true);
     handler.setFilter(mockFilter);
@@ -137,7 +137,7 @@ describe('SelectionHandler - onPointerUp', () => {
       ...ctx.mockOptions,
       selectionMode: 'all' as const
     };
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, optionsWithAllMode);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, optionsWithAllMode, ctx.mockStoreProxy);
 
     const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
       bubbles: true,
@@ -167,7 +167,7 @@ describe('SelectionHandler - onPointerUp', () => {
   });
 
   it('should emit clickAnnotation event when annotation is clicked (sh-ptr-up-007)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     const mockAnnotation = {
       id: 'test-annotation-id',
@@ -206,7 +206,7 @@ describe('SelectionHandler - onPointerUp', () => {
   });
 
   it('should call selection.userSelect with annotation ids (sh-ptr-up-008)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     const mockAnnotation = {
       id: 'clicked-annotation-id',
@@ -247,7 +247,7 @@ describe('SelectionHandler - onPointerUp', () => {
   });
 
   it('should detect selection change by comparing current and next ids (sh-ptr-up-009)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     const mockAnnotation = {
       id: 'annotation-1',
@@ -289,7 +289,7 @@ describe('SelectionHandler - onPointerUp', () => {
   });
 
   it('should clear selection when clicking empty area (sh-ptr-up-010)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     (ctx.mockState.store.getAt as any).mockReturnValue(undefined);
 
@@ -319,7 +319,7 @@ describe('SelectionHandler - onPointerUp', () => {
   });
 
   it('should check timeDifference < CLICK_TIMEOUT (300ms) for click detection (sh-ptr-up-011)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     const mockAnnotation = {
       id: 'test-annotation',
@@ -356,7 +356,7 @@ describe('SelectionHandler - onPointerUp', () => {
   });
 
   it('should call pollSelectionCollapsed before processing click (sh-ptr-up-012)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     const mockAnnotation = {
       id: 'test-annotation',
@@ -393,7 +393,7 @@ describe('SelectionHandler - onPointerUp', () => {
   });
 
   it('should route to clickSelect when selection is collapsed (sh-ptr-up-013)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     const mockAnnotation = {
       id: 'test-annotation',
@@ -441,7 +441,7 @@ describe('SelectionHandler - onPointerUp', () => {
   });
 
   it('should clear currentTarget before calling clickSelect (sh-ptr-up-015)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     (ctx.mockState.selection as any).selected = [];
 
@@ -486,7 +486,7 @@ describe('SelectionHandler - onPointerUp', () => {
   });
 
   it('should call upsertCurrentTarget when valid selection exists (sh-ptr-up-016)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     (ctx.mockState.selection as any).selected = [];
 
@@ -542,7 +542,7 @@ describe('SelectionHandler - onPointerUp', () => {
   });
 
   it('should call selection.userSelect after upserting target (sh-ptr-up-017)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     (ctx.mockState.selection as any).selected = [];
 

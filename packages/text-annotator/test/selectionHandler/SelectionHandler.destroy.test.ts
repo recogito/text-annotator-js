@@ -14,7 +14,7 @@ describe('SelectionHandler - destroy', () => {
   });
 
   it('should reset internal state variables to undefined (sh-destroy-001)', () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     const pointerDownEvent = new (global.PointerEvent || MouseEvent)('pointerdown', {
       bubbles: true,
@@ -30,7 +30,7 @@ describe('SelectionHandler - destroy', () => {
   });
 
   it('should clear debounced onSelectionChange handler (sh-destroy-002)', async () => {
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
 
     const range = document.createRange();
     const textNode = ctx.container.querySelector('p')?.firstChild;
@@ -63,7 +63,7 @@ describe('SelectionHandler - destroy', () => {
   it('should remove pointerdown listener from document (sh-destroy-003)', () => {
     const removeEventListenerSpy = vi.spyOn(document, 'removeEventListener');
 
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
     handler.destroy();
 
     expect(removeEventListenerSpy).toHaveBeenCalledWith('pointerdown', expect.any(Function));
@@ -74,7 +74,7 @@ describe('SelectionHandler - destroy', () => {
   it('should remove pointerup listener from document (sh-destroy-004)', () => {
     const removeEventListenerSpy = vi.spyOn(document, 'removeEventListener');
 
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
     handler.destroy();
 
     expect(removeEventListenerSpy).toHaveBeenCalledWith('pointerup', expect.any(Function));
@@ -85,7 +85,7 @@ describe('SelectionHandler - destroy', () => {
   it('should remove contextmenu listener from document (sh-destroy-005)', () => {
     const removeEventListenerSpy = vi.spyOn(document, 'removeEventListener');
 
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
     handler.destroy();
 
     expect(removeEventListenerSpy).toHaveBeenCalledWith('contextmenu', expect.any(Function));
@@ -96,7 +96,7 @@ describe('SelectionHandler - destroy', () => {
   it('should remove keyup listener from container (sh-destroy-006)', () => {
     const removeEventListenerSpy = vi.spyOn(ctx.container, 'removeEventListener');
 
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
     handler.destroy();
 
     expect(removeEventListenerSpy).toHaveBeenCalledWith('keyup', expect.any(Function));
@@ -107,7 +107,7 @@ describe('SelectionHandler - destroy', () => {
   it('should remove selectstart listener from container (sh-destroy-007)', () => {
     const removeEventListenerSpy = vi.spyOn(ctx.container, 'removeEventListener');
 
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
     handler.destroy();
 
     expect(removeEventListenerSpy).toHaveBeenCalledWith('selectstart', expect.any(Function));
@@ -118,7 +118,7 @@ describe('SelectionHandler - destroy', () => {
   it('should remove selectionchange listener from document (sh-destroy-008)', () => {
     const removeEventListenerSpy = vi.spyOn(document, 'removeEventListener');
 
-    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions);
+    const handler = createSelectionHandler(ctx.container, ctx.mockState, ctx.mockLifecycle, ctx.mockOptions, ctx.mockStoreProxy);
     handler.destroy();
 
     expect(removeEventListenerSpy).toHaveBeenCalledWith('selectionchange', expect.any(Function));

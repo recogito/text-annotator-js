@@ -4,7 +4,7 @@ import hotkeys from 'hotkeys-js';
 import { poll } from 'poll';
 import { Origin } from '@annotorious/core';
 import type { Filter, Lifecycle, Selection, User } from '@annotorious/core';
-import type { TextAnnotatorState } from './state';
+import type { TextAnnotatorState, StoreProxy } from './state';
 import type { TextAnnotation, TextAnnotationTarget } from './model';
 import type { AnnotatingMode } from './TextAnnotator';
 import type { TextAnnotatorOptions } from './TextAnnotatorOptions';
@@ -36,7 +36,8 @@ export const createSelectionHandler = (
   container: HTMLElement,
   state: TextAnnotatorState<TextAnnotation, unknown>,
   lifecycle: Lifecycle<TextAnnotation, unknown>,
-  options: TextAnnotatorOptions<TextAnnotation, unknown>
+  options: TextAnnotatorOptions<TextAnnotation, unknown>,
+  storeProxy: StoreProxy<TextAnnotation>
 ) => {
   const { store, selection } = state;
 
@@ -214,7 +215,7 @@ export const createSelectionHandler = (
         isAddToCurrentSelect(lastDownEvent) || annotatingMode === 'REPLACE_CURRENT'
       )) {
         selection.clear();
-        store.deleteAnnotation(currentTarget.annotation);
+        storeProxy.emit('deleteAnnotation', currentTarget.annotation);
       }
 
       return;
@@ -268,7 +269,7 @@ export const createSelectionHandler = (
      * But it'll be typical during selection via the keyboard or mobile's handlebars.
      */
     if (store.getAnnotation(currentTarget.annotation)) {
-      store.updateTarget(currentTarget, Origin.LOCAL);
+      storeProxy.emit('updateTarget', currentTarget, Origin.LOCAL);
     } else {
       // Proper lifecycle management: clear the previous selection first
       selection.clear();
@@ -436,7 +437,7 @@ export const createSelectionHandler = (
       if (currentTarget?.selector.length > 0) {
         selection.clear();
 
-        store.addAnnotation({
+        storeProxy.emit('addAnnotation', {
           id: currentTarget.annotation,
           bodies: [],
           target: currentTarget
@@ -493,7 +494,7 @@ export const createSelectionHandler = (
   const upsertCurrentTarget = () => {
     const existingAnnotation = store.getAnnotation(currentTarget.annotation);
     if (!existingAnnotation) {
-      store.addAnnotation({
+      storeProxy.emit('addAnnotation', {
         id: currentTarget.annotation,
         bodies: [],
         target: currentTarget
@@ -507,7 +508,7 @@ export const createSelectionHandler = (
         !currentTargetUpdated ||
         existingTargetUpdated < currentTargetUpdated
       ) {
-        store.updateTarget(currentTarget);
+        storeProxy.emit('updateTarget', currentTarget);
       }
     }
   };
