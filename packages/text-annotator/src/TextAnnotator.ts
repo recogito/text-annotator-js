@@ -5,7 +5,7 @@ import { createCanvasRenderer, createHighlightsRenderer, createSpansRenderer } f
 import type { HighlightStyleExpression, RendererFactory } from './highlight';
 import type { TextAnnotation } from './model';
 import { createPresencePainter } from './presence';
-import { type TextAnnotationStore, type TextAnnotatorState, createTextAnnotatorState, createStoreProxy, createSelectionProxy } from './state';
+import { type TextAnnotationStore, type TextAnnotatorState, createTextAnnotatorState, createStoreProxy, createSelectionProxy, createHoverProxy } from './state';
 import { cancelSingleClickEvents, programmaticallyFocusable } from './utils';
 import { createSelectionHandler } from './SelectionHandler';
 import { fillDefaults, type RendererType, type TextAnnotatorOptions } from './TextAnnotatorOptions';
@@ -62,35 +62,48 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
 
   let currentUser: User = opts.user;
 
-  // Use the selected built-in renderer, or fall back to default. If 
-  // CSS_HIGHLIGHT is selected, check if CSS Custom Highlights are 
+  // Create proxies (shared between SelectionHandler and Renderer)
+  const storeProxy = createStoreProxy(store);
+  const selectionProxy = createSelectionProxy(state.selection);
+  const hoverProxy = createHoverProxy(state.hover);
+
+  // Define renderer callbacks
+  const onHoverChange = (annotationId: string | null) => {
+    if (annotationId) {
+      container.classList.add('hovered');
+    } else {
+      container.classList.remove('hovered');
+    }
+  };
+
+  const onViewportChange = (annotationIds: string[]) => viewport.set(annotationIds);
+
+  // Use the selected built-in renderer, or fall back to default. If
+  // CSS_HIGHLIGHT is selected, check if CSS Custom Highlights are
   // supported, and fall back to default renderer if not.
   const useBuiltInRenderer: RendererType | null =
-    typeof opts.renderer !== 'function' ? 
+    typeof opts.renderer !== 'function' ?
       opts.renderer === 'CSS_HIGHLIGHTS'
         ? Boolean(CSS.highlights) ? 'CSS_HIGHLIGHTS' : USE_DEFAULT_RENDERER
         : opts.renderer || USE_DEFAULT_RENDERER :
     null;
 
   const highlightRenderer =
-    useBuiltInRenderer === null ? (opts.renderer as RendererFactory)(container, state, viewport) :
-    useBuiltInRenderer === 'SPANS' ? createSpansRenderer(container, state, viewport) :
-    useBuiltInRenderer === 'CSS_HIGHLIGHTS' ? createHighlightsRenderer(container, state, viewport) :
-    useBuiltInRenderer === 'CANVAS' ? createCanvasRenderer(container, state, viewport) : undefined;
+    useBuiltInRenderer === null ? (opts.renderer as RendererFactory)(container, storeProxy, selectionProxy, hoverProxy, onHoverChange, onViewportChange) :
+    useBuiltInRenderer === 'SPANS' ? createSpansRenderer(container, storeProxy, selectionProxy, hoverProxy, onHoverChange, onViewportChange) :
+    useBuiltInRenderer === 'CSS_HIGHLIGHTS' ? createHighlightsRenderer(container, storeProxy, selectionProxy, hoverProxy, onHoverChange, onViewportChange) :
+    useBuiltInRenderer === 'CANVAS' ? createCanvasRenderer(container, storeProxy, selectionProxy, hoverProxy, onHoverChange, onViewportChange) : undefined;
 
   if (!highlightRenderer)
     throw `Unknown renderer implementation: ${opts.renderer}`;
 
   if (useBuiltInRenderer)
     console.debug(`Using ${useBuiltInRenderer} renderer`);
-  else 
+  else
     console.debug('Using custom renderer implementation');
 
   if (opts.style)
     highlightRenderer.setStyle(opts.style);
-
-  const storeProxy = createStoreProxy(store);
-  const selectionProxy = createSelectionProxy(state.selection);
   const onClickAnnotation = (annotation: I | I[]) => lifecycle.emit('clickAnnotation', annotation);
   const selectionHandler = createSelectionHandler(container, selectionProxy, onClickAnnotation, opts, storeProxy);
   selectionHandler.setUser(currentUser);

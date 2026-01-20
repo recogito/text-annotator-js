@@ -1,7 +1,7 @@
 import { createNanoEvents, type Unsubscribe } from 'nanoevents';
 import type { Filter, Origin } from '@annotorious/core';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
-import type { TextAnnotationStore } from './TextAnnotationStore';
+import type { AnnotationRects, TextAnnotationStore } from './TextAnnotationStore';
 
 export interface StoreProxyEvents<I extends TextAnnotation = TextAnnotation> {
   addAnnotation(annotation: I, origin?: typeof Origin.LOCAL | typeof Origin.REMOTE): void;
@@ -13,11 +13,16 @@ export interface StoreProxy<I extends TextAnnotation = TextAnnotation> {
   // Data Down (reads)
   getAnnotation(id: string): I | undefined;
   getAt(x: number, y: number, all?: boolean, filter?: Filter): I | I[] | undefined;
+  getIntersecting(minX: number, minY: number, maxX: number, maxY: number): AnnotationRects<I>[];
+  recalculatePositions(): void;
 
   // Actions Up (writes)
   addAnnotation(annotation: I, origin?: typeof Origin.LOCAL | typeof Origin.REMOTE): void;
   updateTarget(target: TextAnnotationTarget, origin?: typeof Origin.LOCAL | typeof Origin.REMOTE): void;
   deleteAnnotation(id: string): void;
+
+  // Observation
+  observeStore(callback: () => void): Unsubscribe;
 
   // Subscribe to action intents
   on: <E extends keyof StoreProxyEvents<I>>(event: E, callback: StoreProxyEvents<I>[E]) => Unsubscribe;
@@ -45,6 +50,9 @@ export const createStoreProxy = <I extends TextAnnotation = TextAnnotation>(
     // Data Down (reads) - delegate to store
     getAnnotation: (id: string) => store.getAnnotation(id),
     getAt: (x: number, y: number, all?: boolean, filter?: Filter) => store.getAt(x, y, all, filter),
+    getIntersecting: (minX: number, minY: number, maxX: number, maxY: number) =>
+      store.getIntersecting(minX, minY, maxX, maxY),
+    recalculatePositions: () => store.recalculatePositions(),
 
     // Actions Up (writes) - emit intents
     addAnnotation: (annotation: I, origin?) => {
@@ -55,6 +63,12 @@ export const createStoreProxy = <I extends TextAnnotation = TextAnnotation>(
     },
     deleteAnnotation: (id: string) => {
       emitter.emit('deleteAnnotation', id);
+    },
+
+    // Observation
+    observeStore: (callback: () => void): Unsubscribe => {
+      store.observe(callback);
+      return () => store.unobserve(callback);
     },
 
     // Subscribe to action intents

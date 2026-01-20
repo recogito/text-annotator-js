@@ -2,16 +2,26 @@ import { JSDOM } from 'jsdom';
 import { describe, it, beforeEach, afterEach, expect, vi } from 'vitest';
 import { UserSelectAction } from '@annotorious/core';
 import { createBaseRenderer } from '../src/highlight/Renderer';
-import type { TextAnnotatorState } from '../src/state';
+import type { StoreProxy, SelectionProxy, HoverProxy } from '../src/state';
 import type { TextAnnotation } from '../src/model';
-import type { ViewportState } from '@annotorious/core';
 import type { RendererImplementation } from '../src/highlight/Renderer';
 
 describe('Renderer', () => {
   let container: HTMLElement;
-  let mockState: TextAnnotatorState<TextAnnotation, unknown>;
-  let mockViewport: ViewportState;
+  let mockStoreProxy: StoreProxy<TextAnnotation>;
+  let mockSelectionProxy: SelectionProxy;
+  let mockHoverProxy: HoverProxy;
   let mockRendererImpl: RendererImplementation;
+  let mockOnHoverChange: ReturnType<typeof vi.fn>;
+  let mockOnViewportChange: ReturnType<typeof vi.fn>;
+
+  // Track unsubscribe functions for proxies
+  let storeUnsubscribe: ReturnType<typeof vi.fn>;
+  let selectionUnsubscribe: ReturnType<typeof vi.fn>;
+  let hoverUnsubscribe: ReturnType<typeof vi.fn>;
+
+  // Track current hover state (simulating HoverProxy internal state)
+  let currentHoverId: string | null;
 
   beforeEach(async () => {
     const dom = new JSDOM(`
@@ -59,57 +69,51 @@ describe('Renderer', () => {
       bottom: 350
     });
 
-    // Create mock state
-    mockState = {
-      store: {
-        getAnnotation: vi.fn(),
-        addAnnotation: vi.fn(),
-        updateAnnotation: vi.fn(),
-        deleteAnnotation: vi.fn(),
-        updateTarget: vi.fn(),
-        getAt: vi.fn(),
-        observe: vi.fn(),
-        unobserve: vi.fn(),
-        all: vi.fn().mockReturnValue([]),
-        bulkAddAnnotations: vi.fn(),
-        bulkUpdateTargets: vi.fn(),
-        bulkUpsertAnnotations: vi.fn(),
-        getAnnotationBounds: vi.fn(),
-        getAnnotationRects: vi.fn(),
-        getIntersecting: vi.fn().mockReturnValue([]),
-        recalculatePositions: vi.fn(),
-        onRecalculatePositions: vi.fn()
-      },
-      selection: {
-        selected: [],
-        userSelect: vi.fn(),
-        clear: vi.fn(),
-        subscribe: vi.fn().mockReturnValue(() => {}),
-        evalSelectAction: vi.fn()
-      },
-      hover: {
-        current: undefined,
-        set: vi.fn(),
-        subscribe: vi.fn().mockReturnValue(() => {})
-      },
-      viewport: {
-        current: undefined,
-        set: vi.fn(),
-        subscribe: vi.fn()
-      }
-    } as unknown as TextAnnotatorState<TextAnnotation, unknown>;
+    // Initialize hover state
+    currentHoverId = null;
 
-    mockViewport = {
-      current: undefined,
-      set: vi.fn(),
-      subscribe: vi.fn()
-    } as unknown as ViewportState;
+    // Create unsubscribe functions
+    storeUnsubscribe = vi.fn();
+    selectionUnsubscribe = vi.fn();
+    hoverUnsubscribe = vi.fn();
+
+    // Create mock store proxy
+    mockStoreProxy = {
+      getAnnotation: vi.fn(),
+      getAt: vi.fn(),
+      getIntersecting: vi.fn().mockReturnValue([]),
+      recalculatePositions: vi.fn(),
+      addAnnotation: vi.fn(),
+      updateTarget: vi.fn(),
+      deleteAnnotation: vi.fn(),
+      observeStore: vi.fn().mockReturnValue(storeUnsubscribe),
+      on: vi.fn()
+    } as unknown as StoreProxy<TextAnnotation>;
+
+    // Create mock selection proxy
+    mockSelectionProxy = {
+      getSelected: vi.fn().mockReturnValue([]),
+      evalSelectAction: vi.fn(),
+      clear: vi.fn(),
+      userSelect: vi.fn(),
+      subscribe: vi.fn().mockReturnValue(selectionUnsubscribe)
+    } as unknown as SelectionProxy;
+
+    // Create mock hover proxy
+    mockHoverProxy = {
+      getCurrent: vi.fn(() => currentHoverId),
+      set: vi.fn((id: string | null) => { currentHoverId = id; }),
+      subscribe: vi.fn().mockReturnValue(hoverUnsubscribe)
+    } as unknown as HoverProxy;
 
     mockRendererImpl = {
       destroy: vi.fn(),
       redraw: vi.fn(),
       setVisible: vi.fn()
     };
+
+    mockOnHoverChange = vi.fn();
+    mockOnViewportChange = vi.fn();
   });
 
   afterEach(() => {
@@ -117,8 +121,11 @@ describe('Renderer', () => {
   });
 
   describe('onPointerMove', () => {
-    it('should call store.getAt with relative coordinates (r-hover-001)', () => {
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+    it('should call storeProxy.getAt with relative coordinates (r-hover-001)', () => {
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       // Create a pointermove event at clientX=150, clientY=100
       // Container is at x=100, y=50
@@ -130,14 +137,16 @@ describe('Renderer', () => {
       });
       container.dispatchEvent(pointerMoveEvent);
 
-      // At line 78: store.getAt(event.clientX - x, event.clientY - y, false, currentFilter)
-      expect(mockState.store.getAt).toHaveBeenCalledWith(50, 50, false, undefined);
+      expect(mockStoreProxy.getAt).toHaveBeenCalledWith(50, 50, false, undefined);
 
       renderer.destroy();
     });
 
-    it('should pass currentFilter to store.getAt (r-hover-002)', () => {
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+    it('should pass currentFilter to storeProxy.getAt (r-hover-002)', () => {
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       // Set a filter
       const testFilter = (annotation: TextAnnotation) => annotation.id === 'test';
@@ -150,21 +159,23 @@ describe('Renderer', () => {
       });
       container.dispatchEvent(pointerMoveEvent);
 
-      // At line 78: store.getAt passes currentFilter as the 4th parameter
-      expect(mockState.store.getAt).toHaveBeenCalledWith(50, 50, false, testFilter);
+      expect(mockStoreProxy.getAt).toHaveBeenCalledWith(50, 50, false, testFilter);
 
       renderer.destroy();
     });
 
     it('should check evalSelectAction is not NONE before hovering (r-hover-003)', () => {
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
-      // Mock store.getAt to return a hit
+      // Mock storeProxy.getAt to return a hit
       const mockAnnotation = { id: 'test-annotation', target: {} } as TextAnnotation;
-      (mockState.store.getAt as any).mockReturnValue(mockAnnotation);
+      (mockStoreProxy.getAt as any).mockReturnValue(mockAnnotation);
 
       // Mock evalSelectAction to return NONE
-      (mockState.selection.evalSelectAction as any).mockReturnValue(UserSelectAction.NONE);
+      (mockSelectionProxy.evalSelectAction as any).mockReturnValue(UserSelectAction.NONE);
 
       const pointerMoveEvent = new (global.PointerEvent || MouseEvent)('pointermove', {
         bubbles: true,
@@ -173,24 +184,26 @@ describe('Renderer', () => {
       });
       container.dispatchEvent(pointerMoveEvent);
 
-      // At line 79: if (hit && state.selection.evalSelectAction(hit) !== UserSelectAction.NONE)
-      // When evalSelectAction returns NONE, hover.set should NOT be called
-      expect(mockState.selection.evalSelectAction).toHaveBeenCalledWith(mockAnnotation);
-      expect(mockState.hover.set).not.toHaveBeenCalled();
-      expect(container.classList.contains('hovered')).toBe(false);
+      // When evalSelectAction returns NONE, hoverProxy.set should NOT be called
+      expect(mockSelectionProxy.evalSelectAction).toHaveBeenCalledWith(mockAnnotation);
+      expect(mockHoverProxy.set).not.toHaveBeenCalled();
+      expect(mockOnHoverChange).not.toHaveBeenCalled();
 
       renderer.destroy();
     });
 
-    it('should add hovered class and set hover state when hit found (r-hover-004)', () => {
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+    it('should set hover state and call onHoverChange when hit found (r-hover-004)', () => {
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
-      // Mock store.getAt to return a hit
+      // Mock storeProxy.getAt to return a hit
       const mockAnnotation = { id: 'test-annotation', target: {} } as TextAnnotation;
-      (mockState.store.getAt as any).mockReturnValue(mockAnnotation);
+      (mockStoreProxy.getAt as any).mockReturnValue(mockAnnotation);
 
       // Mock evalSelectAction to return something other than NONE
-      (mockState.selection.evalSelectAction as any).mockReturnValue(UserSelectAction.SELECT);
+      (mockSelectionProxy.evalSelectAction as any).mockReturnValue(UserSelectAction.SELECT);
 
       const pointerMoveEvent = new (global.PointerEvent || MouseEvent)('pointermove', {
         bubbles: true,
@@ -199,24 +212,26 @@ describe('Renderer', () => {
       });
       container.dispatchEvent(pointerMoveEvent);
 
-      // At lines 80-83: When hit found and evalSelectAction is not NONE
-      // container.classList.add('hovered') and hover.set(hit.id)
-      expect(container.classList.contains('hovered')).toBe(true);
-      expect(mockState.hover.set).toHaveBeenCalledWith('test-annotation');
+      // When hit found and evalSelectAction is not NONE
+      expect(mockHoverProxy.set).toHaveBeenCalledWith('test-annotation');
+      expect(mockOnHoverChange).toHaveBeenCalledWith('test-annotation');
 
       renderer.destroy();
     });
 
     it('should only update hover when id changes (r-hover-005)', () => {
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
-      // Mock store.getAt to return a hit
+      // Mock storeProxy.getAt to return a hit
       const mockAnnotation = { id: 'test-annotation', target: {} } as TextAnnotation;
-      (mockState.store.getAt as any).mockReturnValue(mockAnnotation);
-      (mockState.selection.evalSelectAction as any).mockReturnValue(UserSelectAction.SELECT);
+      (mockStoreProxy.getAt as any).mockReturnValue(mockAnnotation);
+      (mockSelectionProxy.evalSelectAction as any).mockReturnValue(UserSelectAction.SELECT);
 
-      // Set hover.current to the same id as the annotation
-      (mockState.hover as any).current = 'test-annotation';
+      // Set hover.getCurrent to return the same id as the annotation
+      currentHoverId = 'test-annotation';
 
       const pointerMoveEvent = new (global.PointerEvent || MouseEvent)('pointermove', {
         bubbles: true,
@@ -225,22 +240,24 @@ describe('Renderer', () => {
       });
       container.dispatchEvent(pointerMoveEvent);
 
-      // At line 80: if (hover.current !== hit.id)
-      // Since hover.current already equals the hit id, hover.set should NOT be called
-      expect(mockState.hover.set).not.toHaveBeenCalled();
+      // Since hoverProxy.getCurrent() already equals the hit id, set should NOT be called
+      expect(mockHoverProxy.set).not.toHaveBeenCalled();
+      expect(mockOnHoverChange).not.toHaveBeenCalled();
 
       renderer.destroy();
     });
 
-    it('should remove hovered class and clear hover when no hit (r-hover-006)', () => {
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+    it('should clear hover and call onHoverChange(null) when no hit (r-hover-006)', () => {
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       // Set initial hovered state
-      container.classList.add('hovered');
-      (mockState.hover as any).current = 'some-annotation';
+      currentHoverId = 'some-annotation';
 
-      // Mock store.getAt to return null (no hit)
-      (mockState.store.getAt as any).mockReturnValue(null);
+      // Mock storeProxy.getAt to return null (no hit)
+      (mockStoreProxy.getAt as any).mockReturnValue(null);
 
       const pointerMoveEvent = new (global.PointerEvent || MouseEvent)('pointermove', {
         bubbles: true,
@@ -249,22 +266,24 @@ describe('Renderer', () => {
       });
       container.dispatchEvent(pointerMoveEvent);
 
-      // At lines 84-88: When no hit and hover.current exists
-      // container.classList.remove('hovered') and hover.set(null)
-      expect(container.classList.contains('hovered')).toBe(false);
-      expect(mockState.hover.set).toHaveBeenCalledWith(null);
+      // When no hit and hover.getCurrent() exists
+      expect(mockHoverProxy.set).toHaveBeenCalledWith(null);
+      expect(mockOnHoverChange).toHaveBeenCalledWith(null);
 
       renderer.destroy();
     });
 
-    it('should only clear hover when hover.current exists (r-hover-007)', () => {
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+    it('should only clear hover when hoverProxy.getCurrent() exists (r-hover-007)', () => {
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
-      // Ensure hover.current is undefined (no current hover)
-      (mockState.hover as any).current = undefined;
+      // Ensure hover.getCurrent() returns null (no current hover)
+      currentHoverId = null;
 
-      // Mock store.getAt to return null (no hit)
-      (mockState.store.getAt as any).mockReturnValue(null);
+      // Mock storeProxy.getAt to return null (no hit)
+      (mockStoreProxy.getAt as any).mockReturnValue(null);
 
       const pointerMoveEvent = new (global.PointerEvent || MouseEvent)('pointermove', {
         bubbles: true,
@@ -273,9 +292,9 @@ describe('Renderer', () => {
       });
       container.dispatchEvent(pointerMoveEvent);
 
-      // At line 85: if (hover.current)
-      // Since hover.current is undefined, hover.set should NOT be called
-      expect(mockState.hover.set).not.toHaveBeenCalled();
+      // Since hoverProxy.getCurrent() is null, set should NOT be called
+      expect(mockHoverProxy.set).not.toHaveBeenCalled();
+      expect(mockOnHoverChange).not.toHaveBeenCalled();
 
       renderer.destroy();
     });
@@ -283,9 +302,11 @@ describe('Renderer', () => {
     it('should add pointermove listener to container (r-hover-008)', () => {
       const addEventListenerSpy = vi.spyOn(container, 'addEventListener');
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
-      // At line 92: container.addEventListener('pointermove', onPointerMove)
       expect(addEventListenerSpy).toHaveBeenCalledWith('pointermove', expect.any(Function));
 
       addEventListenerSpy.mockRestore();
@@ -295,7 +316,10 @@ describe('Renderer', () => {
 
   describe('redraw', () => {
     it('should be debounced at 10ms (r-redraw-001)', async () => {
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       // Reset any calls from initialization
       vi.clearAllMocks();
@@ -328,7 +352,10 @@ describe('Renderer', () => {
       });
       global.requestAnimationFrame = rafMock;
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       // Reset any calls from initialization
       vi.clearAllMocks();
@@ -339,7 +366,6 @@ describe('Renderer', () => {
       // Wait for debounce to complete
       await new Promise(resolve => setTimeout(resolve, 15));
 
-      // At line 94: requestAnimationFrame is called after debounce
       expect(rafMock).toHaveBeenCalled();
 
       renderer.destroy();
@@ -351,7 +377,10 @@ describe('Renderer', () => {
         reset: vi.fn()
       };
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       // Set the painter
       renderer.setPainter(mockPainter as any);
@@ -365,14 +394,16 @@ describe('Renderer', () => {
       // Wait for debounce + requestAnimationFrame
       await new Promise(resolve => setTimeout(resolve, 30));
 
-      // At lines 95-96: if (currentPainter) currentPainter.clear()
       expect(mockPainter.clear).toHaveBeenCalled();
 
       renderer.destroy();
     });
 
     it('should call getViewportBounds with container (r-redraw-004)', async () => {
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       // Reset any calls from initialization
       vi.clearAllMocks();
@@ -382,21 +413,21 @@ describe('Renderer', () => {
       // Wait for debounce + requestAnimationFrame
       await new Promise(resolve => setTimeout(resolve, 30));
 
-      // At line 98: const bounds = getViewportBounds(container)
-      // The bounds are then used to call store.getIntersecting
-      // getViewportBounds uses: minX = -left, minY = -top, maxX = innerWidth - left, maxY = innerHeight - top
-      // Container is at left: 100, top: 50 (from mock getBoundingClientRect)
-      // So minX = -100, minY = -50
-      expect(mockState.store.getIntersecting).toHaveBeenCalled();
-      const call = (mockState.store.getIntersecting as any).mock.calls[0];
+      // getViewportBounds uses: minX = -left, minY = -top
+      // Container is at left: 100, top: 50
+      expect(mockStoreProxy.getIntersecting).toHaveBeenCalled();
+      const call = (mockStoreProxy.getIntersecting as any).mock.calls[0];
       expect(call[0]).toBe(-100); // minX = -left
       expect(call[1]).toBe(-50);  // minY = -top
 
       renderer.destroy();
     });
 
-    it('should call store.getIntersecting with viewport bounds (r-redraw-005)', async () => {
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+    it('should call storeProxy.getIntersecting with viewport bounds (r-redraw-005)', async () => {
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       // Reset any calls from initialization
       vi.clearAllMocks();
@@ -406,9 +437,8 @@ describe('Renderer', () => {
       // Wait for debounce + requestAnimationFrame
       await new Promise(resolve => setTimeout(resolve, 30));
 
-      // At lines 102-104: store.getIntersecting(minX, minY, maxX, maxY)
-      expect(mockState.store.getIntersecting).toHaveBeenCalled();
-      const call = (mockState.store.getIntersecting as any).mock.calls[0];
+      expect(mockStoreProxy.getIntersecting).toHaveBeenCalled();
+      const call = (mockStoreProxy.getIntersecting as any).mock.calls[0];
       // Should have 4 arguments: minX, minY, maxX, maxY
       expect(call.length).toBe(4);
       expect(typeof call[0]).toBe('number'); // minX
@@ -422,9 +452,12 @@ describe('Renderer', () => {
     it('should apply currentFilter to intersecting annotations (r-redraw-006)', async () => {
       const mockAnnotation1 = { annotation: { id: 'ann-1', target: {} }, rects: [] };
       const mockAnnotation2 = { annotation: { id: 'ann-2', target: {} }, rects: [] };
-      (mockState.store.getIntersecting as any).mockReturnValue([mockAnnotation1, mockAnnotation2]);
+      (mockStoreProxy.getIntersecting as any).mockReturnValue([mockAnnotation1, mockAnnotation2]);
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       // Set a filter that only allows ann-1
       const testFilter = vi.fn((annotation: TextAnnotation) => annotation.id === 'ann-1');
@@ -439,8 +472,6 @@ describe('Renderer', () => {
       // Wait for debounce + requestAnimationFrame
       await new Promise(resolve => setTimeout(resolve, 30));
 
-      // At line 103: filter is applied via .filter(({ annotation }) => currentFilter(annotation))
-      // Filter should have been called for each annotation
       expect(testFilter).toHaveBeenCalled();
 
       // renderer.redraw should receive filtered results (only ann-1)
@@ -452,12 +483,15 @@ describe('Renderer', () => {
       renderer.destroy();
     });
 
-    it('should get selectedIds from selection.selected (r-redraw-007)', async () => {
+    it('should get selectedIds from selectionProxy.getSelected (r-redraw-007)', async () => {
       const mockAnnotation = { annotation: { id: 'ann-1', target: {} }, rects: [] };
-      (mockState.store.getIntersecting as any).mockReturnValue([mockAnnotation]);
-      (mockState.selection as any).selected = [{ id: 'ann-1' }];
+      (mockStoreProxy.getIntersecting as any).mockReturnValue([mockAnnotation]);
+      (mockSelectionProxy.getSelected as any).mockReturnValue([{ id: 'ann-1' }]);
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       // Reset any calls from initialization
       vi.clearAllMocks();
@@ -467,7 +501,6 @@ describe('Renderer', () => {
       // Wait for debounce + requestAnimationFrame
       await new Promise(resolve => setTimeout(resolve, 30));
 
-      // At line 106: const selectedIds = selection.selected.map(({ id }) => id)
       // The highlight should have selected: true since its id is in selectedIds
       const redrawCall = (mockRendererImpl.redraw as any).mock.calls[0];
       const highlights = redrawCall[0];
@@ -479,9 +512,12 @@ describe('Renderer', () => {
     it('should create Highlight objects with annotation, rects, and state (r-redraw-008)', async () => {
       const mockRects = [{ x: 0, y: 0, width: 100, height: 20 }];
       const mockAnnotation = { annotation: { id: 'ann-1', target: {} }, rects: mockRects };
-      (mockState.store.getIntersecting as any).mockReturnValue([mockAnnotation]);
+      (mockStoreProxy.getIntersecting as any).mockReturnValue([mockAnnotation]);
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       // Reset any calls from initialization
       vi.clearAllMocks();
@@ -491,7 +527,6 @@ describe('Renderer', () => {
       // Wait for debounce + requestAnimationFrame
       await new Promise(resolve => setTimeout(resolve, 30));
 
-      // At lines 108-117: Highlight objects are created with annotation, rects, and state
       const redrawCall = (mockRendererImpl.redraw as any).mock.calls[0];
       const highlights = redrawCall[0];
 
@@ -509,11 +544,14 @@ describe('Renderer', () => {
     it('should set selected state based on selectedIds (r-redraw-009)', async () => {
       const mockAnnotation1 = { annotation: { id: 'ann-1', target: {} }, rects: [] };
       const mockAnnotation2 = { annotation: { id: 'ann-2', target: {} }, rects: [] };
-      (mockState.store.getIntersecting as any).mockReturnValue([mockAnnotation1, mockAnnotation2]);
+      (mockStoreProxy.getIntersecting as any).mockReturnValue([mockAnnotation1, mockAnnotation2]);
       // Only ann-1 is selected
-      (mockState.selection as any).selected = [{ id: 'ann-1' }];
+      (mockSelectionProxy.getSelected as any).mockReturnValue([{ id: 'ann-1' }]);
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       // Reset any calls from initialization
       vi.clearAllMocks();
@@ -523,7 +561,6 @@ describe('Renderer', () => {
       // Wait for debounce + requestAnimationFrame
       await new Promise(resolve => setTimeout(resolve, 30));
 
-      // At line 109: const selected = selectedIds.includes(annotation.id)
       const redrawCall = (mockRendererImpl.redraw as any).mock.calls[0];
       const highlights = redrawCall[0];
 
@@ -536,14 +573,17 @@ describe('Renderer', () => {
       renderer.destroy();
     });
 
-    it('should set hovered state based on hover.current (r-redraw-010)', async () => {
+    it('should set hovered state based on hoverProxy.getCurrent (r-redraw-010)', async () => {
       const mockAnnotation1 = { annotation: { id: 'ann-1', target: {} }, rects: [] };
       const mockAnnotation2 = { annotation: { id: 'ann-2', target: {} }, rects: [] };
-      (mockState.store.getIntersecting as any).mockReturnValue([mockAnnotation1, mockAnnotation2]);
+      (mockStoreProxy.getIntersecting as any).mockReturnValue([mockAnnotation1, mockAnnotation2]);
       // Only ann-1 is hovered
-      (mockState.hover as any).current = 'ann-1';
+      currentHoverId = 'ann-1';
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       // Reset any calls from initialization
       vi.clearAllMocks();
@@ -553,7 +593,6 @@ describe('Renderer', () => {
       // Wait for debounce + requestAnimationFrame
       await new Promise(resolve => setTimeout(resolve, 30));
 
-      // At line 110: const hovered = annotation.id === hover.current
       const redrawCall = (mockRendererImpl.redraw as any).mock.calls[0];
       const highlights = redrawCall[0];
 
@@ -568,11 +607,14 @@ describe('Renderer', () => {
 
     it('should call renderer.redraw with highlights, bounds, style, painter, lazy (r-redraw-011)', async () => {
       const mockAnnotation = { annotation: { id: 'ann-1', target: {} }, rects: [] };
-      (mockState.store.getIntersecting as any).mockReturnValue([mockAnnotation]);
+      (mockStoreProxy.getIntersecting as any).mockReturnValue([mockAnnotation]);
 
       const mockPainter = { clear: vi.fn(), reset: vi.fn() };
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
       renderer.setPainter(mockPainter as any);
       renderer.setStyle({ fill: 'blue' } as any);
 
@@ -584,7 +626,6 @@ describe('Renderer', () => {
       // Wait for debounce + requestAnimationFrame
       await new Promise(resolve => setTimeout(resolve, 30));
 
-      // At line 119: renderer.redraw(highlights, bounds, currentStyle, currentPainter, lazy)
       expect(mockRendererImpl.redraw).toHaveBeenCalled();
       const call = (mockRendererImpl.redraw as any).mock.calls[0];
 
@@ -604,12 +645,15 @@ describe('Renderer', () => {
       renderer.destroy();
     });
 
-    it('should call onDraw callback with annotations after 1ms delay (r-redraw-012)', async () => {
+    it('should call onViewportChange with annotation ids after 1ms delay (r-redraw-012)', async () => {
       const mockAnnotation1 = { annotation: { id: 'ann-1', target: {} }, rects: [] };
       const mockAnnotation2 = { annotation: { id: 'ann-2', target: {} }, rects: [] };
-      (mockState.store.getIntersecting as any).mockReturnValue([mockAnnotation1, mockAnnotation2]);
+      (mockStoreProxy.getIntersecting as any).mockReturnValue([mockAnnotation1, mockAnnotation2]);
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       // Reset any calls from initialization
       vi.clearAllMocks();
@@ -619,9 +663,8 @@ describe('Renderer', () => {
       // Wait for debounce + requestAnimationFrame + 1ms setTimeout
       await new Promise(resolve => setTimeout(resolve, 35));
 
-      // At line 121: setTimeout(() => onDraw(annotationsInView.map(({ annotation }) => annotation)), 1)
-      // onDraw calls viewport.set with annotation ids
-      expect(mockViewport.set).toHaveBeenCalled();
+      // onViewportChange should be called with annotation ids
+      expect(mockOnViewportChange).toHaveBeenCalledWith(['ann-1', 'ann-2']);
 
       renderer.destroy();
     });
@@ -631,9 +674,11 @@ describe('Renderer', () => {
     it('should update currentPainter (r-set-painter-001)', async () => {
       const mockPainter = { clear: vi.fn(), reset: vi.fn() };
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
-      // At line 124-127: setPainter updates currentPainter
       renderer.setPainter(mockPainter as any);
 
       // Wait for debounce + requestAnimationFrame
@@ -647,13 +692,15 @@ describe('Renderer', () => {
     });
 
     it('should trigger redraw (r-set-painter-002)', async () => {
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       // Reset any calls from initialization
       vi.clearAllMocks();
 
       const mockPainter = { clear: vi.fn(), reset: vi.fn() };
-      // At line 126: redraw() is called after setPainter
       renderer.setPainter(mockPainter as any);
 
       // Wait for debounce + requestAnimationFrame
@@ -667,9 +714,11 @@ describe('Renderer', () => {
 
   describe('setStyle', () => {
     it('should update currentStyle (r-set-style-001)', async () => {
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
-      // At lines 129-132: setStyle updates currentStyle
       const testStyle = { fill: 'red', opacity: 0.5 };
       renderer.setStyle(testStyle as any);
 
@@ -684,13 +733,15 @@ describe('Renderer', () => {
     });
 
     it('should trigger redraw (r-set-style-002)', async () => {
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       // Reset any calls from initialization
       vi.clearAllMocks();
 
       const testStyle = { fill: 'green', opacity: 0.8 };
-      // At line 131: redraw() is called after setStyle
       renderer.setStyle(testStyle as any);
 
       // Wait for debounce + requestAnimationFrame
@@ -706,11 +757,13 @@ describe('Renderer', () => {
     it('should update currentFilter (r-set-filter-001)', async () => {
       const mockAnnotation1 = { annotation: { id: 'ann-1', target: {} }, rects: [] };
       const mockAnnotation2 = { annotation: { id: 'ann-2', target: {} }, rects: [] };
-      (mockState.store.getIntersecting as any).mockReturnValue([mockAnnotation1, mockAnnotation2]);
+      (mockStoreProxy.getIntersecting as any).mockReturnValue([mockAnnotation1, mockAnnotation2]);
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
-      // At lines 134-137: setFilter updates currentFilter
       // Set a filter that only allows ann-2
       const testFilter = (annotation: TextAnnotation) => annotation.id === 'ann-2';
       renderer.setFilter(testFilter);
@@ -728,12 +781,14 @@ describe('Renderer', () => {
     });
 
     it('should trigger non-lazy redraw (false) (r-set-filter-002)', async () => {
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       // Reset any calls from initialization
       vi.clearAllMocks();
 
-      // At line 136: redraw(false) is called after setFilter - lazy flag is false
       const testFilter = (annotation: TextAnnotation) => annotation.id === 'test';
       renderer.setFilter(testFilter);
 
@@ -751,16 +806,19 @@ describe('Renderer', () => {
 
   describe('Observers', () => {
     it('should observe store changes and trigger redraw (r-observe-001)', async () => {
-      // Capture the callback passed to store.observe
+      // Capture the callback passed to storeProxy.observeStore
       let storeObserveCallback: (() => void) | undefined;
-      (mockState.store.observe as any).mockImplementation((cb: () => void) => {
+      (mockStoreProxy.observeStore as any).mockImplementation((cb: () => void) => {
         storeObserveCallback = cb;
+        return storeUnsubscribe;
       });
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
-      // At lines 140-141: store.observe(onStoreChange) registers the callback
-      expect(mockState.store.observe).toHaveBeenCalled();
+      expect(mockStoreProxy.observeStore).toHaveBeenCalled();
       expect(storeObserveCallback).toBeDefined();
 
       // Reset any calls from initialization
@@ -779,17 +837,19 @@ describe('Renderer', () => {
     });
 
     it('should subscribe to selection changes and trigger redraw (r-observe-002)', async () => {
-      // Capture the callback passed to selection.subscribe
+      // Capture the callback passed to selectionProxy.subscribe
       let selectionCallback: (() => void) | undefined;
-      (mockState.selection.subscribe as any).mockImplementation((cb: () => void) => {
+      (mockSelectionProxy.subscribe as any).mockImplementation((cb: () => void) => {
         selectionCallback = cb;
-        return () => {}; // unsubscribe function
+        return selectionUnsubscribe;
       });
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
-      // At line 144: selection.subscribe(() => redraw()) registers the callback
-      expect(mockState.selection.subscribe).toHaveBeenCalled();
+      expect(mockSelectionProxy.subscribe).toHaveBeenCalled();
       expect(selectionCallback).toBeDefined();
 
       // Reset any calls from initialization
@@ -808,17 +868,19 @@ describe('Renderer', () => {
     });
 
     it('should subscribe to hover changes and trigger redraw (r-observe-003)', async () => {
-      // Capture the callback passed to hover.subscribe
+      // Capture the callback passed to hoverProxy.subscribe
       let hoverCallback: (() => void) | undefined;
-      (mockState.hover.subscribe as any).mockImplementation((cb: () => void) => {
+      (mockHoverProxy.subscribe as any).mockImplementation((cb: () => void) => {
         hoverCallback = cb;
-        return () => {}; // unsubscribe function
+        return hoverUnsubscribe;
       });
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
-      // At line 147: hover.subscribe(() => redraw()) registers the callback
-      expect(mockState.hover.subscribe).toHaveBeenCalled();
+      expect(mockHoverProxy.subscribe).toHaveBeenCalled();
       expect(hoverCallback).toBeDefined();
 
       // Reset any calls from initialization
@@ -839,12 +901,14 @@ describe('Renderer', () => {
 
   describe('Scroll', () => {
     it('should trigger lazy redraw (true) on scroll (r-scroll-001)', async () => {
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       // Reset any calls from initialization
       vi.clearAllMocks();
 
-      // At lines 149-150: onScroll calls redraw(true)
       // Dispatch a scroll event on document
       const scrollEvent = new Event('scroll', { bubbles: true });
       document.dispatchEvent(scrollEvent);
@@ -863,9 +927,11 @@ describe('Renderer', () => {
     it('should add scroll listener to document with capture and passive (r-scroll-002)', () => {
       const addEventListenerSpy = vi.spyOn(document, 'addEventListener');
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
-      // At line 152: document.addEventListener('scroll', onScroll, { capture: true, passive: true })
       expect(addEventListenerSpy).toHaveBeenCalledWith(
         'scroll',
         expect.any(Function),
@@ -879,12 +945,14 @@ describe('Renderer', () => {
 
   describe('Resize', () => {
     it('should be debounced at 10ms (r-resize-001)', async () => {
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       // Reset any calls from initialization
       vi.clearAllMocks();
 
-      // At lines 155-161: onResize is debounced at 10ms
       // Dispatch multiple resize events in rapid succession
       const resizeEvent1 = new Event('resize');
       const resizeEvent2 = new Event('resize');
@@ -896,32 +964,34 @@ describe('Renderer', () => {
       // Wait a short time (less than debounce)
       await new Promise(resolve => setTimeout(resolve, 5));
 
-      // store.recalculatePositions should not have been called yet (still debouncing)
-      expect(mockState.store.recalculatePositions).not.toHaveBeenCalled();
+      // storeProxy.recalculatePositions should not have been called yet (still debouncing)
+      expect(mockStoreProxy.recalculatePositions).not.toHaveBeenCalled();
 
       // Wait for debounce to complete (10ms debounce + requestAnimationFrame)
       await new Promise(resolve => setTimeout(resolve, 30));
 
       // Now it should have been called exactly once (debounced to single call)
-      expect(mockState.store.recalculatePositions).toHaveBeenCalledTimes(1);
+      expect(mockStoreProxy.recalculatePositions).toHaveBeenCalledTimes(1);
 
       renderer.destroy();
     });
 
-    it('should call store.recalculatePositions (r-resize-002)', async () => {
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+    it('should call storeProxy.recalculatePositions (r-resize-002)', async () => {
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       // Reset any calls from initialization
       vi.clearAllMocks();
 
-      // At line 156: store.recalculatePositions() is called in onResize
       const resizeEvent = new Event('resize');
       window.dispatchEvent(resizeEvent);
 
       // Wait for debounce to complete
       await new Promise(resolve => setTimeout(resolve, 30));
 
-      expect(mockState.store.recalculatePositions).toHaveBeenCalled();
+      expect(mockStoreProxy.recalculatePositions).toHaveBeenCalled();
 
       renderer.destroy();
     });
@@ -932,7 +1002,10 @@ describe('Renderer', () => {
         reset: vi.fn()
       };
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       // Set the painter
       renderer.setPainter(mockPainter as any);
@@ -941,7 +1014,6 @@ describe('Renderer', () => {
       vi.clearAllMocks();
       mockPainter.reset.mockClear();
 
-      // At line 158: currentPainter?.reset() is called in onResize
       const resizeEvent = new Event('resize');
       window.dispatchEvent(resizeEvent);
 
@@ -954,12 +1026,14 @@ describe('Renderer', () => {
     });
 
     it('should trigger redraw (r-resize-004)', async () => {
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       // Reset any calls from initialization
       vi.clearAllMocks();
 
-      // At line 160: redraw() is called in onResize
       const resizeEvent = new Event('resize');
       window.dispatchEvent(resizeEvent);
 
@@ -974,9 +1048,11 @@ describe('Renderer', () => {
     it('should add resize listener to window (r-resize-005)', () => {
       const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
-      // At line 163: window.addEventListener('resize', onResize)
       expect(addEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function));
 
       addEventListenerSpy.mockRestore();
@@ -993,9 +1069,11 @@ describe('Renderer', () => {
       }
       global.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
-      // At lines 165-166: new ResizeObserver(onResize) and resizeObserver.observe(container)
       expect(mockObserve).toHaveBeenCalledWith(container);
 
       renderer.destroy();
@@ -1015,12 +1093,14 @@ describe('Renderer', () => {
       }
       global.MutationObserver = MockMutationObserver as unknown as typeof MutationObserver;
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       // Reset any calls from initialization
       vi.clearAllMocks();
 
-      // At lines 173-179: MutationObserver callback is debounced at 150ms
       // Create a mock mutation record (external mutation - not from container)
       const mockRecord = {
         target: document.body
@@ -1058,12 +1138,14 @@ describe('Renderer', () => {
       }
       global.MutationObserver = MockMutationObserver as unknown as typeof MutationObserver;
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       // Reset any calls from initialization
       vi.clearAllMocks();
 
-      // At lines 174-175: isInternal = records.every(record => record.target === container || container.contains(record.target))
       // Create a mock mutation record where the target IS the container (internal mutation)
       const mockInternalRecord = {
         target: container
@@ -1093,12 +1175,14 @@ describe('Renderer', () => {
       }
       global.MutationObserver = MockMutationObserver as unknown as typeof MutationObserver;
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       // Reset any calls from initialization
       vi.clearAllMocks();
 
-      // At lines 177-178: if (!isInternal) redraw(true)
       // Create a mock mutation record where the target is NOT the container (external mutation)
       const mockExternalRecord = {
         target: document.body
@@ -1128,9 +1212,11 @@ describe('Renderer', () => {
       }
       global.MutationObserver = MockMutationObserver as unknown as typeof MutationObserver;
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
-      // At line 181: mutationObserver.observe(document.body, config)
       expect(mockObserve).toHaveBeenCalledWith(document.body, expect.any(Object));
 
       renderer.destroy();
@@ -1146,9 +1232,11 @@ describe('Renderer', () => {
       }
       global.MutationObserver = MockMutationObserver as unknown as typeof MutationObserver;
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
-      // At line 171: const config: MutationObserverInit = { attributes: true, childList: true, subtree: true }
       expect(mockObserve).toHaveBeenCalledWith(
         expect.any(Object),
         { attributes: true, childList: true, subtree: true }
@@ -1162,68 +1250,72 @@ describe('Renderer', () => {
     it('should remove pointermove listener from container (r-destroy-001)', () => {
       const removeEventListenerSpy = vi.spyOn(container, 'removeEventListener');
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       renderer.destroy();
 
-      // At line 184: container.removeEventListener('pointermove', onPointerMove)
       expect(removeEventListenerSpy).toHaveBeenCalledWith('pointermove', expect.any(Function));
 
       removeEventListenerSpy.mockRestore();
     });
 
     it('should call renderer.destroy() (r-destroy-002)', () => {
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       renderer.destroy();
 
-      // At line 186: renderer.destroy()
       expect(mockRendererImpl.destroy).toHaveBeenCalled();
     });
 
-    it('should unobserve store changes (r-destroy-003)', () => {
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+    it('should unsubscribe from store changes (r-destroy-003)', () => {
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       renderer.destroy();
 
-      // At line 188: store.unobserve(onStoreChange)
-      expect(mockState.store.unobserve).toHaveBeenCalled();
+      expect(storeUnsubscribe).toHaveBeenCalled();
     });
 
     it('should unsubscribe from selection (r-destroy-004)', () => {
-      // Track unsubscribe function
-      const mockUnsubscribe = vi.fn();
-      (mockState.selection.subscribe as any).mockReturnValue(mockUnsubscribe);
-
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       renderer.destroy();
 
-      // At line 190: unsubscribeSelection()
-      expect(mockUnsubscribe).toHaveBeenCalled();
+      expect(selectionUnsubscribe).toHaveBeenCalled();
     });
 
     it('should unsubscribe from hover (r-destroy-005)', () => {
-      // Track unsubscribe function
-      const mockUnsubscribe = vi.fn();
-      (mockState.hover.subscribe as any).mockReturnValue(mockUnsubscribe);
-
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       renderer.destroy();
 
-      // At line 191: unsubscribeHover()
-      expect(mockUnsubscribe).toHaveBeenCalled();
+      expect(hoverUnsubscribe).toHaveBeenCalled();
     });
 
     it('should remove scroll listener from document (r-destroy-006)', () => {
       const removeEventListenerSpy = vi.spyOn(document, 'removeEventListener');
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       renderer.destroy();
 
-      // At line 193: document.removeEventListener('scroll', onScroll)
       expect(removeEventListenerSpy).toHaveBeenCalledWith('scroll', expect.any(Function));
 
       removeEventListenerSpy.mockRestore();
@@ -1232,11 +1324,13 @@ describe('Renderer', () => {
     it('should remove resize listener from window (r-destroy-007)', () => {
       const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       renderer.destroy();
 
-      // At line 196: window.removeEventListener('resize', onResize)
       expect(removeEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function));
 
       removeEventListenerSpy.mockRestore();
@@ -1252,11 +1346,13 @@ describe('Renderer', () => {
       }
       global.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       renderer.destroy();
 
-      // At line 197: resizeObserver.disconnect()
       expect(mockDisconnect).toHaveBeenCalled();
     });
 
@@ -1270,60 +1366,74 @@ describe('Renderer', () => {
       }
       global.MutationObserver = MockMutationObserver as unknown as typeof MutationObserver;
 
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
       renderer.destroy();
 
-      // At line 199: mutationObserver.disconnect()
       expect(mockDisconnect).toHaveBeenCalled();
     });
   });
 
   describe('ReturnValue', () => {
     it('should return object with destroy method (r-return-001)', () => {
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
-      // At lines 202-209: return { destroy, ... }
       expect(renderer).toHaveProperty('destroy');
       expect(typeof renderer.destroy).toBe('function');
     });
 
     it('should return object with redraw method (r-return-002)', () => {
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
-      // At lines 202-209: return { redraw, ... }
       expect(renderer).toHaveProperty('redraw');
       expect(typeof renderer.redraw).toBe('function');
     });
 
     it('should return object with setStyle method (r-return-003)', () => {
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
-      // At lines 202-209: return { setStyle, ... }
       expect(renderer).toHaveProperty('setStyle');
       expect(typeof renderer.setStyle).toBe('function');
     });
 
     it('should return object with setFilter method (r-return-004)', () => {
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
-      // At lines 202-209: return { setFilter, ... }
       expect(renderer).toHaveProperty('setFilter');
       expect(typeof renderer.setFilter).toBe('function');
     });
 
     it('should return object with setPainter method (r-return-005)', () => {
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
-      // At lines 202-209: return { setPainter, ... }
       expect(renderer).toHaveProperty('setPainter');
       expect(typeof renderer.setPainter).toBe('function');
     });
 
     it('should delegate setVisible to renderer.setVisible (r-return-006)', () => {
-      const renderer = createBaseRenderer(container, mockState, mockViewport, mockRendererImpl);
+      const renderer = createBaseRenderer(
+        container, mockStoreProxy, mockSelectionProxy, mockHoverProxy,
+        mockRendererImpl, mockOnHoverChange, mockOnViewportChange
+      );
 
-      // At line 208: setVisible: renderer.setVisible
       expect(renderer).toHaveProperty('setVisible');
       expect(renderer.setVisible).toBe(mockRendererImpl.setVisible);
     });

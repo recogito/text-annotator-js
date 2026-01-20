@@ -1,7 +1,7 @@
-import { UserSelectAction, type Filter, type ViewportState } from '@annotorious/core';
+import { UserSelectAction, type Filter } from '@annotorious/core';
 import type { TextAnnotation } from '../model';
-import type { TextAnnotatorState } from '../state';
-import { type ViewportBounds, getViewportBounds, trackViewport } from './viewport';
+import type { StoreProxy, SelectionProxy, HoverProxy } from '../state';
+import { type ViewportBounds, getViewportBounds } from './viewport';
 import type { HighlightPainter } from './HighlightPainter';
 import type { Highlight } from './Highlight';
 import type { HighlightStyleExpression } from './HighlightStyle';
@@ -11,9 +11,12 @@ import type { HighlightStyleExpression } from './HighlightStyle';
 import { debounce } from '../utils';
 
 export type RendererFactory = (
-  container: HTMLElement, 
-  state: TextAnnotatorState<TextAnnotation, unknown>,
-  viewport: ViewportState
+  container: HTMLElement,
+  storeProxy: StoreProxy<TextAnnotation>,
+  selectionProxy: SelectionProxy,
+  hoverProxy: HoverProxy,
+  onHoverChange: (annotationId: string | null) => void,
+  onViewportChange: (annotationIds: string[]) => void
 ) => Renderer;
 
 export interface RendererImplementation {
@@ -54,13 +57,15 @@ export interface Renderer {
 
 }
 
-export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorState> (
-  container: HTMLElement, 
-  state: T,
-  viewport: ViewportState,
-  renderer: RendererImplementation
+export const createBaseRenderer = <I extends TextAnnotation = TextAnnotation>(
+  container: HTMLElement,
+  storeProxy: StoreProxy<I>,
+  selectionProxy: SelectionProxy,
+  hoverProxy: HoverProxy,
+  renderer: RendererImplementation,
+  onHoverChange: (annotationId: string | null) => void,
+  onViewportChange: (annotationIds: string[]) => void
 ): Renderer => {
-  const { store, selection, hover } = state;
 
   let currentStyle: HighlightStyleExpression | undefined;
 
@@ -68,23 +73,21 @@ export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorS
 
   let currentPainter: HighlightPainter;
 
-  const onDraw = trackViewport(viewport);
-
   const onPointerMove = (event: PointerEvent) => {
     const {x, y} = container.getBoundingClientRect();
 
-    // TODO this may be a bit of an edge case... but ideally we'd retrieve the whole 
+    // TODO this may be a bit of an edge case... but ideally we'd retrieve the whole
     // stack of annotations, and then evaluate if ANY of them is clickable.
-    const hit = store.getAt(event.clientX - x, event.clientY - y, false, currentFilter);
-    if (hit && state.selection.evalSelectAction(hit) !== UserSelectAction.NONE) {
-      if (hover.current !== hit.id) {
-        container.classList.add('hovered');
-        hover.set(hit.id);
+    const hit = storeProxy.getAt(event.clientX - x, event.clientY - y, false, currentFilter) as I | undefined;
+    if (hit && selectionProxy.evalSelectAction(hit) !== UserSelectAction.NONE) {
+      if (hoverProxy.getCurrent() !== hit.id) {
+        hoverProxy.set(hit.id);
+        onHoverChange(hit.id);
       }
     } else {
-      if (hover.current) {
-        container.classList.remove('hovered');
-        hover.set(null);
+      if (hoverProxy.getCurrent()) {
+        hoverProxy.set(null);
+        onHoverChange(null);
       }
     }
   }
@@ -95,19 +98,20 @@ export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorS
     if (currentPainter)
       currentPainter.clear();
 
-    const bounds = getViewportBounds(container);   
+    const bounds = getViewportBounds(container);
 
     const { minX, minY, maxX, maxY } = bounds;
-    
-    const annotationsInView = currentFilter
-      ? store.getIntersecting(minX, minY, maxX, maxY).filter(({ annotation }) => currentFilter(annotation))
-      : store.getIntersecting(minX, minY, maxX, maxY);
 
-    const selectedIds = selection.selected.map(({ id }) => id);
+    const annotationsInView = currentFilter
+      ? storeProxy.getIntersecting(minX, minY, maxX, maxY).filter(({ annotation }) => currentFilter(annotation))
+      : storeProxy.getIntersecting(minX, minY, maxX, maxY);
+
+    const selectedIds = selectionProxy.getSelected().map(({ id }) => id);
+    const hoveredId = hoverProxy.getCurrent();
 
     const highlights: Highlight[] = annotationsInView.map(({ annotation, rects }) => {
       const selected = selectedIds.includes(annotation.id);
-      const hovered = annotation.id === hover.current;
+      const hovered = annotation.id === hoveredId;
 
       return {
         annotation,
@@ -118,7 +122,7 @@ export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorS
 
     renderer.redraw(highlights, bounds, currentStyle, currentPainter, lazy);
 
-    setTimeout(() => onDraw(annotationsInView.map(({ annotation }) => annotation)), 1);
+    setTimeout(() => onViewportChange(annotationsInView.map(({ annotation }) => annotation.id)), 1);
   }), 10);
 
   const setPainter = (painter: HighlightPainter) => { 
@@ -134,17 +138,16 @@ export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorS
   const setFilter = (filter?: Filter) => {
     currentFilter = filter;
     redraw(false);
-  } 
+  }
 
   // Refresh on store change
-  const onStoreChange = () => redraw();
-  store.observe(onStoreChange);
+  const unsubscribeStore = storeProxy.observeStore(() => redraw());
 
   // Refresh on selection change
-  const unsubscribeSelection = selection.subscribe(() => redraw());
+  const unsubscribeSelection = selectionProxy.subscribe(() => redraw());
 
   // Refresh on hover change
-  const unsubscribeHover = hover.subscribe(() => redraw());
+  const unsubscribeHover = hoverProxy.subscribe(() => redraw());
 
   // Refresh on scroll
   const onScroll = () => redraw(true);
@@ -153,7 +156,7 @@ export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorS
 
   // Refresh on resize
   const onResize = debounce(() => {
-    store.recalculatePositions();
+    storeProxy.recalculatePositions();
 
     currentPainter?.reset();
 
@@ -182,11 +185,10 @@ export const createBaseRenderer = <T extends TextAnnotatorState = TextAnnotatorS
 
   const destroy = () => {
     container.removeEventListener('pointermove', onPointerMove);
-  
-    renderer.destroy();
-  
-    store.unobserve(onStoreChange);
 
+    renderer.destroy();
+
+    unsubscribeStore();
     unsubscribeSelection();
     unsubscribeHover();
 

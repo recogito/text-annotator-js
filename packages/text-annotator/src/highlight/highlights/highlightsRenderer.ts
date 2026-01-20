@@ -1,13 +1,12 @@
-import type { ViewportState } from '@annotorious/core';
 import { colord } from 'colord';
 import type { HighlightPainter } from '../HighlightPainter';
-import type { TextAnnotatorState } from 'src/state';
+import type { StoreProxy, SelectionProxy, HoverProxy } from '../../state';
 import type { ViewportBounds } from '../viewport';
 import { DEFAULT_SELECTED_STYLE, DEFAULT_STYLE } from '../HighlightStyle';
 import type { HighlightStyle, HighlightStyleExpression } from '../HighlightStyle';
-import { type RendererImplementation, createBaseRenderer } from '../Renderer';
+import { type RendererImplementation, type RendererFactory, createBaseRenderer } from '../Renderer';
 import type { Highlight } from '../Highlight';
-import type { TextAnnotation } from 'src/model';
+import type { TextAnnotation } from '../../model';
 
 const toCSS = (s?: HighlightStyle) => {
   const backgroundColor = colord(s?.fill || DEFAULT_STYLE.fill)
@@ -106,8 +105,19 @@ export const createRenderer = (): RendererImplementation => {
 
 }
 
-export const createHighlightsRenderer = (
+export const createHighlightsRenderer: RendererFactory = (
   container: HTMLElement,
-  state: TextAnnotatorState<TextAnnotation, unknown>,
-  viewport: ViewportState
-) => createBaseRenderer(container, state, viewport, createRenderer());
+  storeProxy: StoreProxy<TextAnnotation>,
+  selectionProxy: SelectionProxy,
+  hoverProxy: HoverProxy,
+  onHoverChange: (annotationId: string | null) => void,
+  onViewportChange: (annotationIds: string[]) => void
+) => createBaseRenderer(
+  container,
+  storeProxy,
+  selectionProxy,
+  hoverProxy,
+  createRenderer(),
+  onHoverChange,
+  onViewportChange
+);

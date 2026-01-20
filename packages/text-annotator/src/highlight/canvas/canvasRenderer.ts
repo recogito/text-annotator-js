@@ -1,15 +1,13 @@
 import debounce from 'debounce';
 
-import type { ViewportState } from '@annotorious/core';
-
-import type { TextAnnotatorState } from '../../state';
+import type { StoreProxy, SelectionProxy, HoverProxy } from '../../state';
 import type { ViewportBounds } from '../viewport';
 import type { HighlightStyle } from '../HighlightStyle';
 import { DEFAULT_SELECTED_STYLE, DEFAULT_STYLE, type HighlightStyleExpression } from '../HighlightStyle';
 import type { HighlightPainter } from '../HighlightPainter';
-import { createBaseRenderer, type RendererImplementation } from '../Renderer';
+import { createBaseRenderer, type RendererImplementation, type RendererFactory } from '../Renderer';
 import type { Highlight } from '../Highlight';
-import type { TextAnnotation } from 'src/model';
+import type { TextAnnotation } from '../../model';
 
 import './canvasRenderer.css';
 
@@ -146,8 +144,19 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
 
 };
 
-export const createCanvasRenderer = (
+export const createCanvasRenderer: RendererFactory = (
   container: HTMLElement,
-  state: TextAnnotatorState<TextAnnotation, unknown>,
-  viewport: ViewportState
-) => createBaseRenderer(container, state, viewport, createRenderer(container));
+  storeProxy: StoreProxy<TextAnnotation>,
+  selectionProxy: SelectionProxy,
+  hoverProxy: HoverProxy,
+  onHoverChange: (annotationId: string | null) => void,
+  onViewportChange: (annotationIds: string[]) => void
+) => createBaseRenderer(
+  container,
+  storeProxy,
+  selectionProxy,
+  hoverProxy,
+  createRenderer(container),
+  onHoverChange,
+  onViewportChange
+);

@@ -1,7 +1,6 @@
 import { dequal } from 'dequal/lite';
-import type { ViewportState } from '@annotorious/core';
 import type { TextAnnotation } from '../../model';
-import type { Rect, TextAnnotatorState } from '../../state';
+import type { Rect, StoreProxy, SelectionProxy, HoverProxy } from '../../state';
 import { type HighlightPainter, paint } from '../HighlightPainter';
 import type { ViewportBounds } from '../viewport';
 import { createBaseRenderer, type RendererFactory, type RendererImplementation } from '../Renderer';
@@ -128,6 +127,17 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
 
 export const createSpansRenderer: RendererFactory = (
   container: HTMLElement,
-  state: TextAnnotatorState<TextAnnotation, unknown>,
-  viewport: ViewportState
-) => createBaseRenderer(container, state, viewport, createRenderer(container));
+  storeProxy: StoreProxy<TextAnnotation>,
+  selectionProxy: SelectionProxy,
+  hoverProxy: HoverProxy,
+  onHoverChange: (annotationId: string | null) => void,
+  onViewportChange: (annotationIds: string[]) => void
+) => createBaseRenderer(
+  container,
+  storeProxy,
+  selectionProxy,
+  hoverProxy,
+  createRenderer(container),
+  onHoverChange,
+  onViewportChange
+);

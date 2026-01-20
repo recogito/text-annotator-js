@@ -269,34 +269,50 @@ describe('SpansRenderer', () => {
     });
   });
 
+  // Helper to create mock proxies for tests
+  const createMockProxies = () => ({
+    storeProxy: {
+      getAnnotation: vi.fn(),
+      getAt: vi.fn().mockReturnValue(null),
+      getIntersecting: vi.fn().mockReturnValue([]),
+      recalculatePositions: vi.fn(),
+      addAnnotation: vi.fn(),
+      updateTarget: vi.fn(),
+      deleteAnnotation: vi.fn(),
+      observeStore: vi.fn().mockReturnValue(vi.fn()),
+      on: vi.fn().mockReturnValue(vi.fn())
+    },
+    selectionProxy: {
+      getSelected: vi.fn().mockReturnValue([]),
+      evalSelectAction: vi.fn().mockReturnValue('NONE'),
+      clear: vi.fn(),
+      userSelect: vi.fn(),
+      subscribe: vi.fn().mockReturnValue(vi.fn())
+    },
+    hoverProxy: {
+      getCurrent: vi.fn().mockReturnValue(null),
+      set: vi.fn(),
+      subscribe: vi.fn().mockReturnValue(vi.fn())
+    },
+    onHoverChange: vi.fn(),
+    onViewportChange: vi.fn()
+  });
+
   describe('Initialization', () => {
     it('should add r6o-annotatable class to container (sr-init-001)', async () => {
       // At line 32: container.classList.add('r6o-annotatable')
       const { createSpansRenderer } = await import('../src/highlight/span/spansRenderer');
 
-      const mockState = {
-        store: {
-          observe: vi.fn(),
-          unobserve: vi.fn(),
-          getAt: vi.fn().mockReturnValue(null),
-          getIntersecting: vi.fn().mockReturnValue([]),
-          recalculatePositions: vi.fn()
-        },
-        selection: {
-          selected: [],
-          subscribe: vi.fn().mockReturnValue(vi.fn()),
-          evalSelectAction: vi.fn().mockReturnValue('NONE')
-        },
-        hover: {
-          current: null,
-          set: vi.fn(),
-          subscribe: vi.fn().mockReturnValue(vi.fn())
-        }
-      };
+      const mocks = createMockProxies();
 
-      const mockViewport = {};
-
-      const renderer = createSpansRenderer(container, mockState as any, mockViewport as any);
+      const renderer = createSpansRenderer(
+        container,
+        mocks.storeProxy as any,
+        mocks.selectionProxy as any,
+        mocks.hoverProxy as any,
+        mocks.onHoverChange,
+        mocks.onViewportChange
+      );
 
       expect(container.classList.contains('r6o-annotatable')).toBe(true);
 
@@ -309,29 +325,16 @@ describe('SpansRenderer', () => {
       // highlightLayer.className = 'r6o-span-highlight-layer';
       const { createSpansRenderer } = await import('../src/highlight/span/spansRenderer');
 
-      const mockState = {
-        store: {
-          observe: vi.fn(),
-          unobserve: vi.fn(),
-          getAt: vi.fn().mockReturnValue(null),
-          getIntersecting: vi.fn().mockReturnValue([]),
-          recalculatePositions: vi.fn()
-        },
-        selection: {
-          selected: [],
-          subscribe: vi.fn().mockReturnValue(vi.fn()),
-          evalSelectAction: vi.fn().mockReturnValue('NONE')
-        },
-        hover: {
-          current: null,
-          set: vi.fn(),
-          subscribe: vi.fn().mockReturnValue(vi.fn())
-        }
-      };
+      const mocks = createMockProxies();
 
-      const mockViewport = {};
-
-      const renderer = createSpansRenderer(container, mockState as any, mockViewport as any);
+      const renderer = createSpansRenderer(
+        container,
+        mocks.storeProxy as any,
+        mocks.selectionProxy as any,
+        mocks.hoverProxy as any,
+        mocks.onHoverChange,
+        mocks.onViewportChange
+      );
 
       const highlightLayer = container.querySelector('.r6o-span-highlight-layer');
       expect(highlightLayer).toBeTruthy();
@@ -349,29 +352,16 @@ describe('SpansRenderer', () => {
       existingChild.textContent = 'Existing content';
       container.appendChild(existingChild);
 
-      const mockState = {
-        store: {
-          observe: vi.fn(),
-          unobserve: vi.fn(),
-          getAt: vi.fn().mockReturnValue(null),
-          getIntersecting: vi.fn().mockReturnValue([]),
-          recalculatePositions: vi.fn()
-        },
-        selection: {
-          selected: [],
-          subscribe: vi.fn().mockReturnValue(vi.fn()),
-          evalSelectAction: vi.fn().mockReturnValue('NONE')
-        },
-        hover: {
-          current: null,
-          set: vi.fn(),
-          subscribe: vi.fn().mockReturnValue(vi.fn())
-        }
-      };
+      const mocks = createMockProxies();
 
-      const mockViewport = {};
-
-      const renderer = createSpansRenderer(container, mockState as any, mockViewport as any);
+      const renderer = createSpansRenderer(
+        container,
+        mocks.storeProxy as any,
+        mocks.selectionProxy as any,
+        mocks.hoverProxy as any,
+        mocks.onHoverChange,
+        mocks.onViewportChange
+      );
 
       // The highlight layer should be the first child
       expect(container.firstChild?.nodeName.toLowerCase()).toBe('div');
@@ -477,29 +467,16 @@ describe('SpansRenderer', () => {
       //   highlightLayer.innerHTML = '';
       const { createSpansRenderer } = await import('../src/highlight/span/spansRenderer');
 
-      const mockState = {
-        store: {
-          observe: vi.fn(),
-          unobserve: vi.fn(),
-          getAt: vi.fn().mockReturnValue(null),
-          getIntersecting: vi.fn().mockReturnValue([]),
-          recalculatePositions: vi.fn()
-        },
-        selection: {
-          selected: [],
-          subscribe: vi.fn().mockReturnValue(vi.fn()),
-          evalSelectAction: vi.fn().mockReturnValue('NONE')
-        },
-        hover: {
-          current: null,
-          set: vi.fn(),
-          subscribe: vi.fn().mockReturnValue(vi.fn())
-        }
-      };
+      const mocks = createMockProxies();
 
-      const mockViewport = {};
-
-      const renderer = createSpansRenderer(container, mockState as any, mockViewport as any);
+      const renderer = createSpansRenderer(
+        container,
+        mocks.storeProxy as any,
+        mocks.selectionProxy as any,
+        mocks.hoverProxy as any,
+        mocks.onHoverChange,
+        mocks.onViewportChange
+      );
 
       // Get the highlight layer and add some content
       const highlightLayer = container.querySelector('.r6o-span-highlight-layer');
@@ -891,29 +868,16 @@ describe('SpansRenderer', () => {
       //     highlightLayer.classList.remove('hidden');
       const { createSpansRenderer } = await import('../src/highlight/span/spansRenderer');
 
-      const mockState = {
-        store: {
-          observe: vi.fn(),
-          unobserve: vi.fn(),
-          getAt: vi.fn().mockReturnValue(null),
-          getIntersecting: vi.fn().mockReturnValue([]),
-          recalculatePositions: vi.fn()
-        },
-        selection: {
-          selected: [],
-          subscribe: vi.fn().mockReturnValue(vi.fn()),
-          evalSelectAction: vi.fn().mockReturnValue('NONE')
-        },
-        hover: {
-          current: null,
-          set: vi.fn(),
-          subscribe: vi.fn().mockReturnValue(vi.fn())
-        }
-      };
+      const mocks = createMockProxies();
 
-      const mockViewport = {};
-
-      const renderer = createSpansRenderer(container, mockState as any, mockViewport as any);
+      const renderer = createSpansRenderer(
+        container,
+        mocks.storeProxy as any,
+        mocks.selectionProxy as any,
+        mocks.hoverProxy as any,
+        mocks.onHoverChange,
+        mocks.onViewportChange
+      );
 
       const highlightLayer = container.querySelector('.r6o-span-highlight-layer') as HTMLElement;
       expect(highlightLayer).toBeTruthy();
@@ -934,29 +898,16 @@ describe('SpansRenderer', () => {
       //     highlightLayer.classList.add('hidden');
       const { createSpansRenderer } = await import('../src/highlight/span/spansRenderer');
 
-      const mockState = {
-        store: {
-          observe: vi.fn(),
-          unobserve: vi.fn(),
-          getAt: vi.fn().mockReturnValue(null),
-          getIntersecting: vi.fn().mockReturnValue([]),
-          recalculatePositions: vi.fn()
-        },
-        selection: {
-          selected: [],
-          subscribe: vi.fn().mockReturnValue(vi.fn()),
-          evalSelectAction: vi.fn().mockReturnValue('NONE')
-        },
-        hover: {
-          current: null,
-          set: vi.fn(),
-          subscribe: vi.fn().mockReturnValue(vi.fn())
-        }
-      };
+      const mocks = createMockProxies();
 
-      const mockViewport = {};
-
-      const renderer = createSpansRenderer(container, mockState as any, mockViewport as any);
+      const renderer = createSpansRenderer(
+        container,
+        mocks.storeProxy as any,
+        mocks.selectionProxy as any,
+        mocks.hoverProxy as any,
+        mocks.onHoverChange,
+        mocks.onViewportChange
+      );
 
       const highlightLayer = container.querySelector('.r6o-span-highlight-layer') as HTMLElement;
       expect(highlightLayer).toBeTruthy();
@@ -979,29 +930,16 @@ describe('SpansRenderer', () => {
       // }
       const { createSpansRenderer } = await import('../src/highlight/span/spansRenderer');
 
-      const mockState = {
-        store: {
-          observe: vi.fn(),
-          unobserve: vi.fn(),
-          getAt: vi.fn().mockReturnValue(null),
-          getIntersecting: vi.fn().mockReturnValue([]),
-          recalculatePositions: vi.fn()
-        },
-        selection: {
-          selected: [],
-          subscribe: vi.fn().mockReturnValue(vi.fn()),
-          evalSelectAction: vi.fn().mockReturnValue('NONE')
-        },
-        hover: {
-          current: null,
-          set: vi.fn(),
-          subscribe: vi.fn().mockReturnValue(vi.fn())
-        }
-      };
+      const mocks = createMockProxies();
 
-      const mockViewport = {};
-
-      const renderer = createSpansRenderer(container, mockState as any, mockViewport as any);
+      const renderer = createSpansRenderer(
+        container,
+        mocks.storeProxy as any,
+        mocks.selectionProxy as any,
+        mocks.hoverProxy as any,
+        mocks.onHoverChange,
+        mocks.onViewportChange
+      );
 
       // Verify highlight layer exists
       const highlightLayer = container.querySelector('.r6o-span-highlight-layer');
@@ -1022,29 +960,16 @@ describe('SpansRenderer', () => {
       // return { destroy, redraw, setVisible };
       const { createSpansRenderer } = await import('../src/highlight/span/spansRenderer');
 
-      const mockState = {
-        store: {
-          observe: vi.fn(),
-          unobserve: vi.fn(),
-          getAt: vi.fn().mockReturnValue(null),
-          getIntersecting: vi.fn().mockReturnValue([]),
-          recalculatePositions: vi.fn()
-        },
-        selection: {
-          selected: [],
-          subscribe: vi.fn().mockReturnValue(vi.fn()),
-          evalSelectAction: vi.fn().mockReturnValue('NONE')
-        },
-        hover: {
-          current: null,
-          set: vi.fn(),
-          subscribe: vi.fn().mockReturnValue(vi.fn())
-        }
-      };
+      const mocks = createMockProxies();
 
-      const mockViewport = {};
-
-      const renderer = createSpansRenderer(container, mockState as any, mockViewport as any);
+      const renderer = createSpansRenderer(
+        container,
+        mocks.storeProxy as any,
+        mocks.selectionProxy as any,
+        mocks.hoverProxy as any,
+        mocks.onHoverChange,
+        mocks.onViewportChange
+      );
 
       expect(renderer.destroy).toBeDefined();
       expect(typeof renderer.destroy).toBe('function');
@@ -1056,29 +981,16 @@ describe('SpansRenderer', () => {
       // The renderer object should have a redraw method
       const { createSpansRenderer } = await import('../src/highlight/span/spansRenderer');
 
-      const mockState = {
-        store: {
-          observe: vi.fn(),
-          unobserve: vi.fn(),
-          getAt: vi.fn().mockReturnValue(null),
-          getIntersecting: vi.fn().mockReturnValue([]),
-          recalculatePositions: vi.fn()
-        },
-        selection: {
-          selected: [],
-          subscribe: vi.fn().mockReturnValue(vi.fn()),
-          evalSelectAction: vi.fn().mockReturnValue('NONE')
-        },
-        hover: {
-          current: null,
-          set: vi.fn(),
-          subscribe: vi.fn().mockReturnValue(vi.fn())
-        }
-      };
+      const mocks = createMockProxies();
 
-      const mockViewport = {};
-
-      const renderer = createSpansRenderer(container, mockState as any, mockViewport as any);
+      const renderer = createSpansRenderer(
+        container,
+        mocks.storeProxy as any,
+        mocks.selectionProxy as any,
+        mocks.hoverProxy as any,
+        mocks.onHoverChange,
+        mocks.onViewportChange
+      );
 
       expect(renderer.redraw).toBeDefined();
       expect(typeof renderer.redraw).toBe('function');
@@ -1090,29 +1002,16 @@ describe('SpansRenderer', () => {
       // The renderer object should have a setVisible method
       const { createSpansRenderer } = await import('../src/highlight/span/spansRenderer');
 
-      const mockState = {
-        store: {
-          observe: vi.fn(),
-          unobserve: vi.fn(),
-          getAt: vi.fn().mockReturnValue(null),
-          getIntersecting: vi.fn().mockReturnValue([]),
-          recalculatePositions: vi.fn()
-        },
-        selection: {
-          selected: [],
-          subscribe: vi.fn().mockReturnValue(vi.fn()),
-          evalSelectAction: vi.fn().mockReturnValue('NONE')
-        },
-        hover: {
-          current: null,
-          set: vi.fn(),
-          subscribe: vi.fn().mockReturnValue(vi.fn())
-        }
-      };
+      const mocks = createMockProxies();
 
-      const mockViewport = {};
-
-      const renderer = createSpansRenderer(container, mockState as any, mockViewport as any);
+      const renderer = createSpansRenderer(
+        container,
+        mocks.storeProxy as any,
+        mocks.selectionProxy as any,
+        mocks.hoverProxy as any,
+        mocks.onHoverChange,
+        mocks.onViewportChange
+      );
 
       expect(renderer.setVisible).toBeDefined();
       expect(typeof renderer.setVisible).toBe('function');
@@ -1122,79 +1021,47 @@ describe('SpansRenderer', () => {
   });
 
   describe('Factory', () => {
-    it('createSpansRenderer should call createBaseRenderer with container, state, viewport, and renderer (sr-factory-001)', async () => {
-      // At lines 129-133:
-      // export const createSpansRenderer: RendererFactory = (
-      //   container: HTMLElement,
-      //   state: TextAnnotatorState<TextAnnotation, unknown>,
-      //   viewport: ViewportState
-      // ) => createBaseRenderer(container, state, viewport, createRenderer(container));
+    it('createSpansRenderer should call createBaseRenderer with proxies and callbacks (sr-factory-001)', async () => {
+      // The factory now accepts:
+      // (container, storeProxy, selectionProxy, hoverProxy, onHoverChange, onViewportChange)
 
       // This test verifies that createSpansRenderer is properly exported and accepts
-      // the expected arguments: container, state, viewport
+      // the expected arguments
       const { createSpansRenderer } = await import('../src/highlight/span/spansRenderer');
 
-      const mockState = {
-        store: {
-          observe: vi.fn(),
-          unobserve: vi.fn(),
-          getAt: vi.fn().mockReturnValue(null),
-          getIntersecting: vi.fn().mockReturnValue([]),
-          recalculatePositions: vi.fn()
-        },
-        selection: {
-          selected: [],
-          subscribe: vi.fn().mockReturnValue(vi.fn()),
-          evalSelectAction: vi.fn().mockReturnValue('NONE')
-        },
-        hover: {
-          current: null,
-          set: vi.fn(),
-          subscribe: vi.fn().mockReturnValue(vi.fn())
-        }
-      };
+      const mocks = createMockProxies();
 
-      const mockViewport = {};
-
-      // createSpansRenderer should accept (container, state, viewport)
+      // createSpansRenderer should accept the new proxy-based signature
       expect(() => {
-        const renderer = createSpansRenderer(container, mockState as any, mockViewport as any);
+        const renderer = createSpansRenderer(
+          container,
+          mocks.storeProxy as any,
+          mocks.selectionProxy as any,
+          mocks.hoverProxy as any,
+          mocks.onHoverChange,
+          mocks.onViewportChange
+        );
         renderer.destroy();
       }).not.toThrow();
     });
 
     it('createSpansRenderer should pass createRenderer(container) as implementation (sr-factory-002)', async () => {
-      // At line 133: ) => createBaseRenderer(container, state, viewport, createRenderer(container));
-      // The fourth argument to createBaseRenderer is createRenderer(container)
-      // This creates the SpansRenderer implementation with its redraw/setVisible/destroy methods
+      // The implementation creates the SpansRenderer with its redraw/setVisible/destroy methods
 
       // We verify this by checking that the returned renderer has the expected methods
       // that come from createRenderer
       const { createSpansRenderer } = await import('../src/highlight/span/spansRenderer');
 
-      const mockState = {
-        store: {
-          observe: vi.fn(),
-          unobserve: vi.fn(),
-          getAt: vi.fn().mockReturnValue(null),
-          getIntersecting: vi.fn().mockReturnValue([]),
-          recalculatePositions: vi.fn()
-        },
-        selection: {
-          selected: [],
-          subscribe: vi.fn().mockReturnValue(vi.fn()),
-          evalSelectAction: vi.fn().mockReturnValue('NONE')
-        },
-        hover: {
-          current: null,
-          set: vi.fn(),
-          subscribe: vi.fn().mockReturnValue(vi.fn())
-        }
-      };
+      const mocks = createMockProxies();
 
-      const mockViewport = {};
-
-      const renderer = createSpansRenderer(container, mockState as any, mockViewport as any);
+      const renderer = createSpansRenderer(
+        container,
+        mocks.storeProxy as any,
+        mocks.selectionProxy as any,
+        mocks.hoverProxy as any,
+        mocks.onHoverChange,
+        mocks.onViewportChange
+      );
 
       // The renderer should have methods from createRenderer (via createBaseRenderer)
       // verify the highlight layer was created (this proves createRenderer was called with container)
