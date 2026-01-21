@@ -1,14 +1,13 @@
-import { UserSelectAction, type Filter } from '@annotorious/core';
+import type { Filter } from '@annotorious/core';
 import type { TextAnnotation } from '../model';
 import type { StoreProxy, SelectionProxy, HoverProxy } from '../state';
-import { type ViewportBounds, getViewportBounds } from './viewport';
+import type { ViewportBounds } from './viewport';
 import type { HighlightPainter } from './HighlightPainter';
 import type { Highlight } from './Highlight';
 import type { HighlightStyleExpression } from './HighlightStyle';
-// Note that the debounce npm package has the same issue as below under
-// some circumstances:
-// https://github.com/agentcooper/react-pdf-highlighter/issues/276
-import { debounce } from '../utils';
+import {
+  createBaseRenderer as createStandaloneBaseRenderer
+} from '../standalone';
 
 export type RendererFactory = (
   container: HTMLElement,
@@ -25,16 +24,16 @@ export interface RendererImplementation {
 
   redraw(
 
-    highlights:Highlight[], 
+    highlights:Highlight[],
 
-    bounds: ViewportBounds, 
-    
+    bounds: ViewportBounds,
+
     style?: HighlightStyleExpression,
 
     painter?: HighlightPainter,
 
     lazy?: boolean
-  
+
   ): void;
 
   setVisible(visible: boolean): void;
@@ -57,6 +56,10 @@ export interface Renderer {
 
 }
 
+/**
+ * Creates the base renderer by wrapping the standalone version.
+ * This maintains backwards compatibility while reusing the standalone implementation.
+ */
 export const createBaseRenderer = <I extends TextAnnotation = TextAnnotation>(
   container: HTMLElement,
   storeProxy: StoreProxy<I>,
@@ -66,148 +69,14 @@ export const createBaseRenderer = <I extends TextAnnotation = TextAnnotation>(
   onHoverChange: (annotationId: string | null) => void,
   onViewportChange: (annotationIds: string[]) => void
 ): Renderer => {
-
-  let currentStyle: HighlightStyleExpression | undefined;
-
-  let currentFilter: Filter | undefined;
-
-  let currentPainter: HighlightPainter;
-
-  const onPointerMove = (event: PointerEvent) => {
-    const {x, y} = container.getBoundingClientRect();
-
-    // TODO this may be a bit of an edge case... but ideally we'd retrieve the whole
-    // stack of annotations, and then evaluate if ANY of them is clickable.
-    const hit = storeProxy.getAt(event.clientX - x, event.clientY - y, false, currentFilter) as I | undefined;
-    if (hit && selectionProxy.evalSelectAction(hit) !== UserSelectAction.NONE) {
-      if (hoverProxy.getCurrent() !== hit.id) {
-        hoverProxy.set(hit.id);
-        onHoverChange(hit.id);
-      }
-    } else {
-      if (hoverProxy.getCurrent()) {
-        hoverProxy.set(null);
-        onHoverChange(null);
-      }
-    }
-  }
-
-  container.addEventListener('pointermove', onPointerMove);
-
-  const redraw = debounce((lazy: boolean = false) => requestAnimationFrame(() => {
-    if (currentPainter)
-      currentPainter.clear();
-
-    const bounds = getViewportBounds(container);
-
-    const { minX, minY, maxX, maxY } = bounds;
-
-    const annotationsInView = currentFilter
-      ? storeProxy.getIntersecting(minX, minY, maxX, maxY).filter(({ annotation }) => currentFilter(annotation))
-      : storeProxy.getIntersecting(minX, minY, maxX, maxY);
-
-    const selectedIds = selectionProxy.getSelected().map(({ id }) => id);
-    const hoveredId = hoverProxy.getCurrent();
-
-    const highlights: Highlight[] = annotationsInView.map(({ annotation, rects }) => {
-      const selected = selectedIds.includes(annotation.id);
-      const hovered = annotation.id === hoveredId;
-
-      return {
-        annotation,
-        rects,
-        state: { selected, hovered }
-      };
-    });
-
-    renderer.redraw(highlights, bounds, currentStyle, currentPainter, lazy);
-
-    setTimeout(() => onViewportChange(annotationsInView.map(({ annotation }) => annotation.id)), 1);
-  }), 10);
-
-  const setPainter = (painter: HighlightPainter) => { 
-    currentPainter = painter;
-    redraw();
-  }
-
-  const setStyle = (style?: HighlightStyleExpression) => {
-    currentStyle = style;
-    redraw();
-  }
-
-  const setFilter = (filter?: Filter) => {
-    currentFilter = filter;
-    redraw(false);
-  }
-
-  // Refresh on store change
-  const unsubscribeStore = storeProxy.observeStore(() => redraw());
-
-  // Refresh on selection change
-  const unsubscribeSelection = selectionProxy.subscribe(() => redraw());
-
-  // Refresh on hover change
-  const unsubscribeHover = hoverProxy.subscribe(() => redraw());
-
-  // Refresh on scroll
-  const onScroll = () => redraw(true);
-
-  document.addEventListener('scroll', onScroll, { capture: true, passive: true });
-
-  // Refresh on resize
-  const onResize = debounce(() => {
-    storeProxy.recalculatePositions();
-
-    currentPainter?.reset();
-
-    redraw();
-  }, 10);
-
-  window.addEventListener('resize', onResize);
-
-  const resizeObserver = new ResizeObserver(onResize);
-  resizeObserver.observe(container);
-
-  // This is an extra precaution. The position of the container
-  // might shift (without resizing) due to layout changes higher-up
-  // in the DOM. (This happens in Recogito for example)
-  const config: MutationObserverInit = { attributes: true, childList: true, subtree: true };
-
-  const mutationObserver = new MutationObserver(debounce((records: MutationRecord[]) => {
-    const isInternal = records
-      .every(record => record.target === container || container.contains(record.target));
-
-    if (!isInternal)
-      redraw(true);
-  }, 150));
-
-  mutationObserver.observe(document.body, config);
-
-  const destroy = () => {
-    container.removeEventListener('pointermove', onPointerMove);
-
-    renderer.destroy();
-
-    unsubscribeStore();
-    unsubscribeSelection();
-    unsubscribeHover();
-
-    document.removeEventListener('scroll', onScroll);
-
-    // onResize.clear();
-    window.removeEventListener('resize', onResize);
-    resizeObserver.disconnect();
-
-    mutationObserver.disconnect();
-  }
-
-  return {
-    destroy,
-    redraw,
-    setStyle,
-    setFilter,
-    setPainter,
-    setVisible: renderer.setVisible
-  }
-
+  // Delegate to the standalone implementation
+  return createStandaloneBaseRenderer(
+    container,
+    storeProxy,
+    selectionProxy,
+    hoverProxy,
+    renderer,
+    onHoverChange,
+    onViewportChange
+  );
 }
