@@ -17,6 +17,8 @@ npm install @recogito/text-annotator
 ```js
 import { createTextAnnotator } from '@recogito/text-annotator';
 
+import '@recogito/text-annotator/text-annotator.css';
+
 const anno = createTextAnnotator(document.getElementById('content'));
 
 // Load annotations from a file
