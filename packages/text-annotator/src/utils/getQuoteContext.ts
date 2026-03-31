@@ -1,8 +1,10 @@
 import { getRangeAnnotatableContents } from './splitAnnotatableRanges';
 
+const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+
 export const getQuoteContext = (
-  range: Range, 
-  container: HTMLElement, 
+  range: Range,
+  container: HTMLElement,
   length = 10,
   offsetReferenceSelector?: string
 ) => {
@@ -15,7 +17,7 @@ export const getQuoteContext = (
   rangeBefore.setEnd(range.startContainer, range.startOffset);
 
   const before = getRangeAnnotatableContents(rangeBefore).textContent;
-  
+
   const rangeAfter = document.createRange();
   rangeAfter.setStart(range.endContainer, range.endOffset);
 
@@ -26,8 +28,11 @@ export const getQuoteContext = (
 
   const after = getRangeAnnotatableContents(rangeAfter).textContent;
 
+  const prefixGraphemes = [...segmenter.segment(before)];
+  const suffixGraphemes = [...segmenter.segment(after)];
+
   return {
-    prefix: before.substring(before.length - length),
-    suffix: after.substring(0, length)
-  }
+    prefix: prefixGraphemes.slice(-length).map(s => s.segment).join(''),
+    suffix: suffixGraphemes.slice(0, length).map(s => s.segment).join('')
+  };
 }
