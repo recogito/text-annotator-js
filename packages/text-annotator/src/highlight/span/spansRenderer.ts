@@ -34,7 +34,7 @@ const createRenderer = (container: HTMLElement): RendererImplementation => {
   const highlightLayer = document.createElement('div');
   highlightLayer.className = 'r6o-span-highlight-layer';
 
-  container.insertBefore(highlightLayer, container.firstChild);
+  container.appendChild(highlightLayer);
 
   // Currently rendered highlights
   let currentRendered: Highlight[] = [];
