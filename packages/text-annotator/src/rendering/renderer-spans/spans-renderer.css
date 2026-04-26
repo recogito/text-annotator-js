@@ -8,6 +8,7 @@
   pointer-events: none;
   overflow: hidden;
   user-select: none;
+  -webkit-user-select: none; 
   z-index: 1;
 }
 
