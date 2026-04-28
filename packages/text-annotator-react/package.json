@@ -24,7 +24,7 @@
   "module": "./dist/react-text-annotator.es.js",
   "types": "./dist/index.d.ts",
   "devDependencies": {
-    "@types/react": "^19.2.5",
+    "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
     "react": "^19.2.0",
@@ -47,7 +47,7 @@
   "dependencies": {
     "@annotorious/core": "^3.8.1",
     "@annotorious/react": "^3.8.1",
-    "@floating-ui/react": "^0.27.16",
+    "@floating-ui/react": "^0.27.19",
     "@recogito/text-annotator": "3.4.9",
     "@recogito/text-annotator-tei": "3.4.9",
     "CETEIcean": "^1.9.5",
