@@ -35,7 +35,7 @@
     "vitest": "^4.0.10"
   },
   "dependencies": {
-    "@annotorious/core": "^3.7.13",
+    "@annotorious/core": "^3.8.1",
     "colord": "^2.9.3",
     "debounce": "^3.0.0",
     "dequal": "^2.0.3",
