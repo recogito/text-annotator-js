@@ -1,6 +1,10 @@
+node_modules
+
+dist
+
 .vscode
 .idea
-dist
-node_modules
+.claude
+
 **/config.json
 .DS_Store
