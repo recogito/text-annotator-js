@@ -15,6 +15,7 @@
   "scripts": {
     "start": "vite",
     "build": "vite build && node copy-worker.js",
+    "test": "echo 'Skipping tests in @recogito/pdf-annotator-react package'",
     "preview": "vite preview",
     "copy-worker": "node copy-worker.js"
   },
@@ -34,22 +35,22 @@
   "devDependencies": {
     "@recogito/react-text-annotator": "^4.0.0-beta",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^4.7.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^5.2.0",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
     "typescript": "^5.9.3",
-    "vite": "^6.4.1",
+    "vite": "^7.3.2",
     "vite-plugin-dts": "^4.5.4",
     "vite-tsconfig-paths": "^5.1.4"
   },
   "peerDependencies": {
-    "@annotorious/react": "^3.7.18",
+    "@annotorious/react": "^3.8.1",
     "@recogito/pdf-annotator": "4.0.0-beta",
     "pdfjs-dist": "^5.4.394",
     "react": ">= ^18.x || >= ^19.x",
     "react-dom": ">= ^18.x || >= ^19.x"
   },
   "dependencies": {
-    "@floating-ui/react": "^0.27.16"
+    "@floating-ui/react": "^0.27.19"
   }
 }

@@ -23,16 +23,16 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@annotorious/core": "^3.7.16",
-    "@annotorious/react": "^3.7.18",
+    "@annotorious/core": "^3.8.1",
+    "@annotorious/react": "^3.8.1",
     "@recogito/react-text-annotator": "^4.0.0-beta",
-    "@types/react": "^19.2.7",
+    "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.1.1",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "typescript": "5.9.3",
-    "vite": "^6.4.1"
+    "@vitejs/plugin-react": "^5.2.0",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.2"
   },
   "dependencies": {
     "@recogito/text-annotator": "^4.0.0-beta"
