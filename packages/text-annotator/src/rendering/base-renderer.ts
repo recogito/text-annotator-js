@@ -115,7 +115,7 @@ export const createRenderer = <T extends TextAnnotatorState = TextAnnotatorState
     const { minX, minY, maxX, maxY } = bounds;
     
     const annotationsInView = currentFilter
-      ? store.getIntersecting(minX, minY, maxX, maxY).filter(({ annotation }) => currentFilter(annotation))
+      ? store.getIntersecting(minX, minY, maxX, maxY).filter(({ annotation }) => currentFilter?.(annotation))
       : store.getIntersecting(minX, minY, maxX, maxY);
 
     const selectedIds = selection.selected.map(({ id }) => id);

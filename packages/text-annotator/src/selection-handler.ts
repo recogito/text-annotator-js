@@ -82,7 +82,7 @@ export const createSelectionHandler = (
   
   const setUser = (user?: User) => currentUser = user;
 
-  const isAddToCurrentSelect = (evt: Event) => {
+  const isAddToCurrentSelect = (evt: Selection['event']) => {
     if (annotatingMode === 'ADD_TO_CURRENT')
       return true;
 
@@ -230,7 +230,7 @@ export const createSelectionHandler = (
     const hasChanged =
       (annotatableRanges.length > 0 && !currentTarget) ||
       annotatableRanges.length !== currentTarget.selector.length ||
-      annotatableRanges.some((r, i) => r.toString() !== currentTarget.selector[i]?.quote);
+      annotatableRanges.some((r, i) => r.toString() !== currentTarget?.selector[i]?.quote);
 
     if (!hasChanged) return;
 
@@ -336,14 +336,14 @@ export const createSelectionHandler = (
       }
     };
 
-    const timeDifference = lastUpEvent.timeStamp - lastDownEvent.timeStamp;
+    const timeDifference = lastUpEvent.timeStamp - (lastDownEvent?.timeStamp || 0);
     if (timeDifference < CLICK_TIMEOUT) {
       await pollSelectionCollapsed();
 
       const sel = document.getSelection();
 
       const isDownOnNotAnnotatable =
-        isNotAnnotatable(container, lastDownEvent.target as Node);
+        isNotAnnotatable(container, lastDownEvent?.target as Node);
 
       const isUpOnNotAnnotatable = 
         isNotAnnotatable(container, lastUpEvent.target as Node);
@@ -443,7 +443,7 @@ export const createSelectionHandler = (
 
     if (evt.key === 'Shift' && currentTarget) {
       const sel = document.getSelection();
-      if (!sel.isCollapsed) {
+      if (sel && !sel.isCollapsed) {
         upsertCurrentTarget();
         selection.userSelect(currentTarget.annotation, cloneKeyboardEvent(evt));
       }
@@ -453,7 +453,9 @@ export const createSelectionHandler = (
   const onSelectAll = (evt: KeyboardEvent) => {
 
     const onSelected = () => setTimeout(() => {
-      if (currentTarget?.selector.length > 0) {
+      if (!currentTarget) return;
+
+      if (currentTarget.selector.length > 0) {
         selection.clear();
 
         store.addAnnotation({
@@ -517,6 +519,7 @@ export const createSelectionHandler = (
 
   // Helper
   const upsertCurrentTarget = () => {
+    if (!currentTarget) return;
     const existingAnnotation = store.getAnnotation(currentTarget.annotation);
     if (!existingAnnotation) {
       store.addAnnotation({

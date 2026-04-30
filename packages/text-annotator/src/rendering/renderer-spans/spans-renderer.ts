@@ -57,7 +57,7 @@ const createSpansPainter = (container: HTMLElement): Painter => {
     });
 
     sorted.forEach(highlight => {
-      const style = styleOverrides.get(highlight.annotation.id) || currentStyle;
+      const style = styleOverrides?.get(highlight.annotation.id) || currentStyle;
 
       highlight.rects.map(rect => {
         const z = computeZIndex(rect, highlights);

@@ -140,11 +140,11 @@ export const createSpatialTree = <T extends TextAnnotation>(
     }
   }
 
-  const getAnnotationBounds = (id: string): DOMRect => {
+  const getAnnotationBounds = (id: string): DOMRect | undefined => {
     const rects = getAnnotationRects(id);
 
     if (rects.length === 0)
-      return undefined;
+      return;
 
     let left = rects[0].left;
     let top = rects[0].top;
@@ -189,7 +189,7 @@ export const createSpatialTree = <T extends TextAnnotation>(
     // Resolve annotation IDs. Note that the tree could be slightly out of sync (because 
     // it updates by listening to changes, just like anyone else)
     return Array.from(annotationIds).map(annotationId => ({
-      annotation: store.getAnnotation(annotationId),
+      annotation: store.getAnnotation(annotationId)!,
       rects: getAnnotationRects(annotationId)
     })).filter(t => Boolean(t.annotation));
   }
