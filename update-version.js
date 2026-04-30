@@ -26,10 +26,10 @@ const updateVersionNumbers = (filePath, newVersion) => {
 
     packageData.version = newVersion;
 
-    ['dependencies', 'peerDependencies'].forEach(depType => {
+    ['dependencies', 'peerDependencies', 'devDependencies'].forEach(depType => {
       if (packageData[depType]) {
           for (const dep in packageData[depType]) {
-              if (dep.startsWith('@recogito/text-') || dep.startsWith('@recogito/pdf-')) {
+              if (dep.startsWith('@recogito/text-') || dep.startsWith('@recogito/pdf-') || dep.startsWith('@recogito/react-')) {
                   packageData[depType][dep] = newVersion;
               }
           }
