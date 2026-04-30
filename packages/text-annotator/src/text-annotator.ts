@@ -1,6 +1,9 @@
 import { 
   type Annotator, 
+  type AnnotatorState, 
   type Filter, 
+  type Lifecycle, 
+  type Store, 
   type User,
   createAnonymousGuest, 
   createBaseAnnotator,
@@ -30,7 +33,8 @@ import './text-annotator.css';
 
 const USE_DEFAULT_RENDERER: RendererType = 'SPANS';
 
-export interface TextAnnotator<I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation> extends Annotator<I, E> {
+export interface TextAnnotator<I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation> 
+  extends Omit<Annotator<I, E>, 'setStyle' | 'state'> {
 
   element: HTMLElement;
 
@@ -72,11 +76,13 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
 
   const store: TextAnnotationStore<I> = state.store;
 
-  const undoStack = createUndoStack<I>(store);
+  const undoStack = createUndoStack<I>(store as unknown as Store<I>);
 
-  const lifecycle = createLifecycleObserver<I, E>(state, undoStack, opts.adapter);
+  // Not an ideal cast... but not sure what the best approach would be 
+  const lifecycle = 
+    createLifecycleObserver<I, E>(state as unknown as AnnotatorState<I, E>, undoStack, opts.adapter);
 
-  let currentUser: User = opts.user;
+  let currentUser: User = opts.user!;
 
   // Use the selected built-in renderer, or fall back to default. If 
   // CSS_HIGHLIGHT is selected, check if CSS Custom Highlights are 
@@ -105,7 +111,13 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
   if (opts.style)
     renderer.setStyle(opts.style);
 
-  const selectionHandler = createSelectionHandler(container, state, lifecycle, opts);
+  // Likewise: not an ideal cast...
+  const selectionHandler = createSelectionHandler(
+    container, 
+    state as unknown as TextAnnotatorState<TextAnnotation, E>, 
+    lifecycle as Lifecycle<TextAnnotation, E>,
+    opts);
+
   selectionHandler.setUser(currentUser);
 
   /*************************/
@@ -113,7 +125,7 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
   /******++++++*************/
 
   // Most of the external API functions are covered in the base annotator
-  const base = createBaseAnnotator<I, E>(state, undoStack, opts.adapter);
+  const base = createBaseAnnotator<I, E>(state as unknown as AnnotatorState<I, E>, undoStack, opts.adapter);
 
   const getUser = () => currentUser;
 

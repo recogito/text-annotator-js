@@ -2,7 +2,7 @@ import type { TextAnnotationStore } from '../../state';
 import type { TextAnnotation } from '../../model';
 import { reviveTarget } from '../annotation';
 
-const getScrollParent = (el: Element) => {
+const getScrollParent = (el?: Element | null) => {
   if (!el)
     return document.scrollingElement;
 
@@ -35,7 +35,7 @@ const scroll = <I extends TextAnnotation = TextAnnotation>(
    (Includes block elements?)
    Instead, the normalized height is used from the spatial index!
   */
-  const { width, height } = store.getAnnotationBounds(target.annotation);
+  const { width, height } = store.getAnnotationBounds(target.annotation)!;
 
   // Position of the annotation relative to scrollParent
   const offsetTop = annotationBounds.top - parentBounds.top;

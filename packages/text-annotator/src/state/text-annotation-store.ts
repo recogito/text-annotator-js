@@ -3,7 +3,8 @@ import type { Filter, Origin, Store } from '@annotorious/core';
 import type { TextAnnotation } from '../model';
 import type { SpatialTreeEvents } from '../state/spatial-tree';
 
-export interface TextAnnotationStore<T extends TextAnnotation = TextAnnotation> extends Omit<Store<T>, 'addAnnotation' | 'bulkAddAnnotation'> {
+export interface TextAnnotationStore<T extends TextAnnotation = TextAnnotation> 
+  extends Omit<Store<T>, 'addAnnotation' | 'bulkAddAnnotations' | 'bulkUpsertAnnotations'> {
 
   // Minor changes to default Annotorious store - text store returns feedback
   // on annotations that failed to render, to support lazy document loading scenarios

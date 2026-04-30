@@ -27,7 +27,7 @@ export interface Renderer {
 
   setStyle(style?: HighlightStyleExpression, id?: string): void;
 
-  setFilter(filter?: Filter): void;
+  setFilter(filter?: Filter<any>): void;
 
   setVisible(visible: boolean): void;
 
@@ -39,11 +39,11 @@ export interface RendererEvents {
 
 }
 
-export type RendererFactory = (
+export type RendererFactory = <T extends TextAnnotation>(
 
   container: HTMLElement,
 
-  state: TextAnnotatorState<TextAnnotation, unknown>,
+  state: TextAnnotatorState<T, any>,
 
   viewport: ViewportState
 
@@ -153,7 +153,7 @@ export const createRenderer = <T extends TextAnnotatorState = TextAnnotatorState
     redraw(true);
   }
 
-  const setFilter = (filter?: Filter) => {
+  const setFilter = (filter?: Filter<any>) => {
     currentFilter = filter;
     // console.log('[base-renderer] redrawing filter change');
     redraw(false);

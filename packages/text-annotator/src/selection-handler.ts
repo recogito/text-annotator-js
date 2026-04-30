@@ -31,11 +31,11 @@ const SELECTION_KEYS = [
   SELECT_ALL
 ];
 
-export const createSelectionHandler = (
+export const createSelectionHandler = <T extends TextAnnotation>(
   container: HTMLElement,
-  state: TextAnnotatorState<TextAnnotation, unknown>,
-  lifecycle: Lifecycle<TextAnnotation, unknown>,
-  options: TextAnnotatorOptions<TextAnnotation, unknown>
+  state: TextAnnotatorState<TextAnnotation, any>,
+  lifecycle: Lifecycle<TextAnnotation, any>,
+  options: TextAnnotatorOptions<TextAnnotation, any>
 ) => {
   const { store, selection } = state;
 
@@ -78,7 +78,7 @@ export const createSelectionHandler = (
 
   const setAnnotatingMode = (mode?: AnnotatingMode) => annotatingMode = mode || 'CREATE_NEW';
 
-  const setFilter = (filter?: Filter) => currentFilter = filter;
+  const setFilter = (filter?: Filter<any>) => currentFilter = filter;
   
   const setUser = (user?: User) => currentUser = user;
 

@@ -17,7 +17,8 @@ import type { AnnotationRects, TextAnnotationStore } from '../state/text-annotat
 import { isRevived, reviveAnnotation, reviveTarget } from '../utils/annotation';
 import type { TextAnnotatorOptions } from '../text-annotator-options';
 
-export interface TextAnnotatorState<I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation> extends AnnotatorState<I, E> {
+export interface TextAnnotatorState<I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation> 
+  extends Omit<AnnotatorState<I, E>, 'store'> {
 
   store: TextAnnotationStore<I>;
 
@@ -103,7 +104,7 @@ export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotati
   function getAt(x: number, y: number, all?: boolean, filter?: Filter): I | I[] | undefined {
     const getAll = all || Boolean(filter);
 
-    const annotations = tree.getAt(x, y, getAll).map(id => store.getAnnotation(id));
+    const annotations = tree.getAt(x, y, getAll).map(id => store.getAnnotation(id)!).filter(Boolean);
 
     const filtered = filter ? annotations.filter(filter) : annotations;
 

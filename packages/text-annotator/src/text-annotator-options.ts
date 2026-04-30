@@ -4,7 +4,7 @@ import type { TextAnnotation } from './model';
 
 export interface TextAnnotatorOptions<I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation> {
 
-  adapter?: FormatAdapter<I, E> | null;
+  adapter?: FormatAdapter<I, E>;
 
   allowModifierSelect?: boolean;
 
