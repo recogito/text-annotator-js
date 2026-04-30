@@ -39,7 +39,7 @@ export interface RendererEvents {
 
 }
 
-export type RendererFactory = <T extends TextAnnotation>(
+export type RendererFactory<T extends TextAnnotation> = (
 
   container: HTMLElement,
 
@@ -70,7 +70,7 @@ export interface Painter {
 
 }
 
-export const createRenderer = <T extends TextAnnotatorState = TextAnnotatorState> (
+export const createRenderer = <T extends TextAnnotatorState = TextAnnotatorState<TextAnnotation, any>> (
   painter: Painter,
   container: HTMLElement, 
   state: T,

@@ -1,5 +1,5 @@
 import type { ViewportState } from '@annotorious/core';
-import { colord } from 'colord';
+import { colord, type AnyColor } from 'colord';
 import type { TextAnnotation } from '../../model';
 import type { TextAnnotatorState } from '../../state';
 import { 
@@ -16,8 +16,8 @@ import {
 } from '../';
 
 const toCSS = (s?: HighlightStyle) => {
-  const backgroundColor = colord(s?.fill || DEFAULT_STYLE.fill)
-    .alpha(s?.fillOpacity === undefined ? DEFAULT_STYLE.fillOpacity : s.fillOpacity)
+  const backgroundColor = colord(s?.fill || DEFAULT_STYLE.fill as AnyColor)
+    .alpha((s?.fillOpacity === undefined ? DEFAULT_STYLE.fillOpacity : s.fillOpacity) as number)
     .toHex();
 
   const rules = [
@@ -113,8 +113,8 @@ export const createCSSHighlightPainter = (): Painter => {
 
 }
 
-export const createCSSHighlightRenderer: RendererFactory = (
+export const createCSSHighlightRenderer: RendererFactory<TextAnnotation> = (
   container: HTMLElement,
-  state: TextAnnotatorState<TextAnnotation, unknown>,
+  state: TextAnnotatorState<TextAnnotation, any>,
   viewport: ViewportState
 ) => createRenderer(createCSSHighlightPainter(), container, state, viewport);

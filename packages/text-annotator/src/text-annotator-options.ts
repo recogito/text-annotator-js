@@ -33,7 +33,7 @@ export interface TextAnnotatorOptions<I extends TextAnnotation = TextAnnotation,
 
   offsetReferenceSelector?: string;
   
-  renderer?: RendererType | RendererFactory;
+  renderer?: RendererType | RendererFactory<I>;
 
   selectionMode?: 'shortest' | 'all';
 

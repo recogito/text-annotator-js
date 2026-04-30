@@ -94,10 +94,20 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
         : opts.renderer || USE_DEFAULT_RENDERER :
     null;
 
+  // Likewise: not an ideal cast...
   const renderer =
-    useBuiltInRenderer === null ? (opts.renderer as RendererFactory)(container, state, viewport) :
-    useBuiltInRenderer === 'SPANS' ? createSpansRenderer(container, state, viewport) :
-    useBuiltInRenderer === 'CSS_HIGHLIGHTS' ? createCSSHighlightRenderer(container, state, viewport) :
+    useBuiltInRenderer === null ? (opts.renderer as RendererFactory<I>)(
+      container, 
+      state as unknown as TextAnnotatorState<I, E>, 
+      viewport) :
+    useBuiltInRenderer === 'SPANS' ? createSpansRenderer(
+      container, 
+      state as unknown as TextAnnotatorState<TextAnnotation, E>, 
+      viewport) :
+    useBuiltInRenderer === 'CSS_HIGHLIGHTS' ? createCSSHighlightRenderer(
+      container, 
+      state as unknown as TextAnnotatorState<TextAnnotation, E>, 
+      viewport) :
     undefined;
 
   if (!renderer)
@@ -111,12 +121,12 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
   if (opts.style)
     renderer.setStyle(opts.style);
 
-  // Likewise: not an ideal cast...
+  // Likewise: not ideal casts...
   const selectionHandler = createSelectionHandler(
     container, 
     state as unknown as TextAnnotatorState<TextAnnotation, E>, 
     lifecycle as Lifecycle<TextAnnotation, E>,
-    opts);
+    opts as unknown as TextAnnotatorOptions<TextAnnotation, E>);
 
   selectionHandler.setUser(currentUser);
 

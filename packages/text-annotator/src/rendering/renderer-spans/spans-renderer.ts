@@ -112,8 +112,8 @@ const createSpansPainter = (container: HTMLElement): Painter => {
 
 }
 
-export const createSpansRenderer: RendererFactory = (
+export const createSpansRenderer: RendererFactory<TextAnnotation> = (
   container: HTMLElement,
-  state: TextAnnotatorState<TextAnnotation, unknown>,
+  state: TextAnnotatorState<TextAnnotation, any>,
   viewport: ViewportState
 ) => createRenderer(createSpansPainter(container), container, state, viewport);
