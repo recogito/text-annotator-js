@@ -22,7 +22,7 @@ export const parseW3CTEIAnnotation = <E extends W3CTEIAnnotation = W3CTEIAnnotat
 ): ParseResult<TEIAnnotation> => {
 
   // TODO
-  return undefined;
+  throw new Error('Not implemented');
 
 };
 

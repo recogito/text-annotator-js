@@ -15,8 +15,7 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "verbatimModuleSyntax": true,
-    "noEmit": true,
-    "baseUrl": "."
+    "noEmit": true
   },
   "include": [
     "src",

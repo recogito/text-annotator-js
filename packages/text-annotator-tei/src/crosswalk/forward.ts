@@ -64,7 +64,7 @@ const toTEIXPaths = (container: HTMLElement, startPath: string[], endPath: strin
   }
 
   // For a given node, returns the closest parent that is a TEI element
-  const getClosestTEINode = (node: Node | null) => {
+  const getClosestTEINode = (node: Node | null): Node | null => {
     if (!node) return null;
 
     // Edge case: node is the container itself
@@ -85,12 +85,12 @@ const toTEIXPaths = (container: HTMLElement, startPath: string[], endPath: strin
   }
 
   const startOffset = getOffsetFromTo(
-    getClosestTEINode(selectedRange.startContainer),
+    getClosestTEINode(selectedRange.startContainer)!,
     selectedRange.startContainer,
     selectedRange.startOffset);
 
   const endOffset = getOffsetFromTo(
-    getClosestTEINode(selectedRange.endContainer),
+    getClosestTEINode(selectedRange.endContainer)!,
     selectedRange.endContainer,
     selectedRange.endOffset);
 
@@ -162,8 +162,8 @@ export const reviveTarget = (t: TextAnnotationTarget, container: HTMLElement) =>
       return [node, offset] as [Node, number];
     }
 
-    const [startNode, startOffset] = evaluateSelector(startExpression);
-    const [endNode, endOffset] = evaluateSelector(endExpression);
+    const [startNode, startOffset] = evaluateSelector(startExpression)!;
+    const [endNode, endOffset] = evaluateSelector(endExpression)!;
 
     const range = document.createRange();
 
@@ -172,7 +172,7 @@ export const reviveTarget = (t: TextAnnotationTarget, container: HTMLElement) =>
       if (parent.firstChild instanceof Text && parent.firstChild.length >= offset) {
         return { node: parent.firstChild, offset };
       } else {
-        return reanchor(parent.firstChild, parent, offset);
+        return reanchor(parent.firstChild!, parent, offset);
       } 
     }
 

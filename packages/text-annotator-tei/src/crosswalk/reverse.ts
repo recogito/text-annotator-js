@@ -18,15 +18,15 @@ const xpathToDOMPosition = (path: string, container: Element) => {
   const parentNode = document.evaluate('.' + normalized,
     container, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 
-  if (parentNode.firstChild.nodeType !== Node.TEXT_NODE)
+  if (parentNode?.firstChild?.nodeType !== Node.TEXT_NODE)
     console.warn('XPath not pointing to text node', path);
 
-  const node: Node = parentNode.firstChild;
+  const node: Node = parentNode!.firstChild!;
 
   const offset = parseInt(path.substring(offsetIdx + 2));
 
   if (!(node instanceof Text) || offset > node.length) {
-    return reanchor(node, parentNode, offset);
+    return reanchor(node, parentNode!, offset);
   } else {
     return { node, offset };
   }

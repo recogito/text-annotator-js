@@ -4,10 +4,10 @@ import {
   type TextAnnotatorOptions,
   createTextAnnotator, 
 } from '@recogito/text-annotator';
-import type { 
-  Annotator,
-  Origin,  
-  Store,  
+import { 
+  Origin,
+  type Annotator,
+  type Store,  
 } from '@annotorious/core';
 import { 
   textToTEIAnnotation, 
@@ -57,6 +57,7 @@ export const createTEIAnnotator = <T extends unknown>(
     } catch (error) {
       console.warn(error);
       console.warn(`Failed to render annotation`, annotation);
+      return false;
     }
   }
 
@@ -89,15 +90,15 @@ export const createTEIAnnotator = <T extends unknown>(
     _updateAnnotation(toTEI(annotation), origin);
 
   const _updateTarget = store.updateTarget;
-  store.updateTarget = (target: TEIAnnotationTarget | TextAnnotationTarget, origin: Origin) => 
+  store.updateTarget = (target: TEIAnnotationTarget | TextAnnotationTarget, origin: Origin = Origin.LOCAL) => 
     _updateTarget(toTEITarget(target), origin);
 
   return {
     ...anno,
-    //@ts-ignore
+    // @ts-ignore
     state: {
       ...anno.state,
-      store
+      store: store as Store<TEIAnnotation>
     }
   }
 
