@@ -1,6 +1,6 @@
 {
   "name": "@recogito/text-annotator-plugin-awareness",
-  "version": "4.0.1-beta",
+  "version": "v4.0.2-beta",
   "description": "A realtime-awareness plugin to the text annotator",
   "author": "Rainer Simon",
   "license": "BSD-3-Clause",
@@ -25,7 +25,7 @@
   "devDependencies": {
     "@annotorious/core": "^3.8.1",
     "@annotorious/react": "^3.8.1",
-    "@recogito/react-text-annotator": "4.0.1-beta",
+    "@recogito/react-text-annotator": "v4.0.2-beta",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.2.0",
@@ -35,6 +35,6 @@
     "vite": "^7.3.2"
   },
   "dependencies": {
-    "@recogito/text-annotator": "4.0.1-beta"
+    "@recogito/text-annotator": "v4.0.2-beta"
   }
 }

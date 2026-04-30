@@ -1,6 +1,6 @@
 {
   "name": "@recogito/text-annotator",
-  "version": "4.0.1-beta",
+  "version": "v4.0.2-beta",
   "description": "A JavaScript text annotation library",
   "author": "Rainer Simon",
   "license": "BSD-3-Clause",
