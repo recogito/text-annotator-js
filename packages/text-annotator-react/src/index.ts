@@ -61,7 +61,7 @@ export {
 } from '@recogito/text-annotator';
 
 export type {
-  TEIAnnotator,
+  TEIAnnotator as RecogitoTEIAnnotator,
   TEIAnnotation,
   TEIAnnotationTarget,
   TEIRangeSelector,
