@@ -29,7 +29,7 @@ const updateVersionNumbers = (filePath, newVersion) => {
     ['dependencies', 'peerDependencies'].forEach(depType => {
       if (packageData[depType]) {
           for (const dep in packageData[depType]) {
-              if (dep.startsWith('@recogito/text-')) {
+              if (dep.startsWith('@recogito/text-') || dep.startsWith('@recogito/pdf-')) {
                   packageData[depType][dep] = newVersion;
               }
           }
