@@ -12,8 +12,8 @@ const createCanvas = () => {
   canvas.className = `${styles.container} r6o-presence-layer`;
 
   const context = canvas.getContext('2d');
-  context.scale(2, 2);
-  context.translate(0.5, 0.5);
+  context?.scale(2, 2);
+  context?.translate(0.5, 0.5);
 
   return canvas;
 }
@@ -55,7 +55,7 @@ export const createPresenceLayer = (
 
   const clear = () => {
     const { width, height } = canvas;
-    ctx.clearRect(-0.5, -0.5, width + 1, height + 1);
+    ctx?.clearRect(-0.5, -0.5, width + 1, height + 1);
   }
 
   const redraw = () => {
@@ -64,6 +64,8 @@ export const createPresenceLayer = (
     const viewportBounds = anno.element.getBoundingClientRect();
 
     trackedAnnotations.entries().forEach(([id, user]) => {
+      if (!ctx) return;
+
       const rects = anno.state.store.getAnnotationRects(id);
 
       // Draw cursor + label to the presence canvas
@@ -96,8 +98,8 @@ export const createPresenceLayer = (
 
     // Note that resizing the canvas resets the context
     const context = canvas.getContext('2d');
-    context.scale(2, 2);
-    context.translate(0.5, 0.5);
+    context?.scale(2, 2);
+    context?.translate(0.5, 0.5);
   }
 
   // Refresh on resize

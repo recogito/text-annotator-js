@@ -14,7 +14,8 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/plugin-awareness.es.js"
-    }
+    },
+    "./awareness-plugin.css": "./dist/text-annotator-plugin-awareness.css"
   },
   "scripts": {
     "start": "vite",
