@@ -20,7 +20,7 @@
     "copy-worker": "node copy-worker.js"
   },
   "main": "./dist/pdf-annotator.js",
-  "module": "./dist/pdf-annotator.es.js",
+  "module": "./dist/pdf-annotator.js",
   "types": "./dist/index.d.ts",
   "files": [
     "dist",
@@ -29,11 +29,7 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
-    "./w3c": {
-      "types": "./dist/w3c/index.d.ts",
-      "import": "./dist/w3c/index.js"
+      "import": "./dist/pdf-annotator.js"
     },
     "./pdf-anntator.css": "./dist/pdf-annotator.css"
   },
