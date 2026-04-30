@@ -17,10 +17,9 @@
     "useDefineForClassFields": true,
     "jsx": "react-jsx",
     "noEmit": true,
-    "baseUrl": ".",
     "paths": {
       "@recogito/react": [
-        "src/index.ts"
+        "./src/index.ts"
       ]
     }
   },

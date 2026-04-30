@@ -60,7 +60,7 @@ export interface TextAnnotationPopupContentProps<T extends TextAnnotation = Text
 
 }
 
-let cachedBounds = null;
+let cachedBounds: DOMRect | null = null;
 
 const updateViewportBounds = debounce((annotationId: string, store: TextAnnotationStore, container: HTMLElement) => {
   requestAnimationFrame(() => {

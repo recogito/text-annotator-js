@@ -10,7 +10,7 @@ export interface TextAnnotatorProps<I extends TextAnnotation = TextAnnotation, E
 
   children?: ReactNode | JSX.Element;
 
-  adapter?: FormatAdapter<I, E> | ((container: HTMLElement) => FormatAdapter<I, E>) | null;
+  adapter?: FormatAdapter<I, E> | ((container: HTMLElement) => FormatAdapter<I, E>);
 
   annotatingMode?: AnnotatingMode;
 
@@ -33,11 +33,11 @@ export const TextAnnotator = <I extends TextAnnotation = TextAnnotation, E exten
   const { anno, setAnno } = useContext(AnnotoriousContext);
 
   useEffect(() => {
-    if (!setAnno) return;
+    if (!setAnno || !el.current) return;
 
     const adapter = typeof opts.adapter === 'function' ? opts.adapter(el.current) : opts.adapter;
 
-    const anno = createTextAnnotator(el.current, { ...opts, adapter });
+    const anno = createTextAnnotator(el.current!, { ...opts, adapter });
     setAnno(anno);
 
     return () => anno.destroy();

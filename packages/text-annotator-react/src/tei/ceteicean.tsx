@@ -25,20 +25,20 @@ const PRESET_BEHAVIORS = {
         a.appendChild(elem.removeChild(elem.firstChild));
       }
 
-      a.setAttribute('href', elem.getAttribute('target'));
+      a.setAttribute('href', elem.getAttribute('target')!);
 
       elem.appendChild(a);
     },
     // Cf. https://github.com/TEIC/CETEIcean/issues/67
     graphic: (elem: Element) => {
       const content = new Image();
-      content.src = elem.getAttribute('url')?.trim();
+      content.src = elem.getAttribute('url')?.trim()!;
 
       if (elem.hasAttribute('width'))
-        content.setAttribute('width', elem.getAttribute('width'));
+        content.setAttribute('width', elem.getAttribute('width')!);
 
       if (elem.hasAttribute('height'))
-        content.setAttribute('height', elem.getAttribute('height'));
+        content.setAttribute('height', elem.getAttribute('height')!);
 
       elem.appendChild(content);
     },
@@ -69,8 +69,8 @@ export const CETEIcean = (props: CETEIceanProps) => {
       });
 
       ceteicean.makeHTML5(props.tei, (data: Element) => {
-        el.current.appendChild(data);
-        props.onLoad(el.current);
+        el.current?.appendChild(data);
+        props.onLoad?.(el.current!);
       });
     }
 
