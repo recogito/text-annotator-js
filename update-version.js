@@ -7,7 +7,7 @@ const searchDirectories = (dir, fileList = []) => {
   files.forEach(file => {
     const filePath = path.join(dir, file);
     if (fs.statSync(filePath).isDirectory()) {
-      if (file !== 'node_modules')
+      if (file !== 'node_modules' && file !== 'plugins')
         fileList = searchDirectories(filePath, fileList);
     } else {
       if (file === 'package.json') {
