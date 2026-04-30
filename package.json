@@ -1,6 +1,6 @@
 {
   "name": "@recogito/text-annotator-monorepo",
-  "version": "3.4.10",
+  "version": "4.0.0-beta",
   "description": "Recogito Text Annotator monorepo",
   "author": "Rainer Simon",
   "repository": {
@@ -15,6 +15,11 @@
   "workspaces": [
     "./packages/text-annotator",
     "./packages/text-annotator-tei",
-    "./packages/text-annotator-react"
-  ]
+    "./packages/text-annotator-react",
+    "./packages/pdf-annotator",
+    "./packages/pdf-annotator-react"
+  ],
+  "devDependencies": {
+    "vite-plugin-dts": "^4.5.4"
+  }
 }

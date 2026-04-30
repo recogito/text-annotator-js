@@ -4,8 +4,8 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "noEmit": true,
-    "skipLibCheck": true,
     "resolveJsonModule": true,
+    "skipLibCheck": true,
     "strict": true
   },
   "include": [

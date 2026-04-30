@@ -1,2 +1,2 @@
-export * from './W3CTEIAnnotation';
-export * from './W3CTEIFormatAdapter';
+export * from './w3c-tei-annotation';
+export * from './w3c-tei-format-adapter';

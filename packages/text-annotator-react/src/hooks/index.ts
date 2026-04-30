@@ -1,1 +1,1 @@
-export * from './useAnnotationQuoteIdle';
+export * from './use-annotation-quote-idle';

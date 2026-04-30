@@ -1,5 +1,5 @@
 import { rangeToSelector, reviveTarget as reviveTextOffsetTarget } from '@recogito/text-annotator';
-import type { TEIAnnotation, TEIAnnotationTarget, TEIRangeSelector } from '../TEIAnnotation';
+import type { TEIAnnotation, TEIAnnotationTarget, TEIRangeSelector } from '../tei-annotation';
 import { reanchor } from './utils';
 import type { 
   TextAnnotation, 

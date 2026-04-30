@@ -53,8 +53,7 @@
 
     <script type="module">
       import CETEI from 'CETEIcean';
-      import { createTextAnnotator } from '@recogito/text-annotator';
-      import { TEIPlugin } from '../../src/index.ts';
+      import { createTEIAnnotator } from '../../src/index.ts';
 
       import '@recogito/text-annotator/text-annotator.css';
 
@@ -74,12 +73,12 @@
           // Apply not-annotatable
           Array.from(document.querySelectorAll('tei-orig')).forEach(el => el.setAttribute('class', 'not-annotatable'));
 
-          var anno = TEIPlugin(createTextAnnotator(document.getElementById('content'), { 
+          var anno = createTEIAnnotator(document.getElementById('content'), { 
             style,
             mergeHighlights: {
               horizontalTolerance: 10
             } 
-          }));
+          });
 
           anno.on('createAnnotation', annotation => {
             console.log('createAnnotation', annotation);

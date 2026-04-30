@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Recogito PDF Annotator | Example</title>
+    <style>
+      body {
+        background-color: #808080;
+        margin: 0;
+        padding: 0;
+      }
+
+      #app {
+        overflow: auto;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+      }
+
+      .buttons {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 9999;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="buttons">
+      <button id="size-auto">
+        Auto
+      </button>
+
+      <button id="size-page-fit">
+        Fit Page
+      </button>
+
+      <button id="size-page-width">
+        Fit Width
+      </button>
+
+      <button id="size-page-actual">
+        Original
+      </button>
+
+      <button id="size-zoom-in">
+        +
+      </button>
+
+      <button id="size-zoom-out">
+        -
+      </button>
+
+      <button id="jump">
+        Jump to annotation
+      </button>
+    </div>
+
+    <div id="app"></div>
+    
+    <script type="module">
+      const annotationOnLastPage = {
+        "id": "0611d9e8-4d21-4048-9529-4dcc2ba4a174",
+        "bodies": [],
+        "target": {
+          "annotation": "0611d9e8-4d21-4048-9529-4dcc2ba4a174",
+          "selector": {
+            "quote": "Work is underway in a number of areas to further improve theperformance of our trace-based JavaScript compiler. We currentlydo not trace across recursive function calls, but plan to add thesupport for this capability in the near term. We are also exploringadoption of the existing work on tree recompilation in the contextof the presented dynamic compiler in order to minimize JIT pausetimes and obtain the best of both worlds, fast tree stitching as wellas the improved code quality due to tree recompilation.",
+            "start": 5001,
+            "end": 5511,
+            "range": {},
+            "offsetReference": {},
+            "pageNumber": 13
+          },
+          "creator": {
+            "isGuest": true,
+            "id": "nuPGkgB78UAqgmyUysJ1"
+          },
+          "created": "2023-10-13T07:45:42.530Z"
+        }
+      };
+
+      import { createPDFAnnotator } from '../src/index.ts';
+
+      window.onload = async function() {
+        const container = document.getElementById('app');
+      
+        var anno = await createPDFAnnotator(
+          container, 
+          'compressed.tracemonkey-pldi-09.pdf', {
+            style: {
+              fillOpacity: 0.35
+            },
+            mergeHighlights: { verticalTolerance: 5, horizontalTolerance: 20}
+          });
+
+        anno.on('createAnnotation', a => console.log('create', a));
+        anno.on('deleteAnnotation', a => console.log('delete', a));
+        anno.on('updateAnnotation', (a, b) => console.log('update', a));
+
+        //  anno.loadAnnotations('annotations.json');
+
+        document.getElementById('size-auto')
+          .addEventListener('click', () => anno.setSize('auto'));
+
+        document.getElementById('size-page-fit')
+          .addEventListener('click', () => anno.setSize('page-fit'));
+
+        document.getElementById('size-page-width')
+          .addEventListener('click', () => anno.setSize('page-width'));
+
+        document.getElementById('size-page-actual')
+          .addEventListener('click', () => anno.setSize('page-actual'));
+
+        document.getElementById('size-zoom-in')
+          .addEventListener('click', () => console.log(anno.zoomIn()));
+        
+        document.getElementById('size-zoom-out')
+          .addEventListener('click', () => console.log(anno.zoomOut()));
+
+        let idx = 0;
+
+        document.getElementById('jump')
+          .addEventListener('click', () => {
+            const annotations = anno.getAnnotations();
+            const next = annotations[idx];
+            idx = (idx + 1) % annotations.length;
+            anno.scrollIntoView(next);
+          });
+      }
+    </script>
+  </body>
+</html>

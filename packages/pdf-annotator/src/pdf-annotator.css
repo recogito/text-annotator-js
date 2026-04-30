@@ -1,0 +1,29 @@
+.pdfViewer .textLayer {
+  opacity: 1;
+  position: absolute;
+}
+
+.pdfViewer .annotationLayer {
+  display: none;
+  position: absolute;
+}
+
+.pdfViewer .textLayer span::selection {
+  background-color: rgb(0, 128, 255, 0.25) !important;
+}
+
+.r6o-annotatable.hovered .textLayer span {
+  cursor: pointer;
+}
+
+.r6o-span-highlight-layer {
+  z-index: 2;
+}
+
+.r6o-highlight-layer.bg {
+  z-index: 2;
+}
+
+.r6o-highlight-layer.fg {
+  z-index: 3;
+}

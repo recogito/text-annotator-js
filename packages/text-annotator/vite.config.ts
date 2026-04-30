@@ -1,9 +1,10 @@
+import path from 'path';
 import { defineConfig } from 'vite';
 import { externalizeDeps } from 'vite-plugin-externalize-deps';
 
 export default defineConfig({
   plugins: [
-    externalizeDeps(),
+    externalizeDeps()
   ],
   server: {
     open: '/test/index.html'
