@@ -1,7 +1,5 @@
 import type { PDFViewer } from 'pdfjs-dist/legacy/web/pdf_viewer.mjs';
 
-// Zoom/scale-related Annotator API function implementations
-
 export type PDFScale = 
   'auto' |
   'page-fit' |

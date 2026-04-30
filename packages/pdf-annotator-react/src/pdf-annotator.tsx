@@ -31,6 +31,8 @@ export const PDFAnnotator = (props: PDFAnnotatorProps) => {
   const { anno, setAnno } = useContext(AnnotoriousContext);
 
   useEffect(() => {     
+    if (!el.current) return;
+    
     createPDFAnnotator(el.current, pdfUrl, opts)
       .then(anno => {
         

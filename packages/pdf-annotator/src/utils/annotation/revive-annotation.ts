@@ -28,7 +28,7 @@ export const reviveSelector = (selector: PDFSelector | TextSelector): PDFSelecto
     } else {
       // No pageNumber, but offsetReference element -> crosswalk
       const { offsetReference } = selector;
-      const pageNumber = parseInt(offsetReference.dataset.pageNumber);
+      const pageNumber = parseInt(offsetReference!.dataset.pageNumber!);
     
       // @ts-ignore
       return {
@@ -38,7 +38,7 @@ export const reviveSelector = (selector: PDFSelector | TextSelector): PDFSelecto
     }
   } else if ('pageNumber' in selector) {
     const { pageNumber } = selector;
-    const offsetReference: HTMLElement = document.querySelector(`.page[data-page-number="${pageNumber}"]`);
+    const offsetReference: HTMLElement | null = document.querySelector(`.page[data-page-number="${pageNumber}"]`);
 
     return {
       ...selector,

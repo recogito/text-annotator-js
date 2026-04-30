@@ -96,7 +96,7 @@ export const createPDFAnnotatorState = (
     }
 
     const toPDFSelector = (s: TextSelector) => {
-      const pageNumber = parseInt(s.offsetReference.dataset.pageNumber);
+      const pageNumber = parseInt(s.offsetReference?.dataset.pageNumber!);
       return {
         ...s,
         pageNumber,
@@ -161,7 +161,9 @@ export const createPDFAnnotatorState = (
     
     const toRender = pages.reduce<PDFAnnotation[]>((annotations, page) => (
       [...annotations, ...(renderedAnnotations.get(page) || [])]
-    ), []).map(({ id }) => innerStore.getAnnotation(id));
+    ), [])
+    .map(({ id }) => innerStore.getAnnotation(id)!)
+    .filter(Boolean);
 
     if (toRender.length > 0)
       // Attempt to update the unrendered annotations in the store      
@@ -229,6 +231,7 @@ export const createPDFAnnotatorState = (
 
   return {
     hover,
+    // @ts-ignore
     selection,
     // @ts-ignore
     store: { 
@@ -238,6 +241,7 @@ export const createPDFAnnotatorState = (
       observe,
       onLazyRender,
       unobserve,
+      // @ts-ignore
       updateAnnotation,
       updateTarget
     },

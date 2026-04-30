@@ -1,13 +1,11 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "checkJs": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "outDir": "dist",
     "preserveSymlinks": true,
     "resolveJsonModule": true,
     "skipLibCheck": false,
