@@ -4,7 +4,7 @@ A JavaScript library for PDF annotation, using [PDF.js](https://mozilla.github.i
 
 Also available: [React wrapper](packages/pdf-annotator-react)
 
-![Animated screenshot of the Recogito PDF Annotator](/animated-screenshot.gif "Animated screenshot of the Recogito PDF Annotator")
+![Animated screenshot of the Recogito PDF Annotator](animated-screenshot.gif "Animated screenshot of the Recogito PDF Annotator")
 
 ## Installation
 
