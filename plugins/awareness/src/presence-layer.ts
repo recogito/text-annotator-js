@@ -43,7 +43,11 @@ export const createPresenceLayer = (
       if (selection)
         selection.forEach(id => { 
           trackedAnnotations.set(id, p);
-          anno.setStyle({ fill: p.appearance.color as Color }, id);
+          
+          anno.setStyle((_, state) => ({ 
+            fill: p.appearance.color as Color,
+            fillOpacity: state.selected ? 0.45 : 0.18 
+          }), id);
         });
     });
   }
