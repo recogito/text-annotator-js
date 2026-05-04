@@ -7,14 +7,14 @@ export const scrollIntoView = (
   viewer: PDFViewer,
   viewerElement: HTMLDivElement,
   store: PDFAnnotationStore
-) => (annotationOrId: string | PDFAnnotation) => {
+) => (annotationOrId: string | PDFAnnotation): boolean => {
   const id = 
     typeof annotationOrId === 'string' ? annotationOrId : annotationOrId.id;
   
   const current = store.getAnnotation(id);
   if (!current) {
     console.warn('Cannot scroll to annotation', id);
-    return;
+    return false;
   }
 
   const p = current.target.selector[0].pageNumber;

@@ -2,11 +2,13 @@ import { createSelectionHandler, createSpansRenderer, fillDefaults } from '@reco
 import type { 
   AnnotatingMode, 
   HighlightStyleExpression, 
+  TextAnnotation, 
   TextAnnotator, 
-  TextAnnotatorOptions 
+  TextAnnotatorOptions, 
+  TextAnnotatorState
 } from '@recogito/text-annotator';
 import { createBaseAnnotator, createLifecycleObserver, createUndoStack } from '@annotorious/core';
-import type { Filter, User } from '@annotorious/core';
+import type { AnnotatorState, Filter, Lifecycle, Store, User } from '@annotorious/core';
 import type { PDFAnnotation } from './model/core/pdf-annotation';
 import { createPDFViewer } from './create-pdf-viewer';
 import { createPDFAnnotatorState } from './state';
@@ -30,7 +32,7 @@ export interface PDFAnnotator extends Omit<TextAnnotator<PDFAnnotation, PDFAnnot
 
   setScale(scale: PDFScale | number): number;
 
-  setStyle(style: HighlightStyleExpression | undefined): void;
+  setStyle(style?: HighlightStyleExpression, id?: string): void;
 
   zoomIn(percentage?: number): number;
 
@@ -51,21 +53,28 @@ export const createPDFAnnotator = (
 
   const { store, viewport, selection } = state;
 
-  const undoStack = createUndoStack<PDFAnnotation>(store);
+  const undoStack = createUndoStack<PDFAnnotation>(store as Store<PDFAnnotation>);
   
-  const lifecycle = createLifecycleObserver<PDFAnnotation, PDFAnnotation>(state, undoStack, opts.adapter);
+  const lifecycle = createLifecycleObserver<PDFAnnotation, PDFAnnotation>(
+    state as AnnotatorState<PDFAnnotation, PDFAnnotation>, 
+    undoStack, 
+    opts.adapter);
 
-  let currentUser: User = opts.user;
+  let currentUser: User = opts.user!;
 
-  const renderer = createSpansRenderer(viewerElement, state, viewport);
+  const renderer = createSpansRenderer(
+    viewerElement, 
+    state as unknown as TextAnnotatorState<TextAnnotation, PDFAnnotation>, 
+    viewport);
 
   if (opts.style)
     renderer.setStyle(opts.style);
 
   const selectionHandler = createSelectionHandler(
-    container.querySelector('.pdfViewer'), 
-    state, 
-    lifecycle,
+    container.querySelector('.pdfViewer')!, 
+    state as unknown as TextAnnotatorState<TextAnnotation, PDFAnnotation>, 
+    lifecycle as Lifecycle<TextAnnotation, PDFAnnotation>,
+    // @ts-ignore
     { ...opts, offsetReferenceSelector: '.page' }
   );
   selectionHandler.setUser(currentUser);
@@ -92,7 +101,9 @@ export const createPDFAnnotator = (
   /******++++++*************/
 
   // Most of the external API functions are covered in the base annotator
-  const base = createBaseAnnotator<PDFAnnotation, PDFAnnotation>(state, undoStack);
+  const base = createBaseAnnotator<PDFAnnotation, PDFAnnotation>(
+    state as unknown as AnnotatorState<PDFAnnotation, PDFAnnotation>,
+    undoStack);
 
   const getUser = () => currentUser;
 
@@ -126,8 +137,8 @@ export const createPDFAnnotator = (
     }
   }
 
-  const setStyle = (style: HighlightStyleExpression | undefined) =>
-    renderer.setStyle(style);
+  const setStyle = (style: HighlightStyleExpression | undefined, id?: string) =>
+    renderer.setStyle(style, id);
 
   const setUser = (user: User) => {
     currentUser = user;

@@ -45,7 +45,7 @@ export interface PDFAnnotatorState extends TextAnnotatorState<PDFAnnotation, PDF
 export const createPDFAnnotatorState = (
   viewer: pdfjsViewer.PDFViewer,
   viewerElement: HTMLDivElement, 
-  opts: TextAnnotatorOptions<PDFAnnotation>
+  opts: TextAnnotatorOptions<PDFAnnotation, PDFAnnotation>
 ): PDFAnnotatorState => {
 
   const renderedAnnotations = createRenderedAnnotationsMap();
