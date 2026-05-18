@@ -1,4 +1,5 @@
 import type { TextAnnotation, TextAnnotationTarget, TextSelector } from '../../model';
+import type { SelectorReviveFn } from '../../text-annotator-options';
 import { NOT_ANNOTATABLE_SELECTOR } from '../dom';
 
 export const isRevived = (selector: TextSelector[]) =>
@@ -13,9 +14,12 @@ export const isRevived = (selector: TextSelector[]) =>
  *
  * @returns the revived selector
  */
-export const reviveSelector = <T extends TextSelector>(selector: T, container: HTMLElement): T => {
-
+export const reviveSelector = <T extends TextSelector>( 
+  selector: T, 
+  container: HTMLElement
+): T => {  
   const { start, end } = selector;
+  if (!start || !end) return selector;
 
   const offsetReference = selector.offsetReference || container;
 
@@ -70,19 +74,24 @@ export const reviveSelector = <T extends TextSelector>(selector: T, container: H
     ...selector,
     range
   }
-
 }
 
-
-export const reviveTarget = <T extends TextAnnotationTarget = TextAnnotationTarget>(target: T, container: HTMLElement): T =>
+export const reviveTarget = <T extends TextAnnotationTarget = TextAnnotationTarget>( 
+  target: T, 
+  container: HTMLElement,
+  customFn?: SelectorReviveFn
+): T =>
   isRevived(target.selector)
     ? target
     : ({
       ...target,
-      selector: target.selector.map(s => s.range instanceof Range && !s.range.collapsed ? s : reviveSelector(s, container))
+      selector: target.selector.map(s => 
+        s.range instanceof Range && !s.range.collapsed 
+          ? s 
+          : customFn ? customFn(s, container) : reviveSelector(s, container))
     });
 
-export const reviveAnnotation = <T extends TextAnnotation>(annotation: T, container: HTMLElement): T =>
+export const reviveAnnotation = <T extends TextAnnotation>(annotation: T, container: HTMLElement, customFn?: SelectorReviveFn): T =>
   isRevived(annotation.target.selector)
     ? annotation
-    : ({ ...annotation, target: reviveTarget(annotation.target, container) });
+    : ({ ...annotation, target: reviveTarget(annotation.target, container, customFn) });

@@ -182,9 +182,13 @@ export const createRenderer = <T extends TextAnnotatorState = TextAnnotatorState
     redraw()
   });
 
+  // Cancel last scrol-triggered lazy reviving
+  let cancelPending: (() => void) | undefined;
+
   // Refresh on scroll
   const onScroll = () => {
-    // console.log('[base-renderer] redrawing scroll');
+    cancelPending?.();
+    cancelPending = store.revivePending();
     redraw(true);
   }
 

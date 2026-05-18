@@ -2,6 +2,7 @@ import { rangeToSelector, reviveTarget as reviveTextOffsetTarget } from '@recogi
 import type { TEIAnnotation, TEIAnnotationTarget, TEIRangeSelector } from '../tei-annotation';
 import { reanchor } from './utils';
 import type { 
+  SelectorReviveFn,
   TextAnnotation, 
   TextAnnotationTarget, 
   TextSelector
@@ -107,6 +108,7 @@ const toTEIXPaths = (container: HTMLElement, startPath: string[], endPath: strin
  */
 export const textToTEISelector = (container: HTMLElement) => (selector: TextSelector): TEIRangeSelector => {
   const { range } = selector;
+  if (!range) return selector as TEIRangeSelector;
 
   // XPath segments for Range start and end nodes as a list
   const startPathSegments: string[] = getXPath(range.startContainer);
@@ -131,68 +133,86 @@ export const textToTEISelector = (container: HTMLElement) => (selector: TextSele
   };
 }
 
-export const reviveTarget = (t: TextAnnotationTarget, container: HTMLElement) => {
-  const selector = Array.isArray(t.selector) ? t.selector[0] : t.selector;
-  
-  if ('start' in selector && 'end' in selector) {
-    return reviveTextOffsetTarget(t, container);
-  } else {
-    const startExpression = (selector as TEIRangeSelector).startSelector?.value;
-    const endExpression = (selector as TEIRangeSelector).endSelector?.value;
+const isInViewport = (startElement: Node, endElement: Node): boolean => {
+  const { top: startTop } = (startElement as Element).getBoundingClientRect();
+  const { bottom: endBottom } = (endElement as Element).getBoundingClientRect();
+ 
+  return endBottom > 0 && startTop < window.innerHeight;
+}
 
-    if (!startExpression || !endExpression) {
-      console.error(t);
-      throw 'Could not revive TEI target.'
-    }
+const parseXPathExpression = (expression: string) => {
+  const splitIdx = expression.indexOf('::');
+  if (splitIdx < 0) return null;
+ 
+  const path = expression.substring(0, splitIdx)
+    .replace(/\/([^[/]+)/g, (_, p1) => '/tei-' + p1.toLowerCase())
+    .replace(/xml:/g, '');
+ 
+  const offset = parseInt(expression.substring(splitIdx + 2));
+ 
+  return { path, offset };
+}
 
-    const evaluateSelector = (value: string) => {
-      const splitIdx = value.indexOf('::');
+const resolveElement = (path: string, container: HTMLElement): Node | null =>
+  document.evaluate(
+    '.' + path, container, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null
+  ).singleNodeValue;
 
-      if (splitIdx < 0) return;
+export const reviveSelector: SelectorReviveFn = (selector: TextSelector, container: HTMLElement) => {  
+  const startExpression = (selector as TEIRangeSelector).startSelector?.value;
+  const endExpression = (selector as TEIRangeSelector).endSelector?.value;
 
-      const path = value.substring(0, splitIdx).replace(/\/([^[/]+)/g, (_, p1) => {
-        return '/tei-' + p1.toLowerCase();
-      }).replace(/xml:/g, '');
-
-      const node = document.evaluate('.' + path,
-        container, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-
-      const offset = parseInt(value.substring(splitIdx + 2));
-
-      return [node, offset] as [Node, number];
-    }
-
-    const [startNode, startOffset] = evaluateSelector(startExpression)!;
-    const [endNode, endOffset] = evaluateSelector(endExpression)!;
-
-    const range = document.createRange();
-
-    // Helper
-    const reanchorIfNeeded = (parent: Node, offset: number) => {
-      if (parent.firstChild instanceof Text && parent.firstChild.length >= offset) {
-        return { node: parent.firstChild, offset };
-      } else {
-        return reanchor(parent.firstChild!, parent, offset);
-      } 
-    }
-
-    const reanchoredStart = reanchorIfNeeded(startNode, startOffset);
-    range.setStart(reanchoredStart.node, reanchoredStart.offset);
-
-    const reanchoredEnd = reanchorIfNeeded(endNode, endOffset);
-    range.setEnd(reanchoredEnd.node, reanchoredEnd.offset);
-
-    const textSelector = rangeToSelector(range, container);
-
-    return reviveTextOffsetTarget({
-      ...t,
-      selector: [{
-        ...textSelector,
-        ...(selector as TEIRangeSelector),
-        range
-      }]
-    }, container);
+  if (!startExpression || !endExpression) {
+    console.error(selector);
+    throw 'Could not revive TEI selector.'
   }
+
+  const startParsed = parseXPathExpression(startExpression)!;
+  const endParsed = parseXPathExpression(endExpression)!;
+
+  // Resolve start XPath against DOM
+  const startElement = resolveElement(startParsed.path, container)!;
+
+  // Don't evaluate twice if start === end element
+  const endElement = startParsed.path === endParsed.path
+    ? startElement
+    : resolveElement(endParsed.path, container)!;
+
+  // Lazy eval: skip if target is not in viewport
+  if (!isInViewport(startElement, endElement))
+    return selector;
+
+  const range = document.createRange();
+
+  // Helper
+  const reanchorIfNeeded = (parent: Node, offset: number) => {
+    if (parent.firstChild instanceof Text && parent.firstChild.length >= offset) {
+      return { node: parent.firstChild, offset };
+    } else {
+      return reanchor(parent.firstChild!, parent, offset);
+    } 
+  }
+
+  const reanchoredStart = reanchorIfNeeded(startElement, startParsed.offset);
+  range.setStart(reanchoredStart.node, reanchoredStart.offset);
+
+  const reanchoredEnd = reanchorIfNeeded(endElement, endParsed.offset);
+  range.setEnd(reanchoredEnd.node, reanchoredEnd.offset);
+
+  const textSelector = rangeToSelector(range, container);
+
+  return {
+    ...textSelector,
+    ...(selector as TEIRangeSelector),
+    range
+  };
+}
+
+export const reviveTarget = (t: TextAnnotationTarget, container: HTMLElement) => {
+  return reviveTextOffsetTarget({
+    ...t,
+    selector: t.selector.map(s => reviveSelector(s, container))
+  }, container);
 }
 
 export const textToTEITarget =  (container: HTMLElement) => (t: TextAnnotationTarget): TEIAnnotationTarget => {

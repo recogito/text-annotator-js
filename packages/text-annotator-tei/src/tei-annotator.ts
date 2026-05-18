@@ -10,6 +10,7 @@ import {
   type Store,  
 } from '@annotorious/core';
 import { 
+  reviveSelector,
   textToTEIAnnotation, 
   textToTEITarget 
 } from './crosswalk';
@@ -38,7 +39,10 @@ export const createTEIAnnotator = <T extends unknown>(
   container: HTMLElement,
   options: TextAnnotatorOptions<TEIAnnotation, T> = {}
 ): TEIAnnotator => {
-  const anno = createTextAnnotator(container, options);
+  const anno = createTextAnnotator(container, {
+    ...options,
+    selectorReviveFn: reviveSelector
+  });
 
   const toTEI = textToTEIAnnotation(container);
 
@@ -72,15 +76,7 @@ export const createTEIAnnotator = <T extends unknown>(
       }
     });
 
-    const valid = teiAnnotations.filter(Boolean);
-
-    if (teiAnnotations.length !== valid.length) {
-      console.warn(`Failed to render ${teiAnnotations.length - valid.length} annotations.`);
-      teiAnnotations.forEach((a, idx) => {
-        if (!a) console.warn(annotations[idx]);
-      })
-    }
-    
+    const valid = teiAnnotations.filter(Boolean);    
     return _bulkAddAnnotations(valid as TEIAnnotation[], replace, origin);
   }
 

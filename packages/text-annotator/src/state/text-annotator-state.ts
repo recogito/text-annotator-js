@@ -37,7 +37,13 @@ export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotati
 
   const store: Store<I> = createStore<I>();
 
-  const tree = createSpatialTree(store, container, opts.mergeHighlights?.horizontalTolerance, opts.mergeHighlights?.verticalTolerance);
+  const tree = createSpatialTree(
+    store, 
+    container, 
+    opts.mergeHighlights?.horizontalTolerance, 
+    opts.mergeHighlights?.verticalTolerance,
+    opts.selectorReviveFn
+  );
 
   const selection = createSelectionState<I, E>(store, opts.userSelectAction, opts.adapter);
 
@@ -47,7 +53,7 @@ export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotati
 
   // Wrap store interface to intercept annotations and revive DOM ranges, if needed
   const addAnnotation = (annotation: I, origin = Origin.LOCAL): boolean => {
-    const revived = reviveAnnotation(annotation, container);
+    const revived = reviveAnnotation(annotation, container, opts.selectorReviveFn);
 
     const isValid = isRevived(revived.target.selector);
     if (isValid)
@@ -61,20 +67,15 @@ export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotati
     replace = true, 
     origin = Origin.LOCAL
   ): I[] => {
-    const revived = annotations.map(a => reviveAnnotation<I>(a, container));
-
-    // Initial page load might take some time. Retry for more robustness.
-    const couldNotRevive = revived.filter(a => !isRevived(a.target.selector));
-    store.bulkAddAnnotations(revived, replace, origin);
-
-    return couldNotRevive;
+    store.bulkAddAnnotations(annotations, replace, origin);
+    return [];
   }
   
   const bulkUpsertAnnotations = (
     annotations: I[], 
     origin = Origin.LOCAL
   ): I[] => {
-    const revived = annotations.map(a => reviveAnnotation(a, container));
+    const revived = annotations.map(a => reviveAnnotation(a, container, opts.selectorReviveFn));
 
     // Initial page load might take some time. Retry for more robustness.
     const couldNotRevive = revived.filter(a => !isRevived(a.target.selector));
@@ -90,12 +91,12 @@ export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotati
   }
 
   const updateTarget = (target: TextAnnotationTarget, origin = Origin.LOCAL) => {
-    const revived = reviveTarget(target, container);
+    const revived = reviveTarget(target, container, opts.selectorReviveFn);
     store.updateTarget(revived, origin);
   }
 
   const bulkUpdateTargets = (targets: TextAnnotationTarget[], origin = Origin.LOCAL) => {
-    const revived = targets.map(t => reviveTarget(t, container));
+    const revived = targets.map(t => reviveTarget(t, container, opts.selectorReviveFn));
     store.bulkUpdateTargets(revived, origin);
   }
 
@@ -129,12 +130,13 @@ export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotati
   const getAnnotationRects = (id: string): DOMRect[] => tree.getAnnotationRects(id);
 
   const recalculatePositions = () => tree.recalculate();
+  const revivePending = () => tree.revivePending();
   const onRecalculatePositions = (callback: SpatialTreeEvents['recalculate']) => tree.on('recalculate', callback);
 
   store.observe(({ changes }) => {
-    const deleted = (changes.deleted || []).filter(a => isRevived(a.target.selector));
-    const created = (changes.created || []).filter(a => isRevived(a.target.selector));
-    const updated = (changes.updated || []).filter(u => isRevived(u.newValue.target.selector));
+    const deleted = (changes.deleted || []);
+    const created = (changes.created || []);
+    const updated = (changes.updated || []);
 
     if (deleted?.length > 0)
       deleted.forEach(a => tree.remove(a.target));
@@ -158,6 +160,7 @@ export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotati
       getIntersecting,
       getAt,
       recalculatePositions,
+      revivePending,
       onRecalculatePositions,
       updateTarget
     },

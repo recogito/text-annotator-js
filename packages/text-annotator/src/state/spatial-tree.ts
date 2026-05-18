@@ -3,8 +3,9 @@ import type { Store } from '@annotorious/core';
 import { createNanoEvents, type Unsubscribe } from 'nanoevents';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
 import type { AnnotationRects } from '../state/text-annotation-store';
-import { isRevived, reviveSelector } from '../utils/annotation';
+import { reviveSelector } from '../utils/annotation';
 import { mergeClientRects, getHighlightClientRects, toParentBounds } from '../utils/highlight'; 
+import type { SelectorReviveFn } from '../text-annotator-options';
 
 interface IndexedHighlightRect {
 
@@ -36,20 +37,24 @@ export const createSpatialTree = <T extends TextAnnotation>(
   store: Store<T>,
   container: HTMLElement,
   hMergeTolerance?: number,
-  vMergeTolerance?: number
+  vMergeTolerance?: number,
+  selectorReviveFn?: SelectorReviveFn
 ) => {
 
   const tree = new RBush<IndexedHighlightRect>();
 
   const index = new Map<string, IndexedHighlightRect[]>();
 
+  // Targets not yet in the tree because they had no revived range yet
+  const pending = new Map<string, TextAnnotationTarget>();
+
   const emitter = createNanoEvents<SpatialTreeEvents>();
 
   // Helper: converts a single text annotation target to a list of hightlight rects
   const toItems = (target: TextAnnotationTarget, offset: DOMRect): IndexedHighlightRect[] => {
     const rects = target.selector.flatMap(s => {
-      const revivedRange = isRevived([s]) ? s.range : reviveSelector(s, container).range;
-      return getHighlightClientRects(revivedRange);
+      const revivedRange = (selectorReviveFn ? selectorReviveFn(s, container) : reviveSelector(s, container))?.range;
+      return revivedRange ? getHighlightClientRects(revivedRange) : [];
     });
 
     /**
@@ -80,17 +85,25 @@ export const createSpatialTree = <T extends TextAnnotation>(
   const clear = () => {
     tree.clear();
     index.clear();
+    pending.clear();
   }
 
   const insert = (target: TextAnnotationTarget) => {
     const rects = toItems(target, container.getBoundingClientRect());
-    if (rects.length === 0) return;
+    if (rects.length === 0) {
+       pending.set(target.annotation, target);
+       return;
+    }
+
+    pending.delete(target.annotation);
 
     rects.forEach(rect => tree.insert(rect));
     index.set(target.annotation, rects);
   }
 
   const remove = (target: TextAnnotationTarget) => {
+    pending.delete(target.annotation);
+
     const rects = index.get(target.annotation);
     if (rects) {
       rects.forEach(rect => tree.remove(rect));
@@ -104,15 +117,19 @@ export const createSpatialTree = <T extends TextAnnotation>(
   }
 
   const set = (targets: TextAnnotationTarget[], replace: boolean = true) => {
-    if (replace)
+    if (replace) {
       clear();
+    }
 
     const offset = container.getBoundingClientRect();
 
     const rectsByTarget = targets.map(target => ({ target, rects: toItems(target, offset) }));
     rectsByTarget.forEach(({ target, rects }) => {
-      if (rects.length > 0)
-        index.set(target.annotation, rects)
+      if (rects.length === 0) {
+        pending.set(target.annotation, target);
+      } else {
+        index.set(target.annotation, rects);
+      }
     });
 
     const allRects = rectsByTarget.flatMap(({ rects }) => rects);
@@ -198,8 +215,20 @@ export const createSpatialTree = <T extends TextAnnotation>(
 
   const recalculate = () => {
     set(store.all().map(a => a.target), true);
-    emitter.emit('recalculate');
-  };
+  }
+
+  const revivePending = () => {    
+    if (pending.size === 0) return;
+    let cancelled = false;
+
+    requestAnimationFrame(() => {
+      if (cancelled) return;
+      const candidates = [...pending.values()];
+      set(candidates, false);
+    });
+
+    return () => { cancelled = true };
+  }
 
   const on = <E extends keyof SpatialTreeEvents>(event: E, callback: SpatialTreeEvents[E]): Unsubscribe => emitter.on(event, callback);
 
@@ -212,6 +241,7 @@ export const createSpatialTree = <T extends TextAnnotation>(
     getIntersecting,
     insert,
     recalculate,
+    revivePending,
     remove,
     set,
     size,

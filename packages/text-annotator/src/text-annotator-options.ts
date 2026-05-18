@@ -35,15 +35,20 @@ export interface TextAnnotatorOptions<I extends TextAnnotation = TextAnnotation,
   
   renderer?: RendererType | RendererFactory<I>;
 
+  selectorReviveFn?: SelectorReviveFn;
+
   selectionMode?: 'shortest' | 'all';
 
   style?: HighlightStyleExpression;
 
   user?: User;
 
-  userSelectAction?: UserSelectActionExpression<E>,
+  userSelectAction?: UserSelectActionExpression<E>;
 
 }
+
+export type SelectorReviveFn = 
+  <I extends TextAnnotation = TextAnnotation>(selector: I['target']['selector'][number], container: HTMLElement) => I['target']['selector'][number];
 
 export type RendererType = 'SPANS' | 'CSS_HIGHLIGHTS';
 
