@@ -125,7 +125,7 @@ export const createSpatialTree = <T extends TextAnnotation>(
 
     const rectsByTarget = targets.map(target => ({ target, rects: toItems(target, offset) }));
     rectsByTarget.forEach(({ target, rects }) => {
-      if (rects.length === 0) {
+      if (rects.length === 0 && !index.has(target.annotation)) {
         pending.set(target.annotation, target);
       } else {
         index.set(target.annotation, rects);
