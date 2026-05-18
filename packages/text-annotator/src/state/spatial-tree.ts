@@ -91,8 +91,8 @@ export const createSpatialTree = <T extends TextAnnotation>(
   const insert = (target: TextAnnotationTarget) => {
     const rects = toItems(target, container.getBoundingClientRect());
     if (rects.length === 0) {
-       pending.set(target.annotation, target);
-       return;
+      pending.set(target.annotation, target);
+      return;
     }
 
     pending.delete(target.annotation);
@@ -217,7 +217,7 @@ export const createSpatialTree = <T extends TextAnnotation>(
     set(store.all().map(a => a.target), true);
   }
 
-  const revivePending = () => {    
+  const revivePending = () => {  
     if (pending.size === 0) return;
     let cancelled = false;
 

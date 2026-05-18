@@ -144,7 +144,7 @@ export const serializeW3CTextAnnotation = <I extends TextAnnotation = TextAnnota
       exact: quote
     }
 
-    if (container) {
+    if (container && range) {
       const { prefix, suffix } = getQuoteContext(range, container);
       quoteSelector.prefix = prefix;
       quoteSelector.suffix = suffix;
