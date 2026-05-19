@@ -42,7 +42,8 @@ export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotati
     container, 
     opts.mergeHighlights?.horizontalTolerance, 
     opts.mergeHighlights?.verticalTolerance,
-    opts.selectorReviveFn
+    opts.selectorReviveFn,
+    opts.selectorCompareFn
   );
 
   const selection = createSelectionState<I, E>(store, opts.userSelectAction, opts.adapter);

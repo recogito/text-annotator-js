@@ -10,6 +10,7 @@ import {
   type Store,  
 } from '@annotorious/core';
 import { 
+  compareSelectors,
   reviveSelector,
   textToTEIAnnotation, 
   textToTEITarget 
@@ -41,7 +42,8 @@ export const createTEIAnnotator = <T extends unknown>(
 ): TEIAnnotator => {
   const anno = createTextAnnotator(container, {
     ...options,
-    selectorReviveFn: reviveSelector
+    selectorReviveFn: reviveSelector,
+    selectorCompareFn: compareSelectors
   });
 
   const toTEI = textToTEIAnnotation(container);
@@ -65,20 +67,12 @@ export const createTEIAnnotator = <T extends unknown>(
     }
   }
 
+  /*
   const _bulkAddAnnotations = store.bulkAddAnnotations;
   store.bulkAddAnnotations = (annotations: Array<TEIAnnotation | TextAnnotation>, replace = true, origin: Origin) => {
-    const teiAnnotations = annotations.map(a => {
-      const { selector } = a.target;
-      try {
-        return ('startSelector' in selector && 'start' in selector) ? a : toTEI(a);
-      } catch (error) {
-        console.warn(error);
-      }
-    });
-
-    const valid = teiAnnotations.filter(Boolean);    
-    return _bulkAddAnnotations(valid as TEIAnnotation[], replace, origin);
+    return _bulkAddAnnotations(annotations as TEIAnnotation[], replace, origin);
   }
+  */
 
   const _updateAnnotation = store.updateAnnotation;
   // @ts-ignore

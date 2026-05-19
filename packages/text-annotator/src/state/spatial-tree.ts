@@ -4,8 +4,9 @@ import { createNanoEvents, type Unsubscribe } from 'nanoevents';
 import type { TextAnnotation, TextAnnotationTarget } from '../model';
 import type { AnnotationRects } from '../state/text-annotation-store';
 import { reviveSelector } from '../utils/annotation';
+import { debounce } from '../utils/events';
 import { mergeClientRects, getHighlightClientRects, toParentBounds } from '../utils/highlight'; 
-import type { SelectorReviveFn } from '../text-annotator-options';
+import type { SelectorCompareFn, SelectorReviveFn } from '../text-annotator-options';
 
 interface IndexedHighlightRect {
 
@@ -38,9 +39,9 @@ export const createSpatialTree = <T extends TextAnnotation>(
   container: HTMLElement,
   hMergeTolerance?: number,
   vMergeTolerance?: number,
-  selectorReviveFn?: SelectorReviveFn
+  selectorReviveFn?: SelectorReviveFn,
+  selectorCompareFn?: SelectorCompareFn
 ) => {
-
   const tree = new RBush<IndexedHighlightRect>();
 
   const index = new Map<string, IndexedHighlightRect[]>();
@@ -56,6 +57,8 @@ export const createSpatialTree = <T extends TextAnnotation>(
       const revivedRange = (selectorReviveFn ? selectorReviveFn(s, container) : reviveSelector(s, container))?.range;
       return revivedRange ? getHighlightClientRects(revivedRange) : [];
     });
+
+    if (rects.length === 0) return [];
 
     /**
      * Offset the merged client rects so that coords
@@ -116,25 +119,60 @@ export const createSpatialTree = <T extends TextAnnotation>(
     insert(target);
   }
 
-  const set = (targets: TextAnnotationTarget[], replace: boolean = true) => {
-    if (replace) {
-      clear();
+  const set = debounce((targets: TextAnnotationTarget[], replace: boolean = true, skipSort = false) => {
+    console.log('set', targets.length);
+
+    let sorted = [...targets];
+
+    if (!skipSort) {
+      sorted = [...targets];
+      if (selectorCompareFn)
+        sorted.sort((a, b) => selectorCompareFn(a.selector[0], b.selector[0], container));
     }
+
+    if (replace) clear();
 
     const offset = container.getBoundingClientRect();
 
-    const rectsByTarget = targets.map(target => ({ target, rects: toItems(target, offset) }));
-    rectsByTarget.forEach(({ target, rects }) => {
-      if (rects.length === 0 && !index.has(target.annotation)) {
-        pending.set(target.annotation, target);
+    let enteredViewport = false;
+    let rectsByTarget: { target: TextAnnotationTarget, rects: IndexedHighlightRect[] }[] = [];
+
+    for (const t of sorted) {
+      console.log('loop');
+      const rects = toItems(t, offset);
+      if (rects.length > 0) {
+        enteredViewport = true;
+
+        pending.delete(t.annotation);
+        index.set(t.annotation, rects);
+
+        rectsByTarget.push({ target: t, rects });
       } else {
-        index.set(target.annotation, rects);
+        if (enteredViewport) {
+          // Early return: append remaining as pending
+          const from = sorted.indexOf(t);
+
+          for (let i = from; i < sorted.length; i++) {
+            const remaining = sorted[i];
+            if (!index.has(remaining.annotation)) {
+              pending.set(remaining.annotation, remaining);
+            }
+          }
+
+          console.log('early return from ' + from);
+          break;
+        } else {
+          // Not yet in viewport - append this annotation as pending
+          if (!index.has(t.annotation))
+            pending.set(t.annotation, t);
+        }
       }
-    });
+    }
 
     const allRects = rectsByTarget.flatMap(({ rects }) => rects);
-    tree.load(allRects);
-  }
+    if (allRects.length > 0)
+      tree.load(allRects);
+  }, 10);
 
   const getAt = (x: number, y: number, all = false): string[] => {
     const hits = tree.search({
@@ -217,18 +255,27 @@ export const createSpatialTree = <T extends TextAnnotation>(
     set(store.all().map(a => a.target), true);
   }
 
-  const revivePending = () => {  
-    if (pending.size === 0) return;
-    let cancelled = false;
+  let resolveLatest: (() => void) | null = null;
+
+  const debouncedRun = debounce(() => {
+    if (pending.size === 0) {
+      resolveLatest?.();
+      resolveLatest = null;
+      return;
+    }
 
     requestAnimationFrame(() => {
-      if (cancelled) return;
       const candidates = [...pending.values()];
-      set(candidates, false);
+      set(candidates, false, true);
+      resolveLatest?.();
+      resolveLatest = null;
     });
+  }, 100)
 
-    return () => { cancelled = true };
-  }
+  const revivePending = (): Promise<void> => new Promise(resolve => {
+    resolveLatest = resolve;
+    debouncedRun();
+  });
 
   const on = <E extends keyof SpatialTreeEvents>(event: E, callback: SpatialTreeEvents[E]): Unsubscribe => emitter.on(event, callback);
 

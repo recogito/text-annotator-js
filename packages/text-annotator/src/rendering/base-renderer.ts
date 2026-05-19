@@ -182,24 +182,25 @@ export const createRenderer = <T extends TextAnnotatorState = TextAnnotatorState
     redraw()
   });
 
-  // Cancel last scrol-triggered lazy reviving
-  let cancelPending: (() => void) | undefined;
-
   // Refresh on scroll
   const onScroll = () => {
-    cancelPending?.();
-    cancelPending = store.revivePending();
-    redraw(true);
+    store.revivePending().then(() => redraw(true));
   }
 
   document.addEventListener('scroll', onScroll, { capture: true, passive: true });
 
+  let initial = true;
   // Refresh on resize
-  const onResize = debounce(() => {
+  const onResize = () => {
+    if (initial) {
+      initial = false;
+      return;
+    }
+    
     store.recalculatePositions();
     // console.log('[base-renderer] redrawing resize');
     redraw();
-  }, 10);
+  }
 
   window.addEventListener('resize', onResize);
 

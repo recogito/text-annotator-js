@@ -28,7 +28,7 @@ export interface TextAnnotationStore<T extends TextAnnotation = TextAnnotation>
 
   recalculatePositions(): void;
 
-  revivePending():  (() => void) | undefined;
+  revivePending(): Promise<void>;
 
   onRecalculatePositions(callback: SpatialTreeEvents['recalculate']): Unsubscribe;
 

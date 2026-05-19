@@ -37,6 +37,8 @@ export interface TextAnnotatorOptions<I extends TextAnnotation = TextAnnotation,
 
   selectorReviveFn?: SelectorReviveFn;
 
+  selectorCompareFn?: SelectorCompareFn;
+
   selectionMode?: 'shortest' | 'all';
 
   style?: HighlightStyleExpression;
@@ -47,8 +49,13 @@ export interface TextAnnotatorOptions<I extends TextAnnotation = TextAnnotation,
 
 }
 
+type Selector<I extends TextAnnotation> = I['target']['selector'][number];
+
 export type SelectorReviveFn = 
-  <I extends TextAnnotation = TextAnnotation>(selector: I['target']['selector'][number], container: HTMLElement) => I['target']['selector'][number];
+  <I extends TextAnnotation = TextAnnotation>(selector: Selector<I>, container: HTMLElement) => Selector<I>;
+
+export type SelectorCompareFn =
+  <I extends TextAnnotation = TextAnnotation>(a: Selector<I>, b: Selector<I>, container: HTMLElement) => number;
 
 export type RendererType = 'SPANS' | 'CSS_HIGHLIGHTS';
 

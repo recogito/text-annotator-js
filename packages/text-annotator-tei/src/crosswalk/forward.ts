@@ -2,11 +2,19 @@ import { rangeToSelector, reviveTarget as reviveTextOffsetTarget } from '@recogi
 import type { TEIAnnotation, TEIAnnotationTarget, TEIRangeSelector } from '../tei-annotation';
 import { reanchor } from './utils';
 import type { 
+  SelectorCompareFn,
   SelectorReviveFn,
   TextAnnotation, 
   TextAnnotationTarget, 
   TextSelector
 } from '@recogito/text-annotator';
+
+// Hack for now
+const elementCache = new Map<string, Node>();
+const boundsCache = new Map<Element, DOMRect>();
+
+const onScroll = () => boundsCache.clear();
+document.addEventListener('scroll', onScroll, { capture: true, passive: true });
 
 /**
  * Helper: Returns the given XPath for a DOM node, in the form of 
@@ -101,7 +109,6 @@ const toTEIXPaths = (container: HTMLElement, startPath: string[], endPath: strin
   return { start, end }; 
 }
 
-
 /**
  * Using the DOM Range from a (revived!) TextSelector, this function computes
  * the TEIRangeSelector corresponding to that range.
@@ -133,10 +140,27 @@ export const textToTEISelector = (container: HTMLElement) => (selector: TextSele
   };
 }
 
-const isInViewport = (startElement: Node, endElement: Node): boolean => {
-  const { top: startTop } = (startElement as Element).getBoundingClientRect();
-  const { bottom: endBottom } = (endElement as Element).getBoundingClientRect();
- 
+const isInViewport = (startElement: Element, endElement: Element): boolean => {
+  let start = boundsCache.get(startElement);
+  let end = boundsCache.get(endElement);
+
+  if (!start) {
+    start = startElement.getBoundingClientRect();
+    boundsCache.set(startElement, start);
+  } 
+
+  if (!end) {
+    end = endElement.getBoundingClientRect();
+    boundsCache.set(endElement, end);
+  }
+
+  if (!start || !end) {
+    console.warn('Stale element reference', startElement, endElement);
+    return false;
+  }
+  
+  const startTop = start.top;
+  const endBottom = end.bottom;
   return endBottom > 0 && startTop < window.innerHeight;
 }
 
@@ -153,12 +177,23 @@ const parseXPathExpression = (expression: string) => {
   return { path, offset };
 }
 
-const resolveElement = (path: string, container: HTMLElement): Node | null =>
-  document.evaluate(
-    '.' + path, container, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null
-  ).singleNodeValue;
+const resolveElement = (path: string, container: HTMLElement): Node | null => {
+  const cached = elementCache.get(path);
+  if (!cached) {
+    const evaluated = document.evaluate(
+      '.' + path, container, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null
+    ).singleNodeValue;
+
+    if (evaluated)
+      elementCache.set(path, evaluated);
+  }
+
+  return elementCache.get(path) || null;
+}
 
 export const reviveSelector: SelectorReviveFn = (selector: TextSelector, container: HTMLElement) => {  
+  const startTime = performance.now();
+
   const startExpression = (selector as TEIRangeSelector).startSelector?.value;
   const endExpression = (selector as TEIRangeSelector).endSelector?.value;
 
@@ -179,7 +214,7 @@ export const reviveSelector: SelectorReviveFn = (selector: TextSelector, contain
     : resolveElement(endParsed.path, container)!;
 
   // Lazy eval: skip if target is not in viewport
-  if (!isInViewport(startElement, endElement))
+  if (!isInViewport(startElement as Element, endElement as Element))
     return selector;
 
   const range = document.createRange();
@@ -200,6 +235,8 @@ export const reviveSelector: SelectorReviveFn = (selector: TextSelector, contain
   range.setEnd(reanchoredEnd.node, reanchoredEnd.offset);
 
   const textSelector = rangeToSelector(range, container);
+
+  console.log(`[revive] took ${performance.now() - startTime}`);
 
   return {
     ...textSelector,
@@ -226,5 +263,22 @@ export const textToTEITarget =  (container: HTMLElement) => (t: TextAnnotationTa
 export const textToTEIAnnotation = (container: HTMLElement) => (a: TextAnnotation): TEIAnnotation => ({
   ...a,
   target: textToTEITarget(container)(a.target)
-})
+});
 
+export const compareSelectors: SelectorCompareFn = (a: TextSelector, b: TextSelector, container: HTMLElement) => {
+  const aParsed = parseXPathExpression((a as TEIRangeSelector).startSelector?.value ?? '');
+  const bParsed = parseXPathExpression((b as TEIRangeSelector).startSelector?.value ?? '');
+ 
+  if (!aParsed || !bParsed) return 0;
+ 
+  let aEl = resolveElement(aParsed.path, container);
+  let bEl = resolveElement(bParsed.path, container);
+
+  // Shouldn't happen
+  if (!aEl || !bEl) return 0;
+ 
+  if (aEl === bEl)
+    return aParsed.offset - bParsed.offset;
+ 
+  return aEl.compareDocumentPosition(bEl) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
+}
