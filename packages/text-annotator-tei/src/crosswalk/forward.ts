@@ -192,8 +192,6 @@ const resolveElement = (path: string, container: HTMLElement): Node | null => {
 }
 
 export const reviveSelector: SelectorReviveFn = (selector: TextSelector, container: HTMLElement) => {  
-  const startTime = performance.now();
-
   const startExpression = (selector as TEIRangeSelector).startSelector?.value;
   const endExpression = (selector as TEIRangeSelector).endSelector?.value;
 
@@ -235,8 +233,6 @@ export const reviveSelector: SelectorReviveFn = (selector: TextSelector, contain
   range.setEnd(reanchoredEnd.node, reanchoredEnd.offset);
 
   const textSelector = rangeToSelector(range, container);
-
-  console.log(`[revive] took ${performance.now() - startTime}`);
 
   return {
     ...textSelector,

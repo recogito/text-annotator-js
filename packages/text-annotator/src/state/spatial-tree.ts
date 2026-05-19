@@ -120,7 +120,8 @@ export const createSpatialTree = <T extends TextAnnotation>(
   }
 
   const set = debounce((targets: TextAnnotationTarget[], replace: boolean = true, skipSort = false) => {
-    console.log('set', targets.length);
+    console.log('set ', targets.length);
+    const startTime = performance.now();
 
     let sorted = [...targets];
 
@@ -138,7 +139,6 @@ export const createSpatialTree = <T extends TextAnnotation>(
     let rectsByTarget: { target: TextAnnotationTarget, rects: IndexedHighlightRect[] }[] = [];
 
     for (const t of sorted) {
-      console.log('loop');
       const rects = toItems(t, offset);
       if (rects.length > 0) {
         enteredViewport = true;
@@ -159,7 +159,6 @@ export const createSpatialTree = <T extends TextAnnotation>(
             }
           }
 
-          console.log('early return from ' + from);
           break;
         } else {
           // Not yet in viewport - append this annotation as pending
@@ -172,6 +171,8 @@ export const createSpatialTree = <T extends TextAnnotation>(
     const allRects = rectsByTarget.flatMap(({ rects }) => rects);
     if (allRects.length > 0)
       tree.load(allRects);
+
+    console.log('took ' + (performance.now() - startTime));
   }, 10);
 
   const getAt = (x: number, y: number, all = false): string[] => {
