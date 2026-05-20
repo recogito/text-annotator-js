@@ -16,6 +16,36 @@ const boundsCache = new Map<Element, DOMRect>();
 const onScroll = () => boundsCache.clear();
 document.addEventListener('scroll', onScroll, { capture: true, passive: true });
 
+/*
+const rangeToSelector = (
+  range: Range,
+  container: HTMLElement,
+  offsetReferenceSelector?: string
+): TextSelector => {
+  const rangeBefore = document.createRange();
+
+  const offsetReference: HTMLElement = offsetReferenceSelector
+    ? (range.startContainer.parentElement as HTMLElement).closest(offsetReferenceSelector)!
+    : container;
+
+  // A helper range from the start of the container to the start of the selection
+  rangeBefore.setStart(offsetReference, 0);
+  rangeBefore.setEnd(range.startContainer, range.startOffset);
+
+  // A content range before content w/o not annotatable elements
+  // const before = getRangeAnnotatableContents(rangeBefore).textContent;
+
+  const quote = range.toString();
+  const start = 0; // before.length || 0;
+  const end = 0; // start + quote.length;
+
+  return offsetReferenceSelector
+    ? { quote, start, end, range, offsetReference }
+    : { quote, start, end, range };
+}
+*/
+
+
 /**
  * Helper: Returns the given XPath for a DOM node, in the form of 
  * a list of segments.
@@ -232,10 +262,10 @@ export const reviveSelector: SelectorReviveFn = (selector: TextSelector, contain
   const reanchoredEnd = reanchorIfNeeded(endElement, endParsed.offset);
   range.setEnd(reanchoredEnd.node, reanchoredEnd.offset);
 
-  const textSelector = rangeToSelector(range, container);
+  // const textSelector = rangeToSelector(range, container);
 
   return {
-    ...textSelector,
+    // ...textSelector,
     ...(selector as TEIRangeSelector),
     range
   };

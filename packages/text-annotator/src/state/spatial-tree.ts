@@ -119,16 +119,21 @@ export const createSpatialTree = <T extends TextAnnotation>(
     insert(target);
   }
 
-  const set = debounce((targets: TextAnnotationTarget[], replace: boolean = true, skipSort = false) => {
-    console.log('set ', targets.length);
+  const set = (targets: TextAnnotationTarget[], replace: boolean = true, skipSort = false) => {
+    console.log(`.set() on ${targets.length} targets`);
+    
     const startTime = performance.now();
 
     let sorted = [...targets];
 
     if (!skipSort) {
+      const startTime = performance.now();
+
       sorted = [...targets];
       if (selectorCompareFn)
         sorted.sort((a, b) => selectorCompareFn(a.selector[0], b.selector[0], container));
+
+      console.log(`Sorted in ${performance.now() - startTime} ms`);
     }
 
     if (replace) clear();
@@ -168,12 +173,19 @@ export const createSpatialTree = <T extends TextAnnotation>(
       }
     }
 
-    const allRects = rectsByTarget.flatMap(({ rects }) => rects);
-    if (allRects.length > 0)
+    if (rectsByTarget.length > 0) {
+      // console.log(`updated - ${rectsByTarget.length} targets`);
+      const allRects = [...index.values()].flat()
+      // console.log(`adding ${allRects.length} rects`)
       tree.load(allRects);
+    } else {
+      // console.log('no updates');
+    }
 
-    console.log('took ' + (performance.now() - startTime));
-  }, 10);
+    const totalRects = [...index.values()].flat();
+    // console.log(`Index size: ${index.size} targets, ${totalRects.length} rects`);
+    console.log(`Took ${performance.now() - startTime} ms`);
+  }
 
   const getAt = (x: number, y: number, all = false): string[] => {
     const hits = tree.search({
@@ -271,7 +283,7 @@ export const createSpatialTree = <T extends TextAnnotation>(
       resolveLatest?.();
       resolveLatest = null;
     });
-  }, 100)
+  }, 10)
 
   const revivePending = (): Promise<void> => new Promise(resolve => {
     resolveLatest = resolve;

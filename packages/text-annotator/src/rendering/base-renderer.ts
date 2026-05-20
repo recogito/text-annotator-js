@@ -137,7 +137,7 @@ export const createRenderer = <T extends TextAnnotatorState = TextAnnotatorState
       onDraw(annotationsInView.map(({ annotation }) => annotation));
       emitter.emit('onRedraw')
     }, 1);
-  }), 10);
+  }), 0);
 
   const setStyle = (style?: HighlightStyleExpression, id?: string) => {
     if (id) {
@@ -185,6 +185,7 @@ export const createRenderer = <T extends TextAnnotatorState = TextAnnotatorState
   // Refresh on scroll
   const onScroll = () => {
     store.revivePending().then(() => redraw(true));
+    // redraw(true);
   }
 
   document.addEventListener('scroll', onScroll, { capture: true, passive: true });
