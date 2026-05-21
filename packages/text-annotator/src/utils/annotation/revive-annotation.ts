@@ -19,7 +19,7 @@ export const reviveSelector = <T extends TextSelector>(selector: T, container: H
 
   const offsetReference = selector.offsetReference || container;
 
-  const iterator = document.createNodeIterator(container, NodeFilter.SHOW_TEXT, (node) =>
+  const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, (node) =>
     node.parentElement?.closest(NOT_ANNOTATABLE_SELECTOR)
       ? NodeFilter.FILTER_SKIP
       : NodeFilter.FILTER_ACCEPT
@@ -30,7 +30,7 @@ export const reviveSelector = <T extends TextSelector>(selector: T, container: H
 
   const range = document.createRange();
 
-  let n = iterator.nextNode();
+  let n = walker.nextNode();
   if (n === null) console.error('Could not revive annotation target. Content missing.');
 
   // If there's no offset reference, start immediately
@@ -49,7 +49,7 @@ export const reviveSelector = <T extends TextSelector>(selector: T, container: H
       runningOffset += len;
     }
 
-    n = iterator.nextNode();
+    n = walker.nextNode();
   }
 
   // set range end
@@ -63,7 +63,7 @@ export const reviveSelector = <T extends TextSelector>(selector: T, container: H
 
     runningOffset += len;
 
-    n = iterator.nextNode();
+    n = walker.nextNode();
   }
   
   return {
@@ -72,7 +72,6 @@ export const reviveSelector = <T extends TextSelector>(selector: T, container: H
   }
 
 }
-
 
 export const reviveTarget = <T extends TextAnnotationTarget = TextAnnotationTarget>(target: T, container: HTMLElement): T =>
   isRevived(target.selector)

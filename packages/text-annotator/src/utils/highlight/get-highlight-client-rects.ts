@@ -1,21 +1,30 @@
 export const getHighlightClientRects = (range: Range) => {
   const textNodes: Text[] = [];
 
-  // Get all text nodes inside the range's commonAncestorContainer
-  const it = document.createNodeIterator(
+  // Get all text nodes inside the range's commonAncestorContainer.
+  // Note that treeWalker is known to be faster than NodeIterator!
+  const walker = document.createTreeWalker(
     range.commonAncestorContainer, 
     NodeFilter.SHOW_TEXT);
 
-  /*
-   Filter text nodes that intersect the range. Note that we could
-   also include this filter in the node iterator directly.
-   But the while loop is faster (!) - possibly due to a function call overhead.
-  */
-  let currentNode: Text | undefined;
+  // Filter text nodes that intersect the range.
+  if (range.startContainer.nodeType === Node.TEXT_NODE) {
+    walker.currentNode = range.startContainer;
+    if (range.intersectsNode(range.startContainer)) {
+      textNodes.push(range.startContainer as Text);
+    }
+  }
+
+  let started = textNodes.length > 0;
+  let currentNode: Text;
  
-  while ((currentNode = it.nextNode() as Text)) {
+  while ((currentNode = walker.nextNode() as Text)) {
     if (range.intersectsNode(currentNode)) {
+      started = true;
       textNodes.push(currentNode);
+    } else if (started) {
+      // Break early
+      break;
     }
   }
 

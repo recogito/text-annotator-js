@@ -3,9 +3,9 @@ export const reanchor = (originalNode: Node, parentNode: Node, originalOffset: n
 
   let offset = originalOffset;
 
-  const it = document.createNodeIterator(parentNode, NodeFilter.SHOW_TEXT);
+  const walker = document.createTreeWalker(parentNode, NodeFilter.SHOW_TEXT);
 
-  let currentNode = it.nextNode();
+  let currentNode = walker.nextNode();
 
   let run = true;
 
@@ -19,7 +19,7 @@ export const reanchor = (originalNode: Node, parentNode: Node, originalOffset: n
       }
     }
 
-    currentNode = it.nextNode();
+    currentNode = walker.nextNode();
   } while (currentNode && run);
 
   return { node, offset };
