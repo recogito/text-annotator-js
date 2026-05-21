@@ -1,6 +1,6 @@
 import { createNanoEvents, type Unsubscribe } from 'nanoevents';
 import { UserSelectAction, type Annotation, type AnnotatorState, type Filter, type ViewportState } from '@annotorious/core';
-import type { TextAnnotation } from '../model';
+import type { TextAnnotation, TextAnnotationLike } from '../model';
 import type { TextAnnotatorState } from '../state';
 import { 
   type Highlight,
@@ -17,7 +17,7 @@ import { debounce } from '../utils/events';
 /**
  * The renderer runtime interface.
  */
-export interface Renderer<I extends TextAnnotation = TextAnnotation> {
+export interface Renderer<I extends TextAnnotationLike = TextAnnotation> {
 
   destroy(): void;
 
@@ -39,7 +39,7 @@ export interface RendererEvents {
 
 }
 
-export type RendererFactory<T extends Annotation> = (
+export type RendererFactory<T extends TextAnnotationLike> = (
 
   container: HTMLElement,
 
@@ -47,14 +47,14 @@ export type RendererFactory<T extends Annotation> = (
 
   viewport: ViewportState
 
-) => Renderer;
+) => Renderer<T>;
 
 /**
  * A utility interface. Instead of implementing a Renderer from scratch,
  * implementers can simply implement a painter, and wrap it in the
  * BaseRenderer, which will handle common concerns.
  */
-export interface Painter<I extends TextAnnotation = TextAnnotation> {
+export interface Painter<I extends TextAnnotationLike = TextAnnotation> {
 
   destroy(): void;
 
@@ -70,7 +70,7 @@ export interface Painter<I extends TextAnnotation = TextAnnotation> {
 
 }
 
-export const createRenderer = <T extends TextAnnotatorState = TextAnnotatorState<TextAnnotation, any>, I extends TextAnnotation = TextAnnotation>(
+export const createRenderer = <T extends TextAnnotatorState = TextAnnotatorState<TextAnnotation, any>, I extends TextAnnotationLike = TextAnnotation>(
   painter: Painter<I>,
   container: HTMLElement,
   state: T,

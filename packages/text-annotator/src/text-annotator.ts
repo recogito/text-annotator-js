@@ -96,7 +96,7 @@ export const createTextAnnotator = <I extends TextAnnotationLike = TextAnnotatio
     null;
 
   // Likewise: not an ideal cast...
-  const renderer =
+  const renderer = (
     useBuiltInRenderer === null ? (opts.renderer as RendererFactory<I>)(
       container, 
       state as unknown as AnnotatorState<I, E>, 
@@ -109,7 +109,8 @@ export const createTextAnnotator = <I extends TextAnnotationLike = TextAnnotatio
       container, 
       state as unknown as AnnotatorState<TextAnnotation, E>, 
       viewport) :
-    undefined;
+    undefined
+  ) as unknown as Renderer<I> | undefined;
 
   if (!renderer)
     throw `Unknown renderer implementation: ${opts.renderer}`;
