@@ -1,5 +1,5 @@
 import { createNanoEvents, type Unsubscribe } from 'nanoevents';
-import { UserSelectAction, type Filter, type ViewportState } from '@annotorious/core';
+import { UserSelectAction, type Annotation, type AnnotatorState, type Filter, type ViewportState } from '@annotorious/core';
 import type { TextAnnotation } from '../model';
 import type { TextAnnotatorState } from '../state';
 import { 
@@ -39,11 +39,11 @@ export interface RendererEvents {
 
 }
 
-export type RendererFactory<T extends TextAnnotation> = (
+export type RendererFactory<T extends Annotation> = (
 
   container: HTMLElement,
 
-  state: TextAnnotatorState<T, any>,
+  state: AnnotatorState<T, any>,
 
   viewport: ViewportState
 

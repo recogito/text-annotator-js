@@ -27,3 +27,27 @@ export interface TextSelector {
   offsetReference?: HTMLElement;
 
 }
+
+export interface TextAnnotationLike extends Annotation {
+
+  target: TextAnnotationTargetLike;
+
+}
+
+export interface TextAnnotationTargetLike extends AnnotationTarget {
+
+  selector: TextSelectorLike[];
+
+}
+
+export interface TextSelectorLike {
+
+  id?: string;
+
+  quote: string;
+
+  range: Range;
+
+  offsetReference?: HTMLElement;
+
+}

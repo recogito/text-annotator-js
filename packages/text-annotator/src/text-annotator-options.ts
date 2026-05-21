@@ -1,8 +1,8 @@
-import type { FormatAdapter, UserSelectActionExpression, User } from '@annotorious/core';
+import type { FormatAdapter, UserSelectActionExpression, User, Annotation } from '@annotorious/core';
 import type { HighlightStyleExpression, RendererFactory } from './rendering';
-import type { TextAnnotation } from './model';
+import type { TextAnnotation, TextAnnotationLike } from './model';
 
-export interface TextAnnotatorOptions<I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation> {
+export interface TextAnnotatorOptions<I extends TextAnnotationLike = TextAnnotation, E extends unknown = TextAnnotation> {
 
   adapter?: FormatAdapter<I, E>;
 
@@ -49,7 +49,7 @@ export type RendererType = 'SPANS' | 'CSS_HIGHLIGHTS';
 
 export type DismissOnNotAnnotatableExpression =  'NEVER'| 'ALWAYS' | ((event: Event, container: HTMLElement) => boolean)
 
-export const fillDefaults = <I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation>(
+export const fillDefaults = <I extends TextAnnotationLike = TextAnnotation, E extends unknown = TextAnnotation>(
   opts: TextAnnotatorOptions<I, E>,
   defaults: TextAnnotatorOptions<I, E>
 ): TextAnnotatorOptions<I, E> => ({

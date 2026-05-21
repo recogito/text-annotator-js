@@ -51,9 +51,9 @@ export const createTEIAnnotator = <T extends unknown>(
   store.addAnnotation = (annotation: TEIAnnotation | TextAnnotation, origin: Origin) => {
     const { selector } = annotation.target;
     try {
-      return ('startSelector' in selector && 'start' in selector) ?
-        _addAnnotation(annotation as TEIAnnotation, origin) :
-        _addAnnotation(toTEI(annotation), origin);
+      return (!('startSelector' in selector)) ?
+        _addAnnotation(toTEI(annotation as TextAnnotation), origin) :
+        _addAnnotation(annotation as TEIAnnotation, origin);
     } catch (error) {
       console.warn(error);
       console.warn(`Failed to render annotation`, annotation);
@@ -64,13 +64,14 @@ export const createTEIAnnotator = <T extends unknown>(
   const _bulkAddAnnotations = store.bulkAddAnnotations;
   store.bulkAddAnnotations = (annotations: Array<TEIAnnotation | TextAnnotation>, replace = true, origin: Origin) => {
     const teiAnnotations = annotations.map(a => {
-      const { selector } = a.target;
       try {
-        return ('startSelector' in selector && 'start' in selector) ? a : toTEI(a);
+        return toTEI(a);
       } catch (error) {
         console.warn(error);
       }
     });
+
+    console.log('bulk add', teiAnnotations);
 
     const valid = teiAnnotations.filter(Boolean);
 

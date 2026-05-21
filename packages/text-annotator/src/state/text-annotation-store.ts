@@ -1,9 +1,9 @@
 import type { Unsubscribe } from 'nanoevents';
-import type { Filter, Origin, Store } from '@annotorious/core';
-import type { TextAnnotation } from '../model';
+import type { Annotation, Filter, Origin, Store } from '@annotorious/core';
+import type { TextAnnotation, TextAnnotationLike } from '../model';
 import type { SpatialTreeEvents } from '../state/spatial-tree';
 
-export interface TextAnnotationStore<T extends TextAnnotation = TextAnnotation> 
+export interface TextAnnotationStore<T extends TextAnnotationLike = TextAnnotation> 
   extends Omit<Store<T>, 'addAnnotation' | 'bulkAddAnnotations' | 'bulkUpsertAnnotations'> {
 
   // Minor changes to default Annotorious store - text store returns feedback
@@ -32,7 +32,7 @@ export interface TextAnnotationStore<T extends TextAnnotation = TextAnnotation>
 
 }
 
-export interface AnnotationRects <T extends TextAnnotation = TextAnnotation> {
+export interface AnnotationRects <T extends TextAnnotationLike = TextAnnotation> {
 
   annotation: T;
 

@@ -1,4 +1,4 @@
-import { 
+import {
   type Annotator, 
   type AnnotatorState, 
   type Filter, 
@@ -13,7 +13,7 @@ import {
 import type { HighlightStyleExpression, Renderer, RendererFactory } from './rendering';
 import { createSpansRenderer } from './rendering/renderer-spans';
 import { createCSSHighlightRenderer } from './rendering/renderer-css-highlight';
-import type { TextAnnotation } from './model';
+import type { TextAnnotation, TextAnnotationLike } from './model';
 import { 
   type TextAnnotationStore, 
   type TextAnnotatorState, 
@@ -33,7 +33,7 @@ import './text-annotator.css';
 
 const USE_DEFAULT_RENDERER: RendererType = 'SPANS';
 
-export interface TextAnnotator<I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation> 
+export interface TextAnnotator<I extends TextAnnotationLike = TextAnnotation, E extends unknown = TextAnnotation> 
   extends Omit<Annotator<I, E>, 'setStyle' | 'state'> {
 
   element: HTMLElement;
@@ -55,7 +55,7 @@ export interface TextAnnotator<I extends TextAnnotation = TextAnnotation, E exte
 
 export type AnnotatingMode = 'CREATE_NEW' | 'ADD_TO_CURRENT' | 'REPLACE_CURRENT';
 
-export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation>(
+export const createTextAnnotator = <I extends TextAnnotationLike = TextAnnotation, E extends unknown = TextAnnotation>(
   container: HTMLElement,
   options: TextAnnotatorOptions<I, E> = {}
 ): TextAnnotator<I, E> => {
@@ -70,6 +70,7 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
     user: createAnonymousGuest()
   });
 
+  // @ts-ignore - temporary!
   const state: TextAnnotatorState<I, E> = createTextAnnotatorState<I, E>(container, opts);
 
   const { selection, viewport } = state;
@@ -98,15 +99,15 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
   const renderer =
     useBuiltInRenderer === null ? (opts.renderer as RendererFactory<I>)(
       container, 
-      state as unknown as TextAnnotatorState<I, E>, 
+      state as unknown as AnnotatorState<I, E>, 
       viewport) :
     useBuiltInRenderer === 'SPANS' ? createSpansRenderer(
       container, 
-      state as unknown as TextAnnotatorState<TextAnnotation, E>, 
+      state as unknown as AnnotatorState<TextAnnotation, E>, 
       viewport) :
     useBuiltInRenderer === 'CSS_HIGHLIGHTS' ? createCSSHighlightRenderer(
       container, 
-      state as unknown as TextAnnotatorState<TextAnnotation, E>, 
+      state as unknown as AnnotatorState<TextAnnotation, E>, 
       viewport) :
     undefined;
 
@@ -125,7 +126,7 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
   const selectionHandler = createSelectionHandler(
     container, 
     state as unknown as TextAnnotatorState<TextAnnotation, E>, 
-    lifecycle as Lifecycle<TextAnnotation, E>,
+    lifecycle as unknown as Lifecycle<TextAnnotation, E>,
     opts as unknown as TextAnnotatorOptions<TextAnnotation, E>);
 
   selectionHandler.setUser(currentUser);
@@ -190,6 +191,7 @@ export const createTextAnnotator = <I extends TextAnnotation = TextAnnotation, E
     setVisible: renderer.setVisible.bind(renderer),
     on: lifecycle.on,
     off: lifecycle.off,
+    // @ts-ignore - temporary
     scrollIntoView: scrollIntoView(container, store),
     state
   }
