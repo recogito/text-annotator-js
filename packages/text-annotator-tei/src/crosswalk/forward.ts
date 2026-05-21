@@ -220,7 +220,7 @@ export const textToTEISelector = (container: HTMLElement) => (selector: TextSele
 
 export const reviveSelector = (selector: TEIRangeSelector, container: HTMLElement): TEIRangeSelector => {
   // Don't revive unncessarily
-  if (selector.position && selector.range) return selector;
+  if (selector.position && selector.range instanceof Range) return selector;
 
   const startExpression = selector.startSelector?.value;
   const endExpression = selector.endSelector?.value;
