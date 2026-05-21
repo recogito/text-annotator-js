@@ -71,8 +71,6 @@ export const createTEIAnnotator = <T extends unknown>(
       }
     });
 
-    console.log('bulk add', teiAnnotations);
-
     const valid = teiAnnotations.filter(Boolean);
 
     if (teiAnnotations.length !== valid.length) {
