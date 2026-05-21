@@ -1,7 +1,7 @@
 import { isRangeAnnotatable, NOT_ANNOTATABLE_CLASS, NOT_ANNOTATABLE_SELECTOR } from '../dom';
 
 const iterateNotAnnotatableElements = function*(range: Range): Generator<HTMLElement> {
-  const notAnnotatableIterator = document.createNodeIterator(
+  const notAnnotatableIterator = document.createTreeWalker(
     range.commonAncestorContainer,
     NodeFilter.SHOW_ELEMENT,
     (node) =>
