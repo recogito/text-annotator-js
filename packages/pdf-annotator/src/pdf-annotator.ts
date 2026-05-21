@@ -32,7 +32,7 @@ export interface PDFAnnotator extends Omit<TextAnnotator<PDFAnnotation, PDFAnnot
 
   setScale(scale: PDFScale | number): number;
 
-  setStyle(style?: HighlightStyleExpression, id?: string): void;
+  setStyle(style?: HighlightStyleExpression<PDFAnnotation>, id?: string): void;
 
   zoomIn(percentage?: number): number;
 
@@ -137,7 +137,7 @@ export const createPDFAnnotator = (
     }
   }
 
-  const setStyle = (style: HighlightStyleExpression | undefined, id?: string) =>
+  const setStyle = (style: HighlightStyleExpression<PDFAnnotation> | undefined, id?: string) =>
     renderer.setStyle(style, id);
 
   const setUser = (user: User) => {

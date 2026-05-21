@@ -37,7 +37,7 @@ export interface TextAnnotatorOptions<I extends TextAnnotationLike = TextAnnotat
 
   selectionMode?: 'shortest' | 'all';
 
-  style?: HighlightStyleExpression;
+  style?: HighlightStyleExpression<I>;
 
   user?: User;
 

@@ -38,9 +38,9 @@ export interface TextAnnotator<I extends TextAnnotationLike = TextAnnotation, E 
 
   element: HTMLElement;
 
-  renderer: Renderer;
+  renderer: Renderer<I>;
 
-  setStyle(style?: HighlightStyleExpression, id?: string): void;
+  setStyle(style?: HighlightStyleExpression<I>, id?: string): void;
 
   // Returns true if successful (or false if the annotation is not currently rendered)
   scrollIntoView(annotationOrId: I | string, scrollParentOrId?: string | Element): boolean;

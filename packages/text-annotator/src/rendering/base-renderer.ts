@@ -17,7 +17,7 @@ import { debounce } from '../utils/events';
 /**
  * The renderer runtime interface.
  */
-export interface Renderer {
+export interface Renderer<I extends TextAnnotation = TextAnnotation> {
 
   destroy(): void;
 
@@ -25,7 +25,7 @@ export interface Renderer {
 
   redraw(force?: boolean): void;
 
-  setStyle(style?: HighlightStyleExpression, id?: string): void;
+  setStyle(style?: HighlightStyleExpression<I>, id?: string): void;
 
   setFilter(filter?: Filter<any>): void;
 
@@ -54,15 +54,15 @@ export type RendererFactory<T extends Annotation> = (
  * implementers can simply implement a painter, and wrap it in the
  * BaseRenderer, which will handle common concerns.
  */
-export interface Painter {
+export interface Painter<I extends TextAnnotation = TextAnnotation> {
 
   destroy(): void;
 
   redraw(
-    highlights:Highlight[], 
-    bounds: ViewportBounds, 
-    style?: HighlightStyleExpression,
-    styleOverrides?: Map<string, HighlightStyleExpression>,
+    highlights: Highlight[],
+    bounds: ViewportBounds,
+    style?: HighlightStyleExpression<I>,
+    styleOverrides?: Map<string, HighlightStyleExpression<I>>,
     force?: boolean
   ): void;
 
@@ -70,19 +70,19 @@ export interface Painter {
 
 }
 
-export const createRenderer = <T extends TextAnnotatorState = TextAnnotatorState<TextAnnotation, any>> (
-  painter: Painter,
-  container: HTMLElement, 
+export const createRenderer = <T extends TextAnnotatorState = TextAnnotatorState<TextAnnotation, any>, I extends TextAnnotation = TextAnnotation>(
+  painter: Painter<I>,
+  container: HTMLElement,
   state: T,
   viewport: ViewportState,
-): Renderer => {
+): Renderer<I> => {
   const { store, selection, hover } = state;
 
   const emitter = createNanoEvents<RendererEvents>();
 
-  let currentStyle: HighlightStyleExpression | undefined;
+  let currentStyle: HighlightStyleExpression<I> | undefined;
 
-  const styleOverrides = new Map<string, HighlightStyleExpression>();
+  const styleOverrides = new Map<string, HighlightStyleExpression<I>>();
 
   let currentFilter: Filter | undefined;
 
@@ -139,7 +139,7 @@ export const createRenderer = <T extends TextAnnotatorState = TextAnnotatorState
     }, 1);
   }), 10);
 
-  const setStyle = (style?: HighlightStyleExpression, id?: string) => {
+  const setStyle = (style?: HighlightStyleExpression<I>, id?: string) => {
     if (id) {
       if (style)
         styleOverrides.set(id, style);
