@@ -155,6 +155,7 @@ export const createSelectionHandler = <T extends TextAnnotation>(
     const selectionRanges =
       Array.from(Array(sel.rangeCount).keys()).map(idx => sel.getRangeAt(idx));
 
+    // The selection should be captured only within the annotatable container
     const containedRanges =
       selectionRanges.map(r => trimRangeToContainer(r, container));
 
@@ -222,6 +223,11 @@ export const createSelectionHandler = <T extends TextAnnotation>(
       return;
     }
 
+    /**
+     * The DOM layout may contain collapsed `\n`.
+     * Ranges covering those symbols should be ignored.
+     * @see https://github.com/recogito/text-annotator-js/pull/227
+     */
     if (containedRanges.every(r => isRangeWhitespaceOrEmpty(r))) return;
 
     const annotatableRanges = containedRanges.flatMap(r => splitAnnotatableRanges(container, r.cloneRange()));
