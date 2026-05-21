@@ -62,15 +62,19 @@ export const getHighlightClientRects = (range: Range) => {
     }
 
     // Text nodes have no .getClientRects()!
-    const getTextClientRects = (t: Text) => {
+    const getTextClientRects = (t: Text[]) => {
+      if (t.length === 0) return [];
+
       const r = document.createRange();
-      r.selectNode(t);
+      r.setStartBefore(t[0]);
+      r.setEndAfter(t[t.length - 1]);
+
       return Array.from(r.getClientRects());
     }
 
     return [
       ...Array.from(firstRange.getClientRects()),
-      ...textNodes.slice(1, -1).flatMap(getTextClientRects),
+      ...getTextClientRects(textNodes.slice(1, -1)),
       ...Array.from(lastRange.getClientRects())
     ];
   }
