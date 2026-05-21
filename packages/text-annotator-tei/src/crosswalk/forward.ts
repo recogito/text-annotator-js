@@ -1,4 +1,3 @@
-import { rangeToSelector, reviveTarget as reviveTextOffsetTarget } from '@recogito/text-annotator';
 import type { TEIAnnotation, TEIAnnotationTarget, TEIRangeSelector } from '../tei-annotation';
 import { reanchor } from './utils';
 import type { 
@@ -6,6 +5,73 @@ import type {
   TextAnnotationTarget, 
   TextSelector
 } from '@recogito/text-annotator';
+
+const elementCache = new Map<string, Node>();
+
+/**
+ * Returns the element corresponding to the given XPath expression.
+ */
+const resolveElement = (path: string, container: HTMLElement): Node | null => {
+  const cached = elementCache.get(path);
+  if (!cached) {
+    const evaluated = document.evaluate(
+      '.' + path, container, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null
+    ).singleNodeValue;
+
+    if (evaluated)
+      elementCache.set(path, evaluated);
+  }
+
+  return elementCache.get(path) || null;
+}
+
+/**
+ * Computes a stable, lexically-sortable position key for a DOM node relative
+ * to a container, incorporating a character offset within that node.
+ *
+ * Each path segment is the node's **absolute** child index among all siblings
+ * (regardless of element type), zero-padded to a fixed width so that
+ * lexicographic string comparison (`localeCompare`) faithfully reproduces
+ * document order.
+ * 
+ * Format:  "000002/000000/000005::0000000014"
+ *          ^─────────────────^   ^─────────^
+ *          one segment per DOM   char offset
+ *          level from container
+ */
+export const toPositionKey = (
+  node: Node,
+  offset: number,
+  container: HTMLElement,
+  segmentPad = 6,
+  offsetPad  = 10
+): string => {
+  const segments: number[] = [];
+
+  let current: Node = node;
+ 
+  while (current && current !== container) {
+    const parent = current.parentNode;
+    if (!parent) break;                 // climbed past the document root – shouldn't happen
+ 
+    // Walk forward through *all* siblings to find the absolute index.
+    // This is O(siblings-per-level) but is called once at annotation-load
+    // time and the result is persisted, so it never needs to be repeated.
+    let absoluteIndex = 0;
+    let sibling = parent.firstChild;
+    while (sibling && sibling !== current) {
+      absoluteIndex++;
+      sibling = sibling.nextSibling;
+    }
+ 
+    segments.unshift(absoluteIndex);    // prepend so root comes first
+    current = parent;
+  }
+ 
+  const pathKey   = segments.map(i => i.toString().padStart(segmentPad, '0')).join('/');
+  const offsetKey = offset.toString().padStart(offsetPad, '0');
+  return `${pathKey}::${offsetKey}`;
+}
 
 /**
  * Helper: Returns the given XPath for a DOM node, in the form of 
@@ -47,10 +113,10 @@ const getXPath = (node: Node, path: string[] = []) => {
  * For the given path sgement lists, this function returns the the
  * start & end XPath expression pair.
  */
-const toTEIXPaths = (container: HTMLElement, startPath: string[], endPath: string[], selectedRange: Range) => {
+const toTEIRange = (container: HTMLElement, startPath: string[], endPath: string[], selectedRange: Range) => {
   
   const findFirstTEIChild = (node: Node): Element | null => {
-    const iterator = document.createNodeIterator(
+    const walker = document.createTreeWalker(
       node,
       NodeFilter.SHOW_ELEMENT,
       (node) => {
@@ -60,7 +126,7 @@ const toTEIXPaths = (container: HTMLElement, startPath: string[], endPath: strin
       }
     );
     
-    return iterator.nextNode() as Element | null;
+    return walker.nextNode() as Element | null;
   }
 
   // For a given node, returns the closest parent that is a TEI element
@@ -94,16 +160,30 @@ const toTEIXPaths = (container: HTMLElement, startPath: string[], endPath: strin
     selectedRange.endContainer,
     selectedRange.endOffset);
 
-  const start = startPath.join('') + '::' + startOffset;
-  const end = endPath.join('') + '::' + endOffset;
-
-  return { start, end }; 
+  return { 
+    startPath: startPath.join(''),
+    startOffset, 
+    endPath: endPath.join(''),
+    endOffset
+  }; 
 }
 
+const parseXPathExpression = (expression: string) => {
+  const splitIdx = expression.indexOf('::');
+
+  const pathStr = splitIdx < 0 ? expression : expression.substring(0, splitIdx);
+  const path = pathStr
+    .replace(/\/([^[/]+)/g, (_, p1) => '/tei-' + p1.toLowerCase())
+    .replace(/xml:/g, '');
+ 
+  const offset = splitIdx < 0 ? 0 : parseInt(expression.substring(splitIdx + 2));
+  return { path, offset };
+}
 
 /**
  * Using the DOM Range from a (revived!) TextSelector, this function computes
- * the TEIRangeSelector corresponding to that range.
+ * the TEIRangeSelector corresponding to that range. We need this because
+ * the Text Annotator will always produce a TextAnnotation natively.
  */
 export const textToTEISelector = (container: HTMLElement) => (selector: TextSelector): TEIRangeSelector => {
   const { range } = selector;
@@ -112,98 +192,100 @@ export const textToTEISelector = (container: HTMLElement) => (selector: TextSele
   const startPathSegments: string[] = getXPath(range.startContainer);
   const endPathSegments: string[] = getXPath(range.endContainer);
 
-  // TEI XPath expressions
-  const { start, end } = toTEIXPaths(container, startPathSegments, endPathSegments, range);
+  // TEI XPath expressions + offset
+  const { 
+    startPath, 
+    startOffset, 
+    endPath,
+    endOffset 
+  } = toTEIRange(container, startPathSegments, endPathSegments, range);
+
+  // Lexically sortable position key
+  const position = toPositionKey(range.startContainer, startOffset, container);
 
   return {
-    start: selector.start,
+    position,
     startSelector: {
       type: 'XPathSelector',
-      value: start
+      value: `${startPath}::${startOffset}`
     },
-    end: selector.end,
     endSelector: {
       type: 'XPathSelector',
-      value: end
+      value: `${endPath}::${endOffset}`
     },
     quote: selector.quote?.replace(/\s+/g, ' '),
     range
   };
 }
 
-export const reviveTarget = (t: TextAnnotationTarget, container: HTMLElement) => {
-  const selector = Array.isArray(t.selector) ? t.selector[0] : t.selector;
-  
-  if ('start' in selector && 'end' in selector) {
-    return reviveTextOffsetTarget(t, container);
-  } else {
-    const startExpression = (selector as TEIRangeSelector).startSelector?.value;
-    const endExpression = (selector as TEIRangeSelector).endSelector?.value;
+export const reviveSelector = (selector: TEIRangeSelector, container: HTMLElement): TEIRangeSelector => {
+  // Don't revive unncessarily
+  if (selector.position && selector.range instanceof Range) return selector;
 
-    if (!startExpression || !endExpression) {
-      console.error(t);
-      throw 'Could not revive TEI target.'
-    }
+  const startExpression = selector.startSelector?.value;
+  const endExpression = selector.endSelector?.value;
 
-    const evaluateSelector = (value: string) => {
-      const splitIdx = value.indexOf('::');
-
-      if (splitIdx < 0) return;
-
-      const path = value.substring(0, splitIdx).replace(/\/([^[/]+)/g, (_, p1) => {
-        return '/tei-' + p1.toLowerCase();
-      }).replace(/xml:/g, '');
-
-      const node = document.evaluate('.' + path,
-        container, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-
-      const offset = parseInt(value.substring(splitIdx + 2));
-
-      return [node, offset] as [Node, number];
-    }
-
-    const [startNode, startOffset] = evaluateSelector(startExpression)!;
-    const [endNode, endOffset] = evaluateSelector(endExpression)!;
-
-    const range = document.createRange();
-
-    // Helper
-    const reanchorIfNeeded = (parent: Node, offset: number) => {
-      if (parent.firstChild instanceof Text && parent.firstChild.length >= offset) {
-        return { node: parent.firstChild, offset };
-      } else {
-        return reanchor(parent.firstChild!, parent, offset);
-      } 
-    }
-
-    const reanchoredStart = reanchorIfNeeded(startNode, startOffset);
-    range.setStart(reanchoredStart.node, reanchoredStart.offset);
-
-    const reanchoredEnd = reanchorIfNeeded(endNode, endOffset);
-    range.setEnd(reanchoredEnd.node, reanchoredEnd.offset);
-
-    const textSelector = rangeToSelector(range, container);
-
-    return reviveTextOffsetTarget({
-      ...t,
-      selector: [{
-        ...textSelector,
-        ...(selector as TEIRangeSelector),
-        range
-      }]
-    }, container);
+  if (!startExpression || !endExpression) {
+    console.error(selector);
+    throw new Error('Invalid TEI selector');
   }
-}
 
-export const textToTEITarget =  (container: HTMLElement) => (t: TextAnnotationTarget): TEIAnnotationTarget => {
-  const target = reviveTarget(t, container);
+  const startParsed = parseXPathExpression(startExpression);
+  const endParsed = parseXPathExpression(endExpression);
+
+  // Resolve start XPath against DOM
+  const startElement = resolveElement(startParsed.path, container);
+
+  // Don't evaluate twice if start === end element
+  const endElement = startParsed.path === endParsed.path
+    ? startElement
+    : resolveElement(endParsed.path, container);
+
+  if (!startElement || !endElement) {
+    console.error(selector);
+    throw new Error('Could not resolve XPath');
+  }
+
+  // For future use: stop here for lazy rendering!
+
+  const range = document.createRange();
+
+  const reanchorIfNeeded = (parent: Node, offset: number) => {
+    if (parent.firstChild instanceof Text && parent.firstChild.length >= offset) {
+      return { node: parent.firstChild, offset };
+    } else {
+      return reanchor(parent.firstChild!, parent, offset);
+    } 
+  }
+
+  const reanchoredStart = reanchorIfNeeded(startElement, startParsed.offset);
+  range.setStart(reanchoredStart.node, reanchoredStart.offset);
+
+  const reanchoredEnd = reanchorIfNeeded(endElement, endParsed.offset);
+  range.setEnd(reanchoredEnd.node, reanchoredEnd.offset);
+
+  const position = toPositionKey(reanchoredStart.node, reanchoredStart.offset, container);
+
   return {
-    ...t,
-    selector: target.selector.map(textToTEISelector(container))
+    ...(selector as TEIRangeSelector),
+    position,
+    range
+  };
+}
+
+export const reviveTarget = (t: TEIAnnotationTarget, container: HTMLElement) => ({
+  ...t,
+  selector: t.selector.map(s => reviveSelector(s, container))
+});
+
+export const textToTEITarget =  (container: HTMLElement) => (target: TextAnnotationTarget | TEIAnnotationTarget): TEIAnnotationTarget => {
+  return {
+    ...target,
+    selector: target.selector.map(s => 'startSelector' in s ? reviveSelector(s, container) : textToTEISelector(container)(s))
   }
 }
 
-export const textToTEIAnnotation = (container: HTMLElement) => (a: TextAnnotation): TEIAnnotation => ({
+export const textToTEIAnnotation = (container: HTMLElement) => (a: TextAnnotation | TEIAnnotation): TEIAnnotation => ({
   ...a,
   target: textToTEITarget(container)(a.target)
 })

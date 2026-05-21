@@ -1,19 +1,20 @@
-import type { Annotation, AnnotationTarget } from '@annotorious/core';
-import type { TextSelector } from '@recogito/text-annotator';
+import type { TextAnnotationLike, TextAnnotationTargetLike, TextSelectorLike } from '@recogito/text-annotator';
 
-export interface TEIAnnotation extends Annotation {
+export interface TEIAnnotation extends TextAnnotationLike {
 
   target: TEIAnnotationTarget;
 
 }
 
-export interface TEIAnnotationTarget extends AnnotationTarget {
+export interface TEIAnnotationTarget extends TextAnnotationTargetLike {
 
   selector: TEIRangeSelector[];
 
 }
 
-export interface TEIRangeSelector extends TextSelector {
+export interface TEIRangeSelector extends TextSelectorLike {
+
+  position: string;
 
   startSelector: {
 
