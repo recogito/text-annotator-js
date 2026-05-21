@@ -24,13 +24,13 @@
   "module": "./dist/react-text-annotator.es.js",
   "types": "./dist/index.d.ts",
   "devDependencies": {
-    "@types/react": "^19.2.14",
+    "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.2.0",
-    "react": "^19.2.5",
-    "react-dom": "^19.2.5",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
     "typescript": "^5.9.3",
-    "vite": "^7.3.2",
+    "vite": "^7.3.3",
     "vite-plugin-externalize-deps": "^0.10.0",
     "vite-tsconfig-paths": "^5.1.4"
   },
