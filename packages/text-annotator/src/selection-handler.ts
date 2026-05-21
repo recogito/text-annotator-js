@@ -155,12 +155,15 @@ export const createSelectionHandler = <T extends TextAnnotation>(
     const selectionRanges =
       Array.from(Array(sel.rangeCount).keys()).map(idx => sel.getRangeAt(idx));
 
+    const containedRanges =
+      selectionRanges.map(r => trimRangeToContainer(r, container));
+
     /**
      * This is to handle cases where the selection is "hijacked" by
      * another element in a not-annotatable area. A rare case in practice.
      * But rich text editors like Quill will do it!
      */
-    if (selectionRanges.every(r => !isRangeAnnotatable(container, r))) {
+    if (containedRanges.every(r => !isRangeAnnotatable(container, r))) {
       currentTarget = undefined;
       return;
     }
@@ -219,10 +222,6 @@ export const createSelectionHandler = <T extends TextAnnotation>(
       return;
     }
 
-    const containedRanges =
-      selectionRanges.map(r => trimRangeToContainer(r, container));
-
-    // The selection should be captured only within the annotatable container
     if (containedRanges.every(r => isRangeWhitespaceOrEmpty(r))) return;
 
     const annotatableRanges = containedRanges.flatMap(r => splitAnnotatableRanges(container, r.cloneRange()));
