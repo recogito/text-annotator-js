@@ -185,8 +185,8 @@ const parseXPathExpression = (expression: string) => {
  * the TEIRangeSelector corresponding to that range. We need this because
  * the Text Annotator will always produce a TextAnnotation natively.
  */
-export const textToTEISelector = (container: HTMLElement) => (selector: TextSelector): TEIRangeSelector => {
-  const { range } = selector;
+export const textToTEISelector = (container: HTMLElement) => (selector: TextSelector): TEIRangeSelector & TextSelector => {
+  const { start, end, range } = selector;
 
   // XPath segments for Range start and end nodes as a list
   const startPathSegments: string[] = getXPath(range.startContainer);
@@ -205,10 +205,12 @@ export const textToTEISelector = (container: HTMLElement) => (selector: TextSele
 
   return {
     position,
+    start,
     startSelector: {
       type: 'XPathSelector',
       value: `${startPath}::${startOffset}`
     },
+    end,
     endSelector: {
       type: 'XPathSelector',
       value: `${endPath}::${endOffset}`
