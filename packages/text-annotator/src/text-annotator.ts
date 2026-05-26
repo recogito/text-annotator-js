@@ -55,7 +55,7 @@ export interface TextAnnotator<I extends TextAnnotationLike = TextAnnotation, E 
 
 export type AnnotatingMode = 'CREATE_NEW' | 'ADD_TO_CURRENT' | 'REPLACE_CURRENT';
 
-export const createTextAnnotator = <I extends TextAnnotationLike = TextAnnotation, E extends unknown = TextAnnotation>(
+export const createTextAnnotator = <I extends TextAnnotationLike = TextAnnotationLike, E extends unknown = TextAnnotationLike>(
   container: HTMLElement,
   options: TextAnnotatorOptions<I, E> = {}
 ): TextAnnotator<I, E> => {
@@ -99,15 +99,15 @@ export const createTextAnnotator = <I extends TextAnnotationLike = TextAnnotatio
   const renderer =
     useBuiltInRenderer === null ? (opts.renderer as RendererFactory<I>)(
       container, 
-      state as unknown as AnnotatorState<I, E>, 
+      state, 
       viewport) :
     useBuiltInRenderer === 'SPANS' ? createSpansRenderer(
       container, 
-      state as unknown as AnnotatorState<TextAnnotation, E>, 
+      state as unknown as TextAnnotatorState<TextAnnotationLike, E>, 
       viewport) :
     useBuiltInRenderer === 'CSS_HIGHLIGHTS' ? createCSSHighlightRenderer(
       container, 
-      state as unknown as AnnotatorState<TextAnnotation, E>, 
+      state as unknown as TextAnnotatorState<TextAnnotation, E>, 
       viewport) :
     undefined;
 

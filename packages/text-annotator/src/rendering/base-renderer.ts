@@ -1,6 +1,6 @@
 import { createNanoEvents, type Unsubscribe } from 'nanoevents';
-import { UserSelectAction, type Annotation, type AnnotatorState, type Filter, type ViewportState } from '@annotorious/core';
-import type { TextAnnotation } from '../model';
+import { UserSelectAction, type Filter, type ViewportState } from '@annotorious/core';
+import type { TextAnnotationLike } from '../model';
 import type { TextAnnotatorState } from '../state';
 import { 
   type Highlight,
@@ -39,11 +39,11 @@ export interface RendererEvents {
 
 }
 
-export type RendererFactory<T extends Annotation> = (
+export type RendererFactory<T extends TextAnnotationLike> = (
 
   container: HTMLElement,
 
-  state: AnnotatorState<T, any>,
+  state: TextAnnotatorState<T, any>,
 
   viewport: ViewportState
 
@@ -70,7 +70,7 @@ export interface Painter {
 
 }
 
-export const createRenderer = <T extends TextAnnotatorState = TextAnnotatorState<TextAnnotation, any>> (
+export const createRenderer = <T extends TextAnnotatorState<TextAnnotationLike, any>> (
   painter: Painter,
   container: HTMLElement, 
   state: T,

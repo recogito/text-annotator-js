@@ -1,6 +1,6 @@
 import { dequal } from 'dequal/lite';
 import type { ViewportState } from '@annotorious/core';
-import type { TextAnnotation } from '../../model';
+import type { TextAnnotationLike } from '../../model';
 import type { TextAnnotatorState } from '../../state';
 import { computeZIndex } from '../../utils/highlight/';
 import { 
@@ -34,6 +34,8 @@ const createSpansPainter = (container: HTMLElement): Painter => {
     styleOverrides?: Map<string, HighlightStyleExpression>,
     force?: boolean
   ) => {
+    const startTime = performance.now();
+
     const noChanges = dequal(currentRendered, highlights);
 
     // If there are no changes and rendering is set to lazy
@@ -91,6 +93,8 @@ const createSpansPainter = (container: HTMLElement): Painter => {
     });
 
     currentRendered = highlights;
+
+    console.log(`Took ${performance.now() - startTime} ms`);
   }
 
   const setVisible = (visible: boolean) => {
@@ -112,8 +116,8 @@ const createSpansPainter = (container: HTMLElement): Painter => {
 
 }
 
-export const createSpansRenderer: RendererFactory<TextAnnotation> = (
+export const createSpansRenderer: RendererFactory<TextAnnotationLike> = (
   container: HTMLElement,
-  state: TextAnnotatorState<TextAnnotation, any>,
+  state: TextAnnotatorState<TextAnnotationLike, any>,
   viewport: ViewportState
 ) => createRenderer(createSpansPainter(container), container, state, viewport);

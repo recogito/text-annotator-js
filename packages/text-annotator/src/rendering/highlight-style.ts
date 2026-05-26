@@ -1,6 +1,6 @@
 import { colord, type AnyColor } from 'colord';
 import type { AnnotationState, Color, DrawingStyle } from '@annotorious/core';
-import type { TextAnnotation } from '../model';
+import type { TextAnnotationLike } from '../model';
 import type { Highlight } from './';
 
 export interface HighlightStyle extends Pick<DrawingStyle, 'fill' | 'fillOpacity'> {
@@ -16,7 +16,7 @@ export interface HighlightStyle extends Pick<DrawingStyle, 'fill' | 'fillOpacity
 }
 
 export type HighlightStyleExpression = HighlightStyle 
-  | (<I extends TextAnnotation = TextAnnotation>(annotation: I, state: AnnotationState, zIndex?: number) => HighlightStyle | undefined);
+  | (<I extends TextAnnotationLike = TextAnnotationLike>(annotation: I, state: AnnotationState, zIndex?: number) => HighlightStyle | undefined);
 
 export const DEFAULT_STYLE: HighlightStyle = { 
   fill: 'rgb(0, 128, 255)', 
