@@ -152,11 +152,8 @@ export const createSelectionHandler = <T extends TextAnnotation>(
      */
     if (!sel?.anchorNode) return;
 
-    const selectionRanges =
-      Array.from(Array(sel.rangeCount).keys()).map(idx => sel.getRangeAt(idx));
-
     // Drop any range that doesn't intersect the annotatable container at all before we attempt to trim it
-    const intersectingRanges = selectionRanges.filter(r => r.intersectsNode(container));
+    const intersectingRanges = getIntersectingRanges();
 
     // The selection should be captured only within the annotatable container
     const containedRanges = intersectingRanges.map(r => trimRangeToContainer(r, container));
@@ -429,24 +426,12 @@ export const createSelectionHandler = <T extends TextAnnotation>(
    * When a non-collapsed selection exists upon Shift key release, this handler persists
    * the annotation to the store and programmatically selects it.
    *
-   * Event handling is restricted to:
-   * - Annotatable elements within the container
-   * - The document body (which receives focus during Tab navigation in Firefox and Safari)
-   *
    * @see https://github.com/recogito/text-annotator-js/issues/247
    */
   const onKeyup = (evt: KeyboardEvent) => {
     if (!currentAnnotatingEnabled) return;
-
-    if (
-      evt.repeat ||
-      (
-        evt.target instanceof Node && isNotAnnotatable(container, evt.target) &&
-        evt.target !== document.body
-      )
-    ) {
-      return;
-    }
+    if (evt.repeat) return;
+    if (getIntersectingRanges().length === 0) return;
 
     if (evt.key === 'Shift' && currentTarget) {
       const sel = document.getSelection();
@@ -501,52 +486,16 @@ export const createSelectionHandler = <T extends TextAnnotation>(
    *
    * This handler resets the selection state to ensure that free caret navigation through the text
    * does not inadvertently maintain an active annotation selection.
-   *
-   * Event handling is restricted to:
-   * - Annotatable elements within the container
-   * - The document body (which receives focus when the popup is closed or when interacting
-   *   with elements that become unmounted, such as a "Close" button)
    */
   const handleArrowKeyPress = (evt: KeyboardEvent) => {
-    if (
-      evt.repeat ||
-      (
-        evt.target instanceof Node && isNotAnnotatable(container, evt.target) &&
-        evt.target !== document.body
-      )
-    ) {
-      return;
-    }
+    if (evt.repeat) return;
+    if (getIntersectingRanges().length === 0) return;
 
     currentTarget = undefined;
     selection.clear();
   };
 
   hotkeys(ARROW_KEYS.join(','), { keydown: true, keyup: false }, handleArrowKeyPress);
-
-  // Helper
-  const upsertCurrentTarget = () => {
-    if (!currentTarget) return;
-    const existingAnnotation = store.getAnnotation(currentTarget.annotation);
-    if (!existingAnnotation) {
-      store.addAnnotation({
-        id: currentTarget.annotation,
-        bodies: [],
-        target: currentTarget
-      });
-    } else {
-      const { target: { updated: existingTargetUpdated } } = existingAnnotation;
-      const { updated: currentTargetUpdated } = currentTarget;
-
-      if (
-        !existingTargetUpdated ||
-        !currentTargetUpdated ||
-        existingTargetUpdated < currentTargetUpdated
-      ) {
-        store.updateTarget(currentTarget);
-      }
-    }
-  };
 
   document.addEventListener('pointerdown', onPointerDown);
   document.addEventListener('pointerup', onPointerUp);
@@ -573,6 +522,51 @@ export const createSelectionHandler = <T extends TextAnnotation>(
     document.removeEventListener('selectionchange', onSelectionChange);
 
     hotkeys.unbind();
+  };
+
+  /* ─────────────────────────── Helpers ─────────────────────────── */
+
+  /**
+   * Returns the ranges of the current document selection that geometrically
+   * intersect the annotatable container.
+   *
+   * A `selectionchange` may carry ranges whose endpoints fall entirely
+   * outside the container - e.g. when the user drags a selection from an
+   * adjacent element, or when another listener "hijacks" the selection.
+   * Such ranges aren't ours to act on and need to be dropped before any
+   * downstream container-relative processing (trimming, observer guards).
+   */
+  const getIntersectingRanges = (): Range[] => {
+    const sel = document.getSelection();
+    if (!sel) return [];
+
+    return Array.from(Array(sel.rangeCount).keys())
+      .map(idx => sel.getRangeAt(idx))
+      .filter(range => range.intersectsNode(container));
+  };
+
+  const upsertCurrentTarget = () => {
+    if (!currentTarget) return;
+
+    const existingAnnotation = store.getAnnotation(currentTarget.annotation);
+    if (!existingAnnotation) {
+      store.addAnnotation({
+        id: currentTarget.annotation,
+        bodies: [],
+        target: currentTarget
+      });
+    } else {
+      const { target: { updated: existingTargetUpdated } } = existingAnnotation;
+      const { updated: currentTargetUpdated } = currentTarget;
+
+      if (
+        !existingTargetUpdated ||
+        !currentTargetUpdated ||
+        existingTargetUpdated < currentTargetUpdated
+      ) {
+        store.updateTarget(currentTarget);
+      }
+    }
   };
 
   return {
