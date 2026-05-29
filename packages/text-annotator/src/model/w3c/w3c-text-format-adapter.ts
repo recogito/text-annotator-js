@@ -145,8 +145,9 @@ export const serializeW3CTextAnnotation = <I extends TextAnnotationLike = TextAn
       exact: quote
     }
 
-    if (container && isRevived(s)) {
-      const { prefix, suffix } = getQuoteContext(s.range, container);
+    // Doesn't pass the isRevived test in test mode
+    if (container && 'range' in s) {
+      const { prefix, suffix } = getQuoteContext(s.range as Range, container);
       quoteSelector.prefix = prefix;
       quoteSelector.suffix = suffix;
     }
