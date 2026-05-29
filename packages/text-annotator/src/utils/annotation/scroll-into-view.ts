@@ -1,5 +1,5 @@
 import type { TextAnnotationStore } from '../../state';
-import { isRevived, type RevivedTextAnnotationTargetLike, type TextAnnotation, type TextAnnotationLike } from '../../model';
+import { isRevived, type RevivedTextAnnotationLike, type RevivedTextAnnotationTargetLike, type RevivedTextSelector, type TextAnnotation, type TextAnnotationLike } from '../../model';
 import { reviveTarget } from '../annotation';
 
 const getScrollParent = (el?: Element | null) => {
@@ -68,7 +68,7 @@ export const scrollIntoView = <I extends TextAnnotationLike = TextAnnotationLike
     return false;
   }
 
-  // Get curren version of the annotation from the store
+  // Get current version of the annotation from the store
   const current = store.getAnnotation(id);
   if (!current) {
     console.warn(`The annotation is missing in the store: ${id}`);
@@ -76,23 +76,20 @@ export const scrollIntoView = <I extends TextAnnotationLike = TextAnnotationLike
   }
 
   // The first selector is the topmost one as well
-  const selector = current.target.selector[0];
-  if (isRevived(selector)) {
-    const { range: annoRange } = selector;
-    if (annoRange && !annoRange.collapsed) {
-      scroll(store, current.target as RevivedTextAnnotationTargetLike, scrollParent);
-      return true;
-    }
-  } else {
-    // Try reviving now to account for lazy rendering
-    const revived = reviveTarget(current.target, container);
-
-    const { range: revivedAnnoRange } = revived.selector[0];
-    if (revivedAnnoRange && !revivedAnnoRange.collapsed) {
-      scroll(store, revived, scrollParent);
-      return true;
-    }
-
-    return false;
+  const { range: annoRange } = (current.target.selector[0] as RevivedTextSelector);
+  if (annoRange && !annoRange.collapsed) {
+    scroll(store, current.target as RevivedTextAnnotationTargetLike, scrollParent);
+    return true;
   }
+
+  // Try reviving now to account for lazy rendering
+  const revived = reviveTarget(current.target, container);
+  const { range: revivedAnnoRange } = revived.selector[0];
+  if (revivedAnnoRange && !revivedAnnoRange.collapsed) {
+    scroll(store, revived, scrollParent);
+    return true;
+  }
+
+  return false;
+  
 }
