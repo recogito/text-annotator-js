@@ -34,7 +34,7 @@ const createSpansPainter = (container: HTMLElement): Painter => {
     styleOverrides?: Map<string, HighlightStyleExpression>,
     force?: boolean
   ) => {
-    const startTime = performance.now();
+    // const startTime = performance.now();
 
     const noChanges = dequal(currentRendered, highlights);
 
@@ -94,7 +94,7 @@ const createSpansPainter = (container: HTMLElement): Painter => {
 
     currentRendered = highlights;
 
-    console.log(`Took ${performance.now() - startTime} ms`);
+    // console.log(`Took ${performance.now() - startTime} ms`);
   }
 
   const setVisible = (visible: boolean) => {
