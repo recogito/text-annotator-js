@@ -1,6 +1,6 @@
 import type { ViewportState } from '@annotorious/core';
 import { colord, type AnyColor } from 'colord';
-import type { RevivedTextAnnotationLike, RevivedTextSelectorLike, TextAnnotationLike } from '../../model';
+import type { RevivedTextSelectorLike, TextAnnotationLike } from '../../model';
 import type { TextAnnotatorState } from '../../state';
 import { 
   computeStyle,
