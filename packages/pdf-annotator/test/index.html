@@ -98,7 +98,7 @@
         anno.on('deleteAnnotation', a => console.log('delete', a));
         anno.on('updateAnnotation', (a, b) => console.log('update', a));
 
-        //  anno.loadAnnotations('annotations.json');
+        anno.loadAnnotations('annotations.json');
 
         document.getElementById('size-auto')
           .addEventListener('click', () => anno.setSize('auto'));
