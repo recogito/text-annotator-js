@@ -1,5 +1,5 @@
 import type { TextAnnotationStore } from '../../state';
-import type { TextAnnotation } from '../../model';
+import { isRevived, type RevivedTextAnnotationTargetLike, type TextAnnotation, type TextAnnotationLike } from '../../model';
 import { reviveTarget } from '../annotation';
 
 const getScrollParent = (el?: Element | null) => {
@@ -17,9 +17,9 @@ const getScrollParent = (el?: Element | null) => {
 };
 
 // Executes scroll on an annotation with a valid DOM range selector
-const scroll = <I extends TextAnnotation = TextAnnotation>(
+const scroll = <I extends TextAnnotationLike = TextAnnotationLike>(
   store: TextAnnotationStore<I>,
-  target: I['target'],
+  target: RevivedTextAnnotationTargetLike,
   scrollParent: Element
 ) => {
   // Parent bounds and client (= visible) height
@@ -51,7 +51,7 @@ const scroll = <I extends TextAnnotation = TextAnnotation>(
   scrollParent.scroll({ top, left, behavior: 'smooth' });
 };
 
-export const scrollIntoView = <I extends TextAnnotation = TextAnnotation>(
+export const scrollIntoView = <I extends TextAnnotationLike = TextAnnotationLike>(
   container: HTMLElement, store: TextAnnotationStore<I>
 ) => <E extends Element = Element>(
   annotationOrId: string | I, scrollParentOrId?: string | E
@@ -62,7 +62,6 @@ export const scrollIntoView = <I extends TextAnnotation = TextAnnotation>(
   const scrollParent = scrollParentOrId
     ? typeof scrollParentOrId === 'string' ? document.getElementById(scrollParentOrId) : scrollParentOrId
     : getScrollParent(container);
-
 
   if (!scrollParent) {
     console.warn(`The scroll parent is missing for the annotation: ${id}`, { container });
@@ -77,19 +76,23 @@ export const scrollIntoView = <I extends TextAnnotation = TextAnnotation>(
   }
 
   // The first selector is the topmost one as well
-  const { range: annoRange } = current.target.selector[0];
-  if (annoRange && !annoRange.collapsed) {
-    scroll(store, current.target, scrollParent);
-    return true;
-  }
+  const selector = current.target.selector[0];
+  if (isRevived(selector)) {
+    const { range: annoRange } = selector;
+    if (annoRange && !annoRange.collapsed) {
+      scroll(store, current.target as RevivedTextAnnotationTargetLike, scrollParent);
+      return true;
+    }
+  } else {
+    // Try reviving now to account for lazy rendering
+    const revived = reviveTarget(current.target, container);
 
-  // Try reviving to account for lazy rendering
-  const revived = reviveTarget(current.target, container);
-  const { range: revivedAnnoRange } = revived.selector[0];
-  if (revivedAnnoRange && !revivedAnnoRange.collapsed) {
-    scroll(store, revived, scrollParent);
-    return true;
-  }
+    const { range: revivedAnnoRange } = revived.selector[0];
+    if (revivedAnnoRange && !revivedAnnoRange.collapsed) {
+      scroll(store, revived, scrollParent);
+      return true;
+    }
 
-  return false;
-};
+    return false;
+  }
+}

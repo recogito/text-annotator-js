@@ -1,6 +1,6 @@
 import type { Unsubscribe } from 'nanoevents';
-import type { Annotation, Filter, Origin, Store } from '@annotorious/core';
-import type { TextAnnotation, TextAnnotationLike } from '../model';
+import type { Filter, Origin, Store } from '@annotorious/core';
+import type { RevivedTextAnnotationLike, TextAnnotation, TextAnnotationLike } from '../model';
 import type { SpatialTreeEvents } from '../state/spatial-tree';
 
 export interface TextAnnotationStore<T extends TextAnnotationLike = TextAnnotation> 
@@ -20,11 +20,11 @@ export interface TextAnnotationStore<T extends TextAnnotationLike = TextAnnotati
 
   getAnnotationRects(id: string): DOMRect[];
 
-  getAt(x: number, y: number, all: true, filter?: Filter): T[] | undefined;
-  getAt(x: number, y: number, all: false, filter?: Filter): T | undefined;
-  getAt(x: number, y: number, all?: boolean, filter?: Filter): T | T[] | undefined;
+  getAt(x: number, y: number, all: true, filter?: Filter): RevivedTextAnnotationLike<T>[] | undefined;
+  getAt(x: number, y: number, all: false, filter?: Filter): RevivedTextAnnotationLike<T>| undefined;
+  getAt(x: number, y: number, all?: boolean, filter?: Filter): RevivedTextAnnotationLike<T> | RevivedTextAnnotationLike<T>[] | undefined;
 
-  getIntersecting(minX: number, minY: number, maxX: number, maxY: number): AnnotationRects<T>[];
+  getIntersecting(minX: number, minY: number, maxX: number, maxY: number): AnnotationRects<RevivedTextAnnotationLike<T>>[];
 
   recalculatePositions(): void;
 
