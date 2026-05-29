@@ -25,7 +25,7 @@ export const reviveTextSelector = <T extends TextSelector>(
 ): RevivedTextSelector  => {
   const { start, end } = selector;
 
-  const offsetReference = (selector as unknown as RevivedTextSelectorLike).offsetReference || container;
+  const offsetReference = (selector as unknown as RevivedTextSelector).offsetReference || container;
   
   const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, (node) =>
     node.parentElement?.closest(NOT_ANNOTATABLE_SELECTOR)
