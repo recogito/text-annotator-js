@@ -1,4 +1,6 @@
 import { 
+  type RevivedTextAnnotationLike,
+  type RevivedTextAnnotationTargetLike,
   type TextAnnotation,
   type TextAnnotationTarget,
   type TextAnnotatorOptions,
@@ -52,7 +54,7 @@ export const createTEIAnnotator = <T extends unknown>(
     const { selector } = annotation.target;
     try {
       return (!('startSelector' in selector)) ?
-        _addAnnotation(toTEI(annotation as TextAnnotation), origin) :
+        _addAnnotation(toTEI(annotation as RevivedTextAnnotationLike<TextAnnotation>), origin) :
         _addAnnotation(annotation as TEIAnnotation, origin);
     } catch (error) {
       console.warn(error);
@@ -65,7 +67,7 @@ export const createTEIAnnotator = <T extends unknown>(
   store.bulkAddAnnotations = (annotations: Array<TEIAnnotation | TextAnnotation>, replace = true, origin: Origin) => {
     const teiAnnotations = annotations.map(a => {
       try {
-        return toTEI(a);
+        return toTEI(a as TEIAnnotation);
       } catch (error) {
         console.warn(error);
       }
@@ -84,12 +86,13 @@ export const createTEIAnnotator = <T extends unknown>(
   }
 
   const _updateAnnotation = store.updateAnnotation;
+  
   // @ts-ignore
-  store.updateAnnotation = (annotation: TEIAnnotation | TextAnnotation, origin: Origin) =>
+  store.updateAnnotation = (annotation: TEIAnnotation | RevivedTextAnnotationLike<TextAnnotation>, origin: Origin) =>
     _updateAnnotation(toTEI(annotation), origin);
 
   const _updateTarget = store.updateTarget;
-  store.updateTarget = (target: TEIAnnotationTarget | TextAnnotationTarget, origin: Origin = Origin.LOCAL) => 
+  store.updateTarget = (target: TEIAnnotationTarget | RevivedTextAnnotationTargetLike<TextAnnotationTarget>, origin: Origin = Origin.LOCAL) => 
     _updateTarget(toTEITarget(target), origin);
 
   return {
