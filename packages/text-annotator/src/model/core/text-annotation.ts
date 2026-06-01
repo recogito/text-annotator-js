@@ -86,9 +86,7 @@ export type RevivedTextSelector = TextSelector & RevivedTextSelectorLike;
 export const isRevivedAnnotation = (annotation: TextAnnotationLike): annotation is RevivedTextAnnotationLike => 
   annotation.target.selector.every(isRevived);
 
-export const isRevivedTarget = (target: TextAnnotationTargetLike): target is TextAnnotationTargetLike & {
-  selector: RevivedTextSelectorLike[]
-} => target.selector.every(isRevived);
+export const isRevivedTarget = (target: TextAnnotationTargetLike): target is RevivedTextAnnotationTargetLike => target.selector.every(isRevived);
 
 export function isRevived(selector: TextSelectorLike): selector is RevivedTextSelectorLike;
 export function isRevived(selectors: TextSelectorLike[]): selectors is RevivedTextSelectorLike[];
