@@ -45,7 +45,7 @@ export interface RevivedTextSelectorLike extends TextSelectorLike {
  */
 export type RevivedTextAnnotationLike<T extends TextAnnotationLike = TextAnnotationLike> = T & {
 
-  target: RevivedTextAnnotationTargetLike;
+  target: RevivedTextAnnotationTargetLike<T['target']>;
 
 }
 
