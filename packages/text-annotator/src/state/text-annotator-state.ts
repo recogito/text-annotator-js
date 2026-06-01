@@ -1,4 +1,4 @@
-import type { Annotation, Filter, Store, ViewportState } from '@annotorious/core';
+import type { Filter, Store, ViewportState } from '@annotorious/core';
 import { 
   createHoverState, 
   createSelectionState, 
@@ -11,13 +11,14 @@ import type {
   SelectionState, 
   HoverState, 
 } from '@annotorious/core';
-import type { TextAnnotation, TextAnnotationLike, TextAnnotationTarget } from '../model';
+import { isRevived } from '../model';
+import type { RevivedTextAnnotationLike, RevivedTextSelectorLike, TextAnnotation, TextAnnotationLike, TextAnnotationTargetLike } from '../model';
 import { createSpatialTree, type SpatialTreeEvents } from '../state/spatial-tree';
 import type { AnnotationRects, TextAnnotationStore } from '../state/text-annotation-store';
-import { isRevived, reviveAnnotation, reviveTarget } from '../utils/annotation';
+import { reviveAnnotation, reviveTarget } from '../utils/annotation';
 import type { TextAnnotatorOptions } from '../text-annotator-options';
 
-export interface TextAnnotatorState<I extends TextAnnotationLike = TextAnnotation, E extends unknown = TextAnnotation> 
+export interface TextAnnotatorState<I extends TextAnnotationLike = TextAnnotationLike, E extends unknown = TextAnnotation> 
   extends Omit<AnnotatorState<I, E>, 'store'> {
 
   store: TextAnnotationStore<I>;
@@ -30,14 +31,21 @@ export interface TextAnnotatorState<I extends TextAnnotationLike = TextAnnotatio
 
 }
 
-export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotation, E extends unknown = TextAnnotation>(
+export const createTextAnnotatorState = <I extends TextAnnotationLike = TextAnnotation, E extends unknown = TextAnnotation>(
   container: HTMLElement,
-  opts: TextAnnotatorOptions<I, E>
+  opts: TextAnnotatorOptions<I, E>,
+  selectorReviveFn?: (arg: I['target']['selector'][number], container: HTMLElement) => RevivedTextSelectorLike
 ): TextAnnotatorState<I, E> => {
 
   const store: Store<I> = createStore<I>();
 
-  const tree = createSpatialTree(store, container, opts.mergeHighlights?.horizontalTolerance, opts.mergeHighlights?.verticalTolerance);
+  const tree = createSpatialTree(
+    store, 
+    container, 
+    opts.mergeHighlights?.horizontalTolerance, 
+    opts.mergeHighlights?.verticalTolerance,
+    selectorReviveFn
+  );
 
   const selection = createSelectionState<I, E>(store, opts.userSelectAction, opts.adapter);
 
@@ -47,7 +55,7 @@ export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotati
 
   // Wrap store interface to intercept annotations and revive DOM ranges, if needed
   const addAnnotation = (annotation: I, origin = Origin.LOCAL): boolean => {
-    const revived = reviveAnnotation(annotation, container);
+    const revived = reviveAnnotation(annotation, container, selectorReviveFn);
 
     const isValid = isRevived(revived.target.selector);
     if (isValid)
@@ -89,22 +97,23 @@ export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotati
     return couldNotRevive;
   }
 
-  const updateTarget = (target: TextAnnotationTarget, origin = Origin.LOCAL) => {
+  const updateTarget = (target: TextAnnotationTargetLike, origin = Origin.LOCAL) => {
     const revived = reviveTarget(target, container);
     store.updateTarget(revived, origin);
   }
 
-  const bulkUpdateTargets = (targets: TextAnnotationTarget[], origin = Origin.LOCAL) => {
+  const bulkUpdateTargets = (targets: TextAnnotationTargetLike[], origin = Origin.LOCAL) => {
     const revived = targets.map(t => reviveTarget(t, container));
     store.bulkUpdateTargets(revived, origin);
   }
 
-  function getAt(x: number, y: number, all: true, filter?: Filter): I[] | undefined;
-  function getAt(x: number, y: number, all: false, filter?: Filter): I | undefined;
-  function getAt(x: number, y: number, all?: boolean, filter?: Filter): I | I[] | undefined {
+  function getAt(x: number, y: number, all: true, filter?: Filter): RevivedTextAnnotationLike<I>[] | undefined;
+  function getAt(x: number, y: number, all: false, filter?: Filter): RevivedTextAnnotationLike<I> | undefined;
+  function getAt(x: number, y: number, all?: boolean, filter?: Filter): RevivedTextAnnotationLike<I> | RevivedTextAnnotationLike<I>[] | undefined {
     const getAll = all || Boolean(filter);
 
-    const annotations = tree.getAt(x, y, getAll).map(id => store.getAnnotation(id)!).filter(Boolean);
+    const annotations = tree.getAt(x, y, getAll).map(id => 
+      store.getAnnotation(id) as RevivedTextAnnotationLike<I>).filter(Boolean);
 
     const filtered = filter ? annotations.filter(filter) : annotations;
 
@@ -124,7 +133,7 @@ export const createTextAnnotatorState = <I extends TextAnnotation = TextAnnotati
     minY: number,
     maxX: number,
     maxY: number,
-  ): AnnotationRects<I>[] => tree.getIntersecting(minX, minY, maxX, maxY);
+  ): AnnotationRects<RevivedTextAnnotationLike<I>>[] => tree.getIntersecting(minX, minY, maxX, maxY);
 
   const getAnnotationRects = (id: string): DOMRect[] => tree.getAnnotationRects(id);
 

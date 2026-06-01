@@ -2,7 +2,9 @@ import { createSelectionHandler, createSpansRenderer, fillDefaults } from '@reco
 import type { 
   AnnotatingMode, 
   HighlightStyleExpression, 
+  RevivedTextAnnotationLike, 
   TextAnnotation, 
+  TextAnnotationLike, 
   TextAnnotator, 
   TextAnnotatorOptions, 
   TextAnnotatorState
@@ -64,7 +66,7 @@ export const createPDFAnnotator = (
 
   const renderer = createSpansRenderer(
     viewerElement, 
-    state as unknown as TextAnnotatorState<TextAnnotation, PDFAnnotation>, 
+    state as unknown as TextAnnotatorState<TextAnnotationLike, PDFAnnotation>, 
     viewport);
 
   if (opts.style)
@@ -72,8 +74,8 @@ export const createPDFAnnotator = (
 
   const selectionHandler = createSelectionHandler(
     container.querySelector('.pdfViewer')!, 
-    state as unknown as TextAnnotatorState<TextAnnotation, PDFAnnotation>, 
-    lifecycle as Lifecycle<TextAnnotation, PDFAnnotation>,
+    state as unknown as TextAnnotatorState<RevivedTextAnnotationLike, PDFAnnotation>, 
+    lifecycle as Lifecycle<TextAnnotationLike, PDFAnnotation>,
     // @ts-ignore
     { ...opts, offsetReferenceSelector: '.page' }
   );

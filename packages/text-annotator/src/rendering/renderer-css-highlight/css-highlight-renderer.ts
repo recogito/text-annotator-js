@@ -1,6 +1,6 @@
 import type { ViewportState } from '@annotorious/core';
 import { colord, type AnyColor } from 'colord';
-import type { TextAnnotation } from '../../model';
+import type { RevivedTextSelectorLike, TextAnnotationLike } from '../../model';
 import type { TextAnnotatorState } from '../../state';
 import { 
   computeStyle,
@@ -41,11 +41,11 @@ export const createCSSHighlightPainter = (): Painter => {
   let currentRendered = new Set<string>();
 
   const redraw = (
-    highlights:Highlight[], 
-    viewportBounds: ViewportBounds,
+    highlights: Highlight[], 
+    _: ViewportBounds,
     currentStyle?: HighlightStyleExpression,
-    styleOverrides?: Map<string, HighlightStyleExpression>,
-    force?: boolean
+    __?: Map<string, HighlightStyleExpression>,
+    ___?: boolean
   ) => {
     // Next set of rendered annotation IDs and selections
     const nextRendered = new Set(highlights.map(h => h.annotation.id));
@@ -80,7 +80,7 @@ export const createCSSHighlightPainter = (): Painter => {
     // Could be improved further by (re-)setting only annotations that
     // have changes.
     highlights.forEach(({ annotation }) => {
-      const ranges = annotation.target.selector.map(s => s.range);
+      const ranges = annotation.target.selector.map((s: RevivedTextSelectorLike) => s.range);
 
       // @ts-ignore
       const highlights = new Highlight(...ranges);
@@ -113,8 +113,8 @@ export const createCSSHighlightPainter = (): Painter => {
 
 }
 
-export const createCSSHighlightRenderer: RendererFactory<TextAnnotation> = (
+export const createCSSHighlightRenderer: RendererFactory<TextAnnotationLike> = (
   container: HTMLElement,
-  state: TextAnnotatorState<TextAnnotation, any>,
+  state: TextAnnotatorState<TextAnnotationLike, any>,
   viewport: ViewportState
 ) => createRenderer(createCSSHighlightPainter(), container, state, viewport);

@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import type { TextAnnotation, TextAnnotationTarget, TextSelector } from '../core';
+import { isRevived } from '../core';
+import type { TextAnnotationLike, TextAnnotationTarget, TextSelector } from '../core';
 import type { W3CTextAnnotation, W3CTextAnnotationTarget, W3CTextSelector } from './';
 import { getQuoteContext } from '../../utils/annotation';
 import {
@@ -10,14 +11,14 @@ import {
   serializeW3CBodies
 } from '@annotorious/core';
 
-export type W3CTextFormatAdapter<I extends TextAnnotation = TextAnnotation, E extends W3CTextAnnotation = W3CTextAnnotation> = FormatAdapter<I, E>;
+export type W3CTextFormatAdapter<I extends TextAnnotationLike = TextAnnotationLike, E extends W3CTextAnnotation = W3CTextAnnotation> = FormatAdapter<I, E>;
 
 /**
  * @param source - the IRI of the annotated content
  * @param container - the HTML container of the annotated content,
  *                    Required to locate the content's `range` within the DOM
  */
-export const W3CTextFormat =<I extends TextAnnotation = TextAnnotation, E extends W3CTextAnnotation = W3CTextAnnotation>(
+export const W3CTextFormat =<I extends TextAnnotationLike = TextAnnotationLike, E extends W3CTextAnnotation = W3CTextAnnotation>(
   source: string,
   container?: HTMLElement
 ): W3CTextFormatAdapter<I, E> => ({
@@ -90,7 +91,7 @@ const parseW3CTextTargets = (annotation: W3CTextAnnotation) => {
   return { parsed };
 };
 
-export const parseW3CTextAnnotation = <I extends TextAnnotation = TextAnnotation, E extends W3CTextAnnotation = W3CTextAnnotation>(
+export const parseW3CTextAnnotation = <I extends TextAnnotationLike = TextAnnotationLike, E extends W3CTextAnnotation = W3CTextAnnotation>(
   annotation: E
 ): ParseResult<I> => {
   const annotationId = annotation.id || uuidv4();
@@ -121,7 +122,7 @@ export const parseW3CTextAnnotation = <I extends TextAnnotation = TextAnnotation
 
 };
 
-export const serializeW3CTextAnnotation = <I extends TextAnnotation = TextAnnotation, E extends W3CTextAnnotation = W3CTextAnnotation>(
+export const serializeW3CTextAnnotation = <I extends TextAnnotationLike = TextAnnotationLike, E extends W3CTextAnnotation = W3CTextAnnotation>(
   annotation: I,
   source: string,
   container?: HTMLElement
@@ -137,19 +138,25 @@ export const serializeW3CTextAnnotation = <I extends TextAnnotation = TextAnnota
   } = target;
 
   const w3cTargets = selector.map((s): W3CTextAnnotationTarget => {
-    const { id, quote, start, end, range } = s;
+    const { id, quote } = s;
 
     const quoteSelector: W3CTextSelector = {
       type: 'TextQuoteSelector',
       exact: quote
     }
 
-    if (container) {
-      const { prefix, suffix } = getQuoteContext(range, container);
+    // Doesn't pass the isRevived test in test mode
+    if (container && 'range' in s) {
+      const { prefix, suffix } = getQuoteContext(s.range as Range, container);
       quoteSelector.prefix = prefix;
       quoteSelector.suffix = suffix;
     }
 
+    if (!('start' in s)) 
+      throw new Error('W3C serialization requires TextSelector with start/end');
+
+    const { start, end } = s as TextSelector;
+    
     const positionSelector: W3CTextSelector = {
       type: 'TextPositionSelector',
       start,

@@ -2,6 +2,9 @@ import * as pdfjsViewer from 'pdfjs-dist/legacy/web/pdf_viewer.mjs';
 import { createTextAnnotatorState, Origin } from '@recogito/text-annotator';
 import type { 
   HoverState, 
+  RevivedTextAnnotationLike, 
+  RevivedTextAnnotationTargetLike, 
+  RevivedTextSelector, 
   SelectionState, 
   TextAnnotation, 
   TextAnnotationStore, 
@@ -71,10 +74,10 @@ export const createPDFAnnotatorState = (
     });
   }
 
-  const toPDFAnnotationTarget = (target: TextAnnotationTarget) => {    
+  const toPDFAnnotationTarget = (target: RevivedTextAnnotationTargetLike<TextAnnotationTarget>) => {    
     // Split the text annotation target across pages, if necessary.
-    const split = target.selector.reduce<TextSelector[]>((all, selector) => (
-      [...all, ...splitSelector(target.selector[0])]
+    const split = target.selector.reduce<RevivedTextSelector[]>((all, selector) => (
+      [...all, ...splitSelector(selector as RevivedTextSelector)]
     ), []);
 
     // CAUTION: some annotations seem to be re-split. Investigate! 
@@ -85,7 +88,7 @@ export const createPDFAnnotatorState = (
     // Container element bounds
     const offset = viewerElement.getBoundingClientRect().top;
 
-    const getRectsForSelector = (selector: TextSelector) => {
+    const getRectsForSelector = (selector: RevivedTextSelector) => {
       const bounds = selector.range.getBoundingClientRect();
 
       // Checking for vertical intersection is enough, because we know
@@ -95,7 +98,7 @@ export const createPDFAnnotatorState = (
       ));
     }
 
-    const toPDFSelector = (s: TextSelector) => {
+    const toPDFSelector = (s: RevivedTextSelector) => {
       const pageNumber = parseInt(s.offsetReference?.dataset.pageNumber!);
       return {
         ...s,
@@ -110,7 +113,7 @@ export const createPDFAnnotatorState = (
     } as PDFAnnotationTarget;
   }
 
-  const toPDFAnnotation = (t: TextAnnotation) => ({
+  const toPDFAnnotation = (t: RevivedTextAnnotationLike<TextAnnotation>) => ({
     ...t,
     target: toPDFAnnotationTarget(t.target)
   });
@@ -174,7 +177,8 @@ export const createPDFAnnotatorState = (
     const { changes } = event;
 
     // Annotations coming from the innerStore or all TextAnnotations!
-    const created: PDFAnnotation[] = (changes.created || []).map(toPDFAnnotation);
+    const created: PDFAnnotation[] = (changes.created || []).map(a => 
+      toPDFAnnotation(a as unknown as RevivedTextAnnotationLike<TextAnnotation>));
 
     // Update the store silently, i.e. without triggering events
     // @ts-ignore
@@ -182,7 +186,7 @@ export const createPDFAnnotatorState = (
 
     const updated = (changes.updated || []).map(e => {
       if (e.targetUpdated) {
-        const newTarget = toPDFAnnotationTarget(e.targetUpdated.newTarget as TextAnnotationTarget);
+        const newTarget = toPDFAnnotationTarget(e.targetUpdated.newTarget as unknown as RevivedTextAnnotationTargetLike<TextAnnotationTarget>);
         const oldValue: PDFAnnotation = e.oldValue as PDFAnnotation;
 
         const newValue: PDFAnnotation = {
@@ -205,10 +209,11 @@ export const createPDFAnnotatorState = (
     });
 
     // Update silently
-    // @ts-ignore
     updated.forEach(u => innerStore.updateAnnotation(u.newValue, Origin.SILENT));
 
-    const deleted: PDFAnnotation[] = (changes.deleted || []).map(toPDFAnnotation);
+    const deleted: PDFAnnotation[] = (changes.deleted || []).map(a => 
+      toPDFAnnotation(a as unknown as RevivedTextAnnotationLike<TextAnnotation>));
+
     deleted.forEach(a => renderedAnnotations.deleteAnnotation(a));
 
     const crosswalked = {

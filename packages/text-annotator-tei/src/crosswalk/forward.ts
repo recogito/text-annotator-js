@@ -1,9 +1,14 @@
-import type { TEIAnnotation, TEIAnnotationTarget, TEIRangeSelector } from '../tei-annotation';
+import type { RevivedTEIAnnotationTarget, RevivedTEIRangeSelector, TEIAnnotation, TEIAnnotationTarget, TEIRangeSelector } from '../tei-annotation';
 import { reanchor } from './utils';
-import type { 
-  TextAnnotation, 
-  TextAnnotationTarget, 
-  TextSelector
+import { 
+  isRevived,
+  type RevivedTextAnnotationLike,
+  type RevivedTextAnnotationTargetLike,
+  type RevivedTextSelector,
+  type RevivedTextSelectorLike,
+  type TextAnnotation, 
+  type TextAnnotationTarget,
+  type TextSelector
 } from '@recogito/text-annotator';
 
 const elementCache = new Map<string, Node>();
@@ -185,7 +190,7 @@ const parseXPathExpression = (expression: string) => {
  * the TEIRangeSelector corresponding to that range. We need this because
  * the Text Annotator will always produce a TextAnnotation natively.
  */
-export const textToTEISelector = (container: HTMLElement) => (selector: TextSelector): TEIRangeSelector & TextSelector => {
+export const textToTEISelector = (container: HTMLElement) => (selector: RevivedTextSelector): RevivedTEIRangeSelector & RevivedTextSelector => {
   const { start, end, range } = selector;
 
   // XPath segments for Range start and end nodes as a list
@@ -220,9 +225,9 @@ export const textToTEISelector = (container: HTMLElement) => (selector: TextSele
   };
 }
 
-export const reviveSelector = (selector: TEIRangeSelector, container: HTMLElement): TEIRangeSelector => {
+export const reviveSelector = (selector: TEIRangeSelector, container: HTMLElement): RevivedTEIRangeSelector => {
   // Don't revive unncessarily
-  if (selector.position && selector.range instanceof Range) return selector;
+  if (selector.position && isRevived(selector)) return selector;
 
   const startExpression = selector.startSelector?.value;
   const endExpression = selector.endSelector?.value;
@@ -280,14 +285,14 @@ export const reviveTarget = (t: TEIAnnotationTarget, container: HTMLElement) => 
   selector: t.selector.map(s => reviveSelector(s, container))
 });
 
-export const textToTEITarget =  (container: HTMLElement) => (target: TextAnnotationTarget | TEIAnnotationTarget): TEIAnnotationTarget => {
+export const textToTEITarget =  (container: HTMLElement) => (target: TEIAnnotationTarget | RevivedTextAnnotationTargetLike<TextAnnotationTarget>): RevivedTEIAnnotationTarget => {
   return {
     ...target,
-    selector: target.selector.map(s => 'startSelector' in s ? reviveSelector(s, container) : textToTEISelector(container)(s))
+    selector: target.selector.map(s => 'startSelector' in s ? reviveSelector(s, container) : textToTEISelector(container)(s as RevivedTextSelector))
   }
 }
 
-export const textToTEIAnnotation = (container: HTMLElement) => (a: TextAnnotation | TEIAnnotation): TEIAnnotation => ({
+export const textToTEIAnnotation = (container: HTMLElement) => (a: RevivedTextAnnotationLike<TextAnnotation> | TEIAnnotation): TEIAnnotation => ({
   ...a,
   target: textToTEITarget(container)(a.target)
 })

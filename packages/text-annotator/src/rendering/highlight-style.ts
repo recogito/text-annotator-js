@@ -1,18 +1,24 @@
 import { colord, type AnyColor } from 'colord';
-import type { AnnotationState, Color, DrawingStyle } from '@annotorious/core';
+import type { AnnotationState } from '@annotorious/core';
 import type { TextAnnotationLike } from '../model';
 import type { Highlight } from './';
 
-export interface HighlightStyle extends Pick<DrawingStyle, 'fill' | 'fillOpacity'> {
+export type CSSColor = string;
+
+export interface HighlightStyle {
+
+  fill?: CSSColor;
+
+  fillOpacity?: number;
 
   underlineStyle?: string;
 
-  underlineColor?: Color;
+  underlineColor?: CSSColor;
 
   underlineOffset?: number;
 
   underlineThickness?: number;
-  
+
 }
 
 export type HighlightStyleExpression = HighlightStyle 
