@@ -19,7 +19,7 @@ const getScrollParent = (el?: Element | null) => {
 // Executes scroll on an annotation with a valid DOM range selector
 const scroll = <I extends TextAnnotationLike = TextAnnotationLike>(
   store: TextAnnotationStore<I>,
-  target: RevivedTextAnnotationTargetLike,
+  target: RevivedTextAnnotationTargetLike<I['target']>,
   scrollParent: Element
 ) => {
   // Parent bounds and client (= visible) height
