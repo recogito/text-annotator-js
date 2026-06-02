@@ -1,4 +1,4 @@
-import type { FormatAdapter, UserSelectActionExpression, User, Annotation } from '@annotorious/core';
+import type { FormatAdapter, UserSelectActionExpression, User } from '@annotorious/core';
 import type { HighlightStyleExpression, RendererFactory } from './rendering';
 import type { TextAnnotation, TextAnnotationLike } from './model';
 

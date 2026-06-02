@@ -29,13 +29,13 @@ export interface TextSelectorLike {
 
   quote: string;
 
+  offsetReference?: HTMLElement;
+
 }
 
 export interface RevivedTextSelectorLike extends TextSelectorLike {
 
   range: Range;
-
-  offsetReference?: HTMLElement;
 
 }
 

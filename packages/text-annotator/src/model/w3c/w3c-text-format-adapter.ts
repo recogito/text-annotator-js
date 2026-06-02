@@ -1,5 +1,4 @@
 import { v4 as uuidv4 } from 'uuid';
-import { isRevived } from '../core';
 import type { TextAnnotationLike, TextAnnotationTarget, TextSelector } from '../core';
 import type { W3CTextAnnotation, W3CTextAnnotationTarget, W3CTextSelector } from './';
 import { getQuoteContext } from '../../utils/annotation';
