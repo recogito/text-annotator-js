@@ -1,4 +1,4 @@
-import type { RevivedTextSelector, TextSelector } from '@recogito/text-annotator';
+import type { RevivedTextSelector } from '@recogito/text-annotator';
 
 export const isSamePage = (selector: RevivedTextSelector) => {
   const startPage = selector.range.startContainer.parentElement?.closest('.page');
