@@ -12,7 +12,7 @@ export type PDFAnnotatorProps = TextAnnotatorOptions<PDFAnnotation, PDFAnnotatio
 
   filter?: Filter;
 
-  style?: HighlightStyleExpression
+  style?: HighlightStyleExpression<PDFAnnotation>
 
   pdfUrl: string;
 
