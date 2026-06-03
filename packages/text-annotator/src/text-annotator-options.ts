@@ -1,6 +1,6 @@
 import type { FormatAdapter, UserSelectActionExpression, User } from '@annotorious/core';
 import type { HighlightStyleExpression, RendererFactory } from './rendering';
-import type { TextAnnotation, TextAnnotationLike } from './model';
+import type { RevivedTextSelectorLike, TextAnnotation, TextAnnotationLike } from './model';
 
 export interface TextAnnotatorOptions<I extends TextAnnotationLike = TextAnnotation, E extends unknown = TextAnnotation> {
 
@@ -9,6 +9,12 @@ export interface TextAnnotatorOptions<I extends TextAnnotationLike = TextAnnotat
   allowModifierSelect?: boolean;
 
   annotatingEnabled?: boolean;
+
+  /**
+   * Custom function that turns a stored selector into a revived one (with a live DOM `range`).
+   * Used by sub-formats such as PDF to map their selector shape to a text range.
+   */
+  selectorReviveFn?: (arg: I['target']['selector'][number], container: HTMLElement) => RevivedTextSelectorLike;
 
   /**
    * Determines whether an active selection should be dismissed
