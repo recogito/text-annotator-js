@@ -12,7 +12,7 @@ import type {
   HoverState, 
 } from '@annotorious/core';
 import { isRevived } from '../model';
-import type { RevivedTextAnnotationLike, RevivedTextSelectorLike, TextAnnotation, TextAnnotationLike, TextAnnotationTargetLike } from '../model';
+import type { RevivedTextAnnotationLike, TextAnnotation, TextAnnotationLike, TextAnnotationTargetLike } from '../model';
 import { createSpatialTree, type SpatialTreeEvents } from '../state/spatial-tree';
 import type { AnnotationRects, TextAnnotationStore } from '../state/text-annotation-store';
 import { reviveAnnotation, reviveTarget } from '../utils/annotation';
@@ -33,18 +33,17 @@ export interface TextAnnotatorState<I extends TextAnnotationLike = TextAnnotatio
 
 export const createTextAnnotatorState = <I extends TextAnnotationLike = TextAnnotation, E extends unknown = TextAnnotation>(
   container: HTMLElement,
-  opts: TextAnnotatorOptions<I, E>,
-  selectorReviveFn?: (arg: I['target']['selector'][number], container: HTMLElement) => RevivedTextSelectorLike
+  opts: TextAnnotatorOptions<I, E>
 ): TextAnnotatorState<I, E> => {
 
   const store: Store<I> = createStore<I>();
 
   const tree = createSpatialTree(
-    store, 
-    container, 
-    opts.mergeHighlights?.horizontalTolerance, 
+    store,
+    container,
+    opts.mergeHighlights?.horizontalTolerance,
     opts.mergeHighlights?.verticalTolerance,
-    selectorReviveFn
+    opts.selectorReviveFn
   );
 
   const selection = createSelectionState<I, E>(store, opts.userSelectAction, opts.adapter);
@@ -55,7 +54,7 @@ export const createTextAnnotatorState = <I extends TextAnnotationLike = TextAnno
 
   // Wrap store interface to intercept annotations and revive DOM ranges, if needed
   const addAnnotation = (annotation: I, origin = Origin.LOCAL): boolean => {
-    const revived = reviveAnnotation(annotation, container, selectorReviveFn);
+    const revived = reviveAnnotation(annotation, container, opts.selectorReviveFn);
 
     const isValid = isRevived(revived.target.selector);
     if (isValid)
