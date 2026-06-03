@@ -1,8 +1,14 @@
-import type { TextAnnotation, TextAnnotationTarget, TextSelector, TextSelectorLike } from '../../model';
+import { isRevived, isRevivedTarget } from '../../model';
 import { NOT_ANNOTATABLE_SELECTOR } from '../dom';
-
-export const isRevived = (selector: TextSelectorLike[]) =>
-  selector.every(s => s.range instanceof Range && !s.range.collapsed);
+import type { 
+  RevivedTextAnnotationLike, 
+  RevivedTextAnnotationTargetLike, 
+  RevivedTextSelector, 
+  RevivedTextSelectorLike, 
+  TextAnnotationLike, 
+  TextAnnotationTargetLike, 
+  TextSelector 
+} from '../../model';
 
 /**
  * Creates a new selector object with the revived DOM range from the given text annotation position
@@ -13,12 +19,14 @@ export const isRevived = (selector: TextSelectorLike[]) =>
  *
  * @returns the revived selector
  */
-export const reviveSelector = <T extends TextSelector>(selector: T, container: HTMLElement): T => {
-
+export const reviveTextSelector = <T extends TextSelector>(
+  selector: T, 
+  container: HTMLElement
+): RevivedTextSelector  => { 
   const { start, end } = selector;
 
   const offsetReference = selector.offsetReference || container;
-
+  
   const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, (node) =>
     node.parentElement?.closest(NOT_ANNOTATABLE_SELECTOR)
       ? NodeFilter.FILTER_SKIP
@@ -73,15 +81,24 @@ export const reviveSelector = <T extends TextSelector>(selector: T, container: H
 
 }
 
-export const reviveTarget = <T extends TextAnnotationTarget = TextAnnotationTarget>(target: T, container: HTMLElement): T =>
-  isRevived(target.selector)
+export const reviveTarget = <T extends TextAnnotationTargetLike>(
+  target: T, 
+  container: HTMLElement,
+  reviveFn: (arg: T['selector'][number], container: HTMLElement) => RevivedTextSelectorLike =
+    (s, c) => reviveTextSelector(s as TextSelector, c) as RevivedTextSelectorLike
+): RevivedTextAnnotationTargetLike<T> =>
+  isRevivedTarget(target)
     ? target
     : ({
       ...target,
-      selector: target.selector.map(s => s.range instanceof Range && !s.range.collapsed ? s : reviveSelector(s, container))
+      selector: target.selector.map(s => isRevived(s) ? s : reviveFn(s, container))
     });
 
-export const reviveAnnotation = <T extends TextAnnotation>(annotation: T, container: HTMLElement): T =>
-  isRevived(annotation.target.selector)
-    ? annotation
-    : ({ ...annotation, target: reviveTarget(annotation.target, container) });
+export const reviveAnnotation = <T extends TextAnnotationLike>(
+  annotation: T, 
+  container: HTMLElement,
+  reviveFn?: (arg: T['target']['selector'][number], container: HTMLElement) => RevivedTextSelectorLike
+): RevivedTextAnnotationLike<T> =>
+  isRevivedTarget(annotation.target)
+    ? annotation as RevivedTextAnnotationLike<T>
+    : ({ ...annotation, target: reviveTarget(annotation.target, container, reviveFn) } as RevivedTextAnnotationLike<T>);

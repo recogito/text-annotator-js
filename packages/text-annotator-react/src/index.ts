@@ -11,7 +11,6 @@ export type {
   AnnotationTarget,
   Annotator,
   AnnotatorState,
-  Color,
   Filter,
   FormatAdapter,
   HoverState,

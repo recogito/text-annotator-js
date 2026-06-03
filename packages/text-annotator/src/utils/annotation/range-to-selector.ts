@@ -1,11 +1,11 @@
-import type { TextSelector } from '../../model';
+import type { RevivedTextSelector } from '../../model';
 import { getRangeAnnotatableContents } from '../dom';
 
 export const rangeToSelector = (
   range: Range,
   container: HTMLElement,
   offsetReferenceSelector?: string
-): TextSelector => {
+): RevivedTextSelector => {
   const rangeBefore = document.createRange();
 
   const offsetReference: HTMLElement = offsetReferenceSelector

@@ -1,4 +1,4 @@
-import type { TextAnnotation, TextAnnotationTarget, TextSelector } from '@recogito/text-annotator';
+import type { RevivedTextSelectorLike, TextAnnotation, TextAnnotationTarget, TextSelector } from '@recogito/text-annotator';
 import type { PDFAnnotation, PDFAnnotationTarget, PDFSelector } from '../../model/core/pdf-annotation';
 
 /**
@@ -27,8 +27,7 @@ export const reviveSelector = (selector: PDFSelector | TextSelector): PDFSelecto
       return selector as PDFSelector;
     } else {
       // No pageNumber, but offsetReference element -> crosswalk
-      const { offsetReference } = selector;
-      const pageNumber = parseInt(offsetReference!.dataset.pageNumber!);
+      const pageNumber = parseInt(selector.offsetReference!.dataset.pageNumber!);
     
       // @ts-ignore
       return {

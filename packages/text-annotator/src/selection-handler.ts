@@ -5,7 +5,7 @@ import { poll } from 'poll';
 import { Origin } from '@annotorious/core';
 import type { Filter, Lifecycle, Selection, User } from '@annotorious/core';
 import type { TextAnnotatorState } from './state';
-import type { TextAnnotation, TextAnnotationTarget } from './model';
+import type { RevivedTextAnnotationLike, RevivedTextAnnotationTargetLike, TextAnnotationLike } from './model';
 import type { AnnotatingMode } from './text-annotator';
 import type { TextAnnotatorOptions } from './text-annotator-options';
 import { rangeToSelector } from './utils/annotation';
@@ -31,11 +31,11 @@ const SELECTION_KEYS = [
   SELECT_ALL
 ];
 
-export const createSelectionHandler = <T extends TextAnnotation>(
+export const createSelectionHandler = (
   container: HTMLElement,
-  state: TextAnnotatorState<TextAnnotation, any>,
-  lifecycle: Lifecycle<TextAnnotation, any>,
-  options: TextAnnotatorOptions<TextAnnotation, any>
+  state: TextAnnotatorState<RevivedTextAnnotationLike, any>,
+  lifecycle: Lifecycle<TextAnnotationLike, any>,
+  options: TextAnnotatorOptions<TextAnnotationLike, any>
 ) => {
   const { store, selection } = state;
 
@@ -54,11 +54,11 @@ export const createSelectionHandler = <T extends TextAnnotation>(
 
   let annotatingMode: AnnotatingMode = 'CREATE_NEW';
 
-  let currentTarget: TextAnnotationTarget | undefined;
+  let currentTarget: RevivedTextAnnotationTargetLike | undefined;
 
   // Only used if allowModifierSelect === true or if
   // annotatingMode === 'ADD_TO_CURRENT' | 'REPLACE_CURRENT'
-  let targetToModify: TextAnnotationTarget | undefined;
+  let targetToModify: RevivedTextAnnotationTargetLike | undefined;
 
   let isLeftClick: boolean | undefined;
 

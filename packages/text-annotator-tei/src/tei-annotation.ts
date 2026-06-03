@@ -1,4 +1,9 @@
-import type { TextAnnotationLike, TextAnnotationTargetLike, TextSelectorLike } from '@recogito/text-annotator';
+import type { 
+  RevivedTextSelectorLike, 
+  TextAnnotationLike, 
+  TextAnnotationTargetLike, 
+  TextSelectorLike 
+} from '@recogito/text-annotator';
 
 export interface TEIAnnotation extends TextAnnotationLike {
 
@@ -33,3 +38,17 @@ export interface TEIRangeSelector extends TextSelectorLike {
   }
 
 }
+
+export interface RevivedTEIAnnotationTarget extends TEIAnnotationTarget {
+
+  selector: RevivedTEIRangeSelector[];
+
+}
+
+export interface RevivedTEIAnnotation extends TEIAnnotation {
+
+  target: RevivedTEIAnnotationTarget;
+
+}
+
+export type RevivedTEIRangeSelector = TEIRangeSelector & RevivedTextSelectorLike;

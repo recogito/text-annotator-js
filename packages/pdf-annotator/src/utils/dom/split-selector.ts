@@ -1,12 +1,12 @@
-import type { TextSelector } from '@recogito/text-annotator';
+import type { RevivedTextSelector } from '@recogito/text-annotator';
 
-export const isSamePage = (selector: TextSelector) => {
+export const isSamePage = (selector: RevivedTextSelector) => {
   const startPage = selector.range.startContainer.parentElement?.closest('.page');
   const endPage = selector.range.endContainer.parentElement?.closest('.page');
   return startPage === endPage;
 }
 
-const pageRangeToTextSelectorSelector = (range: Range): TextSelector => {
+const pageRangeToTextSelectorSelector = (range: Range): RevivedTextSelector => {
   const rangeBefore = document.createRange();
 
   const offsetReference: HTMLElement = range.startContainer instanceof HTMLElement 
@@ -31,7 +31,7 @@ const pageRangeToTextSelectorSelector = (range: Range): TextSelector => {
 
 }
 
-export const splitSelector = (selector: TextSelector): TextSelector[] => {
+export const splitSelector = (selector: RevivedTextSelector): RevivedTextSelector[] => {
   const startPage = selector.range.startContainer.parentElement!.closest('.page')!;
   const endPage = selector.range.endContainer.parentElement!.closest('.page')!;
 
