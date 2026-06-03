@@ -25,7 +25,7 @@ export interface Renderer {
 
   redraw(force?: boolean): void;
 
-  setStyle(style?: HighlightStyleExpression, id?: string): void;
+  setStyle<I extends TextAnnotationLike = TextAnnotationLike>(style?: HighlightStyleExpression<I>, id?: string): void;
 
   setFilter(filter?: Filter<any>): void;
 
@@ -139,14 +139,14 @@ export const createRenderer = <T extends TextAnnotatorState<TextAnnotationLike, 
     }, 1);
   }), 10);
 
-  const setStyle = (style?: HighlightStyleExpression, id?: string) => {
+  const setStyle = <I extends TextAnnotationLike = TextAnnotationLike>(style?: HighlightStyleExpression<I>, id?: string) => {
     if (id) {
       if (style)
-        styleOverrides.set(id, style);
+        styleOverrides.set(id, style as HighlightStyleExpression);
       else
         styleOverrides.delete(id);
     } else {
-      currentStyle = style;
+      currentStyle = style as HighlightStyleExpression | undefined;
     }
 
     // console.log('[base-renderer] redrawing style change');

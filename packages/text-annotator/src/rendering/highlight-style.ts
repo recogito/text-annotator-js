@@ -21,8 +21,8 @@ export interface HighlightStyle {
 
 }
 
-export type HighlightStyleExpression = HighlightStyle 
-  | (<I extends TextAnnotationLike = TextAnnotationLike>(annotation: I, state: AnnotationState, zIndex?: number) => HighlightStyle | undefined);
+export type HighlightStyleExpression<I extends TextAnnotationLike = TextAnnotationLike> = HighlightStyle
+  | ((annotation: I, state: AnnotationState, zIndex?: number) => HighlightStyle | undefined);
 
 export const DEFAULT_STYLE: HighlightStyle = { 
   fill: 'rgb(0, 128, 255)', 

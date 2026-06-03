@@ -40,7 +40,7 @@ export interface TextAnnotator<I extends TextAnnotationLike = TextAnnotation, E 
 
   renderer: Renderer;
 
-  setStyle(style?: HighlightStyleExpression, id?: string): void;
+  setStyle(style?: HighlightStyleExpression<I>, id?: string): void;
 
   // Returns true if successful (or false if the annotation is not currently rendered)
   scrollIntoView(annotationOrId: I | string, scrollParentOrId?: string | Element): boolean;
