@@ -22,10 +22,10 @@ import type {
 export const reviveTextSelector = <T extends TextSelector>(
   selector: T, 
   container: HTMLElement
-): RevivedTextSelector  => {
+): RevivedTextSelector  => { 
   const { start, end } = selector;
 
-  const offsetReference = (selector as unknown as RevivedTextSelector).offsetReference || container;
+  const offsetReference = selector.offsetReference || container;
   
   const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, (node) =>
     node.parentElement?.closest(NOT_ANNOTATABLE_SELECTOR)
