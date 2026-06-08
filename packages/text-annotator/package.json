@@ -30,9 +30,9 @@
     "@types/rbush": "^4.0.0",
     "jsdom": "^29.1.1",
     "typescript": "^5.9.3",
-    "vite": "^7.3.3",
+    "vite": "^7.3.5",
     "vite-plugin-externalize-deps": "^0.10.0",
-    "vitest": "^4.1.7"
+    "vitest": "^4.1.8"
   },
   "dependencies": {
     "@annotorious/core": "^3.8.2",
