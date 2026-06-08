@@ -41,6 +41,6 @@
   "dependencies": {
     "@annotorious/core": "^3.8.2",
     "@recogito/text-annotator": "4.1.1",
-    "pdfjs-dist": "^5.7.284"
+    "pdfjs-dist": "^6.0.227"
   }
 }
