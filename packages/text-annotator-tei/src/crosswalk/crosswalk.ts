@@ -1,15 +1,6 @@
-import type { RevivedTEIAnnotationTarget, RevivedTEIRangeSelector, TEIAnnotation, TEIAnnotationTarget, TEIRangeSelector } from '../tei-annotation';
-import { reanchor } from './utils';
-import { 
-  isRevived,
-  type RevivedTextAnnotationLike,
-  type RevivedTextAnnotationTargetLike,
-  type RevivedTextSelector,
-  type RevivedTextSelectorLike,
-  type TextAnnotation, 
-  type TextAnnotationTarget,
-  type TextSelector
-} from '@recogito/text-annotator';
+import { isRevived } from '@recogito/text-annotator';
+import type { RevivedTextSelector, TextSelector } from '@recogito/text-annotator';
+import type { RevivedTEIRangeSelector, TEIRangeSelector } from '../tei-annotation';
 
 const elementCache = new Map<string, Node>();
 
@@ -28,6 +19,39 @@ const resolveElement = (path: string, container: HTMLElement): Node | null => {
   }
 
   return elementCache.get(path) || null;
+}
+
+/**
+ * Resolves a character offset relative to a parent element down to a specific
+ * text node and local offset within it, as required by the DOM Range API.
+ * Walks text nodes in order, subtracting each node's length until the offset
+ * lands within the current node.
+ */
+export const reanchor = (originalNode: Node, parentNode: Node, originalOffset: number) => {
+  let node = originalNode;
+
+  let offset = originalOffset;
+
+  const walker = document.createTreeWalker(parentNode, NodeFilter.SHOW_TEXT);
+
+  let currentNode = walker.nextNode();
+
+  let run = true;
+
+  do {
+    if (currentNode instanceof Text) {
+      if (currentNode.length < offset) {
+        offset -= currentNode.length;
+      } else {
+        node = currentNode;
+        run = false;
+      }
+    }
+
+    currentNode = walker.nextNode();
+  } while (currentNode && run);
+
+  return { node, offset };
 }
 
 /**
@@ -190,7 +214,7 @@ const parseXPathExpression = (expression: string) => {
  * the TEIRangeSelector corresponding to that range. We need this because
  * the Text Annotator will always produce a TextAnnotation natively.
  */
-export const textToTEISelector = (container: HTMLElement) => (selector: RevivedTextSelector): RevivedTEIRangeSelector & RevivedTextSelector => {
+const textToTEISelector = (selector: RevivedTextSelector, container: HTMLElement): RevivedTEIRangeSelector & RevivedTextSelector => {
   const { start, end, range } = selector;
 
   // XPath segments for Range start and end nodes as a list
@@ -225,7 +249,16 @@ export const textToTEISelector = (container: HTMLElement) => (selector: RevivedT
   };
 }
 
-export const reviveSelector = (selector: TEIRangeSelector, container: HTMLElement): RevivedTEIRangeSelector => {
+export const isTEIRangeSelector = (selector: TEIRangeSelector | TextSelector): selector is TEIRangeSelector => 
+  'startSelector' in selector && 'endSelector' in selector && (
+    selector.startSelector.type === 'XPathSelector' &&
+    selector.endSelector.type === 'XPathSelector'
+  );
+
+export const reviveSelector = (selector: TEIRangeSelector | RevivedTextSelector, container: HTMLElement): RevivedTEIRangeSelector =>
+  isTEIRangeSelector(selector) ? reviveTEISelector(selector, container) : textToTEISelector(selector, container);
+
+const reviveTEISelector = (selector: TEIRangeSelector, container: HTMLElement): RevivedTEIRangeSelector => {
   // Don't revive unncessarily
   if (selector.position && isRevived(selector)) return selector;
 
@@ -279,21 +312,3 @@ export const reviveSelector = (selector: TEIRangeSelector, container: HTMLElemen
     range
   };
 }
-
-export const reviveTarget = (t: TEIAnnotationTarget, container: HTMLElement) => ({
-  ...t,
-  selector: t.selector.map(s => reviveSelector(s, container))
-});
-
-export const textToTEITarget =  (container: HTMLElement) => (target: TEIAnnotationTarget | RevivedTextAnnotationTargetLike<TextAnnotationTarget>): RevivedTEIAnnotationTarget => {
-  return {
-    ...target,
-    selector: target.selector.map(s => 'startSelector' in s ? reviveSelector(s, container) : textToTEISelector(container)(s as RevivedTextSelector))
-  }
-}
-
-export const textToTEIAnnotation = (container: HTMLElement) => (a: RevivedTextAnnotationLike<TextAnnotation> | TEIAnnotation): TEIAnnotation => ({
-  ...a,
-  target: textToTEITarget(container)(a.target)
-})
-

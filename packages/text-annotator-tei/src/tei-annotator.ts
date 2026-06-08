@@ -1,29 +1,12 @@
-import { 
-  type RevivedTextAnnotationLike,
-  type RevivedTextAnnotationTargetLike,
-  type TextAnnotation,
-  type TextAnnotationTarget,
-  type TextAnnotatorOptions,
-  createTextAnnotator, 
-} from '@recogito/text-annotator';
-import { 
-  Origin,
-  type Annotator,
-  type Store,  
-} from '@annotorious/core';
-import { 
-  textToTEIAnnotation, 
-  textToTEITarget 
-} from './crosswalk';
-import type { 
-  TEIAnnotation,
-  TEIAnnotationTarget
-} from './tei-annotation';
+import { createTextAnnotator } from '@recogito/text-annotator';
+import type { TextAnnotation, TextAnnotatorOptions } from '@recogito/text-annotator';
+import { Origin } from '@annotorious/core';
+import type { Annotator, Store } from '@annotorious/core';
+import { reviveSelector } from './crosswalk';
+import type { TEIAnnotation } from './tei-annotation';
 
 export type TEIAnnotationStore = Store<TEIAnnotation> & {
 
-  // Minor change to default Annotorious store - text store returns annotations
-  // that failed to render, to support lazy document loading scenarios
   bulkAddAnnotation(annotations: TextAnnotation[], replace: boolean, origin: Origin): TEIAnnotation[];
 
   getAt(x: number, y: number): TEIAnnotation | undefined;
@@ -34,74 +17,12 @@ export type TEIAnnotationStore = Store<TEIAnnotation> & {
 
 }
 
-export interface TEIAnnotator<T extends unknown = TEIAnnotation> extends Annotator<TEIAnnotation, T> { }
+export type TEIAnnotator<T extends unknown = TEIAnnotation> = Annotator<TEIAnnotation, T>;
 
 export const createTEIAnnotator = <T extends unknown>(
   container: HTMLElement,
   options: TextAnnotatorOptions<TEIAnnotation, T> = {}
-): TEIAnnotator => {
-  const anno = createTextAnnotator(container, options);
-
-  const toTEI = textToTEIAnnotation(container);
-
-  const toTEITarget = textToTEITarget(container);
-
-  // Monkey-patch the store
-  const store = anno.state.store;
-
-  const _addAnnotation = store.addAnnotation;
-  store.addAnnotation = (annotation: TEIAnnotation | TextAnnotation, origin: Origin) => {
-    const { selector } = annotation.target;
-    try {
-      return (!('startSelector' in selector)) ?
-        _addAnnotation(toTEI(annotation as RevivedTextAnnotationLike<TextAnnotation>), origin) :
-        _addAnnotation(annotation as TEIAnnotation, origin);
-    } catch (error) {
-      console.warn(error);
-      console.warn(`Failed to render annotation`, annotation);
-      return false;
-    }
-  }
-
-  const _bulkAddAnnotations = store.bulkAddAnnotations;
-  store.bulkAddAnnotations = (annotations: Array<TEIAnnotation | TextAnnotation>, replace = true, origin: Origin) => {
-    const teiAnnotations = annotations.map(a => {
-      try {
-        return toTEI(a as TEIAnnotation);
-      } catch (error) {
-        console.warn(error);
-      }
-    });
-
-    const valid = teiAnnotations.filter(Boolean);
-
-    if (teiAnnotations.length !== valid.length) {
-      console.warn(`Failed to render ${teiAnnotations.length - valid.length} annotations.`);
-      teiAnnotations.forEach((a, idx) => {
-        if (!a) console.warn(annotations[idx]);
-      })
-    }
-    
-    return _bulkAddAnnotations(valid as TEIAnnotation[], replace, origin);
-  }
-
-  const _updateAnnotation = store.updateAnnotation;
-  
-  // @ts-ignore
-  store.updateAnnotation = (annotation: TEIAnnotation | RevivedTextAnnotationLike<TextAnnotation>, origin: Origin) =>
-    _updateAnnotation(toTEI(annotation), origin);
-
-  const _updateTarget = store.updateTarget;
-  store.updateTarget = (target: TEIAnnotationTarget | RevivedTextAnnotationTargetLike<TextAnnotationTarget>, origin: Origin = Origin.LOCAL) => 
-    _updateTarget(toTEITarget(target), origin);
-
-  return {
-    ...anno,
-    // @ts-ignore
-    state: {
-      ...anno.state,
-      store: store as Store<TEIAnnotation>
-    }
-  }
-
-}
+): TEIAnnotator => createTextAnnotator(container, {
+  ...options,
+  selectorReviveFn: reviveSelector
+}) as unknown as TEIAnnotator;
