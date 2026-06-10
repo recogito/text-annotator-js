@@ -55,7 +55,7 @@ export const createTextAnnotatorState = <I extends TextAnnotationLike = TextAnno
   // Wrap store interface to intercept annotations and revive DOM ranges, if needed
   const addAnnotation = (annotation: I, origin = Origin.LOCAL): boolean => {
     const revived = reviveAnnotation(annotation, container, opts.selectorReviveFn);
-
+    
     const isValid = isRevived(revived.target.selector);
     if (isValid)
       store.addAnnotation(revived, origin); 
@@ -68,7 +68,7 @@ export const createTextAnnotatorState = <I extends TextAnnotationLike = TextAnno
     replace = true, 
     origin = Origin.LOCAL
   ): I[] => {
-    const revived = annotations.map(a => reviveAnnotation<I>(a, container));
+    const revived = annotations.map(a => reviveAnnotation<I>(a, container, opts.selectorReviveFn));
 
     // Initial page load might take some time. Retry for more robustness.
     const couldNotRevive = revived.filter(a => !isRevived(a.target.selector));
@@ -81,7 +81,7 @@ export const createTextAnnotatorState = <I extends TextAnnotationLike = TextAnno
     annotations: I[], 
     origin = Origin.LOCAL
   ): I[] => {
-    const revived = annotations.map(a => reviveAnnotation(a, container));
+    const revived = annotations.map(a => reviveAnnotation(a, container, opts.selectorReviveFn));
 
     // Initial page load might take some time. Retry for more robustness.
     const couldNotRevive = revived.filter(a => !isRevived(a.target.selector));

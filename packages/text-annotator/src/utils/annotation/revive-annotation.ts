@@ -1,4 +1,4 @@
-import { isRevived, isRevivedTarget } from '../../model';
+import { isRevived } from '../../model';
 import { NOT_ANNOTATABLE_SELECTOR } from '../dom';
 import type { 
   RevivedTextAnnotationLike, 
@@ -20,9 +20,11 @@ import type {
  * @returns the revived selector
  */
 export const reviveTextSelector = <T extends TextSelector>(
-  selector: T, 
+  selector: T,
   container: HTMLElement
 ): RevivedTextSelector  => { 
+  if (isRevived(selector)) return selector;
+
   const { start, end } = selector;
 
   const offsetReference = selector.offsetReference || container;
@@ -86,19 +88,16 @@ export const reviveTarget = <T extends TextAnnotationTargetLike>(
   container: HTMLElement,
   reviveFn: (arg: T['selector'][number], container: HTMLElement) => RevivedTextSelectorLike =
     (s, c) => reviveTextSelector(s as TextSelector, c) as RevivedTextSelectorLike
-): RevivedTextAnnotationTargetLike<T> =>
-  isRevivedTarget(target)
-    ? target
-    : ({
-      ...target,
-      selector: target.selector.map(s => isRevived(s) ? s : reviveFn(s, container))
-    });
+): RevivedTextAnnotationTargetLike<T> => ({
+  ...target,
+  selector: target.selector.map(s => reviveFn(s, container))
+});
 
 export const reviveAnnotation = <T extends TextAnnotationLike>(
   annotation: T, 
   container: HTMLElement,
   reviveFn?: (arg: T['target']['selector'][number], container: HTMLElement) => RevivedTextSelectorLike
-): RevivedTextAnnotationLike<T> =>
-  isRevivedTarget(annotation.target)
-    ? annotation as RevivedTextAnnotationLike<T>
-    : ({ ...annotation, target: reviveTarget(annotation.target, container, reviveFn) } as RevivedTextAnnotationLike<T>);
+): RevivedTextAnnotationLike<T> => ({ 
+  ...annotation, 
+  target: reviveTarget(annotation.target, container, reviveFn) 
+} as RevivedTextAnnotationLike<T>);
