@@ -10,8 +10,7 @@ import type {
   TextAnnotationStore, 
   TextAnnotationTarget, 
   TextAnnotatorOptions,
-  TextAnnotatorState,
-  TextSelector
+  TextAnnotatorState
 } from '@recogito/text-annotator';
 import { 
   shouldNotify,
