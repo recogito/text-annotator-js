@@ -21,7 +21,7 @@ import {
   type Update,
 } from '@annotorious/core';
 import type { PDFAnnotation, PDFAnnotationTarget } from '../model/core/pdf-annotation';
-import { reviveAnnotation, reviveTarget } from '../utils/annotation';
+import { resolveAnnotation, resolveTarget } from '../utils/annotation';
 import { getQuadPoints } from '../utils/pdf';
 import { createRenderedAnnotationsMap } from './rendered-annotations';
 import { splitSelector } from '../utils/dom/split-selector';
@@ -29,7 +29,7 @@ import { splitSelector } from '../utils/dom/split-selector';
 export interface PDFAnnotationStore extends TextAnnotationStore<PDFAnnotation> {
 
   onLazyRender(page: number): void;   
-  
+
 }
 
 export interface PDFAnnotatorState extends TextAnnotatorState<PDFAnnotation, PDFAnnotation> {
@@ -79,8 +79,6 @@ export const createPDFAnnotatorState = (
       [...all, ...splitSelector(selector as RevivedTextSelector)]
     ), []);
 
-    // CAUTION: some annotations seem to be re-split. Investigate! 
-
     // All rects, for all selectors
     const rects = innerStore.getAnnotationRects(target.annotation);
 
@@ -122,11 +120,9 @@ export const createPDFAnnotatorState = (
   /**********************/
 
   const addAnnotation = (annotation: PDFAnnotation, origin = Origin.LOCAL) => {
-    const revived = reviveAnnotation(annotation);
-
-    const success = innerStore.addAnnotation(revived, origin);
-    renderedAnnotations.upsert(revived);
-
+    const resolved = resolveAnnotation(annotation);
+    const success = innerStore.addAnnotation(resolved, origin);
+    renderedAnnotations.upsert(resolved);
     return success;
   }
 
@@ -135,26 +131,23 @@ export const createPDFAnnotatorState = (
     replace: boolean,
     origin = Origin.LOCAL
   ) => {
-    const revived = annotations.map(reviveAnnotation);
-    revived.forEach(a => renderedAnnotations.upsert(a));
-
-    return innerStore.bulkAddAnnotations(revived, replace, origin) as PDFAnnotation[];
+    const resolved = annotations.map(resolveAnnotation);
+    resolved.forEach(a => renderedAnnotations.upsert(a));
+    return innerStore.bulkAddAnnotations(resolved, replace, origin) as PDFAnnotation[];
   }
 
-  const updateAnnotation = (annotation: PDFAnnotation, origin = Origin.LOCAL) => {
-    const revived = reviveAnnotation(annotation);
-    
-    innerStore.updateAnnotation(revived, origin);
-
-    renderedAnnotations.upsert(revived);
+  const updateAnnotation = (arg1: string | PDFAnnotation, arg2?: PDFAnnotation | Origin, arg3?: Origin) => {
+    const annotation = typeof arg1 === 'string' ? arg2 as PDFAnnotation : arg1; 
+    const origin = typeof arg1 === 'string' ? arg3 : arg2 as Origin;
+    const resolved = resolveAnnotation(annotation);
+    innerStore.updateAnnotation(resolved, origin);
+    renderedAnnotations.upsert(resolved);
   }
 
   const updateTarget = (target: PDFAnnotationTarget, origin = Origin.LOCAL) => {
-    const revived = reviveTarget(target);
-
-    innerStore.updateTarget(revived, origin);
-
-    renderedAnnotations.updateTarget(revived);
+    const resolved = resolveTarget(target);
+    innerStore.updateTarget(resolved, origin);
+    renderedAnnotations.updateTarget(resolved);
   }
 
   // Callback method for when a new page gets rendered by PDF.js
@@ -180,7 +173,6 @@ export const createPDFAnnotatorState = (
       toPDFAnnotation(a as unknown as RevivedTextAnnotationLike<TextAnnotation>));
 
     // Update the store silently, i.e. without triggering events
-    // @ts-ignore
     created.forEach(a => innerStore.updateAnnotation(a, Origin.SILENT));
 
     const updated = (changes.updated || []).map(e => {
@@ -235,9 +227,7 @@ export const createPDFAnnotatorState = (
 
   return {
     hover,
-    // @ts-ignore
     selection,
-    // @ts-ignore
     store: { 
       ...innerStore,
       addAnnotation,
@@ -245,12 +235,10 @@ export const createPDFAnnotatorState = (
       observe,
       onLazyRender,
       unobserve,
-      // @ts-ignore
       updateAnnotation,
       updateTarget
     },
-    viewport,
-
+    viewport
   }
   
 }

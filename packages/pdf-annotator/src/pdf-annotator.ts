@@ -3,7 +3,6 @@ import type {
   AnnotatingMode, 
   HighlightStyleExpression, 
   RevivedTextAnnotationLike, 
-  TextAnnotation, 
   TextAnnotationLike, 
   TextAnnotator, 
   TextAnnotatorOptions, 
@@ -76,9 +75,12 @@ export const createPDFAnnotator = (
     container.querySelector('.pdfViewer')!, 
     state as unknown as TextAnnotatorState<RevivedTextAnnotationLike, PDFAnnotation>, 
     lifecycle as Lifecycle<TextAnnotationLike, PDFAnnotation>,
-    // @ts-ignore
-    { ...opts, offsetReferenceSelector: '.page' }
+    { 
+      ...opts, 
+      offsetReferenceSelector: '.page' 
+    } as TextAnnotatorOptions<TextAnnotationLike, PDFAnnotation>
   );
+
   selectionHandler.setUser(currentUser);
 
   viewer.eventBus.on('textlayerrendered', ({ pageNumber }: { pageNumber: number }) =>

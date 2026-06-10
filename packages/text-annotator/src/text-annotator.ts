@@ -187,7 +187,6 @@ export const createTextAnnotator = <I extends TextAnnotationLike = TextAnnotatio
     setVisible: renderer.setVisible.bind(renderer),
     on: lifecycle.on,
     off: lifecycle.off,
-    // @ts-ignore - temporary
     scrollIntoView: scrollIntoView(container, store),
     state
   }
