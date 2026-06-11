@@ -63,38 +63,41 @@ export const createTextAnnotatorState = <I extends TextAnnotationLike = TextAnno
     return isValid;
   }
 
-  const bulkAddAnnotations = (
-    annotations: I[], 
-    replace = true, 
-    origin = Origin.LOCAL
-  ): I[] => {
+  const reviveAll = (annotations: I[]): { revived: I[], couldNotRevive: I[] } => {
     const revived = annotations.map(a => reviveAnnotation<I>(a, container, opts.selectorReviveFn));
-
     // Initial page load might take some time. Retry for more robustness.
     const couldNotRevive = revived.filter(a => !isRevived(a.target.selector));
-    store.bulkAddAnnotations(revived, replace, origin);
-
-    return couldNotRevive;
+    return { revived, couldNotRevive };
   }
-  
-  const bulkUpsertAnnotations = (
-    annotations: I[], 
+
+  const syncAnnotations = (
+    annotations: I[],
     origin = Origin.LOCAL
   ): I[] => {
-    const revived = annotations.map(a => reviveAnnotation(a, container, opts.selectorReviveFn));
-
-    // Initial page load might take some time. Retry for more robustness.
-    const couldNotRevive = revived.filter(a => !isRevived(a.target.selector));
-    
-    revived.forEach(a => {
-      if (store.getAnnotation(a.id))
-        store.updateAnnotation(a, origin);
-      else 
-        store.addAnnotation(a, origin);
-    })
-
+    const { revived, couldNotRevive } = reviveAll(annotations);
+    store.syncAnnotations(revived, origin);
     return couldNotRevive;
   }
+
+  const bulkUpsertAnnotations = (
+    annotations: I[],
+    origin = Origin.LOCAL
+  ): I[] => {
+    const { revived, couldNotRevive } = reviveAll(annotations);
+    store.bulkUpsertAnnotations(revived, origin);
+    return couldNotRevive;
+  }
+
+  /**
+   * @deprecated use {@link syncAnnotations} (replace) or {@link bulkUpsertAnnotations} (merge) instead.
+   */
+  const bulkAddAnnotations = (
+    annotations: I[],
+    replace = true,
+    origin = Origin.LOCAL
+  ): I[] => replace
+    ? syncAnnotations(annotations, origin)
+    : bulkUpsertAnnotations(annotations, origin);
 
   const updateTarget = (target: TextAnnotationTargetLike, origin = Origin.LOCAL) => {
     const revived = reviveTarget(target, container);
@@ -167,6 +170,7 @@ export const createTextAnnotatorState = <I extends TextAnnotationLike = TextAnno
       getAt,
       recalculatePositions,
       onRecalculatePositions,
+      syncAnnotations,
       updateTarget
     },
     selection,
