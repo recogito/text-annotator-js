@@ -14,7 +14,7 @@ export interface TextAnnotatorOptions<I extends TextAnnotationLike = TextAnnotat
    * Custom function that turns a stored selector into a revived one (with a live DOM `range`).
    * Used by sub-formats such as PDF to map their selector shape to a text range.
    */
-  selectorReviveFn?: (arg: I['target']['selector'][number], container: HTMLElement) => RevivedTextSelectorLike;
+  selectorReviveFn?: (arg: I['target']['selector'][number], container: HTMLElement) => RevivedTextSelectorLike | RevivedTextSelectorLike[];
 
   /**
    * Determines whether an active selection should be dismissed

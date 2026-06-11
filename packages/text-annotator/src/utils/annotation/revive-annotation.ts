@@ -86,17 +86,17 @@ export const reviveTextSelector = <T extends TextSelector>(
 export const reviveTarget = <T extends TextAnnotationTargetLike>(
   target: T, 
   container: HTMLElement,
-  reviveFn: (arg: T['selector'][number], container: HTMLElement) => RevivedTextSelectorLike =
-    (s, c) => reviveTextSelector(s as TextSelector, c) as RevivedTextSelectorLike
+  reviveFn: (arg: T['selector'][number], container: HTMLElement) => RevivedTextSelectorLike | RevivedTextSelectorLike[] =
+    (s, c) => reviveTextSelector(s as TextSelector, c)
 ): RevivedTextAnnotationTargetLike<T> => ({
   ...target,
-  selector: target.selector.map(s => reviveFn(s, container))
+  selector: target.selector.flatMap(s => reviveFn(s, container))
 });
 
 export const reviveAnnotation = <T extends TextAnnotationLike>(
   annotation: T, 
   container: HTMLElement,
-  reviveFn?: (arg: T['target']['selector'][number], container: HTMLElement) => RevivedTextSelectorLike
+  reviveFn?: (arg: T['target']['selector'][number], container: HTMLElement) => RevivedTextSelectorLike | RevivedTextSelectorLike[]
 ): RevivedTextAnnotationLike<T> => ({ 
   ...annotation, 
   target: reviveTarget(annotation.target, container, reviveFn) 
