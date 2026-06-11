@@ -45,8 +45,8 @@
     }
   },
   "dependencies": {
-    "@annotorious/core": "^3.8.2",
-    "@annotorious/react": "^3.8.2",
+    "@annotorious/core": "^3.8.6",
+    "@annotorious/react": "^3.8.6",
     "@floating-ui/react": "^0.27.19",
     "@recogito/text-annotator": "4.2.2",
     "@recogito/text-annotator-tei": "4.2.2",
