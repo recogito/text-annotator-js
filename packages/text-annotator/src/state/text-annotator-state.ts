@@ -115,12 +115,12 @@ export const createTextAnnotatorState = <I extends TextAnnotationLike = TextAnno
   }
 
   const updateTarget = (target: TextAnnotationTargetLike, origin = Origin.LOCAL) => {
-    const revived = reviveTarget(target, container);
+    const revived = reviveTarget(target, container, opts.selectorReviveFn);
     store.updateTarget(revived, origin);
   }
 
   const bulkUpdateTargets = (targets: TextAnnotationTargetLike[], origin = Origin.LOCAL) => {
-    const revived = targets.map(t => reviveTarget(t, container));
+    const revived = targets.map(t => reviveTarget(t, container, opts.selectorReviveFn));
     store.bulkUpdateTargets(revived, origin);
   }
 
