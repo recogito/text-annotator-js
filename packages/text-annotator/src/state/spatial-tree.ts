@@ -2,15 +2,12 @@ import RBush from 'rbush';
 import type { Store } from '@annotorious/core';
 import { createNanoEvents, type Unsubscribe } from 'nanoevents';
 import type { AnnotationRects } from '../state/text-annotation-store';
-import { mergeClientRects, getHighlightClientRects, toParentBounds } from '../utils/highlight'; 
-import { reviveTextSelector } from '../utils/annotation';
-import type { 
+import { mergeClientRects, getHighlightClientRects, toParentBounds } from '../utils/highlight';
+import type {
   RevivedTextAnnotationLike,
-  RevivedTextSelectorLike, 
-  TextAnnotationLike, 
-  TextAnnotationTarget, 
-  TextAnnotationTargetLike, 
-  TextSelector 
+  RevivedTextAnnotationTargetLike,
+  TextAnnotationLike,
+  TextAnnotationTargetLike
 } from '../model';
 
 interface IndexedHighlightRect {
@@ -43,8 +40,7 @@ export const createSpatialTree = <T extends TextAnnotationLike>(
   store: Store<T>,
   container: HTMLElement,
   hMergeTolerance?: number,
-  vMergeTolerance?: number,
-  selectorReviveFn?: (arg: T['target']['selector'][number], container: HTMLElement) => RevivedTextSelectorLike
+  vMergeTolerance?: number
 ) => {
 
   const tree = new RBush<IndexedHighlightRect>();
@@ -54,15 +50,8 @@ export const createSpatialTree = <T extends TextAnnotationLike>(
   const emitter = createNanoEvents<SpatialTreeEvents>();
 
   // Helper: converts a single text annotation target to a list of hightlight rects
-  const toItems = (target: TextAnnotationTargetLike, offset: DOMRect): IndexedHighlightRect[] => {
-    const rects = target.selector.flatMap(s => {
-      const revivedRange = (selectorReviveFn 
-        ? selectorReviveFn(s, container) 
-        : reviveTextSelector(s as TextSelector, container)
-      )?.range;
-
-      return getHighlightClientRects(revivedRange);
-    });
+  const toItems = (target: RevivedTextAnnotationTargetLike, offset: DOMRect): IndexedHighlightRect[] => {
+    const rects = target.selector.flatMap(s => getHighlightClientRects(s.range));
 
     /**
      * Offset the merged client rects so that coords
@@ -94,7 +83,7 @@ export const createSpatialTree = <T extends TextAnnotationLike>(
     index.clear();
   }
 
-  const insert = (target: TextAnnotationTargetLike) => {
+  const insert = (target: RevivedTextAnnotationTargetLike) => {
     const rects = toItems(target, container.getBoundingClientRect());
     if (rects.length === 0) return;
 
@@ -110,12 +99,12 @@ export const createSpatialTree = <T extends TextAnnotationLike>(
     }
   }
 
-  const update = (target: TextAnnotationTargetLike) => {
+  const update = (target: RevivedTextAnnotationTargetLike) => {
     remove(target);
     insert(target);
   }
 
-  const set = (targets: TextAnnotationTargetLike[], replace: boolean = true) => {
+  const set = (targets: RevivedTextAnnotationTargetLike[], replace: boolean = true) => {
     if (replace)
       clear();
 
@@ -209,7 +198,7 @@ export const createSpatialTree = <T extends TextAnnotationLike>(
   const size = () => tree.all().length;
 
   const recalculate = () => {
-    set(store.all().map(a => a.target as TextAnnotationTarget), true);
+    set(store.all().map(a => a.target as RevivedTextAnnotationTargetLike), true);
     emitter.emit('recalculate');
   };
 

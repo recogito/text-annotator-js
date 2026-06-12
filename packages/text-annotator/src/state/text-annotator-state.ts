@@ -12,7 +12,13 @@ import type {
   HoverState, 
 } from '@annotorious/core';
 import { isRevived } from '../model';
-import type { RevivedTextAnnotationLike, TextAnnotation, TextAnnotationLike, TextAnnotationTargetLike } from '../model';
+import type {
+  RevivedTextAnnotationLike,
+  RevivedTextAnnotationTargetLike,
+  TextAnnotation,
+  TextAnnotationLike,
+  TextAnnotationTargetLike
+} from '../model';
 import { createSpatialTree, type SpatialTreeEvents } from '../state/spatial-tree';
 import type { AnnotationRects, TextAnnotationStore } from '../state/text-annotation-store';
 import { reviveAnnotation, reviveTarget } from '../utils/annotation';
@@ -42,8 +48,7 @@ export const createTextAnnotatorState = <I extends TextAnnotationLike = TextAnno
     store,
     container,
     opts.mergeHighlights?.horizontalTolerance,
-    opts.mergeHighlights?.verticalTolerance,
-    opts.selectorReviveFn
+    opts.mergeHighlights?.verticalTolerance
   );
 
   const selection = createSelectionState<I, E>(store, opts.userSelectAction, opts.adapter);
@@ -151,10 +156,10 @@ export const createTextAnnotatorState = <I extends TextAnnotationLike = TextAnno
       deleted.forEach(a => tree.remove(a.target));
 
     if (created.length > 0)
-      tree.set(created.map(a => a.target), false);
+      tree.set(created.map(a => a.target as RevivedTextAnnotationTargetLike), false);
 
     if (updated?.length > 0)
-      updated.forEach(({ newValue }) => tree.update(newValue.target));
+      updated.forEach(({ newValue }) => tree.update(newValue.target as RevivedTextAnnotationTargetLike));
   });
 
   return {
