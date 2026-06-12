@@ -57,6 +57,13 @@ export const createTextAnnotatorState = <I extends TextAnnotationLike = TextAnno
 
   const viewport = createViewportState();
 
+  const reviveAll = (annotations: I[]): { revived: I[], couldNotRevive: I[] } => {
+    const revived = annotations.map(a => reviveAnnotation<I>(a, container, opts.selectorReviveFn));
+    // Initial page load might take some time. Retry for more robustness.
+    const couldNotRevive = revived.filter(a => !isRevived(a.target.selector));
+    return { revived, couldNotRevive };
+  }
+
   // Wrap store interface to intercept annotations and revive DOM ranges, if needed
   const addAnnotation = (annotation: I, origin = Origin.LOCAL): boolean => {
     const revived = reviveAnnotation(annotation, container, opts.selectorReviveFn);
@@ -68,28 +75,12 @@ export const createTextAnnotatorState = <I extends TextAnnotationLike = TextAnno
     return isValid;
   }
 
-  const reviveAll = (annotations: I[]): { revived: I[], couldNotRevive: I[] } => {
-    const revived = annotations.map(a => reviveAnnotation<I>(a, container, opts.selectorReviveFn));
-    // Initial page load might take some time. Retry for more robustness.
-    const couldNotRevive = revived.filter(a => !isRevived(a.target.selector));
-    return { revived, couldNotRevive };
-  }
-
   const syncAnnotations = (
     annotations: I[],
     origin = Origin.LOCAL
   ): I[] => {
     const { revived, couldNotRevive } = reviveAll(annotations);
     store.syncAnnotations(revived, origin);
-    return couldNotRevive;
-  }
-
-  const bulkUpsertAnnotations = (
-    annotations: I[],
-    origin = Origin.LOCAL
-  ): I[] => {
-    const { revived, couldNotRevive } = reviveAll(annotations);
-    store.bulkUpsertAnnotations(revived, origin);
     return couldNotRevive;
   }
 
@@ -103,6 +94,25 @@ export const createTextAnnotatorState = <I extends TextAnnotationLike = TextAnno
   ): I[] => replace
     ? syncAnnotations(annotations, origin)
     : bulkUpsertAnnotations(annotations, origin);
+
+  const updateAnnotation = (arg1: string | I, arg2?: I | Origin, arg3?: Origin) => {
+    if (typeof arg1 === 'string') {
+      const revived = reviveAnnotation(arg2 as I, container, opts.selectorReviveFn);
+      store.updateAnnotation(arg1, revived, arg3);
+    } else {
+      const revived = reviveAnnotation(arg1, container, opts.selectorReviveFn);
+      store.updateAnnotation(revived, arg2 as Origin);
+    }
+  }
+
+  const bulkUpsertAnnotations = (
+    annotations: I[],
+    origin = Origin.LOCAL
+  ): I[] => {
+    const { revived, couldNotRevive } = reviveAll(annotations);
+    store.bulkUpsertAnnotations(revived, origin);
+    return couldNotRevive;
+  }
 
   const updateTarget = (target: TextAnnotationTargetLike, origin = Origin.LOCAL) => {
     const revived = reviveTarget(target, container);
@@ -176,6 +186,7 @@ export const createTextAnnotatorState = <I extends TextAnnotationLike = TextAnno
       recalculatePositions,
       onRecalculatePositions,
       syncAnnotations,
+      updateAnnotation,
       updateTarget
     },
     selection,
