@@ -19,10 +19,10 @@ import type {
   TextAnnotationLike,
   TextAnnotationTargetLike
 } from '../model';
-import { createSpatialTree, type SpatialTreeEvents } from '../state/spatial-tree';
-import type { AnnotationRects, TextAnnotationStore } from '../state/text-annotation-store';
 import { reviveAnnotation, reviveTarget } from '../utils/annotation';
 import type { TextAnnotatorOptions } from '../text-annotator-options';
+import { createSpatialTree, type SpatialTreeEvents } from './spatial-tree';
+import type { AnnotationRects, TextAnnotationStore } from './text-annotation-store';
 
 export interface TextAnnotatorState<I extends TextAnnotationLike = TextAnnotationLike, E extends unknown = TextAnnotation> 
   extends Omit<AnnotatorState<I, E>, 'store'> {
