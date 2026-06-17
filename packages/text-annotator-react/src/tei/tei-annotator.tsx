@@ -13,6 +13,8 @@ export type TEIAnnotatorProps = TextAnnotatorOptions<TEIAnnotation, unknown> & {
 
   filter?: Filter;
 
+  hideAnnotations?: boolean;
+
 }
 
 export const TEIAnnotator = (props: TEIAnnotatorProps) => {
@@ -29,6 +31,8 @@ export const TEIAnnotator = (props: TEIAnnotatorProps) => {
   useEffect(() => anno?.setStyle(props.style), [anno, props.style]);
 
   useEffect(() => anno?.setFilter(props.filter), [anno, props.filter]);
+
+  useEffect(() => anno?.setVisible(!props.hideAnnotations), [anno, props.hideAnnotations]);
 
   useEffect(() => anno?.setUser(opts.user), [anno, opts.user]);
 
