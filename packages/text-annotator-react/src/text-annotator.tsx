@@ -16,6 +16,8 @@ export interface TextAnnotatorProps<I extends TextAnnotation = TextAnnotation, E
 
   filter?: Filter<I>;
 
+  hideAnnotations?: boolean;
+
   className?: string;
 
 }
@@ -26,7 +28,7 @@ export const TextAnnotator = <I extends TextAnnotation = TextAnnotation, E exten
 
   const el = useRef<HTMLDivElement>(null);
 
-  const { className, children, ...opts } = props;
+  const { className, children, hideAnnotations, ...opts } = props;
 
   const { style, filter, user, annotatingEnabled, userSelectAction, annotatingMode } = opts;
 
@@ -46,6 +48,8 @@ export const TextAnnotator = <I extends TextAnnotation = TextAnnotation, E exten
   useEffect(() => anno?.setStyle(style), [anno, style]);
 
   useEffect(() => anno?.setFilter(filter), [anno, filter]);
+
+  useEffect(() => anno?.setVisible(!hideAnnotations), [anno, hideAnnotations]);
 
   useEffect(() => anno?.setUser(user), [anno, user]);
 
