@@ -255,8 +255,15 @@ export const isTEIRangeSelector = (selector: TEIRangeSelector | TextSelector): s
     selector.endSelector.type === 'XPathSelector'
   );
 
-export const reviveSelector = (selector: TEIRangeSelector | RevivedTextSelector, container: HTMLElement): RevivedTEIRangeSelector =>
-  isTEIRangeSelector(selector) ? reviveTEISelector(selector, container) : textToTEISelector(selector, container);
+export const reviveSelector = (selector: TEIRangeSelector | RevivedTextSelector, container: HTMLElement): RevivedTEIRangeSelector => {
+  try {
+    return isTEIRangeSelector(selector) ? reviveTEISelector(selector, container) : textToTEISelector(selector, container);
+  } catch (error) {
+    console.error(`Could not revive selector`);
+    console.error(selector);
+    throw error;
+  }
+}
 
 const reviveTEISelector = (selector: TEIRangeSelector, container: HTMLElement): RevivedTEIRangeSelector => {
   // Don't revive unncessarily
