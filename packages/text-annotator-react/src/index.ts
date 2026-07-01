@@ -42,9 +42,16 @@ export type {
   AnnotatingMode,
   HighlightStyle,
   HighlightStyleExpression,
+  RevivedTextAnnotationLike,
+  RevivedTextAnnotationTargetLike,
+  RevivedTextSelector,
+  RevivedTextSelectorLike,
   TextAnnotation,
+  TextAnnotationLike,
   TextAnnotationTarget,
+  TextAnnotationTargetLike,
   TextSelector,
+  TextSelectorLike,
   W3CTextAnnotation,
   W3CTextAnnotationTarget,
   W3CTextSelector,
@@ -60,6 +67,9 @@ export {
 } from '@recogito/text-annotator';
 
 export type {
+  RevivedTEIAnnotation,
+  RevivedTEIAnnotationTarget,
+  RevivedTEIRangeSelector,
   TEIAnnotator as RecogitoTEIAnnotator,
   TEIAnnotation,
   TEIAnnotationTarget,
