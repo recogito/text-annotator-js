@@ -30,7 +30,7 @@
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "typescript": "^5.9.3",
-    "vite": "^7.3.5",
+    "vite": "^7.3.6",
     "vite-plugin-externalize-deps": "^0.10.0",
     "vite-tsconfig-paths": "^5.1.4"
   },
