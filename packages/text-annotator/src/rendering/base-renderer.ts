@@ -229,7 +229,9 @@ export const createRenderer = <T extends TextAnnotatorState<TextAnnotationLike, 
     unsubscribeSelection();
     unsubscribeHover();
 
-    document.removeEventListener('scroll', onScroll);
+    // Note: the capture flag must match the one used on registration,
+    // otherwise this call matches no listener and silently does nothing.
+    document.removeEventListener('scroll', onScroll, { capture: true });
 
     // onResize.clear();
     window.removeEventListener('resize', onResize);
