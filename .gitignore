@@ -1,6 +1,7 @@
 .vscode
 .idea
 .claude
+pdf.worker.min.mjs
 
 dist
 node_modules
