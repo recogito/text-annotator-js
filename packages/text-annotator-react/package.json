@@ -24,11 +24,11 @@
   "module": "./dist/react-text-annotator.es.js",
   "types": "./dist/index.d.ts",
   "devDependencies": {
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.5",
     "@vitejs/plugin-react": "^5.2.0",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "typescript": "^5.9.3",
     "vite": "^7.3.6",
     "vite-plugin-externalize-deps": "^0.10.0",
@@ -45,9 +45,9 @@
     }
   },
   "dependencies": {
-    "@annotorious/core": "^3.8.6",
-    "@annotorious/react": "^3.8.6",
-    "@floating-ui/react": "^0.27.19",
+    "@annotorious/core": "^3.8.9",
+    "@annotorious/react": "^3.8.9",
+    "@floating-ui/react": "^0.27.20",
     "@recogito/text-annotator": "4.2.5",
     "@recogito/text-annotator-tei": "4.2.5",
     "CETEIcean": "^1.9.5",
