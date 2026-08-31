@@ -34,23 +34,23 @@
   },
   "devDependencies": {
     "@recogito/react-text-annotator": "4.2.5",
-    "@types/react-dom": "^19.2.3",
+    "@types/react-dom": "^19.2.5",
     "@vitejs/plugin-react": "^5.2.0",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "typescript": "^5.9.3",
     "vite": "^7.3.6",
     "vite-plugin-dts": "^4.5.4",
     "vite-tsconfig-paths": "^5.1.4"
   },
   "peerDependencies": {
-    "@annotorious/react": "^3.8.6",
+    "@annotorious/react": "^3.8.9",
     "@recogito/pdf-annotator": "4.2.5",
-    "pdfjs-dist": "^6.0.227",
+    "pdfjs-dist": "^6.3.289",
     "react": ">= ^18.x || >= ^19.x",
     "react-dom": ">= ^18.x || >= ^19.x"
   },
   "dependencies": {
-    "@floating-ui/react": "^0.27.19"
+    "@floating-ui/react": "^0.27.20"
   }
 }
