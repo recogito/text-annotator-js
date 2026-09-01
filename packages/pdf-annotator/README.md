@@ -45,6 +45,7 @@ const anno = createPDFAnnotator(element, url, options);
 | `selectionMode` | `'shortest' \| 'all'` | `'shortest'` | When the user selects overlapping annotations: select all or only the shortest. |
 | `style` | `HighlightStyleExpression` | `undefined` | Custom styling function for highlights. |
 | `user` | `User` | anonymous guest | Current user information, automatically added to created or updated annotations. |
+| `workerSrc` | `string` | `/pdf.worker.min.mjs` | Path to the PDF.js web worker script. |
 
 ## Annotator API
 
