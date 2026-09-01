@@ -17,6 +17,7 @@ import type { PDFScale } from './utils/pdf';
 import { addResizeObserver } from './utils/dom';
 import { scrollIntoView as _scrollIntoView } from './utils/annotation';
 import { setScale as _setScale, zoomIn as _zoomIn, zoomOut as _zoomOut } from './utils/pdf';
+import type { PDFAnnotatorOptions } from './pdf-annotator-options';
 
 import '@recogito/text-annotator/text-annotator.css';
 import './pdf-annotator.css';
@@ -44,8 +45,8 @@ export interface PDFAnnotator extends Omit<TextAnnotator<PDFAnnotation, PDFAnnot
 export const createPDFAnnotator = (
   container: HTMLDivElement, 
   pdfURL: string,
-  options: TextAnnotatorOptions<PDFAnnotation, PDFAnnotation> = {}
-): Promise<PDFAnnotator> => createPDFViewer(container, pdfURL).then(({ viewer, viewerElement }) => {
+  options: PDFAnnotatorOptions = {}
+): Promise<PDFAnnotator> => createPDFViewer(container, pdfURL, options).then(({ viewer, viewerElement }) => {
   const opts = fillDefaults<PDFAnnotation, PDFAnnotation>(options, {
     annotatingEnabled: true
   });

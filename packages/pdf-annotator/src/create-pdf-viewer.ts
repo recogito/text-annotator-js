@@ -17,9 +17,9 @@
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 import * as pdfjsViewer from 'pdfjs-dist/legacy/web/pdf_viewer.mjs';
 
-import 'pdfjs-dist/legacy/web/pdf_viewer.css';
+import type { PDFAnnotatorOptions } from './pdf-annotator-options';
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
+import 'pdfjs-dist/legacy/web/pdf_viewer.css';
 
 const CMAP_URL = 'pdfjs-dist/cmaps/';
 const CMAP_PACKED = true;
@@ -29,7 +29,10 @@ const ENABLE_XFA = true;
 export const createPDFViewer = (
   container: HTMLDivElement,
   pdfURL: string,
+  opts: PDFAnnotatorOptions
 ) => new Promise<{ viewer: pdfjsViewer.PDFViewer, viewerElement: HTMLDivElement }>((resolve, reject) => {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = opts.workerSrc || '/pdf.worker.min.mjs';
+
   // Container needs a DIV child - cf:
   // https://github.com/mozilla/pdf.js/blob/master/examples/components/simpleviewer.html
   const viewerElement = document.createElement('div');
