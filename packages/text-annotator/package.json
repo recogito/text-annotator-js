@@ -32,7 +32,7 @@
     "typescript": "^5.9.3",
     "vite": "^7.3.6",
     "vite-plugin-externalize-deps": "^0.10.0",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.11"
   },
   "dependencies": {
     "@annotorious/core": "^3.8.9",
@@ -41,7 +41,7 @@
     "dequal": "^2.0.3",
     "hotkeys-js": "^4.0.7",
     "poll": "^3.2.2",
-    "nanoevents": "^9.1.0",
+    "nanoevents": "^10.0.0",
     "rbush": "^4.0.1",
     "uuid": "^14.0.2"
   }
