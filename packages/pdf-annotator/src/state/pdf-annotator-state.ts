@@ -126,14 +126,33 @@ export const createPDFAnnotatorState = (
     return success;
   }
 
+  /**
+   * @deprecated use {@link syncAnnotations} (replace) or {@link bulkUpsertAnnotations} (merge) instead.
+   */
   const bulkAddAnnotations = (
     annotations: PDFAnnotation[], 
     replace: boolean,
     origin = Origin.LOCAL
+  ) => replace
+    ? syncAnnotations(annotations, origin)
+    : bulkUpsertAnnotations(annotations, origin);
+
+  const syncAnnotations = (
+    annotations: PDFAnnotation[],
+    origin = Origin.LOCAL
   ) => {
     const resolved = annotations.map(resolveAnnotation);
     resolved.forEach(a => renderedAnnotations.upsert(a));
-    return innerStore.bulkAddAnnotations(resolved, replace, origin) as PDFAnnotation[];
+    return innerStore.syncAnnotations(resolved, origin) as PDFAnnotation[];
+  }
+
+  const bulkUpsertAnnotations = (
+    annotations: PDFAnnotation[],
+    origin = Origin.LOCAL
+  ) => {
+    const resolved = annotations.map(resolveAnnotation);
+    resolved.forEach(a => renderedAnnotations.upsert(a));
+    return innerStore.bulkUpsertAnnotations(resolved, origin) as PDFAnnotation[];
   }
 
   const updateAnnotation = (arg1: string | PDFAnnotation, arg2?: PDFAnnotation | Origin, arg3?: Origin) => {
@@ -232,8 +251,10 @@ export const createPDFAnnotatorState = (
       ...innerStore,
       addAnnotation,
       bulkAddAnnotations,
+      bulkUpsertAnnotations,
       observe,
       onLazyRender,
+      syncAnnotations,
       unobserve,
       updateAnnotation,
       updateTarget
