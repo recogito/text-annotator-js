@@ -15,7 +15,10 @@ export default defineConfig({
     sourcemap: true,
     target: 'esnext',
     lib: {
-      entry: './src/index.ts',
+      entry: {
+        'pdf-annotator': './src/index.ts',
+        'index.node': './src/index.node.ts',
+      },
       formats: ['es'],
     },
     rollupOptions: {

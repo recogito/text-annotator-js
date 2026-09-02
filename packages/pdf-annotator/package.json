@@ -21,17 +21,19 @@
   },
   "main": "./dist/pdf-annotator.js",
   "module": "./dist/pdf-annotator.js",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/pdf-annotator.d.ts",
   "files": [
     "dist",
     "copy-worker.js"
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/pdf-annotator.js"
+      "types": "./dist/pdf-annotator.d.ts",
+      "node": "./dist/index.node.js",
+      "import": "./dist/pdf-annotator.js",
+      "default": "./dist/pdf-annotator.js"
     },
-    "./pdf-anntator.css": "./dist/pdf-annotator.css"
+    "./pdf-annotator.css": "./dist/pdf-annotator.css"
   },
   "devDependencies": {
     "typescript": "^5.9.3",

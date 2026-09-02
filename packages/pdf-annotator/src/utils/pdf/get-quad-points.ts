@@ -1,8 +1,8 @@
-import * as pdfjsViewer from 'pdfjs-dist/legacy/web/pdf_viewer.mjs';
+import type { PDFPageView } from 'pdfjs-dist/legacy/web/pdf_viewer.mjs';
 
 interface Point { x: number, y: number };
 
-const clientPointToPDFPoint = (pt: Point, page: pdfjsViewer.PDFPageView, viewerElement: HTMLDivElement): Point => {
+const clientPointToPDFPoint = (pt: Point, page: PDFPageView, viewerElement: HTMLDivElement): Point => {
   // Points y is relative to viewerElement!
   const canvas = page.canvas as unknown as HTMLCanvasElement;
 
@@ -31,7 +31,7 @@ const clientPointToPDFPoint = (pt: Point, page: pdfjsViewer.PDFPageView, viewerE
   return { x: round(pdfX), y: round(pdfY) };
 }
 
-const rectToQuadPoints = (rect: DOMRect, page: pdfjsViewer.PDFPageView, viewerElement: HTMLDivElement) => {
+const rectToQuadPoints = (rect: DOMRect, page: PDFPageView, viewerElement: HTMLDivElement) => {
   // QuadPoint-compliant. The (Adobe) spec says: starting bottom-left, counter-clockwise.
   // The (Adobe) implementation does: bottom-left, bottom-right, top-left, top-right. Yay.
   // https://github.com/highkite/pdfAnnotate?tab=readme-ov-file#quadpoints
@@ -48,5 +48,5 @@ const rectToQuadPoints = (rect: DOMRect, page: pdfjsViewer.PDFPageView, viewerEl
   },[]);
 }
 
-export const getQuadPoints = (rects: DOMRect[], page: pdfjsViewer.PDFPageView, viewerElement: HTMLDivElement) =>
+export const getQuadPoints = (rects: DOMRect[], page: PDFPageView, viewerElement: HTMLDivElement) =>
   rects.reduce<number[]>((qp, rect) => [...qp, ...rectToQuadPoints(rect, page, viewerElement)], []);
