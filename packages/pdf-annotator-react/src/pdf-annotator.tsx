@@ -9,7 +9,7 @@ import {
   type PDFAnnotation 
 } from '@recogito/pdf-annotator';
 
-import '@recogito/pdf-annotator/pdf-anntator.css';
+import '@recogito/pdf-annotator/pdf-annotator.css';
 import './pdf-annotator.css';
 
 export type PDFAnnotatorProps = PDFAnnotatorOptions & {
