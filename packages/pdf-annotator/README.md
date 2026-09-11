@@ -46,6 +46,7 @@ const anno = createPDFAnnotator(element, url, options);
 | `style` | `HighlightStyleExpression` | `undefined` | Custom styling function for highlights. |
 | `user` | `User` | anonymous guest | Current user information, automatically added to created or updated annotations. |
 | `workerSrc` | `string` | `/pdf.worker.min.mjs` | Path to the PDF.js web worker script. |
+| `wasmUrl` | `string` | `/` | Path to the WASM helper directory. |
 
 ## Annotator API
 

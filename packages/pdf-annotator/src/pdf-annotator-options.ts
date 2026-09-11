@@ -5,4 +5,6 @@ export interface PDFAnnotatorOptions extends TextAnnotatorOptions<PDFAnnotation,
 
   workerSrc?: string;
 
+  wasmUrl?: string;
+
 }

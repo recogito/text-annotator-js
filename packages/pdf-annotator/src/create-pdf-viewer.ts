@@ -33,6 +33,8 @@ export const createPDFViewer = (
 ) => new Promise<{ viewer: pdfjsViewer.PDFViewer, viewerElement: HTMLDivElement }>((resolve, reject) => {
   pdfjsLib.GlobalWorkerOptions.workerSrc = opts.workerSrc || '/pdf.worker.min.mjs';
 
+  const wasmUrl = opts.wasmUrl || '/';
+
   // Container needs a DIV child - cf:
   // https://github.com/mozilla/pdf.js/blob/master/examples/components/simpleviewer.html
   const viewerElement = document.createElement('div');
@@ -64,7 +66,8 @@ export const createPDFViewer = (
     url: pdfURL,
     cMapUrl: CMAP_URL,
     cMapPacked: CMAP_PACKED,
-    enableXfa: ENABLE_XFA
+    enableXfa: ENABLE_XFA,
+    wasmUrl
   }).promise.then(pdfDocument => {
     viewer.setDocument(pdfDocument);
     pdfLinkService.setDocument(pdfDocument);
