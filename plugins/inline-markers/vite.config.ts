@@ -11,7 +11,7 @@ export default defineConfig({
     lib: {
       entry: {
         'plugin-inline-markers': './src/index.ts',
-        'plugin-inline-markers-react': './src/react/index.tsx'
+        'plugin-inline-markers-react': './src/react/index.ts'
       },
       formats: ['es'],
       fileName: (format, entryName) => `${entryName}.${format}.js`,

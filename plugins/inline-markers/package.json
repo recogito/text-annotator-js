@@ -15,6 +15,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/plugin-inline-markers.es.js"
     },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/plugin-inline-markers-react.es.js"
+    },
     "./style.css": "./dist/index.css"
   },
   "scripts": {
@@ -24,8 +28,29 @@
   },
   "devDependencies": {
     "@annotorious/react": "^3.8.9",
+    "@recogito/react-text-annotator": "4.3.2",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.5",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "typescript": "^5.9.3",
     "vite": "^7.3.6"
+  },
+  "peerDependencies": {
+    "@recogito/react-text-annotator": "^4.3.2",
+    "react": ">=18 <20",
+    "react-dom": ">=18 <20"
+  },
+  "peerDependenciesMeta": {
+    "@recogito/react-text-annotator": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
   },
   "dependencies": {
     "@recogito/text-annotator": "^4.3.2",
