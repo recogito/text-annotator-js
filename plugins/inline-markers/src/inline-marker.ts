@@ -1,4 +1,4 @@
-import { RevivedTextAnnotationLike, RevivedTextSelector } from '@recogito/text-annotator';
+import { RevivedTextAnnotationLike } from '@recogito/text-annotator';
 
 export interface InlineMarker {
 

@@ -149,6 +149,7 @@ export const createTextAnnotator = <I extends TextAnnotationLike = TextAnnotatio
   }
 
   const setRenderer = (factory: RendererFactory<I>) => {
+    console.debug('Setting custom renderer implementation');
     const nextRenderer = factory(container, state, viewport);
     renderer?.destroy();
     renderer = nextRenderer;
