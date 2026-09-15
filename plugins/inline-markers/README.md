@@ -10,11 +10,18 @@ visibility.
 
 ```js
 import { createTextAnnotator } from '@recogito/text-annotator';
-import { InlineMarkersRenderer } from '@recogito/text-annotator-plugin-inline-markers';
+import { InlineMarkersExtension } from '@recogito/text-annotator-plugin-inline-markers';
+
+import '@recogito/text-annotator/text-annotator.css';
+
+const ext = InlineMarkersExtension();
 
 const r = createTextAnnotator(contentContainer, {
   // Replace default renderer with this extension
-  renderer: InlineMarkersRenderer
+  renderer: ext.Renderer
 });
+
+// Toggle marker visibility:
+// ext.setShowMarkers(false);
 ```
 

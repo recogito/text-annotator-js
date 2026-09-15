@@ -9,7 +9,6 @@ import {
   TextAnnotationLike,
   type Highlight,
   type HighlightStyleExpression, 
-  type Painter,
   type TextAnnotatorState, 
   type ViewportBounds, 
   type ViewportState
@@ -17,8 +16,9 @@ import {
 
 const createInlineMarkersPainter = (
   container: HTMLElement,
-  state: TextAnnotatorState<TextAnnotationLike, unknown>
-): Painter => {
+  _state: TextAnnotatorState<TextAnnotationLike, unknown>,
+  opts: InlineMarkersExtensionOptions
+) => {
   container.classList.add('r6o-annotatable');
 
   const highlightLayer = document.createElement('div');
@@ -26,6 +26,7 @@ const createInlineMarkersPainter = (
 
   container.insertBefore(highlightLayer, container.firstChild);
 
+  let showMarkers = opts.showMarkers;
   let currentMarkers: InlineMarker[] = [];
 
   const redraw = (
@@ -43,13 +44,16 @@ const createInlineMarkersPainter = (
     const groups = groupByPosition(highlights);
 
     currentMarkers = groups.map(group => {
-      // Create a marker to indicate the start of the group
-      // if multiple annotations start here
-      const highlightsInGroup = group.subgroups.flatMap(sg => sg.highlights);
-      
       let marker: InlineMarker | undefined;
-      if (highlightsInGroup.length > 1)
-        marker = createInlineMarker(highlightsInGroup.map(h => h.annotation));
+      
+      if (showMarkers) {
+        // Create a marker to indicate the start of the group
+        // if multiple annotations start here
+        const highlightsInGroup = group.subgroups.flatMap(sg => sg.highlights);
+      
+        if (highlightsInGroup.length > 1)
+          marker = createInlineMarker(highlightsInGroup.map(h => h.annotation));
+      }
 
       // Render highlights for each sub-group (as a side effect)
       group.subgroups.map(subgroup => {
@@ -94,6 +98,10 @@ const createInlineMarkersPainter = (
     }).filter(Boolean) as InlineMarker[];
   }
 
+  const setShowMarkers = (show: boolean) => {
+    showMarkers = show;
+  }
+
   const setVisible = (visible: boolean) => {
     if (visible)
       highlightLayer.classList.remove('hidden');
@@ -108,33 +116,58 @@ const createInlineMarkersPainter = (
   return {
     destroy,
     redraw,
+    setShowMarkers,
     setVisible
   };
 
 }
 
-export const InlineMarkersRenderer = (
-  container: HTMLElement,
-  state: TextAnnotatorState<TextAnnotationLike, unknown>,
-  viewport: ViewportState
-): Renderer => {
-  const painter = createInlineMarkersPainter(container, state);
+interface InlineMarkersExtensionOptions {
 
-  const renderer = createRenderer(painter, container, state, viewport);
+  showMarkers: boolean;
 
-  state.store.observe(event => {
-    const { created } = event.changes;
-    if (created && created.length > 0) {
-      setTimeout(() => {
-        const unsubscribe = state.store.onRecalculatePositions(() => {
-          renderer.redraw();
-          unsubscribe();
-        });
+}
 
-        state.store.recalculatePositions();
-      }, 100);
-    }
-  });
+export const InlineMarkersExtension = (options: InlineMarkersExtensionOptions = { showMarkers: true }) => {
+  let painterRef: ReturnType<typeof createInlineMarkersPainter> | undefined;
+  let rendererRef: Renderer | undefined;
 
-  return renderer;
+  const factory = (
+    container: HTMLElement,
+    state: TextAnnotatorState<TextAnnotationLike, unknown>,
+    viewport: ViewportState
+  ) => {
+    const painter = createInlineMarkersPainter(container, state, options);
+    painterRef = painter;
+
+    const renderer = createRenderer(painter, container, state, viewport);
+    rendererRef = renderer;
+
+    state.store.observe(event => {
+      const { created } = event.changes;
+      if (created && created.length > 0) {
+        setTimeout(() => {
+          const unsubscribe = state.store.onRecalculatePositions(() => {
+            renderer.redraw();
+            unsubscribe();
+          });
+
+          state.store.recalculatePositions();
+        }, 100);
+      }
+    });
+
+    return renderer;
+  }
+
+  const setShowMarkers = (show: boolean) => {
+    painterRef?.setShowMarkers(show);
+    rendererRef?.redraw();
+  }
+
+  return { 
+    setShowMarkers,
+    Renderer: factory
+  }
+
 }

@@ -44,22 +44,32 @@
         font-size: 17px;
         line-height: 160%;
       }
+
+      #toggle-markers {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 999;
+      }
     </style>
   </head>
 
   <body>
-    <div id="content">
-    </div>
+    <button id="toggle-markers">Toggle Markers</button>
+
+    <div id="content"></div>
 
     <script type="module">
       import CETEI from 'CETEIcean';
       import { createTEIAnnotator } from '@recogito/text-annotator-tei';
-      import { InlineMarkersRenderer } from '../../src/index.ts';
+      import { InlineMarkersExtension } from '../../src/index.ts';
 
       import '@recogito/text-annotator/text-annotator.css';
 
       window.onload = async function () {
         var CETEIcean = new CETEI();
+
+        const ext = InlineMarkersExtension();
 
         CETEIcean.getHTML5('chapter_BCar_incl_sandhi.xml', data => {
           document.getElementById('content').appendChild(data);
@@ -71,10 +81,17 @@
             mergeHighlights: {
               horizontalTolerance: 10
             },
-            renderer: InlineMarkersRenderer
+            renderer: ext.Renderer
           });
 
           anno.loadAnnotations('annotations.json');
+        });
+
+        let showMarkers = true;
+
+        document.getElementById('toggle-markers').addEventListener('click', () => {
+          showMarkers = !showMarkers;
+          ext.setShowMarkers(showMarkers);
         });
       };
     </script>
