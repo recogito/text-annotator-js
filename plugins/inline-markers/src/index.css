@@ -1,0 +1,17 @@
+marker {
+  padding-right: 2px;
+  pointer-events: none;
+}
+
+marker > span:before {
+  position:relative;
+  border-right: 1.5px solid oklch(59% 0.136 62 / 0.8);
+  color: oklch(59% 0.136 62);
+  font-family: sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  font-style: normal;
+  content: attr(data-count);
+  padding-right: 2px;
+  bottom: 1px;
+}
