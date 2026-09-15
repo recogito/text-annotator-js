@@ -165,7 +165,14 @@ export const InlineMarkersExtension = (options: InlineMarkersExtensionOptions = 
     rendererRef?.redraw();
   }
 
+  const destroy = () => {
+    rendererRef?.destroy();
+    painterRef = undefined;
+    rendererRef = undefined;
+  }
+
   return { 
+    destroy,
     setShowMarkers,
     Renderer: factory
   }
