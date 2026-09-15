@@ -22,7 +22,7 @@ import type { PDFAnnotatorOptions } from './pdf-annotator-options';
 import '@recogito/text-annotator/text-annotator.css';
 import './pdf-annotator.css';
 
-export interface PDFAnnotator extends Omit<TextAnnotator<PDFAnnotation, PDFAnnotation>, 'setAnnotatingEnabled' | 'redraw'> {
+export interface PDFAnnotator extends Omit<TextAnnotator<PDFAnnotation, PDFAnnotation>, 'setAnnotatingEnabled' | 'redraw' | 'setRenderer'> {
 
   element: HTMLElement;
 
