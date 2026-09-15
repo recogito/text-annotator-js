@@ -40,6 +40,8 @@ export interface TextAnnotator<I extends TextAnnotationLike = TextAnnotation, E 
 
   renderer: Renderer;
 
+  setRenderer(renderer: RendererFactory<I>): void;
+
   setStyle(style?: HighlightStyleExpression<I>, id?: string): void;
 
   // Returns true if successful (or false if the annotation is not currently rendered)
@@ -93,7 +95,7 @@ export const createTextAnnotator = <I extends TextAnnotationLike = TextAnnotatio
         : opts.renderer || USE_DEFAULT_RENDERER :
     null;
 
-  const renderer =
+  let renderer =
     useBuiltInRenderer === null ? (opts.renderer as RendererFactory<I>)(
       container, 
       state, 
@@ -146,8 +148,14 @@ export const createTextAnnotator = <I extends TextAnnotationLike = TextAnnotatio
     selectionHandler.setAnnotatingMode(mode);
   }
 
+  const setRenderer = (factory: RendererFactory<I>) => {
+    const nextRenderer = factory(container, state, viewport);
+    renderer?.destroy();
+    renderer = nextRenderer;
+  }
+
   const setFilter = (filter?: Filter<I>) => {
-    renderer.setFilter(filter);
+    renderer?.setFilter(filter);
     selectionHandler.setFilter(filter);
   }
 
@@ -165,7 +173,7 @@ export const createTextAnnotator = <I extends TextAnnotationLike = TextAnnotatio
   }
 
   const destroy = () => {
-    renderer.destroy();
+    renderer?.destroy();
     selectionHandler.destroy();
 
     // Other cleanup actions
@@ -177,11 +185,14 @@ export const createTextAnnotator = <I extends TextAnnotationLike = TextAnnotatio
     destroy,
     element: container,
     getUser,
-    renderer,
+    get renderer() {
+      return renderer!;
+    },
+    setRenderer,
     setAnnotatingEnabled,
     setAnnotatingMode,
     setFilter,
-    setStyle: renderer.setStyle.bind(renderer),
+    setStyle: (style, id) => renderer?.setStyle(style, id),
     setUser,
     setSelected,
     setVisible: renderer.setVisible.bind(renderer),
