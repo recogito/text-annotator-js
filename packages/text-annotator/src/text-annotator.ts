@@ -152,7 +152,6 @@ export const createTextAnnotator = <I extends TextAnnotationLike = TextAnnotatio
     const nextRenderer = factory(container, state, viewport);
     renderer?.destroy();
     renderer = nextRenderer;
-    renderer.setStyle(opts.style);
   }
 
   const setFilter = (filter?: Filter<I>) => {
