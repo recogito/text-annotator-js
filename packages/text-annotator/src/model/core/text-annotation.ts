@@ -95,3 +95,6 @@ export function isRevived(selector: TextSelectorLike | TextSelectorLike[]): bool
     ? selector.every(s => 'range' in s && s.range instanceof Range && !s.range.collapsed)
     : 'range' in selector && selector.range instanceof Range && !selector.range.collapsed;
 }
+
+export const isTextSelector = (selector: TextSelectorLike): selector is TextSelector =>
+  'start' in selector && 'end' in selector; 

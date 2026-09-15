@@ -52,3 +52,6 @@ export interface RevivedTEIAnnotation extends TEIAnnotation {
 }
 
 export type RevivedTEIRangeSelector = TEIRangeSelector & RevivedTextSelectorLike;
+
+export const isTEIRangeSelector = (selector: TextSelectorLike): selector is TEIRangeSelector =>
+  'position' in selector && (selector as TEIRangeSelector).startSelector?.type === 'XPathSelector' && (selector as TEIRangeSelector).endSelector?.type === 'XPathSelector';
