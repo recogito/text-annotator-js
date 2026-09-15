@@ -14,7 +14,8 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/plugin-inline-markers.es.js"
-    }
+    },
+    "./style.css": "./dist/index.css"
   },
   "scripts": {
     "start": "vite",

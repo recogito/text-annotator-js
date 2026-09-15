@@ -11,7 +11,11 @@ export default defineConfig({
     lib: {
       entry: './src/index.ts',
       formats: ['es'],
-      fileName: (format) => `plugin-inline-markers.${format}.js`
+      fileName: (format) => `plugin-inline-markers.${format}.js`,
+      cssFileName: 'index'
+    },
+    rollupOptions: {
+      external: ['@recogito/text-annotator', '@recogito/text-annotator-tei']
     }
   }
 });
