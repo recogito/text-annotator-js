@@ -150,13 +150,13 @@ export const createTextAnnotator = <I extends TextAnnotationLike = TextAnnotatio
 
   const setRenderer = (factory: RendererFactory<I>) => {
     const nextRenderer = factory(container, state, viewport);
-    renderer!.destroy();
+    renderer?.destroy();
     renderer = nextRenderer;
     renderer.setStyle(opts.style);
   }
 
   const setFilter = (filter?: Filter<I>) => {
-    renderer!.setFilter(filter);
+    renderer?.setFilter(filter);
     selectionHandler.setFilter(filter);
   }
 
@@ -174,7 +174,7 @@ export const createTextAnnotator = <I extends TextAnnotationLike = TextAnnotatio
   }
 
   const destroy = () => {
-    renderer!.destroy();
+    renderer?.destroy();
     selectionHandler.destroy();
 
     // Other cleanup actions
@@ -193,7 +193,7 @@ export const createTextAnnotator = <I extends TextAnnotationLike = TextAnnotatio
     setAnnotatingEnabled,
     setAnnotatingMode,
     setFilter,
-    setStyle: (style, id) => renderer!.setStyle(style, id),
+    setStyle: (style, id) => renderer?.setStyle(style, id),
     setUser,
     setSelected,
     setVisible: renderer.setVisible.bind(renderer),
