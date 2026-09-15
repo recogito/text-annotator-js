@@ -1,10 +1,10 @@
 import { useEffect, useRef } from 'react';
-import { AnnotoriousPlugin, TextAnnotation, type TextAnnotatorPlugin } from '@recogito/react-text-annotator';
+import type { TextAnnotator } from '@recogito/text-annotator';
+import { AnnotoriousPlugin, type TextAnnotationLike, type TextAnnotatorPlugin } from '@recogito/react-text-annotator';
 import { InlineMarkersExtension } from '../inline-markers-renderer';
 
 import '@recogito/text-annotator/text-annotator.css';
 import '../index.css';
-import { TEIAnnotation } from '@recogito/text-annotator-tei';
 
 export interface InlineMarkersPluginProps {
 
@@ -15,7 +15,7 @@ export interface InlineMarkersPluginProps {
 export const InlineMarkersPlugin = ({ showMarkers = true }: InlineMarkersPluginProps) => {
   const extensionRef = useRef<ReturnType<typeof InlineMarkersExtension> | undefined>(undefined);
 
-  const pluginRef = useRef<TextAnnotatorPlugin<TextAnnotation | TEIAnnotation>>(annotator => {
+  const pluginRef = useRef<TextAnnotatorPlugin<TextAnnotator<TextAnnotationLike>>>(annotator => {
     const extension = InlineMarkersExtension({ showMarkers });
 
     extensionRef.current = extension;
@@ -30,5 +30,8 @@ export const InlineMarkersPlugin = ({ showMarkers = true }: InlineMarkersPluginP
     extensionRef.current?.setShowMarkers(showMarkers);
   }, [showMarkers]);
 
-  return <AnnotoriousPlugin plugin={pluginRef.current} />;
-};
+  return (
+    <AnnotoriousPlugin plugin={pluginRef.current} />
+  )
+
+}
