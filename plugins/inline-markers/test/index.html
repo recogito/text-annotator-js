@@ -106,34 +106,25 @@
       import '@recogito/text-annotator/text-annotator.css';
 
       const STYLE_NO_HOVER = {
-        // fill: 'oklch(0.8 0.18 59.17 / 0.14)',
         fill: 'oklch(0.8 0.18 59.17 / 0.25)',
       };
 
       const STYLE_HOVER = (_, state, z) => {
         return state.hovered ? {
-          // fill: 'oklch(0.8 0.18 59.17 / 0.7)',
           fill: 'oklch(0.87 0.12 66.96)',
-          // fill: 'oklch(0.8 0.18 59.17 / 0.5)',
-          // underlineColor: 'oklch(0.78 0.19 57.08 / 0.75)',
-          // underlineThickness: 1.5,
-          // underlineOffset: 3.5 * z
         } : {
           fill: '#bcbcbc40',
-          // underlineColor: 'oklch(0.78 0.19 57.08 / 0.75)',
-          // underlineThickness: 1.5,
-          // underlineOffset: 3.5 * z
         }
       }
 
       window.onload = async () => {
         const contentContainer = document.getElementById('content');
         const r = createTextAnnotator(contentContainer, {
-          // annotatingEnabled: false,
           mergeHighlights: {
             horizontalTolerance: 30
           },
           style: STYLE_NO_HOVER,
+          selectionMode: 'all',
           renderer: InlineMarkersRenderer
         });
 
@@ -149,17 +140,14 @@
           r.setStyle(STYLE_NO_HOVER);
         });
 
+        r.on('createAnnotation', a => console.log('created', a));
+
         r.on('selectionChanged', sel => {
           if (sel.length > 0) {
-            // Find all at this place
-            const { start, end } = sel[0].target.selector[0];
-            // console.log(start, end);
+            console.log('selected', sel);
+            console.log('all', r.getAnnotations());
 
-            const all = r.getAnnotations().filter(a => {
-              const selector = a.target.selector[0];
-              return selector.start === start && selector.end === end;
-            });
-
+            /*
             if (all.length > 0) {
               document.querySelector('#selection > div').innerHTML = 
                 '<ul>' +
@@ -169,6 +157,7 @@
               document.querySelector('#selection ul').innerHTML = 
                 '<p class="empty">Click an annotation to select!</p>';
             }
+                */
           }
         });
 

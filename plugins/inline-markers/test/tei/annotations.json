@@ -1,0 +1,77 @@
+[
+  {
+    "id": "7740195a-87a3-4e52-b4c1-74eabf61b8e8",
+    "bodies": [],
+    "target": {
+      "annotation": "7740195a-87a3-4e52-b4c1-74eabf61b8e8",
+      "selector": [
+        {
+          "position": "000002/000001/000001/000001/000001/000001/000003/000001/000000::0000000000",
+          "start": 628,
+          "startSelector": {
+            "type": "XPathSelector",
+            "value": "//w[@xml:id='w.2550359']::0"
+          },
+          "end": 666,
+          "endSelector": {
+            "type": "XPathSelector",
+            "value": "//l[@xml:id='l.473175']/choice[1]::17"
+          },
+          "quote": "priyaḥ ",
+          "range": {}
+        },
+        {
+          "position": "000002/000001/000001/000001/000001/000001/000003/000003::0000000064",
+          "start": 666,
+          "startSelector": {
+            "type": "XPathSelector",
+            "value": "//l[@xml:id='l.473175']/choice[1]::64"
+          },
+          "end": 733,
+          "endSelector": {
+            "type": "XPathSelector",
+            "value": "//w[@xml:id='w.2550920']::7"
+          },
+          "quote": " śarad candraḥ",
+          "range": {}
+        }
+      ],
+      "created": "2026-09-15T08:39:43.175Z",
+      "creator": {
+        "isGuest": true,
+        "id": "KOIjW0HgAqkAIy0UHI1D"
+      },
+      "updated": "2026-09-15T08:39:43.978Z"
+    }
+  },
+  {
+    "id": "cf51a770-e8f8-42d2-9687-24f7b6d59f5e",
+    "bodies": [],
+    "target": {
+      "annotation": "cf51a770-e8f8-42d2-9687-24f7b6d59f5e",
+      "selector": [
+        {
+          "position": "000002/000001/000001/000001/000001/000001/000003/000001/000000::0000000000",
+          "start": 628,
+          "startSelector": {
+            "type": "XPathSelector",
+            "value": "//w[@xml:id='w.2550359']::0"
+          },
+          "end": 634,
+          "endSelector": {
+            "type": "XPathSelector",
+            "value": "//w[@xml:id='w.2550359']::6"
+          },
+          "quote": "priyaḥ",
+          "range": {}
+        }
+      ],
+      "created": "2026-09-15T08:39:46.574Z",
+      "creator": {
+        "isGuest": true,
+        "id": "KOIjW0HgAqkAIy0UHI1D"
+      },
+      "updated": "2026-09-15T08:39:47.276Z"
+    }
+  }
+]

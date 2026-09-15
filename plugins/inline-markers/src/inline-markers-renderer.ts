@@ -6,10 +6,10 @@ import {
   createRenderer,
   getBackgroundColor,
   Renderer,
+  TextAnnotationLike,
   type Highlight,
   type HighlightStyleExpression, 
   type Painter,
-  type TextAnnotation, 
   type TextAnnotatorState, 
   type ViewportBounds, 
   type ViewportState
@@ -17,7 +17,7 @@ import {
 
 const createInlineMarkersPainter = (
   container: HTMLElement,
-  state: TextAnnotatorState<TextAnnotation, unknown>
+  state: TextAnnotatorState<TextAnnotationLike, unknown>
 ): Painter => {
   container.classList.add('r6o-annotatable');
 
@@ -43,54 +43,55 @@ const createInlineMarkersPainter = (
     const groups = groupByPosition(highlights);
 
     currentMarkers = groups.map(group => {
-      const highlights = group.subgroups[0].highlights;
-
-      const firstId = highlights[0].annotation.id;
-      const { x, y } = highlights[0].rects[0];
-
-      const hasOverlapping = Boolean(state.store.getAt(x, y, true).find(a => a.id !== firstId));
+      // Create a marker to indicate the start of the group
+      // if multiple annotations start here
+      const highlightsInGroup = group.subgroups.flatMap(sg => sg.highlights);
       
-      let marker: InlineMarker;
-      if (hasOverlapping)
-        marker = createInlineMarker(highlights.map(h => h.annotation));
+      let marker: InlineMarker | undefined;
+      if (highlightsInGroup.length > 1)
+        marker = createInlineMarker(highlightsInGroup.map(h => h.annotation));
 
-      const h = highlights[0];
-      const style = styleOverrides?.get(h.annotation.id) || currentStyle;
-      const computedStyle = computeStyle(h, style);
+      // Render highlights for each sub-group (as a side effect)
+      group.subgroups.map(subgroup => {
+        const h = subgroup.highlights[0];
 
-      h.rects.map(rect => {
-        const span = document.createElement('span');
-        span.className = 'r6o-annotation';
-        span.dataset.annotation = highlights.map(h => h.annotation.id).join(' ');
+        const style = styleOverrides?.get(h.annotation.id) || currentStyle;
+        const computedStyle = computeStyle(h, style);
 
-        span.style.left = `${rect.x}px`;
-        span.style.top = `${rect.y}px`;
-        span.style.width = `${rect.width}px`;
-        span.style.height = `${rect.height}px`;
+        h.rects.map(rect => {
+          const span = document.createElement('span');
+          span.className = 'r6o-annotation';
+          span.dataset.annotation = highlights.map(h => h.annotation.id).join(' ');
 
-        // Lift hovered SPAN to top
-        if (highlights.some(h => h.state.hovered))
-          span.style.zIndex = '1';
+          span.style.left = `${rect.x}px`;
+          span.style.top = `${rect.y}px`;
+          span.style.width = `${rect.width}px`;
+          span.style.height = `${rect.height}px`;
 
-        span.style.backgroundColor = getBackgroundColor(computedStyle);
+          // Lift hovered SPAN to top
+          if (highlights.some(h => h.state.hovered))
+            span.style.zIndex = '1';
 
-        if (computedStyle.underlineStyle)
-          span.style.borderStyle = computedStyle.underlineStyle;
+          span.style.backgroundColor = getBackgroundColor(computedStyle);
 
-        if (computedStyle.underlineColor)
-          span.style.borderColor = computedStyle.underlineColor;
+          if (computedStyle.underlineStyle)
+            span.style.borderStyle = computedStyle.underlineStyle;
 
-        if (computedStyle.underlineThickness)
-          span.style.borderBottomWidth = `${computedStyle.underlineThickness}px`;
+          if (computedStyle.underlineColor)
+            span.style.borderColor = computedStyle.underlineColor;
 
-        if (computedStyle.underlineOffset)
-          span.style.paddingBottom = `${computedStyle.underlineOffset}px`;
+          if (computedStyle.underlineThickness)
+            span.style.borderBottomWidth = `${computedStyle.underlineThickness}px`;
 
-        highlightLayer.appendChild(span);
+          if (computedStyle.underlineOffset)
+            span.style.paddingBottom = `${computedStyle.underlineOffset}px`;
+
+          highlightLayer.appendChild(span);
+        });
       });
 
       return marker;
-    }).filter(Boolean);
+    }).filter(Boolean) as InlineMarker[];
   }
 
   const setVisible = (visible: boolean) => {
@@ -114,7 +115,7 @@ const createInlineMarkersPainter = (
 
 export const InlineMarkersRenderer = (
   container: HTMLElement,
-  state: TextAnnotatorState<TextAnnotation, unknown>,
+  state: TextAnnotatorState<TextAnnotationLike, unknown>,
   viewport: ViewportState
 ): Renderer => {
   const painter = createInlineMarkersPainter(container, state);
@@ -123,7 +124,7 @@ export const InlineMarkersRenderer = (
 
   state.store.observe(event => {
     const { created } = event.changes;
-    if (created?.length > 0) {
+    if (created && created.length > 0) {
       setTimeout(() => {
         const unsubscribe = state.store.onRecalculatePositions(() => {
           renderer.redraw();
