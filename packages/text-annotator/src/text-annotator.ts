@@ -31,7 +31,7 @@ import {
 
 import './text-annotator.css';
 
-const USE_DEFAULT_RENDERER: RendererType = 'SPANS';
+const DEFAULT_RENDERER: RendererType = 'SPANS';
 
 export interface TextAnnotator<I extends TextAnnotationLike = TextAnnotation, E extends unknown = TextAnnotation> 
   extends Omit<Annotator<I, E>, 'setStyle' | 'state'> {
@@ -91,11 +91,11 @@ export const createTextAnnotator = <I extends TextAnnotationLike = TextAnnotatio
   const useBuiltInRenderer: RendererType | null =
     typeof opts.renderer !== 'function' ? 
       opts.renderer === 'CSS_HIGHLIGHTS'
-        ? Boolean(CSS.highlights) ? 'CSS_HIGHLIGHTS' : USE_DEFAULT_RENDERER
-        : opts.renderer || USE_DEFAULT_RENDERER :
+        ? Boolean(CSS.highlights) ? 'CSS_HIGHLIGHTS' : DEFAULT_RENDERER
+        : opts.renderer || DEFAULT_RENDERER :
     null;
 
-  let renderer =
+  const getInitialRenderer = () =>
     useBuiltInRenderer === null ? (opts.renderer as RendererFactory<I>)(
       container, 
       state, 
@@ -110,6 +110,7 @@ export const createTextAnnotator = <I extends TextAnnotationLike = TextAnnotatio
       viewport) :
     undefined;
 
+  let renderer = getInitialRenderer();
   if (!renderer)
     throw `Unknown renderer implementation: ${opts.renderer}`;
 
@@ -148,9 +149,8 @@ export const createTextAnnotator = <I extends TextAnnotationLike = TextAnnotatio
     selectionHandler.setAnnotatingMode(mode);
   }
 
-  const setRenderer = (factory: RendererFactory<I>) => {
-    console.debug('Setting custom renderer implementation');
-    const nextRenderer = factory(container, state, viewport);
+  const setRenderer = (factory?: RendererFactory<I>) => {
+    const nextRenderer = factory ? factory(container, state, viewport) : getInitialRenderer();
     renderer?.destroy();
     renderer = nextRenderer;
   }

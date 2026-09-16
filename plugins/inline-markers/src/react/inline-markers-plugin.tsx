@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import type { TextAnnotator } from '@recogito/text-annotator';
 import { AnnotoriousPlugin, type TextAnnotationLike, type TextAnnotatorPlugin } from '@recogito/react-text-annotator';
-import { InlineMarkersExtension } from '../inline-markers-renderer';
+import { InlineMarkersExtension } from '../inline-markers-extension';
 
 import '@recogito/text-annotator/text-annotator.css';
 import '../index.css';
@@ -24,7 +24,9 @@ export const InlineMarkersPlugin = ({ showMarkers = true }: InlineMarkersPluginP
     annotator.setRenderer(extension.Renderer);
 
     return {
-      unmount: extension.destroy
+      unmount: () => {
+        extension.destroy();
+      }
     };
   });
 
