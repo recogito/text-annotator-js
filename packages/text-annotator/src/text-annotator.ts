@@ -40,7 +40,7 @@ export interface TextAnnotator<I extends TextAnnotationLike = TextAnnotation, E 
 
   renderer: Renderer;
 
-  setRenderer(renderer: RendererFactory<I>): void;
+  setRenderer(renderer?: RendererFactory<I>): void;
 
   setStyle(style?: HighlightStyleExpression<I>, id?: string): void;
 
