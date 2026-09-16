@@ -24,9 +24,9 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@annotorious/core": "^3.8.9",
-    "@annotorious/react": "^3.8.9",
-    "@recogito/react-text-annotator": "^4.2.6",
+    "@annotorious/core": "^3.8.10",
+    "@annotorious/react": "^3.8.10",
+    "@recogito/react-text-annotator": "^4.3.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",
     "@vitejs/plugin-react": "^5.2.0",
@@ -36,6 +36,6 @@
     "vite": "^7.3.6"
   },
   "dependencies": {
-    "@recogito/text-annotator": "^4.2.6"
+    "@recogito/text-annotator": "^4.3.3"
   }
 }
