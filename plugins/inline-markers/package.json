@@ -1,6 +1,6 @@
 {
   "name": "@recogito/text-annotator-plugin-inline-markers",
-  "version": "0.1.4",
+  "version": "0.1.5-beta",
   "description": "A plugin to the text annotator that places inline markers on text highlights",
   "author": "Rainer Simon",
   "license": "BSD-3-Clause",
