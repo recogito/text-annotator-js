@@ -16,7 +16,7 @@ export const InlineMarkersPlugin = ({ showMarkers = true }: InlineMarkersPluginP
   const extensionRef = useRef<ReturnType<typeof InlineMarkersExtension> | undefined>(undefined);
 
   const pluginRef = useRef<TextAnnotatorPlugin<TextAnnotator<TextAnnotationLike>>>(annotator => {
-    console.debug('[inline-markers-react] Initializing plugin', annotator);
+    // console.debug('[inline-markers-react] Initializing plugin', annotator);
 
     const extension = InlineMarkersExtension({ showMarkers });
 
@@ -25,7 +25,7 @@ export const InlineMarkersPlugin = ({ showMarkers = true }: InlineMarkersPluginP
 
     return {
       unmount: () => {
-        console.debug('[inline-markers-react] unmounting');
+        // console.debug('[inline-markers-react] unmounting');
         
         // @ts-ignore
         annotator.setRenderer();
