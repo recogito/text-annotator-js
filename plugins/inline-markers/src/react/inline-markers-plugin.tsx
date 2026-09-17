@@ -18,13 +18,13 @@ export const InlineMarkersPlugin = ({ showMarkers = true }: InlineMarkersPluginP
   const pluginRef = useRef<TextAnnotatorPlugin<TextAnnotator<TextAnnotationLike>>>(annotator => {
     const extension = InlineMarkersExtension({ showMarkers });
 
-    console.debug('Initializing Recogito Inline Markers plugin');
-
     extensionRef.current = extension;
     annotator.setRenderer(extension.Renderer);
 
     return {
       unmount: () => {
+        // @ts-ignore
+        annotator.setRenderer();
         extension.destroy();
       }
     };

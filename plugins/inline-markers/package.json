@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@annotorious/react": "^3.8.10",
-    "@recogito/react-text-annotator": "4.3.2",
+    "@recogito/react-text-annotator": "^4.3.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",
     "react": "^19.2.8",
@@ -37,7 +37,7 @@
     "vite": "^7.3.6"
   },
   "peerDependencies": {
-    "@recogito/react-text-annotator": "^4.3.2",
+    "@recogito/react-text-annotator": "^4.3.3",
     "react": ">=18 <20",
     "react-dom": ">=18 <20"
   },
