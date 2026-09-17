@@ -45,7 +45,7 @@
         line-height: 160%;
       }
 
-      #toggle-markers {
+      #buttons {
         position: absolute;
         top: 10px;
         right: 10px;
@@ -55,7 +55,10 @@
   </head>
 
   <body>
-    <button id="toggle-markers">Toggle Markers</button>
+    <div id="buttons">
+      <button id="toggle-markers">Toggle Markers</button>
+      <button id="delete">Delete</button>
+    </div>
 
     <div id="content"></div>
 
@@ -86,6 +89,20 @@
           });
 
           // anno.loadAnnotations('annotations.json');
+
+          let currentSelected;
+
+          anno.on('selectionChanged', sel => {
+            if (sel.length === 1)
+              currentSelected = sel[0];
+            else 
+              currentSelected = null;
+          });
+
+          document.getElementById('delete').addEventListener('click', () => {
+            if (currentSelected)
+              anno.removeAnnotation(currentSelected.id);
+          });
         });
 
         let showMarkers = true;

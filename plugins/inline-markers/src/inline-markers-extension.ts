@@ -154,8 +154,8 @@ export const InlineMarkersExtension = (options: InlineMarkersExtensionOptions = 
     rendererRef = renderer;
 
     state.store.observe(event => {
-      const { created } = event.changes;
-      if (created && created.length > 0) {
+      const { created, deleted } = event.changes;
+      if ((created && created.length > 0) || (deleted && deleted.length > 0)) {
         setTimeout(() => {
           const unsubscribe = state.store.onRecalculatePositions(() => {
             renderer.redraw();
