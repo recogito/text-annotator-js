@@ -35,6 +35,8 @@ const createInlineMarkersPainter = (
     currentStyle?: HighlightStyleExpression,
     styleOverrides?: Map<string, HighlightStyleExpression>
   ) => {
+    console.debug('[inline-markers] redraw viewport - show markers?', showMarkers);
+
     highlightLayer.innerHTML = '';
 
     currentMarkers.forEach(m => m.remove());
@@ -50,6 +52,8 @@ const createInlineMarkersPainter = (
         // Create a marker to indicate the start of the group
         // if multiple annotations start here
         const highlightsInGroup = group.subgroups.flatMap(sg => sg.highlights);
+
+        console.debug('[inline-markers] marker for group', highlightsInGroup);
       
         if (highlightsInGroup.length > 1)
           marker = createInlineMarker(highlightsInGroup.map(h => h.annotation));

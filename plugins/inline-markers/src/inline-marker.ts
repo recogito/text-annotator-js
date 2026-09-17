@@ -7,6 +7,9 @@ export interface InlineMarker {
 }
 
 export const createInlineMarker = (annotations: RevivedTextAnnotationLike[]): InlineMarker => {
+  console.debug('[inline-markers] creating marker');
+  console.debug(annotations);
+
   const marker = document.createElement('marker');
   marker.className = 'r6o-annotation-start';
 
@@ -16,6 +19,7 @@ export const createInlineMarker = (annotations: RevivedTextAnnotationLike[]): In
   
   marker.appendChild(span);
 
+  console.debug('[inline-markers] appending to', annotations[0].target.selector[0]);
   annotations[0].target.selector[0].range.insertNode(marker);
 
   const remove = () => {
