@@ -54,6 +54,60 @@ export const reanchor = (originalNode: Node, parentNode: Node, originalOffset: n
   return { node, offset };
 }
 
+const isTeiElement = (node: Node): boolean =>
+  node.nodeType === Node.ELEMENT_NODE && node.nodeName.toLowerCase().startsWith('tei-');
+
+const isTransparent = (node: Node): boolean =>
+  node.nodeType === Node.ELEMENT_NODE && !isTeiElement(node);
+
+/** 
+ * Flattens transparent elements (like inline markers!) away, yielding only 
+ * Text nodes and tei-* elements
+ */
+function* relevantDescendants(node: Node): Generator<Node> {
+  for (let child = node.firstChild; child; child = child.nextSibling) {
+    if (child.nodeType === Node.TEXT_NODE || isTeiElement(child)) {
+      yield child;
+    } else if (isTransparent(child)) {
+      yield* relevantDescendants(child);
+    }
+  }
+}
+
+/**
+ * Index of `target` among `parent`'s relevant children, normalized so that 
+ * a text split into multiple Text nodes (e.g. by an inline marker!) counts 
+ * as a single sibling, indexed by its first fragment. This makes position 
+ * keys stable regardless of splits inserted by non-TEI elements.
+ */
+const normalizedIndexOf = (target: Node, parent: Node): number => {
+  let index = -1;
+  let precedingWasText = false;
+
+  for (const sig of relevantDescendants(parent)) {
+    const isText = sig.nodeType === Node.TEXT_NODE;
+
+    if (!(isText && precedingWasText)) index++; // new logical slot starts here
+
+    if (sig === target) return index;
+
+    precedingWasText = isText;
+  }
+
+  return -1; // target wasn't found under parent — shouldn't happen
+}
+
+/** 
+ * Nearest relevant ancestor (tei-* or the container itself)
+ */
+const relevantParent = (node: Node, container: HTMLElement): Node | null => {
+  let parent = node.parentNode;
+  while (parent && parent !== container && !isTeiElement(parent)) {
+    parent = parent.parentNode;
+  }
+  return parent;
+}
+
 /**
  * Computes a stable, lexically-sortable position key for a DOM node relative
  * to a container, incorporating a character offset within that node.
@@ -78,25 +132,15 @@ export const toPositionKey = (
   const segments: number[] = [];
 
   let current: Node = node;
- 
+
   while (current && current !== container) {
-    const parent = current.parentNode;
-    if (!parent) break;                 // climbed past the document root – shouldn't happen
- 
-    // Walk forward through *all* siblings to find the absolute index.
-    // This is O(siblings-per-level) but is called once at annotation-load
-    // time and the result is persisted, so it never needs to be repeated.
-    let absoluteIndex = 0;
-    let sibling = parent.firstChild;
-    while (sibling && sibling !== current) {
-      absoluteIndex++;
-      sibling = sibling.nextSibling;
-    }
- 
-    segments.unshift(absoluteIndex);    // prepend so root comes first
+    const parent = relevantParent(current, container);
+    if (!parent) break;
+
+    segments.unshift(normalizedIndexOf(current, parent));
     current = parent;
   }
- 
+
   const pathKey   = segments.map(i => i.toString().padStart(segmentPad, '0')).join('/');
   const offsetKey = offset.toString().padStart(offsetPad, '0');
   return `${pathKey}::${offsetKey}`;

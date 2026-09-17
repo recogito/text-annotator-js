@@ -71,7 +71,8 @@
 
         const ext = InlineMarkersExtension();
 
-        CETEIcean.getHTML5('chapter_BCar_incl_sandhi.xml', data => {
+        // CETEIcean.getHTML5('chapter_BCar_incl_sandhi.xml', data => {
+        CETEIcean.getHTML5('I_grievd_for_Buonaparte.tei.xml', data => {
           document.getElementById('content').appendChild(data);
 
           // Apply not-annotatable
@@ -84,7 +85,7 @@
             renderer: ext.Renderer
           });
 
-          anno.loadAnnotations('annotations.json');
+          // anno.loadAnnotations('annotations.json');
         });
 
         let showMarkers = true;

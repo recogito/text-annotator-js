@@ -35,7 +35,7 @@ const createInlineMarkersPainter = (
     currentStyle?: HighlightStyleExpression,
     styleOverrides?: Map<string, HighlightStyleExpression>
   ) => {
-    console.debug('[inline-markers] redraw viewport - show markers?', showMarkers);
+    // console.debug('[inline-markers] redraw viewport - show markers?', showMarkers);
 
     highlightLayer.innerHTML = '';
 
@@ -45,6 +45,8 @@ const createInlineMarkersPainter = (
     // for perfectly overlapping annotations
     const groups = groupByPosition(highlights);
 
+    // console.debug({ groups });
+
     currentMarkers = groups.map(group => {
       let marker: InlineMarker | undefined;
       
@@ -53,14 +55,14 @@ const createInlineMarkersPainter = (
         // if multiple annotations start here
         const highlightsInGroup = group.subgroups.flatMap(sg => sg.highlights);
 
-        console.debug('[inline-markers] marker for group size?', highlightsInGroup.length);
+        // console.debug('[inline-markers] marker for group size?', highlightsInGroup.length);
       
         if (highlightsInGroup.length > 1) {
-          console.log('[inline-markers] group', highlightsInGroup);
+          // console.log('[inline-markers] group', highlightsInGroup);
           marker = createInlineMarker(highlightsInGroup.map(h => h.annotation));
-        } else {
+        } /* else {
           console.log('[inline-markers] no markers - annotations', _state.store.all());
-        }
+        } */
       }
 
       // Render highlights for each sub-group (as a side effect)
