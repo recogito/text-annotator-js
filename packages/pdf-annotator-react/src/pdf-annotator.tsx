@@ -38,16 +38,35 @@ export const PDFAnnotator = (props: PDFAnnotatorProps) => {
 
   useEffect(() => {     
     if (!el.current) return;
+
+    let cancelled = false;
+    let instance: VanillaPDFAnnotator | undefined;
     
     createPDFAnnotator(el.current, pdfUrl, opts)
       .then(anno => {
+        if (cancelled) {
+          anno.destroy();
+          return;
+        }
         
+        instance = anno;
         anno.setStyle(props.style);
         setAnno(anno);
 
-        props.onRendered && props.onRendered();
+        props.onRendered?.();
+      }).catch(error => {
+        if (!cancelled) console.error(error);
       });
-  }, []);
+
+    return () => {
+      cancelled = true;
+
+      if (instance) {
+        setAnno(undefined);
+        instance.destroy();
+      }
+    }
+  }, [pdfUrl]);
 
   useEffect(() => {
     if (props.pageSize && anno)
