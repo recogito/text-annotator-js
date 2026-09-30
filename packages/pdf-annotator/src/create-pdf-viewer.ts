@@ -30,7 +30,11 @@ export const createPDFViewer = (
   container: HTMLDivElement,
   pdfURL: string,
   opts: PDFAnnotatorOptions
-) => new Promise<{ viewer: pdfjsViewer.PDFViewer, viewerElement: HTMLDivElement }>((resolve, reject) => {
+) => new Promise<{ 
+  viewer: pdfjsViewer.PDFViewer, 
+  viewerElement: HTMLDivElement,
+  destroy: () => Promise<void>;
+}>((resolve, reject) => {
   pdfjsLib.GlobalWorkerOptions.workerSrc = opts.workerSrc || '/pdf.worker.min.mjs';
 
   const wasmUrl = opts.wasmUrl || '/';
@@ -62,27 +66,56 @@ export const createPDFViewer = (
 
   pdfLinkService.setViewer(viewer);
 
-  pdfjsLib.getDocument({
+  const loadingTask = pdfjsLib.getDocument({
     url: pdfURL,
     cMapUrl: CMAP_URL,
     cMapPacked: CMAP_PACKED,
     enableXfa: ENABLE_XFA,
     wasmUrl
-  }).promise.then(pdfDocument => {
-    viewer.setDocument(pdfDocument);
-    pdfLinkService.setDocument(pdfDocument);
-  }).catch(error => reject(error));
+  });
 
-  eventBus.on('pagesinit', () => {    
+  // Listen to the first 'textlayerrendered' event (once)
+  const onInit = () => {
+    resolve({ viewer, viewerElement, destroy });
+    eventBus.off('textlayerrendered', onInit);
+  }
+
+  const onPagesInit = () => {
     // Default to scale = auto
     viewer.currentScaleValue = 'auto';
+    eventBus.on('textlayerrendered', onInit, { once: true });  
+  }
 
-    // Listen to the first 'textlayerrendered' event (once)
-    const onInit = () => {
-      resolve({ viewer, viewerElement });
-      eventBus.off('textlayerrendered', onInit);
+  let destroyed = false;
+
+  const destroy = async () => {
+    if (destroyed) return Promise.resolve();
+    destroyed = true;
+    
+    eventBus.off('pagesinit', onPagesInit);
+    eventBus.off('textlayerrendered', onInit);
+
+    try {
+      viewer.setDocument(null as any); 
+      pdfLinkService.setDocument(null);
+      viewer.cleanup();
+    } finally {
+      try {
+        await loadingTask.destroy();
+      } finally {
+        viewerElement.remove();
+      }
     }
+  }
+  
+  eventBus.on('pagesinit', onPagesInit);
 
-    eventBus.on('textlayerrendered', onInit);  
+  loadingTask.promise.then(pdfDocument => {
+    if (destroyed) return;
+    viewer.setDocument(pdfDocument);
+    pdfLinkService.setDocument(pdfDocument);
+  }).catch(error => {
+    destroy();
+    reject(error);
   });
 });
