@@ -27,31 +27,26 @@ const resolveElement = (path: string, container: HTMLElement): Node | null => {
  * Walks text nodes in order, subtracting each node's length until the offset
  * lands within the current node.
  */
-export const reanchor = (originalNode: Node, parentNode: Node, originalOffset: number) => {
-  let node = originalNode;
-
-  let offset = originalOffset;
-
+export const reanchor = (parentNode: Node, originalOffset: number) => {
   const walker = document.createTreeWalker(parentNode, NodeFilter.SHOW_TEXT);
 
-  let currentNode = walker.nextNode();
+  let remaining = originalOffset;
+  let last: Text | null = null;
+  let current: Node | null;
 
-  let run = true;
+  while ((current = walker.nextNode())) {
+    const text = current as Text;
+    if (remaining <= text.length)
+      return { node: text, offset: remaining };
 
-  do {
-    if (currentNode instanceof Text) {
-      if (currentNode.length < offset) {
-        offset -= currentNode.length;
-      } else {
-        node = currentNode;
-        run = false;
-      }
-    }
+    remaining -= text.length;
+    last = text;
+  }
 
-    currentNode = walker.nextNode();
-  } while (currentNode && run);
-
-  return { node, offset };
+  // Offset past the end → clamp; no text at all (e.g. <lb>) → element, offset 0
+  return last
+    ? { node: last, offset: last.length }
+    : { node: parentNode, offset: 0 };
 }
 
 const isTeiElement = (node: Node): boolean =>
@@ -345,26 +340,21 @@ const reviveTEISelector = (selector: TEIRangeSelector, container: HTMLElement): 
     if (parent.firstChild instanceof Text && parent.firstChild.length >= offset) {
       return { node: parent.firstChild, offset };
     } else {
-      return reanchor(parent.firstChild!, parent, offset);
+      return reanchor(parent, offset);
     } 
   }
 
-  try {
-    const reanchoredStart = reanchorIfNeeded(startElement, startParsed.offset);
-    range.setStart(reanchoredStart.node, reanchoredStart.offset);
+  const reanchoredStart = reanchorIfNeeded(startElement, startParsed.offset);
+  range.setStart(reanchoredStart.node, reanchoredStart.offset);
 
-    const reanchoredEnd = reanchorIfNeeded(endElement, endParsed.offset);
-    range.setEnd(reanchoredEnd.node, reanchoredEnd.offset);
+  const reanchoredEnd = reanchorIfNeeded(endElement, endParsed.offset);
+  range.setEnd(reanchoredEnd.node, reanchoredEnd.offset);
 
-    const position = toPositionKey(reanchoredStart.node, reanchoredStart.offset, container);
+  const position = toPositionKey(reanchoredStart.node, reanchoredStart.offset, container);
 
-    return {
-      ...(selector as TEIRangeSelector),
-      position,
-      range
-    };
-  } catch (error) {
-    console.warn(selector);
-    throw error;
-  }
+  return {
+    ...(selector as TEIRangeSelector),
+    position,
+    range
+  };
 }
