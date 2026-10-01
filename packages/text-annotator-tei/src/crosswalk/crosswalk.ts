@@ -2,6 +2,10 @@ import { isRevived } from '@recogito/text-annotator';
 import type { RevivedTextSelector, TextSelector } from '@recogito/text-annotator';
 import type { RevivedTEIRangeSelector, TEIRangeSelector } from '../tei-annotation';
 
+/** 
+ * Note: module-level! This will break if multiple
+ * TEI annotator instances exist on the same page!
+ */
 const elementCache = new Map<string, Node>();
 
 /**
@@ -27,7 +31,7 @@ const resolveElement = (path: string, container: HTMLElement): Node | null => {
  * Walks text nodes in order, subtracting each node's length until the offset
  * lands within the current node.
  */
-export const reanchor = (parentNode: Node, originalOffset: number) => {
+const reanchor = (parentNode: Node, originalOffset: number) => {
   const walker = document.createTreeWalker(parentNode, NodeFilter.SHOW_TEXT);
 
   let remaining = originalOffset;
@@ -269,7 +273,7 @@ const textToTEISelector = (selector: RevivedTextSelector, container: HTMLElement
   } = toTEIRange(container, startPathSegments, endPathSegments, range);
 
   // Lexically sortable position key
-  const position = toPositionKey(range.startContainer, startOffset, container);
+  const position = toPositionKey(range.startContainer, range.startOffset, container);
 
   return {
     position,
