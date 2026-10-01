@@ -349,17 +349,22 @@ const reviveTEISelector = (selector: TEIRangeSelector, container: HTMLElement): 
     } 
   }
 
-  const reanchoredStart = reanchorIfNeeded(startElement, startParsed.offset);
-  range.setStart(reanchoredStart.node, reanchoredStart.offset);
+  try {
+    const reanchoredStart = reanchorIfNeeded(startElement, startParsed.offset);
+    range.setStart(reanchoredStart.node, reanchoredStart.offset);
 
-  const reanchoredEnd = reanchorIfNeeded(endElement, endParsed.offset);
-  range.setEnd(reanchoredEnd.node, reanchoredEnd.offset);
+    const reanchoredEnd = reanchorIfNeeded(endElement, endParsed.offset);
+    range.setEnd(reanchoredEnd.node, reanchoredEnd.offset);
 
-  const position = toPositionKey(reanchoredStart.node, reanchoredStart.offset, container);
+    const position = toPositionKey(reanchoredStart.node, reanchoredStart.offset, container);
 
-  return {
-    ...(selector as TEIRangeSelector),
-    position,
-    range
-  };
+    return {
+      ...(selector as TEIRangeSelector),
+      position,
+      range
+    };
+  } catch (error) {
+    console.warn(selector);
+    throw error;
+  }
 }
