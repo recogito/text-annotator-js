@@ -1,17 +1,22 @@
 import type { RevivedTextSelector } from '@recogito/text-annotator';
 
+// A boundary can be the .page element itself (e.g. in a piece
+// already split by splitSelector), so look elements up from themselves
+const getPage = (node: Node): HTMLElement | null => {
+  const element = node.nodeType === Node.ELEMENT_NODE ? node as Element : node.parentElement;
+  return element?.closest<HTMLElement>('.page') || null;
+}
+
 export const isSamePage = (selector: RevivedTextSelector) => {
-  const startPage = selector.range.startContainer.parentElement?.closest('.page');
-  const endPage = selector.range.endContainer.parentElement?.closest('.page');
+  const startPage = getPage(selector.range.startContainer);
+  const endPage = getPage(selector.range.endContainer);
   return startPage === endPage;
 }
 
 const pageRangeToTextSelectorSelector = (range: Range): RevivedTextSelector => {
   const rangeBefore = document.createRange();
 
-  const offsetReference: HTMLElement = range.startContainer instanceof HTMLElement 
-    ? range.startContainer!.closest('.page')!
-    : range.startContainer.parentElement!.closest('.page')!;
+  const offsetReference = getPage(range.startContainer)!;
 
   // A helper range from the start of the container to the start of the selection
   rangeBefore.setStart(offsetReference, 0);
@@ -32,8 +37,8 @@ const pageRangeToTextSelectorSelector = (range: Range): RevivedTextSelector => {
 }
 
 export const splitSelector = (selector: RevivedTextSelector): RevivedTextSelector[] => {
-  const startPage = selector.range.startContainer.parentElement!.closest('.page')!;
-  const endPage = selector.range.endContainer.parentElement!.closest('.page')!;
+  const startPage = getPage(selector.range.startContainer)!;
+  const endPage = getPage(selector.range.endContainer)!;
 
   if (startPage === endPage)
     return [selector];
